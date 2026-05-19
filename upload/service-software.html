@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Software Development | X.Foundry</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root{--primary-red:#dc143c;--dark-red:#8b0000;--darker-red:#5c0000;--black:#070707;--dark-gray:#111111;--light-gray:#222222;--text-light:#efefef;--text-dim:#777;--card-bg:#111111;--input-bg:rgba(255,255,255,.03);--border-color:rgba(255,255,255,.08)}
+        [data-theme="light"]{--black:#f5f5f5;--dark-gray:#e8e8e8;--light-gray:#d4d4d4;--text-light:#1a1a1a;--text-dim:#666666;--card-bg:#ffffff;--input-bg:#f0f0f0;--border-color:#e0e0e0;--primary-red:#b91c1c}
+        *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+        body{font-family:'Space Grotesk',sans-serif;font-weight:600;background-color:var(--black);color:var(--text-light);overflow-x:hidden;line-height:1.6;cursor:none!important}*,*::before,*::after{cursor:none!important}
+        @media(hover:none) and (pointer:coarse){.cursor-dot,.cursor-ring{display:none!important}body,*,*::before,*::after{cursor:auto!important}}
+        ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--black)}::-webkit-scrollbar-thumb{background:var(--primary-red);border-radius:2px}
+        .cursor-dot{width:8px;height:8px;background:var(--primary-red);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform .05s}
+        .cursor-ring{width:36px;height:36px;border:1.5px solid rgba(220,20,60,.5);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:all .12s ease}.cursor-ring.hovered{width:60px;height:60px;border-color:var(--primary-red);background:rgba(220,20,60,.08)}
+        body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9997;opacity:.4}
+        .global-particles{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:1}.particle{position:absolute;width:2px;height:2px;background:var(--primary-red);border-radius:50%;animation:float linear infinite;opacity:.4}@keyframes float{0%{transform:translateY(100vh) rotate(0);opacity:0}10%{opacity:.4}90%{opacity:.4}100%{transform:translateY(-10vh) rotate(720deg);opacity:0}}
+        .theme-toggle{width:44px;height:44px;background:rgba(220,20,60,.08);border:1px solid rgba(220,20,60,.25);border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:16px;transition:all .3s ease}.theme-toggle:hover{background:rgba(220,20,60,.15);color:var(--primary-red)}
+
+        /* NAVIGATION — FULL FEATURED */
+        .navbar{position:fixed!important;top:0;left:0;width:100%;padding:28px 60px;display:flex;justify-content:space-between;align-items:center;z-index:1000;transition:all .4s ease}
+        .navbar.scrolled{background:rgba(7,7,7,.96);backdrop-filter:blur(24px);padding:18px 60px;border-bottom:1px solid rgba(220,20,60,.12)}[data-theme="light"] .navbar.scrolled{background:rgba(245,245,245,.95);border-bottom-color:rgba(185,28,28,.15)}
+        .logo{font-family:'Orbitron',sans-serif;font-size:22px;font-weight:900;color:var(--text-light);text-decoration:none;letter-spacing:3px;text-transform:uppercase;position:relative}.logo span{color:var(--primary-red)}.logo::after{content:'';position:absolute;bottom:-4px;left:0;width:100%;height:1px;background:var(--primary-red);transform:scaleX(0);transform-origin:right;transition:transform .4s ease}.logo:hover::after{transform:scaleX(1);transform-origin:left}
+        .nav-links{display:flex;list-style:none;gap:44px;align-items:center}.nav-links a{color:var(--text-dim);text-decoration:none;font-weight:700;font-size:13px;letter-spacing:2px;text-transform:uppercase;position:relative;transition:color .3s ease}.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--primary-red);transition:width .3s ease}.nav-links a:hover,.nav-links a.active{color:var(--text-light)}.nav-links a.active::after,.nav-links a:hover::after{width:100%}
+        .nav-actions{display:flex;align-items:center;gap:16px}.nav-search-btn{background:none;border:none;color:var(--text-dim);font-size:15px;transition:color .3s ease}.nav-search-btn:hover{color:var(--primary-red)}
+        .menu-toggle{display:none;flex-direction:column;cursor:pointer;gap:5px}.menu-toggle span{width:28px;height:2px;background:var(--text-light);transition:all .3s ease}
+
+        @keyframes gridMove{0%{transform:translate(0,0)}100%{transform:translate(60px,60px)}}@keyframes scanMove{0%{top:-2px;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:100%;opacity:0}}
+
+        .page-hero{min-height:50vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:140px 40px 80px;background:var(--black)}.page-hero::before{content:'';position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(220,20,60,.12) 0%,transparent 70%);filter:blur(80px);top:-100px;right:-150px}
+        .page-hero-content{text-align:center;max-width:800px;position:relative;z-index:10}
+        .page-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 22px;background:rgba(220,20,60,.08);border:1px solid rgba(220,20,60,.3);border-radius:2px;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--primary-red);margin-bottom:24px;font-weight:700}
+        .page-title{font-family:'Orbitron',sans-serif;font-size:clamp(36px,6vw,64px);font-weight:900;line-height:1.1;margin-bottom:20px;letter-spacing:-1px}
+        .page-subtitle{font-size:18px;color:var(--text-dim);max-width:600px;margin:0 auto;line-height:1.7}
+        .breadcrumb{display:flex;align-items:center;gap:10px;margin-top:30px;font-size:13px;color:var(--text-dim);justify-content:center}.breadcrumb a{color:var(--primary-red);text-decoration:none;transition:color .2s}.breadcrumb a:hover{color:var(--text-light)}
+
+        .section{padding:130px 60px;position:relative;overflow:hidden;background:var(--black)}.container-max{max-width:1200px;margin:0 auto;position:relative;z-index:10}
+        .service-layout{display:grid;grid-template-columns:1fr 380px;gap:60px;margin-top:60px}
+        .service-main h2{font-family:'Orbitron',sans-serif;font-size:28px;font-weight:900;margin-bottom:20px;letter-spacing:-.3px;color:var(--text-light)}
+        .service-main p{color:var(--text-dim);line-height:1.85;margin-bottom:24px;font-size:15px}
+        .feature-list{list-style:none;margin:32px 0}.feature-list li{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;color:var(--text-dim);font-size:15px;line-height:1.6}.feature-list li i{color:var(--primary-red);margin-top:4px;font-size:14px}
+
+        .sidebar{position:sticky;top:120px;height:fit-content}
+        .sidebar-card{background:var(--card-bg);border:1px solid var(--border-color);padding:32px}
+        .sidebar-card h3{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;margin-bottom:20px;letter-spacing:1px;color:var(--text-light)}
+        .roadmap-link{display:flex;align-items:center;gap:12px;padding:16px 20px;background:rgba(220,20,60,.08);border:1px solid rgba(220,20,60,.25);color:var(--text-light);text-decoration:none;font-weight:700;font-size:14px;transition:all .3s ease;margin-bottom:16px}.roadmap-link:hover{background:var(--primary-red);border-color:var(--primary-red);transform:translateX(4px)}.roadmap-link i{font-size:18px}
+        .tech-stack{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}.tech-tag{padding:6px 14px;background:var(--input-bg);border:1px solid var(--border-color);font-size:12px;color:var(--text-dim);font-weight:600}
+
+        .cta-section{background:var(--black);padding:80px 60px;margin-top:60px;text-align:center;position:relative;overflow:hidden}.cta-section::before{content:'';position:absolute;width:400px;height:400px;background:radial-gradient(circle,rgba(0, 0, 0, 0) 0%,transparent 70%);filter:blur(60px);top:50%;left:50%;transform:translate(-50%,-50%)}
+        .cta-content{position:relative;z-index:10}.cta-content h2{font-family:'Orbitron',sans-serif;font-size:clamp(28px,4vw,42px);font-weight:900;margin-bottom:16px;color:var(--text-light)}.cta-content p{color:var(--text-dim);max-width:500px;margin:0 auto 32px}
+        .btn{padding:15px 40px;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:3px;border:none;border-radius:2px;transition:all .35s ease;text-decoration:none;display:inline-flex;align-items:center;gap:10px;position:relative;overflow:hidden}
+        .btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.08);transform:translateX(-100%);transition:transform .4s ease}.btn:hover::after{transform:translateX(0)}.btn-primary{background:var(--primary-red);color:white}.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(220,20,60,.35)}.btn-secondary{background:transparent;color:var(--text-light);border:1px solid rgba(255,255,255,.15)}.btn-secondary:hover{border-color:var(--primary-red);color:var(--primary-red);transform:translateY(-2px)}
+
+        /* FOOTER */
+        .footer{background:#050505;padding:80px 60px 32px;position:relative;z-index:10;overflow:hidden}[data-theme="light"] .footer{background:#f8f8f8;border-top:1px solid #e0e0e0}
+        .footer-effects{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+        .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;max-width:1400px;margin:0 auto 64px;position:relative;z-index:2}
+        .footer-brand .logo{margin-bottom:20px;display:inline-flex}.footer-brand p{color:var(--text-dim);line-height:1.85;margin-bottom:28px;font-weight:600;font-size:14px}[data-theme="light"] .footer-brand p{color:#555}
+        .footer-socials{display:flex;gap:10px}.footer-socials a{width:38px;height:38px;background:var(--card-bg);border:1px solid var(--border-color);display:flex;align-items:center;justify-content:center;color:var(--text-dim);text-decoration:none;font-size:14px;transition:all .3s ease}[data-theme="light"] .footer-socials a{background:#fff;border-color:#ddd;color:#666}.footer-socials a:hover{background:var(--primary-red);border-color:var(--primary-red);color:white}[data-theme="light"] .footer-socials a:hover{background:#b91c1c;border-color:#b91c1c;color:#fff}
+        .footer-column h4{font-family:'Orbitron',sans-serif;font-size:12px;font-weight:900;margin-bottom:28px;color:var(--text-light);text-transform:uppercase;letter-spacing:3px}[data-theme="light"] .footer-column h4{color:#222}
+        .footer-links{list-style:none}.footer-links li{margin-bottom:12px}.footer-links a{color:var(--text-dim);text-decoration:none;font-size:14px;font-weight:600;transition:all .3s ease;display:inline-block}[data-theme="light"] .footer-links a{color:#555}.footer-links a:hover{color:var(--primary-red);transform:translateX(4px)}[data-theme="light"] .footer-links a:hover{color:#b91c1c}
+        .footer-bottom{border-top:1px solid var(--border-color);padding-top:28px;text-align:center;color:var(--text-dim);font-size:13px;font-weight:600;position:relative;z-index:2}[data-theme="light"] .footer-bottom{color:#777;border-top-color:#e0e0e0}
+
+        /* SEARCH MODAL */
+        .search-modal{position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:9999;display:none;align-items:flex-start;justify-content:center;padding-top:140px;opacity:0;transition:opacity .25s ease}.search-modal.active{display:flex;opacity:1}
+        .search-result-item{padding:18px 22px;background:var(--card-bg);border:1px solid var(--border-color);margin-bottom:4px;transition:all .25s ease;border-left:2px solid transparent}.search-result-item:hover{border-left-color:var(--primary-red);background:rgba(220,20,60,.05)}
+        .search-result-item h4{color:var(--primary-red);margin-bottom:4px;font-weight:700}.search-result-item p{color:var(--text-dim);font-size:13px;font-weight:600}
+        .close-search{position:absolute;top:28px;right:28px;background:none;border:none;color:var(--text-dim);font-size:32px;transition:color .3s ease}.close-search:hover{color:var(--primary-red)}
+
+        .reveal{opacity:0;transform:translateY(32px);transition:all .75s cubic-bezier(.22,1,.36,1)}.reveal.visible{opacity:1;transform:translateY(0)}
+
+        @media(max-width:1024px){.navbar{padding:18px 28px}.navbar.scrolled{padding:14px 28px}.nav-links{position:fixed;top:0;right:-100%;width:280px;height:100vh;background:#0d0d0d;flex-direction:column;padding:80px 36px;gap:28px;transition:right .35s ease;border-left:1px solid var(--border-color)}[data-theme="light"] .nav-links{background:var(--card-bg)}.nav-links.active{right:0}.menu-toggle{display:flex;z-index:1001}.section{padding:90px 28px}.service-layout{grid-template-columns:1fr}.sidebar{position:static}.footer-grid{grid-template-columns:1fr 1fr}}
+        @media(max-width:768px){.page-hero{min-height:40vh;padding:120px 24px 60px}.section{padding:56px 20px}.cta-section{padding:60px 24px}.footer-grid{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+
+<div class="global-particles" id="globalParticles"></div><div class="cursor-dot" id="cursorDot"></div><div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAVIGATION -->
+<nav class="navbar" id="navbar">
+    <a href="index.html" class="logo">X<span>.</span>Foundry</a>
+    <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="index.html#services" class="active">Services</a></li>
+        <li><a href="index.html#projects">Projects</a></li>
+        <li><a href="index.html#courses">Courses</a></li>
+        <li><a href="index.html#team">Team</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+    <div class="nav-actions" id="navActions">
+        <button class="theme-toggle" id="themeToggle" title="Toggle Theme"><i class="fas fa-moon" id="themeIcon"></i></button>
+        <button class="nav-search-btn" onclick="openSearchModal()" title="Search (⌘K)"><i class="fas fa-search"></i></button>
+        <div class="menu-toggle" id="menuToggle"><span></span><span></span><span></span></div>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="page-hero">
+    <div style="position:absolute;width:200%;height:200%;top:-50%;left:-50%;background-image:linear-gradient(rgba(220,20,60,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(220,20,60,.025) 1px,transparent 1px);background-size:60px 60px;animation:gridMove 25s linear infinite;pointer-events:none;z-index:1"></div>
+    <div style="position:absolute;width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(220,20,60,.3),transparent);animation:scanMove 6s linear infinite;pointer-events:none;z-index:2"></div>
+    <div class="page-hero-content">
+        <span class="page-badge"><i class="fas fa-code"></i> Service</span>
+        <h1 class="page-title">Custom<br><span style="color:var(--primary-red)">Software Dev</span></h1>
+        <p class="page-subtitle">End-to-end software development from concept to deployment. Web apps, mobile applications, APIs, and enterprise solutions.</p>
+        <div class="breadcrumb"><a href="index.html">Home</a> <span>/</span> <a href="index.html#services">Services</a> <span>/</span> <span style="color:var(--text-light)">Software Dev</span></div>
+    </div>
+</section>
+
+<!-- CONTENT -->
+<section class="section">
+    <div class="container-max">
+        <div class="service-layout">
+            <div class="service-main reveal">
+                <h2>Built For Scale, Designed for Impact</h2>
+                <p>We don't just write code — we engineer digital products that drive business growth. Our team of full-stack developers brings years of experience building everything from MVPs to enterprise-grade systems.</p>
+                
+                <h2 style="margin-top:40px;">Development Services</h2>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check-circle"></i> <strong>Web Applications</strong> — React, Next.js, Vue.js, or custom solutions. SPA, SSR, or static sites optimized for performance.</li>
+                    <li><i class="fas fa-check-circle"></i> <strong>Mobile Development</strong> — Native (iOS/Android) or cross-platform (React Native, Flutter) apps with polished UX.</li>
+                    <li><i class="fas fa-check-circle"></i> <strong>API Development & Integration</strong> — RESTful APIs, GraphQL endpoints, third-party integrations, and webhook systems.</li>
+                    <li><i class="fas fa-check-circle"></i> <strong>Database Architecture</strong> — SQL, NoSQL, or serverless databases designed for your specific data needs.</li>
+                    <li><i class="fas fa-check-circle"></i> <strong>DevOps & Deployment</strong> — CI/CD pipelines, Docker containers, cloud infrastructure on AWS/GCP/Azure.</li>
+                    <li><i class="fas fa-check-circle"></i> <strong>Maintenance & Support</strong> — Ongoing updates, bug fixes, performance optimization, and feature additions.</li>
+                </ul>
+
+                <h2 style="margin-top:40px;">Our Tech Stack</h2>
+                <p>We choose the right tool for each job. Our core expertise includes modern JavaScript frameworks, Python backends, cloud-native architectures, and everything in between.</p>
+            </div>
+
+            <aside class="sidebar reveal">
+                <div class="sidebar-card">
+                    <h3>Quick Actions</h3>
+                    <a href="#" class="roadmap-link" target="_blank" id="roadmapLink"><i class="fas fa-road"></i><span>View Roadmap</span><i class="fas fa-arrow-right" style="margin-left:auto;"></i></a>
+                    <a href="index.html#contact" class="roadmap-link"><i class="fas fa-envelope"></i><span>Request Quote</span><i class="fas fa-arrow-right" style="margin-left:auto;"></i></a>
+                    <div style="margin-top:24px;">
+                        <h3 style="font-size:13px;margin-bottom:12px;font-family:'Space Grotesk';font-weight:700;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;">Tech Stack</h3>
+                        <div class="tech-stack">
+                            <span class="tech-tag">React</span><span class="tech-tag">Next.js</span><span class="tech-tag">Node.js</span><span class="tech-tag">Python</span><span class="tech-tag">TypeScript</span><span class="tech-tag">PostgreSQL</span><span class="tech-tag">MongoDB</span><span class="tech-tag">Docker</span><span class="tech-tag">AWS</span><span class="tech-tag">Flutter</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+    <div style="position:absolute;width:200%;height:200%;top:-50%;left:-50%;background-image:linear-gradient(rgba(220,20,60,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(220,20,60,.025) 1px,transparent 1px);background-size:60px 60px;animation:gridMove 25s linear infinite;pointer-events:none;z-index:1"></div>
+    <div style="position:absolute;width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(220,20,60,.3),transparent);animation:scanMove 6s linear infinite;pointer-events:none;z-index:2"></div>
+    <div class="cta-content reveal" style="position:relative;z-index:10">
+        <h2>Have a Project in Mind?</h2>
+        <p>Let's turn your idea into a production-ready product.</p>
+        <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+            <a href="index.html#contact" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Get a Quote</a>
+            <a href="index.html#projects" class="btn btn-secondary"><i class="fas fa-eye"></i> View Projects</a>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="footer-effects">
+        <div style="position:absolute;width:200%;height:200%;top:-50%;left:-50%;background-image:linear-gradient(rgba(220,20,60,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(220,20,60,.025) 1px,transparent 1px);background-size:60px 60px;animation:gridMove 25s linear infinite"></div>
+        <div style="position:absolute;width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(220,20,60,.3),transparent);animation:scanMove 6s linear infinite"></div>
+    </div>
+    <div class="footer-grid">
+        <div class="footer-brand">
+            <a href="index.html" class="logo" style="display:inline-block;margin-bottom:20px">X<span>.</span>Foundry</a>
+            <p>Pioneering the future of technology through innovation, research, and education. Building solutions that transform industries and empower human potential.</p>
+            <div class="footer-socials">
+                <a href="https://www.linkedin.com/in/marwan-montaser-067054387/" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                <a href="https://github.com/for-tristan" target="_blank"><i class="fab fa-github"></i></a>
+                <a href="https://discord.gg/TVRxJg3rcN" target="_blank"><i class="fab fa-discord"></i></a>
+            </div>
+        </div>
+        <div class="footer-column">
+            <h4>Quick Links</h4>
+            <ul class="footer-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#services">Services</a></li>
+                <li><a href="index.html#projects">Projects</a></li>
+                <li><a href="index.html#courses">Courses</a></li>
+                <li><a href="index.html#team">Team</a></li>
+            </ul>
+        </div>
+        <div class="footer-column">
+            <h4>Courses</h4>
+            <ul class="footer-links">
+                <li><a href="course-ml.html">ML Bootcamp</a></li>
+                <li><a href="course-linux.html">Linux Basics</a></li>
+            </ul>
+        </div>
+        <div class="footer-column">
+            <h4>Contact</h4>
+            <ul class="footer-links">
+                <li><a href="mailto:xfoundationcom@gmail.com">xfoundationcom@gmail.com</a></li>
+                <li><a href="tel:+201040394896">+201040394896</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 X-Foundry. All Rights Reserved.</div>
+</footer>
+
+<!-- AUTH GATE -->
+<div class="auth-gate" id="authGate"><div style="width:72px;height:72px;background:var(--primary-red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;color:white"><i class="fas fa-lock"></i></div><h2>Sign In Required</h2><p>You need to be signed in to access this page.</p><div class="auth-gate-btns"><button class="btn btn-primary" onclick="openAuthModal('signin')"><i class="fas fa-sign-in-alt"></i> Sign In</button><button class="btn btn-secondary" onclick="openAuthModal('signup')"><i class="fas fa-user-plus"></i> Create Account</button></div></div>
+
+<!-- AUTH MODAL -->
+<div class="auth-modal-overlay" id="authModal"><div class="auth-modal" onclick="event.stopPropagation()"><div class="auth-modal-header"><h2 id="authModalTitle">Sign In</h2><button class="auth-modal-close" onclick="closeAuthModal()"><!-- SEARCH MODAL -->times;</button></div><div class="auth-modal-tabs"><button class="auth-modal-tab active" id="tabSignin" onclick="switchAuthTab('signin')">Sign In</button><button class="auth-modal-tab" id="tabSignup" onclick="switchAuthTab('signup')">Create Account</button></div><div class="auth-modal-body"><div class="auth-error" id="authError"></div><form id="signinForm" onsubmit="handleSignin(event)"><div class="form-group"><label>Email</label><input type="email" id="signinEmail" placeholder="your@email.com" required></div><div class="form-group"><label>Password</label><input type="password" id="signinPassword" placeholder="Enter password" required></div><button type="submit" class="enroll-btn" id="signinBtn" style="margin-top:8px"><i class="fas fa-arrow-right"></i> Sign In</button></form><form id="signupForm" style="display:none" onsubmit="handleSignup(event)"><div class="form-group"><label>Full Name</label><input type="text" id="signupName" placeholder="John Doe" required></div><div class="form-group"><label>Email</label><input type="email" id="signupEmail" placeholder="your@email.com" required></div><div class="form-group"><label>Password</label><input type="password" id="signupPassword" placeholder="Min. 6 characters" required minlength="6"></div><button type="submit" class="enroll-btn" id="signupBtn" style="margin-top:8px"><i class="fas fa-user-plus"></i> Create Account</button></form></div></div></div>
+
+<!-- SEARCH MODAL -->
+<div class="search-modal" id="searchModal">
+    <button class="close-search" onclick="closeSearchModal()">&times;</button>
+    <div style="width:90%;max-width:680px">
+        <input type="text" placeholder="Search services, projects, courses..." id="modalSearchInput" style="width:100%;padding:22px 28px;background:var(--card-bg);border:1px solid rgba(220,20,60,.4);color:var(--text-light);font-family:'Space Grotesk';font-size:22px;font-weight:700;outline:none">
+        <div id="searchResults" style="margin-top:16px;max-height:400px;overflow-y:auto"></div>
+    </div>
+</div>
+
+<script>
+function createParticles(){const c=document.getElementById('globalParticles');if(!c)return;for(let i=0;i<50;i++){const p=document.createElement('div');p.classList.add('particle');p.style.left=Math.random()*100+'%';p.style.width=p.style.height=Math.random()*2+1+'px';p.style.animationDuration=(Math.random()*20+15)+'s';p.style.animationDelay=(Math.random()*15)+'s';c.appendChild(p)}}createParticles();
+
+if('ontouchstart'in window||navigator.maxTouchPoints>0){document.getElementById('cursorDot').style.display='none';document.getElementById('cursorRing').style.display='none'}
+const dot=document.getElementById('cursorDot'),ring=document.getElementById('cursorRing');let mx=0,my=0,rx=0,ry=0;
+if(dot&&ring&&window.matchMedia('(hover: hover)').matches){document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px'});function l(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(l)}l();document.querySelectorAll('a,button,.roadmap-link').forEach(el=>{el.addEventListener('mouseenter',()=>ring.classList.add('hovered'));el.addEventListener('mouseleave',()=>ring.classList.remove('hovered'))})}
+
+const tt=document.getElementById('themeToggle'),ti=document.getElementById('themeIcon'),ht=document.documentElement;
+const st=localStorage.getItem('x-foundry-theme')||'dark';
+ht.setAttribute('data-theme',st);ti.className=st==='dark'?'fas fa-moon':'fas fa-sun';
+tt.addEventListener('click',()=>{const c=ht.getAttribute('data-theme'),n=c==='dark'?'light':'dark';ht.setAttribute('data-theme',n);localStorage.setItem('x-foundry-theme',n);ti.className=n==='dark'?'fas fa-moon':'fas fa-sun'});
+
+const sections=document.querySelectorAll('section[id]');const navLinksAll=document.querySelectorAll('.nav-links a');
+function updateActiveNav(){const scrollPos=window.scrollY+150;
+sections.forEach(section=>{const sectionTop=section.offsetTop;const sectionHeight=section.offsetHeight;
+if(scrollPos>=sectionTop&&scrollPos<sectionTop+sectionHeight){navLinksAll.forEach(link=>{link.classList.remove('active');if(link.getAttribute('href')==='index.html#services')link.classList.add('active')})}})}
+window.addEventListener('scroll',updateActiveNav);updateActiveNav();
+
+window.addEventListener('scroll',()=>document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>80));
+document.getElementById('menuToggle')?.addEventListener('click',()=>document.getElementById('navLinks').classList.toggle('active'));
+document.querySelectorAll('.nav-links a').forEach(link=>link.addEventListener('click',()=>document.getElementById('navLinks').classList.remove('active')));
+function rv(){document.querySelectorAll('.reveal').forEach(el=>{if(el.getBoundingClientRect().top<window.innerHeight-100)el.classList.add('visible')})}window.addEventListener('scroll',rv);rv();
+document.getElementById('roadmapLink').href="https://your-roadmap-url-here.com";
+
+const searchModal=document.getElementById('searchModal');const modalInput=document.getElementById('modalSearchInput'); const searchResults=document.getElementById('searchResults');
+const searchData=[
+    {title:'Custom Software Dev',category:'Service',desc:'End-to-end software development for web, mobile, enterprise',link:'service-software.html'},
+    {title:'AI & Machine Learning',category:'Service',desc:'Intelligent systems with ML algorithms, NLP, computer vision',link:'service-ai.html'},
+    {title:'Tech Education & Training',category:'Service',desc:'Training programs and certification courses',link:'service-training.html'},
+    {title:'ML Engineer Bootcamp',category:'Course',desc:'8-week machine learning program from fundamentals to production',link:'course-ml.html'},
+    {title:'Linux Basics Course',category:'Course',desc:'4-week Linux administration & customization program',link:'course-linux.html'},
+    {title:'Jack Voice Assistant',category:'Project',desc:'AI voice assistant project',link:'index.html#projects'},
+    {title:'Transparent Dotfiles',category:'Project',desc:'Linux customization config',link:'index.html#projects'},
+    {title:'Real-time Web View',category:'Project',desc:'Live coding visualization',link:'index.html#projects'},
+    {title:'Contact Us',category:'Page',desc:'Get in touch with our team',link:'index.html#contact'},
+    {title:'Our Team',category:'Page',desc:'Meet Marwan Montaser',link:'index.html#team'},
+    {title:'Home',category:'Page',desc:'Return to homepage',link:'index.html'}
+];
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();openSearchModal()}if(e.key==='Escape')closeSearchModal()});
+function openSearchModal(){searchModal.classList.add('active');setTimeout(()=>modalInput.focus(),50);document.body.style.overflow='hidden'}
+function closeSearchModal(){searchModal.classList.remove('active');document.body.style.overflow='';modalInput.value='';searchResults.innerHTML=''}
+searchModal?.addEventListener('click',e=>{if(e.target===searchModal)closeSearchModal()});
+modalInput?.addEventListener('input',e=>{const q=e.target.value.toLowerCase().trim();
+if(q.length<2){searchResults.innerHTML='<p style="color:var(--text-dim);text-align:center;padding:20px;font-weight:600">Type at least 2 characters...</p>';return}
+const results=searchData.filter(i=>i.title.toLowerCase().includes(q)||i.desc.toLowerCase().includes(q));
+searchResults.innerHTML=results.length===0?'<p style="color:var(--text-dim);text-align:center;padding:20px;font-weight:600">No results found.</p>':results.map(i=>`<div class="search-result-item" onclick="navigateTo('${i.link}')"><h4>${i.title}</h4><p>${i.desc} <span style="color:var(--primary-red)">[${i.category}]</span></p></div>`).join('')});
+function navigateTo(link){closeSearchModal();setTimeout(()=>{if(link.startsWith('#')||link.includes('#'))window.location.href=link;else window.location.href=link},300)}
+
+// ══════════════════════════════════════════════
+// AUTH SYSTEM
+// ══════════════════════════════════════════════
+let currentUser=null;
+async function checkAuth(){try{const r=await fetch('/api/auth/me');if(r.ok){const d=await r.json();if(d.user){currentUser=d.user;onAuthSuccess();return}}}catch(e){}onAuthFail()}
+function onAuthSuccess(){document.getElementById('authGate').classList.add('hidden');document.getElementById('navAuthBtns').style.display='none';document.getElementById('navUserBtns').style.display='flex';document.getElementById('navUserName').querySelector('span').textContent=currentUser.name;if(currentUser.role==='admin')document.getElementById('navAdminLink').style.display='inline-flex'}
+function onAuthFail(){document.getElementById('authGate').classList.remove('hidden');document.getElementById('navAuthBtns').style.display='flex';document.getElementById('navUserBtns').style.display='none'}
+function openAuthModal(tab){switchAuthTab(tab);document.getElementById('authModal').classList.add('active');document.getElementById('authError').style.display='none'}
+function closeAuthModal(){document.getElementById('authModal').classList.remove('active');document.getElementById('authError').style.display='none'}
+function switchAuthTab(tab){document.getElementById('signinForm').style.display=tab==='signin'?'block':'none';document.getElementById('signupForm').style.display=tab==='signup'?'block':'none';document.getElementById('tabSignin').classList.toggle('active',tab==='signin');document.getElementById('tabSignup').classList.toggle('active',tab==='signup');document.getElementById('authModalTitle').textContent=tab==='signin'?'Sign In':'Create Account';document.getElementById('authError').style.display='none'}
+async function handleSignin(e){e.preventDefault();const btn=document.getElementById('signinBtn');btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Signing In...';btn.disabled=true;try{const r=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:document.getElementById('signinEmail').value,password:document.getElementById('signinPassword').value})});const d=await r.json();if(r.ok){currentUser=d.user;closeAuthModal();onAuthSuccess()}else{document.getElementById('authError').textContent=d.error||'Login failed';document.getElementById('authError').style.display='block'}}catch(e){document.getElementById('authError').textContent='Network error';document.getElementById('authError').style.display='block'}btn.innerHTML='<i class="fas fa-arrow-right"></i> Sign In';btn.disabled=false}
+async function handleSignup(e){e.preventDefault();const btn=document.getElementById('signupBtn');const pw=document.getElementById('signupPassword').value;if(pw.length<6){document.getElementById('authError').textContent='Password must be at least 6 characters';document.getElementById('authError').style.display='block';return}btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Creating Account...';btn.disabled=true;try{const r=await fetch('/api/auth/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:document.getElementById('signupName').value,email:document.getElementById('signupEmail').value,password:pw})});const d=await r.json();if(r.ok){currentUser=d.user;closeAuthModal();onAuthSuccess()}else{document.getElementById('authError').textContent=d.error||'Signup failed';document.getElementById('authError').style.display='block'}}catch(e){document.getElementById('authError').textContent='Network error';document.getElementById('authError').style.display='block'}btn.innerHTML='<i class="fas fa-user-plus"></i> Create Account';btn.disabled=false}
+async function doLogout(){await fetch('/api/auth/logout',{method:'POST'});currentUser=null;onAuthFail()}
+document.getElementById('authModal').addEventListener('click',e=>{if(e.target===document.getElementById('authModal'))closeAuthModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAuthModal();closeSearchModal()}});
+checkAuth();
+
+console.log('%c💻 service-software.html | v4.0 — Auth Gate','color:#dc143c;font-size:14px;font-weight:bold;');
+</script>
+</body>
+</html>
