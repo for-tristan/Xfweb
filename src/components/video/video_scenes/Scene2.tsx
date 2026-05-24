@@ -66,7 +66,7 @@ export function Scene2() {
       </div>
 
       {/* Heading 2 */}
-      <div className="overflow-hidden mb-14">
+      <div className="overflow-hidden mb-24">
         <motion.h2
           style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-dim)', fontSize: 'clamp(40px, 6vw, 72px)', fontWeight: 300, fontStyle: 'italic', lineHeight: 1.1 }}
           initial={{ y: "100%" }}
@@ -78,7 +78,7 @@ export function Scene2() {
       </div>
 
       {/* Pills */}
-      <div className="flex gap-3 flex-wrap justify-center max-w-xl">
+      <div className="flex gap-4 flex-wrap justify-center max-w-xl">
         {pills.map((pill, i) => (
           <motion.div
             key={i}

@@ -44,7 +44,7 @@ export function Scene4() {
         />
       </div>
 
-      <div className="overflow-hidden mt-8">
+      <div className="overflow-hidden mt-14">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}

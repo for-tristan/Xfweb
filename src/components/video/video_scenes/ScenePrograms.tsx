@@ -55,7 +55,7 @@ export function ScenePrograms() {
       </div>
 
       {/* Heading 2 */}
-      <div className="overflow-hidden mb-16">
+      <div className="overflow-hidden mb-24">
         <motion.h2
           style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-dim)', fontSize: 'clamp(40px, 6vw, 72px)', fontWeight: 300, fontStyle: 'italic', lineHeight: 1.1 }}
           initial={{ y: '100%' }}
