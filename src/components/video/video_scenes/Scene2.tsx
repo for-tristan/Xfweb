@@ -27,22 +27,23 @@ export function Scene2() {
 
   return (
     <motion.div
-      className="absolute inset-0 flex flex-col justify-center pl-16 lg:pl-32 bg-black z-10"
+      className="absolute inset-0 flex flex-col justify-center pl-8 lg:pl-16 z-10"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ x: "-100%" }}
       transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
     >
       <motion.div
-        className="mb-8"
-        style={{ height: 2, background: 'rgba(255,255,255,0.2)' }}
+        className="mb-6"
+        style={{ height: 2, background: 'var(--border-color)' }}
         initial={{ width: 0 }}
         animate={phase >= 1 ? { width: "40%" } : { width: 0 }}
         transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
       />
 
       <motion.div
-        className="text-[11px] text-white/50 tracking-[0.3em] font-[300] mb-4 uppercase"
+        className="text-[11px] tracking-[0.3em] font-[300] mb-3 uppercase"
+        style={{ color: 'var(--text-dim)' }}
         initial={{ opacity: 0, y: 10 }}
         animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
         transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
@@ -52,7 +53,8 @@ export function Scene2() {
 
       <div className="overflow-hidden">
         <motion.h2
-          className="text-white text-[72px] font-black leading-tight"
+          className="font-black leading-tight"
+          style={{ color: 'var(--text-light)', fontSize: 'clamp(36px, 5vw, 60px)' }}
           initial={{ y: "100%" }}
           animate={phase >= 3 ? { y: 0 } : { y: "100%" }}
           transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
@@ -61,9 +63,10 @@ export function Scene2() {
         </motion.h2>
       </div>
 
-      <div className="overflow-hidden mb-12">
+      <div className="overflow-hidden mb-10">
         <motion.h2
-          className="text-white/70 text-[72px] font-[300] italic leading-tight"
+          className="font-[300] italic leading-tight"
+          style={{ color: 'var(--text-dim)', fontSize: 'clamp(36px, 5vw, 60px)' }}
           initial={{ y: "100%" }}
           animate={phase >= 4 ? { y: 0 } : { y: "100%" }}
           transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
@@ -72,11 +75,12 @@ export function Scene2() {
         </motion.h2>
       </div>
 
-      <div className="flex gap-4 flex-wrap">
+      <div className="flex gap-3 flex-wrap">
         {pills.map((pill, i) => (
           <motion.div
             key={i}
-            className="border border-white/20 text-white/60 text-[12px] font-[400] uppercase tracking-widest px-4 py-2 rounded-full"
+            className="text-[11px] font-[400] uppercase tracking-widest px-3 py-1.5 rounded-full"
+            style={{ border: '1px solid var(--border-color)', color: 'var(--text-dim)' }}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={
               phase >= 5 ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }

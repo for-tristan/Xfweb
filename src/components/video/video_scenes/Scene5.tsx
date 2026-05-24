@@ -19,7 +19,7 @@ export function Scene5() {
 
   return (
     <motion.div 
-      className="absolute inset-0 flex flex-col items-center justify-center bg-black z-10"
+      className="absolute inset-0 flex flex-col items-center justify-center z-10"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -33,7 +33,7 @@ export function Scene5() {
         <motion.img 
           src="/logo.png" 
           alt="XFoundry Logo"
-          className="w-[120px] h-[120px] object-contain mb-8"
+          className="w-[100px] h-[100px] object-contain mb-6"
           initial={{ opacity: 0 }}
           animate={phase >= 1 ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 1, ease: [0.25, 1, 0.5, 1] }}
@@ -43,13 +43,15 @@ export function Scene5() {
           initial={{ opacity: 0, y: 10 }}
           animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
           transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
-          className="text-[56px] font-black text-white tracking-[0.2em] mb-4"
+          className="font-black tracking-[0.2em] mb-3"
+          style={{ color: 'var(--text-light)', fontSize: 'clamp(36px, 5vw, 56px)' }}
         >
           XFOUNDRY
         </motion.div>
 
         <motion.div 
-          className="h-[1px] bg-[#FF0033] mb-8"
+          className="h-[1px] mb-6"
+          style={{ background: 'var(--primary-red)' }}
           initial={{ width: 0 }}
           animate={phase >= 3 ? { width: 80 } : { width: 0 }}
           transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1] }}
@@ -59,10 +61,9 @@ export function Scene5() {
           initial={{ opacity: 0 }}
           animate={phase >= 4 ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
-          className="text-[18px] font-[300] text-white/50 max-w-md text-center"
+          className="text-[16px] font-[300] max-w-md text-center"
+          style={{ color: 'var(--text-dim)' }}
         >coming very very. soon</motion.div>
-
-       
       </motion.div>
     </motion.div>
   );

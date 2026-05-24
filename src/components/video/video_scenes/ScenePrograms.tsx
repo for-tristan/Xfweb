@@ -25,14 +25,15 @@ export function ScenePrograms() {
 
   return (
     <motion.div
-      className="absolute inset-0 flex flex-col justify-center pl-16 lg:pl-32 bg-black z-10"
+      className="absolute inset-0 flex flex-col justify-center pl-8 lg:pl-16 z-10"
       initial={{ opacity: 0, x: 60 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -60 }}
       transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
     >
       <motion.div
-        className="text-[11px] text-white/50 tracking-[0.3em] font-light mb-5 uppercase"
+        className="text-[11px] tracking-[0.3em] font-light mb-4 uppercase"
+        style={{ color: 'var(--text-dim)' }}
         initial={{ opacity: 0, y: 8 }}
         animate={phase >= 1 ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
         transition={{ duration: 0.7, ease: [0.25, 1, 0.5, 1] }}
@@ -40,10 +41,10 @@ export function ScenePrograms() {
         TECH EDUCATION
       </motion.div>
 
-      <div className="overflow-hidden mb-3">
+      <div className="overflow-hidden mb-2">
         <motion.h2
-          className="text-white font-black leading-none"
-          style={{ fontSize: 'clamp(52px, 6vw, 80px)' }}
+          className="font-black leading-none"
+          style={{ color: 'var(--text-light)', fontSize: 'clamp(36px, 5vw, 64px)' }}
           initial={{ y: '100%' }}
           animate={phase >= 2 ? { y: 0 } : { y: '100%' }}
           transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
@@ -52,10 +53,10 @@ export function ScenePrograms() {
         </motion.h2>
       </div>
 
-      <div className="overflow-hidden mb-14">
+      <div className="overflow-hidden mb-10">
         <motion.h2
-          className="text-white/60 font-light italic leading-none"
-          style={{ fontSize: 'clamp(52px, 6vw, 80px)' }}
+          className="font-light italic leading-none"
+          style={{ color: 'var(--text-dim)', fontSize: 'clamp(36px, 5vw, 64px)' }}
           initial={{ y: '100%' }}
           animate={phase >= 3 ? { y: 0 } : { y: '100%' }}
           transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
@@ -64,21 +65,21 @@ export function ScenePrograms() {
         </motion.h2>
       </div>
 
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-4">
         {PROGRAMS.map((program, i) => (
           <motion.div
             key={program.label}
-            className="flex items-center gap-6"
+            className="flex items-center gap-5"
             initial={{ opacity: 0, x: -20 }}
             animate={phase >= 4 + Math.min(i, 1) ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
             transition={{ duration: 0.6, delay: i * 0.12, ease: [0.25, 1, 0.5, 1] }}
           >
-            <div className="w-6 h-[1px] bg-[#FF0033] shrink-0" />
+            <div className="w-5 h-[1px] shrink-0" style={{ background: 'var(--primary-red)' }} />
             <div>
-              <span className="text-white font-black text-[18px] tracking-wide mr-3">
+              <span className="font-black text-[16px] tracking-wide mr-2" style={{ color: 'var(--text-light)' }}>
                 {program.label}
               </span>
-              <span className="text-white/40 font-light text-[14px] tracking-wide">
+              <span className="font-light text-[13px] tracking-wide" style={{ color: 'var(--text-dim)' }}>
                 {program.desc}
               </span>
             </div>

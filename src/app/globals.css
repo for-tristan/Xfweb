@@ -1891,30 +1891,11 @@ body.xf-body {
 }
 
 /* ═══ HERO ANIMATION ═══ */
-.hero-animation-wrapper {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    min-height: 100vh;
-    overflow: hidden;
-    background: #000;
-}
-.hero-animation-wrapper .hero-scroll-indicator {
-    position: absolute; bottom: 40px;
-    left: 0; right: 0;
-    display: flex; flex-direction: column; align-items: center; gap: 10px;
-    animation: bounce 2.5s ease-in-out infinite;
-    z-index: 20;
+.hero-video-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
     pointer-events: none;
-}
-.hero-animation-wrapper .hero-scroll-indicator span {
-    font-size: 10px; letter-spacing: 3px;
-    text-transform: uppercase; color: rgba(255,255,255,0.4); font-weight: 700;
-}
-.hero-animation-wrapper .hero-scroll-indicator .scroll-line {
-    width: 1px; height: 50px;
-    background: linear-gradient(180deg, #FF0033, transparent);
-    animation: lineGrow 2.5s ease-in-out infinite;
 }
 
 .scroll-indicator {

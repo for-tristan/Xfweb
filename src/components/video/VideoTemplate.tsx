@@ -58,7 +58,7 @@ export default function VideoTemplate({
   const SceneComponent = SCENE_COMPONENTS[baseSceneKey];
 
   return (
-    <div className="w-full h-full overflow-hidden relative bg-black">
+    <div className="w-full h-full overflow-hidden relative">
       <AnimatePresence mode="popLayout">
         {SceneComponent && <SceneComponent key={currentSceneKey} />}
       </AnimatePresence>

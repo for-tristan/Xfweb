@@ -16,7 +16,7 @@ export function Scene1() {
 
   return (
     <motion.div 
-      className="absolute inset-0 flex flex-col items-center justify-center bg-black z-10"
+      className="absolute inset-0 flex flex-col items-center justify-center z-10"
       initial={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.8, ease: "linear" }}
@@ -27,11 +27,11 @@ export function Scene1() {
         transition={{ duration: 1.2, ease: [0.25, 1, 0.5, 1] }}
         className="mb-8"
       >
-        <img src="/logo.png" alt="XFoundry Logo" className="w-[180px] h-[180px] object-contain" />
+        <img src="/logo.png" alt="XFoundry Logo" className="w-[140px] h-[140px] object-contain" />
       </motion.div>
 
-      <div className="h-16 overflow-hidden flex justify-center items-center">
-        <h1 className="text-3xl md:text-5xl font-black text-white tracking-[0.15em]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+      <div className="h-12 overflow-hidden flex justify-center items-center">
+        <h1 className="text-2xl md:text-4xl font-black tracking-[0.15em]" style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-light)' }}>
           {'XFOUNDRY'.split('').map((char, i) => (
             <motion.span 
               key={i} 

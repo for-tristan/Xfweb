@@ -930,9 +930,18 @@ useEffect(() => {
       {/* ═══════════════════════════════════════════════════
           HERO — XFOUNDRY ANIMATED INTRO
           ═══════════════════════════════════════════════════ */}
-      <section id="home" className="hero-animation-wrapper">
-        <VideoTemplate />
-        <div className="hero-scroll-indicator">
+      <section className="hero" id="home">
+        <div className="grid-bg"></div>
+        <div className="orb orb-1"></div>
+        <div className="orb orb-2"></div>
+        <div className="scan-line"></div>
+
+        {/* Animated video background layer */}
+        <div className="hero-video-layer">
+          <VideoTemplate />
+        </div>
+
+        <div className="scroll-indicator">
           <span>Scroll</span>
           <div className="scroll-line"></div>
         </div>
