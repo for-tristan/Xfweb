@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { SkeletonHero, SkeletonSectionHeader, SkeletonServiceCard, SkeletonCourseCard } from '@/components/SkeletonScreens';
 import { ChatModal } from '@/components/ChatModal';
 import ConfirmModal from '@/components/ConfirmModal';
+import VideoTemplate from '@/components/video/VideoTemplate';
 import Link from 'next/dist/client/link';
 
 
@@ -773,9 +774,6 @@ useEffect(() => {
 
   // Site content
   const siteName = 'X-Foundry';
-  const heroTitle = 'Building The';
-  const heroTitleHighlight = 'Future';
-  const heroSubtitle = 'The best way to predict the future is to create it.';
   const contactEmail = 'xfoundationcom@gmail.com';
   const contactPhone = '+201234567890';
   const businessHours = 'Sun - Thu: 9:00 AM - 6:00 PM EET';
@@ -929,28 +927,12 @@ useEffect(() => {
         </div>
       ) : (
       <>
-      <section className="hero" id="home">
-        <div className="grid-bg"></div>
-        <div className="orb orb-1"></div>
-        <div className="orb orb-2"></div>
-        <div className="scan-line"></div>
-
-        <div className="hero-content">
-          <h1 className="hero-title">
-            {heroTitle}<br />
-            <span className="highlight">{heroTitleHighlight}</span>
-          </h1>
-          <p className="hero-subtitle">
-            {heroSubtitle}
-          </p>
-          <div className="hero-buttons">
-            <a href="#projects" className="btn btn-secondary" onClick={(e) => { e.preventDefault(); scrollToSection('projects'); }}>
-              View Projects <i className="fas fa-arrow-right"></i>
-            </a>
-          </div>
-        </div>
-
-        <div className="scroll-indicator">
+      {/* ═══════════════════════════════════════════════════
+          HERO — XFOUNDRY ANIMATED INTRO
+          ═══════════════════════════════════════════════════ */}
+      <section id="home" className="hero-animation-wrapper">
+        <VideoTemplate />
+        <div className="hero-scroll-indicator">
           <span>Scroll</span>
           <div className="scroll-line"></div>
         </div>
