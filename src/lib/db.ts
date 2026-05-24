@@ -2,10 +2,17 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaLibSQL } from '@prisma/adapter-libsql';
 
 function createPrismaClient() {
-  const adapter = new PrismaLibSQL({
-    url: process.env.DATABASE_URL!,
-  });
+  const url = process.env.DATABASE_URL;
 
+  if (!url) {
+    // During static prerendering on Vercel, DATABASE_URL is not set.
+    // Provide a fallback so the module can be imported without crashing.
+    return new PrismaClient({
+      datasources: { db: { url: 'file:./_prerender_placeholder.db' } },
+    });
+  }
+
+  const adapter = new PrismaLibSQL({ url });
   return new PrismaClient({ adapter });
 }
 
