@@ -29,7 +29,7 @@ export function Scene4() {
             initial={{ y: 40 }}
             animate={phase >= 1 ? { y: 0 } : { y: 40 }}
             transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
-            style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-light)', fontSize: 'clamp(80px, 12vw, 140px)', fontWeight: 900, lineHeight: 1, letterSpacing: '0.04em' }}
+            style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-light)', fontSize: 'clamp(80px, 12vw, 140px)', fontWeight: 900, lineHeight: 1, letterSpacing: '0.04em', paddingTop: 10, paddingBottom: 10 }}
           >
             BUILT
           </motion.div>
@@ -44,7 +44,7 @@ export function Scene4() {
         />
       </div>
 
-      <div className="overflow-hidden mt-14">
+      <div className="overflow-hidden" style={{ marginTop: 48 }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}

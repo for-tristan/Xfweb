@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useVideoPlayer } from '@/lib/video';
-import { startAmbient, playTransitionHit, stopAmbient } from '@/lib/audio';
+import { startAmbient, playTransitionHit, stopAmbient, setAmbientVolume } from '@/lib/audio';
 import { Scene1 } from './video_scenes/Scene1';
 import { Scene2 } from './video_scenes/Scene2';
 import { ScenePrograms } from './video_scenes/ScenePrograms';
@@ -53,6 +53,31 @@ export default function VideoTemplate({
     playTransitionHit();
     onSceneChange?.(currentSceneKey);
   }, [currentSceneKey, onSceneChange]);
+
+  // Scroll-based audio fade
+  const handleScroll = useCallback(() => {
+    const hero = document.getElementById('home');
+    if (!hero) return;
+
+    const rect = hero.getBoundingClientRect();
+    const heroHeight = rect.height;
+
+    // Calculate how much the hero has scrolled out of view
+    // 0 = hero fully visible, 1 = hero fully scrolled past
+    let progress = 0;
+    if (rect.bottom <= 0) {
+      progress = 1; // fully scrolled past
+    } else if (rect.bottom < heroHeight) {
+      progress = 1 - (rect.bottom / heroHeight);
+    }
+
+    setAmbientVolume(Math.min(1, Math.max(0, progress)));
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
 
   const baseSceneKey = currentSceneKey.replace(/_r[12]$/, '') as keyof typeof SCENE_DURATIONS;
   const SceneComponent = SCENE_COMPONENTS[baseSceneKey];

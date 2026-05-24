@@ -44,7 +44,7 @@ export function Scene2() {
 
       {/* Sub-label */}
       <motion.div
-        className="mb-6"
+        className="mb-8"
         style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 13, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--text-dim)' }}
         initial={{ opacity: 0, y: 12 }}
         animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
@@ -54,9 +54,9 @@ export function Scene2() {
       </motion.div>
 
       {/* Heading 1 */}
-      <div className="overflow-hidden mb-2">
+      <div className="overflow-hidden">
         <motion.h2
-          style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-light)', fontSize: 'clamp(40px, 6vw, 72px)', fontWeight: 900, lineHeight: 1.1, letterSpacing: '-0.02em' }}
+          style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-light)', fontSize: 'clamp(40px, 6vw, 72px)', fontWeight: 900, lineHeight: 1.1, letterSpacing: '-0.02em', paddingTop: 8, paddingBottom: 8 }}
           initial={{ y: "100%" }}
           animate={phase >= 3 ? { y: 0 } : { y: "100%" }}
           transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
@@ -66,9 +66,9 @@ export function Scene2() {
       </div>
 
       {/* Heading 2 */}
-      <div className="overflow-hidden mb-24">
+      <div className="overflow-hidden">
         <motion.h2
-          style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-dim)', fontSize: 'clamp(40px, 6vw, 72px)', fontWeight: 300, fontStyle: 'italic', lineHeight: 1.1 }}
+          style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-dim)', fontSize: 'clamp(40px, 6vw, 72px)', fontWeight: 300, fontStyle: 'italic', lineHeight: 1.1, paddingTop: 8, paddingBottom: 8 }}
           initial={{ y: "100%" }}
           animate={phase >= 4 ? { y: 0 } : { y: "100%" }}
           transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
@@ -77,12 +77,12 @@ export function Scene2() {
         </motion.h2>
       </div>
 
-      {/* Pills */}
-      <div className="flex gap-4 flex-wrap justify-center max-w-xl">
+      {/* Pills — big gap from heading */}
+      <div className="flex gap-4 flex-wrap justify-center max-w-xl mt-10">
         {pills.map((pill, i) => (
           <motion.div
             key={i}
-            style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 13, fontWeight: 500, letterSpacing: '0.04em', color: 'var(--text-dim)', border: '1px solid var(--border-color)', borderRadius: 9999, padding: '8px 18px' }}
+            style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 13, fontWeight: 500, letterSpacing: '0.04em', color: 'var(--text-dim)', border: '1px solid var(--border-color)', borderRadius: 9999, padding: '10px 22px' }}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={
               phase >= 5 ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }

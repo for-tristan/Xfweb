@@ -43,9 +43,9 @@ export function ScenePrograms() {
       </motion.div>
 
       {/* Heading 1 */}
-      <div className="overflow-hidden mb-3">
+      <div className="overflow-hidden">
         <motion.h2
-          style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-light)', fontSize: 'clamp(40px, 6vw, 72px)', fontWeight: 900, lineHeight: 1.1, letterSpacing: '-0.02em' }}
+          style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-light)', fontSize: 'clamp(40px, 6vw, 72px)', fontWeight: 900, lineHeight: 1.1, letterSpacing: '-0.02em', paddingTop: 8, paddingBottom: 8 }}
           initial={{ y: '100%' }}
           animate={phase >= 2 ? { y: 0 } : { y: '100%' }}
           transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
@@ -55,9 +55,9 @@ export function ScenePrograms() {
       </div>
 
       {/* Heading 2 */}
-      <div className="overflow-hidden mb-24">
+      <div className="overflow-hidden">
         <motion.h2
-          style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-dim)', fontSize: 'clamp(40px, 6vw, 72px)', fontWeight: 300, fontStyle: 'italic', lineHeight: 1.1 }}
+          style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-dim)', fontSize: 'clamp(40px, 6vw, 72px)', fontWeight: 300, fontStyle: 'italic', lineHeight: 1.1, paddingTop: 8, paddingBottom: 8 }}
           initial={{ y: '100%' }}
           animate={phase >= 3 ? { y: 0 } : { y: '100%' }}
           transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
@@ -66,8 +66,8 @@ export function ScenePrograms() {
         </motion.h2>
       </div>
 
-      {/* Program list */}
-      <div className="flex flex-col gap-7 max-w-lg w-full">
+      {/* Program list — big gap from heading */}
+      <div className="flex flex-col gap-8 max-w-lg w-full mt-12">
         {PROGRAMS.map((program, i) => (
           <motion.div
             key={program.label}

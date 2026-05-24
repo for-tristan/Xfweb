@@ -4,6 +4,7 @@ let ctx: AudioContext | null = null;
 let masterGain: GainNode | null = null;
 let droneNodes: { osc: OscillatorNode; gain: GainNode }[] = [];
 let started = false;
+let targetVolume = 0.18; // the "full" volume level
 
 function getCtx(): AudioContext {
   if (!ctx) {
@@ -23,6 +24,7 @@ export function startAmbient() {
   const mg = masterGain!;
 
   // Fade master in over 2s
+  targetVolume = 0.18;
   mg.gain.linearRampToValueAtTime(0.18, ac.currentTime + 2);
 
   // Sub-bass drone — deep, dark foundation
@@ -59,11 +61,25 @@ export function startAmbient() {
   droneNodes.push({ osc: shimOsc, gain: shimGain });
 }
 
+export function setAmbientVolume(normalizedScroll: number) {
+  // normalizedScroll: 0 = hero fully visible, 1 = fully scrolled past
+  // Fade volume based on scroll position
+  const newTarget = Math.max(0, 0.18 * (1 - normalizedScroll));
+  targetVolume = newTarget;
+
+  if (!ctx || !masterGain) return;
+  masterGain.gain.linearRampToValueAtTime(newTarget, ctx.currentTime + 0.3);
+}
+
 export function playTransitionHit() {
+  // Only play if volume is not muted
+  if (targetVolume < 0.01) return;
+
   const ac = getCtx();
   if (ac.state === 'suspended') ac.resume();
 
   const now = ac.currentTime;
+  const volumeMultiplier = targetVolume / 0.18; // scale with current volume
 
   // Low thud
   const thud = ac.createOscillator();
@@ -71,7 +87,7 @@ export function playTransitionHit() {
   thud.type = 'sine';
   thud.frequency.setValueAtTime(80, now);
   thud.frequency.exponentialRampToValueAtTime(30, now + 0.18);
-  thudGain.gain.setValueAtTime(0.38, now);
+  thudGain.gain.setValueAtTime(0.38 * volumeMultiplier, now);
   thudGain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
   thud.connect(thudGain);
   thudGain.connect(ac.destination);
@@ -84,7 +100,7 @@ export function playTransitionHit() {
   click.type = 'triangle';
   click.frequency.setValueAtTime(2200, now);
   click.frequency.exponentialRampToValueAtTime(800, now + 0.06);
-  clickGain.gain.setValueAtTime(0.07, now);
+  clickGain.gain.setValueAtTime(0.07 * volumeMultiplier, now);
   clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
   click.connect(clickGain);
   clickGain.connect(ac.destination);
@@ -96,6 +112,7 @@ export function stopAmbient() {
   if (!ctx || !masterGain) return;
   const mg = masterGain;
   const ac = ctx;
+  targetVolume = 0;
   mg.gain.linearRampToValueAtTime(0, ac.currentTime + 1.5);
   setTimeout(() => {
     for (const n of droneNodes) { try { n.osc.stop(); } catch {} }
