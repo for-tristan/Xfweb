@@ -505,8 +505,6 @@ export function ProfileModal({
   profileName, setProfileName, profileUsername, setProfileUsername, profilePhone, setProfilePhone, profileCompany, setProfileCompany,
   profileSaving, avatarUploading, onProfileSave, onAvatarUpload,
 }: ProfileModalProps) {
-  if (!open || !user) return null;
-
   const [confirmModal, setConfirmModal] = useState<{ open: boolean; title: string; message: string; confirmLabel: string; danger: boolean; icon: string; onConfirm: () => void }>({ open: false, title: '', message: '', confirmLabel: 'Confirm', danger: false, icon: 'fas fa-exclamation-triangle', onConfirm: () => {} });
 
   const openConfirm = (title: string, message: string, onConfirm: () => void, opts?: { confirmLabel?: string; danger?: boolean; icon?: string }) => {
@@ -518,6 +516,8 @@ export function ProfileModal({
       onConfirm,
     });
   };
+
+  if (!open || !user) return null;
 
   return (
     <div role="dialog" aria-modal="true" aria-label="Dashboard" className="dashboard-modal-overlay active" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
