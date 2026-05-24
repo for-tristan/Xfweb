@@ -33,7 +33,7 @@ export function Scene5() {
         <motion.img 
           src="/logo.png" 
           alt="XFoundry Logo"
-          className="w-[100px] h-[100px] object-contain mb-6"
+          className="w-[100px] h-[100px] object-contain mb-10"
           initial={{ opacity: 0 }}
           animate={phase >= 1 ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 1, ease: [0.25, 1, 0.5, 1] }}
@@ -43,14 +43,14 @@ export function Scene5() {
           initial={{ opacity: 0, y: 10 }}
           animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
           transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
-          className="font-black tracking-[0.2em] mb-3"
-          style={{ color: 'var(--text-light)', fontSize: 'clamp(36px, 5vw, 56px)' }}
+          className="mb-5"
+          style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-light)', fontSize: 'clamp(36px, 5vw, 56px)', fontWeight: 900, letterSpacing: '0.2em' }}
         >
           XFOUNDRY
         </motion.div>
 
         <motion.div 
-          className="h-[1px] mb-6"
+          className="h-[1px] mb-8 rounded-full"
           style={{ background: 'var(--primary-red)' }}
           initial={{ width: 0 }}
           animate={phase >= 3 ? { width: 80 } : { width: 0 }}
@@ -61,9 +61,10 @@ export function Scene5() {
           initial={{ opacity: 0 }}
           animate={phase >= 4 ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
-          className="text-[16px] font-[300] max-w-md text-center"
-          style={{ color: 'var(--text-dim)' }}
-        >coming very very. soon</motion.div>
+          style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-dim)', fontSize: 18, fontWeight: 300, letterSpacing: '0.02em' }}
+        >
+          coming very very. soon
+        </motion.div>
       </motion.div>
     </motion.div>
   );

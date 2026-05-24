@@ -25,13 +25,13 @@ export function Scene1() {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={phase >= 1 ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
         transition={{ duration: 1.2, ease: [0.25, 1, 0.5, 1] }}
-        className="mb-8"
+        className="mb-10"
       >
         <img src="/logo.png" alt="XFoundry Logo" className="w-[140px] h-[140px] object-contain" />
       </motion.div>
 
-      <div className="h-12 overflow-hidden flex justify-center items-center">
-        <h1 className="text-2xl md:text-4xl font-black tracking-[0.15em]" style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-light)' }}>
+      <div className="h-14 overflow-hidden flex justify-center items-center">
+        <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-light)', fontSize: 'clamp(24px, 4vw, 48px)', fontWeight: 900, letterSpacing: '0.15em' }}>
           {'XFOUNDRY'.split('').map((char, i) => (
             <motion.span 
               key={i} 

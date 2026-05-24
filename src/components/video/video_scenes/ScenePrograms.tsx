@@ -25,26 +25,27 @@ export function ScenePrograms() {
 
   return (
     <motion.div
-      className="absolute inset-0 flex flex-col justify-center pl-8 lg:pl-16 z-10"
+      className="absolute inset-0 flex flex-col items-center justify-center z-10 px-6 sm:px-12"
       initial={{ opacity: 0, x: 60 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -60 }}
       transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
     >
+      {/* Sub-label */}
       <motion.div
-        className="text-[11px] tracking-[0.3em] font-light mb-4 uppercase"
-        style={{ color: 'var(--text-dim)' }}
-        initial={{ opacity: 0, y: 8 }}
-        animate={phase >= 1 ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+        className="mb-8"
+        style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 13, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--text-dim)' }}
+        initial={{ opacity: 0, y: 10 }}
+        animate={phase >= 1 ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
         transition={{ duration: 0.7, ease: [0.25, 1, 0.5, 1] }}
       >
         TECH EDUCATION
       </motion.div>
 
-      <div className="overflow-hidden mb-2">
+      {/* Heading 1 */}
+      <div className="overflow-hidden mb-3">
         <motion.h2
-          className="font-black leading-none"
-          style={{ color: 'var(--text-light)', fontSize: 'clamp(36px, 5vw, 64px)' }}
+          style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-light)', fontSize: 'clamp(40px, 6vw, 72px)', fontWeight: 900, lineHeight: 1.1, letterSpacing: '-0.02em' }}
           initial={{ y: '100%' }}
           animate={phase >= 2 ? { y: 0 } : { y: '100%' }}
           transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
@@ -53,10 +54,10 @@ export function ScenePrograms() {
         </motion.h2>
       </div>
 
-      <div className="overflow-hidden mb-10">
+      {/* Heading 2 */}
+      <div className="overflow-hidden mb-16">
         <motion.h2
-          className="font-light italic leading-none"
-          style={{ color: 'var(--text-dim)', fontSize: 'clamp(36px, 5vw, 64px)' }}
+          style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-dim)', fontSize: 'clamp(40px, 6vw, 72px)', fontWeight: 300, fontStyle: 'italic', lineHeight: 1.1 }}
           initial={{ y: '100%' }}
           animate={phase >= 3 ? { y: 0 } : { y: '100%' }}
           transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
@@ -65,21 +66,22 @@ export function ScenePrograms() {
         </motion.h2>
       </div>
 
-      <div className="flex flex-col gap-4">
+      {/* Program list */}
+      <div className="flex flex-col gap-7 max-w-lg w-full">
         {PROGRAMS.map((program, i) => (
           <motion.div
             key={program.label}
-            className="flex items-center gap-5"
+            className="flex items-center gap-6"
             initial={{ opacity: 0, x: -20 }}
             animate={phase >= 4 + Math.min(i, 1) ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
             transition={{ duration: 0.6, delay: i * 0.12, ease: [0.25, 1, 0.5, 1] }}
           >
-            <div className="w-5 h-[1px] shrink-0" style={{ background: 'var(--primary-red)' }} />
-            <div>
-              <span className="font-black text-[16px] tracking-wide mr-2" style={{ color: 'var(--text-light)' }}>
+            <div className="w-8 h-[2px] shrink-0 rounded-full" style={{ background: 'var(--primary-red)' }} />
+            <div style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+              <span style={{ color: 'var(--text-light)', fontSize: 18, fontWeight: 700, letterSpacing: '0.02em', marginRight: 14 }}>
                 {program.label}
               </span>
-              <span className="font-light text-[13px] tracking-wide" style={{ color: 'var(--text-dim)' }}>
+              <span style={{ color: 'var(--text-dim)', fontSize: 15, fontWeight: 300 }}>
                 {program.desc}
               </span>
             </div>

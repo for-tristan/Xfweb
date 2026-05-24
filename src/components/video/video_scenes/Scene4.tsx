@@ -29,15 +29,14 @@ export function Scene4() {
             initial={{ y: 40 }}
             animate={phase >= 1 ? { y: 0 } : { y: 40 }}
             transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
-            className="font-black leading-none"
-            style={{ color: 'var(--text-light)', fontSize: 'clamp(80px, 12vw, 140px)' }}
+            style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-light)', fontSize: 'clamp(80px, 12vw, 140px)', fontWeight: 900, lineHeight: 1, letterSpacing: '0.04em' }}
           >
             BUILT
           </motion.div>
         </div>
         
         <motion.div 
-          className="absolute -bottom-2 left-0 h-[2px]"
+          className="absolute -bottom-3 left-0 h-[2px] rounded-full"
           style={{ background: 'var(--primary-red)' }}
           initial={{ width: 0 }}
           animate={phase >= 3 ? { width: "100%" } : { width: 0 }}
@@ -45,13 +44,12 @@ export function Scene4() {
         />
       </div>
 
-      <div className="overflow-hidden mt-4">
+      <div className="overflow-hidden mt-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
-          className="font-[300] tracking-[0.25em]"
-          style={{ color: 'var(--text-dim)', fontSize: 'clamp(20px, 3vw, 32px)' }}
+          style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-dim)', fontSize: 'clamp(20px, 3vw, 32px)', fontWeight: 300, letterSpacing: '0.25em' }}
         >
           FOR WHAT&apos;S NEXT.
         </motion.div>
