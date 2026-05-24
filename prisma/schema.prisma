@@ -51,7 +51,7 @@ model Enrollment {
   enrolledAt      DateTime  @default(now())
   deletedAt       DateTime?
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model QuoteRequest {
@@ -68,7 +68,7 @@ model QuoteRequest {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Notification {
