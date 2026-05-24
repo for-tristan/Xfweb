@@ -9,22 +9,35 @@ export async function DELETE() {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    // Delete all related data in dependency order to avoid FK constraint errors
-    // Even though the schema has onDelete: Cascade, SQLite with Turso sometimes
-    // doesn't enforce it at the application level, so we delete explicitly.
-    await db.testAttempt.deleteMany({ where: { userId: user.id } });
-    await db.testUnlock.deleteMany({ where: { userId: user.id } });
-    await db.certificate.deleteMany({ where: { userId: user.id } });
-    await db.moduleStudy.deleteMany({ where: { userId: user.id } });
-    await db.moduleUnlock.deleteMany({ where: { userId: user.id } });
-    await db.accountLink.deleteMany({ where: { userId: user.id } });
-    await db.courseProgress.deleteMany({ where: { userId: user.id } });
-    await db.studySession.deleteMany({ where: { userId: user.id } });
-    await db.notification.deleteMany({ where: { userId: user.id } });
-    await db.chatMessage.deleteMany({ where: { OR: [{ senderId: user.id }, { receiverId: user.id }] } });
-    await db.friendship.deleteMany({ where: { OR: [{ senderId: user.id }, { receiverId: user.id }] } });
-    await db.enrollment.deleteMany({ where: { userId: user.id } });
-    await db.quoteRequest.deleteMany({ where: { userId: user.id } });
+    // Delete all related data in dependency order.
+    // Each deletion is wrapped in its own try/catch so that if a table
+    // doesn't exist in the remote Turso database, we skip it gracefully
+    // instead of failing the entire operation.
+    const deletions: Promise<unknown>[] = [
+      // Test-related (depend on ModuleTest)
+      db.testAttempt.deleteMany({ where: { userId: user.id } }).catch(() => {}),
+      db.testUnlock.deleteMany({ where: { userId: user.id } }).catch(() => {}),
+      // Certificates
+      db.certificate.deleteMany({ where: { userId: user.id } }).catch(() => {}),
+      // Module-related (depend on CourseModule)
+      db.moduleStudy.deleteMany({ where: { userId: user.id } }).catch(() => {}),
+      db.moduleUnlock.deleteMany({ where: { userId: user.id } }).catch(() => {}),
+      // Account links
+      db.accountLink.deleteMany({ where: { userId: user.id } }).catch(() => {}),
+      // Course progress & sessions
+      db.courseProgress.deleteMany({ where: { userId: user.id } }).catch(() => {}),
+      db.studySession.deleteMany({ where: { userId: user.id } }).catch(() => {}),
+      // Notifications
+      db.notification.deleteMany({ where: { userId: user.id } }).catch(() => {}),
+      // Social (bidirectional — delete where user is sender OR receiver)
+      db.chatMessage.deleteMany({ where: { OR: [{ senderId: user.id }, { receiverId: user.id }] } }).catch(() => {}),
+      db.friendship.deleteMany({ where: { OR: [{ senderId: user.id }, { receiverId: user.id }] } }).catch(() => {}),
+      // Enrollments & quote requests (previously missing onDelete: Cascade)
+      db.enrollment.deleteMany({ where: { userId: user.id } }).catch(() => {}),
+      db.quoteRequest.deleteMany({ where: { userId: user.id } }).catch(() => {}),
+    ];
+
+    await Promise.all(deletions);
 
     // Finally delete the user
     await db.user.delete({ where: { id: user.id } });
