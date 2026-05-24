@@ -1,0 +1,346 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  username  String?  @unique
+  phone     String?
+  company   String?
+  avatar    String?
+  bio       String?
+  role      String   @default("student")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  enrollments    Enrollment[]
+  quoteRequests  QuoteRequest[]
+  notifications  Notification[]
+  courseProgress CourseProgress[]
+  studySessions  StudySession[]
+  sentFriendships     Friendship[] @relation("SentFriendships")
+  receivedFriendships Friendship[] @relation("ReceivedFriendships")
+  sentMessages        ChatMessage[]  @relation("SentMessages")
+  receivedMessages    ChatMessage[]  @relation("ReceivedMessages")
+  moduleUnlocks       ModuleUnlock[]
+  moduleStudies       ModuleStudy[]
+  accountLinks        AccountLink[]
+  certificates        Certificate[]
+  testAttempts        TestAttempt[]
+  testUnlocks         TestUnlock[]
+}
+
+model Enrollment {
+  id              String    @id @default(cuid())
+  userId          String
+  courseId        String
+  courseName      String
+  courseLevel     String
+  duration        String
+  status          String    @default("pending")
+  experienceLevel String?
+  motivation      String?
+  enrolledAt      DateTime  @default(now())
+  deletedAt       DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model QuoteRequest {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  email       String
+  phone       String
+  company     String?
+  serviceType String
+  budget      String?
+  description String
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String   @default("info")
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CourseProgress {
+  id              String   @id @default(cuid())
+  userId          String
+  courseId        String
+  courseName      String
+  completedModules String   @default("[]")
+  lastAccessed    DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
+
+model PasswordReset {
+  id        String   @id @default(cuid())
+  email     String
+  code      String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model StudySession {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  duration  Int      @default(0)
+  date      String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId, date])
+}
+
+model Friendship {
+  id        String   @id @default(cuid())
+  senderId  String
+  receiverId String
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sender   User @relation("SentFriendships", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("ReceivedFriendships", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([senderId, receiverId])
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  senderId  String
+  receiverId String
+  content   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  sender   User @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@index([senderId, receiverId])
+  @@index([receiverId, senderId])
+}
+
+model CourseModule {
+  id          String   @id @default(cuid())
+  courseId    String
+  title       String
+  description String
+  content     String   @default("")
+  moduleOrder Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  course  Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  studies ModuleStudy[]
+  tests   ModuleTest[]
+}
+
+model ModuleUnlock {
+  id        String   @id @default(cuid())
+  userId    String
+  moduleId  String
+  unlockedBy String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, moduleId])
+}
+
+model ModuleStudy {
+  id          String   @id @default(cuid())
+  userId      String
+  moduleId    String
+  timeSpent   Int      @default(0)
+  studied     Boolean  @default(false)
+  lastStudied DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  module CourseModule  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, moduleId])
+}
+
+model AccountLink {
+  id           String   @id @default(cuid())
+  userId       String
+  provider     String
+  providerAccountId String
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Certificate {
+  id              String   @id @default(cuid())
+  userId          String
+  courseId        String
+  courseName      String
+  certificateId   String   @unique
+  completionDate  String
+  issuedAt        DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String   @default("")
+  icon        String   @default("fas fa-code")
+  status      String   @default("active")
+  displayOrder Int     @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  features ServiceFeature[]
+}
+
+model ServiceFeature {
+  id          String  @id @default(cuid())
+  title       String
+  description String  @default("")
+  icon        String  @default("")
+  displayOrder Int    @default(0)
+  serviceId   String
+
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+}
+
+model Course {
+  id             String   @id @default(cuid())
+  title          String
+  slug           String   @unique
+  description    String   @default("")
+  level          String   @default("Beginner")
+  duration       String   @default("4 Weeks")
+  price          String   @default("Free")
+  status         String   @default("active")
+  icon           String   @default("fas fa-graduation-cap")
+  features       String   @default("[]")
+  prerequisites  String   @default("")
+  displayOrder   Int      @default(0)
+  techStack      String   @default("")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  modules CourseModule[]
+}
+
+model TeamMember {
+  id          String   @id @default(cuid())
+  name        String
+  role        String
+  bio         String   @default("")
+  avatar      String   @default("")
+  icon        String   @default("fas fa-user-tie")
+  linkedinUrl String   @default("")
+  githubUrl   String   @default("")
+  displayOrder Int     @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ModuleTest {
+  id           String   @id @default(cuid())
+  moduleId     String   @map("moduleid")
+  title        String
+  description  String   @default("")
+  timeLimit    Int      @default(30) @map("timelimit")
+  passingScore Int      @default(70) @map("passingscore")
+  createdAt    DateTime @default(now()) @map("createdat")
+  updatedAt    DateTime @updatedAt @map("updatedat")
+
+  module   CourseModule  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  questions TestQuestion[]
+  attempts  TestAttempt[]
+  unlocks   TestUnlock[]
+
+  @@map("ModuleTest")
+}
+
+model TestQuestion {
+  id            String   @id @default(cuid())
+  testId        String   @map("testid")
+  questionText  String   @map("questiontext")
+  questionType  String   @default("multiple_choice") @map("questiontype")
+  options       String   @default("[]")
+  correctAnswer Int      @default(0) @map("correctanswer")
+  points        Int      @default(1)
+  questionOrder Int      @default(0) @map("questionorder")
+  createdAt     DateTime @default(now()) @map("createdat")
+
+  test ModuleTest @relation(fields: [testId], references: [id], onDelete: Cascade)
+
+  @@map("TestQuestion")
+}
+
+model TestAttempt {
+  id          String    @id @default(cuid())
+  testId      String    @map("testid")
+  userId      String    @map("userid")
+  answers     String    @default("{}")
+  score       Int       @default(0)
+  totalPoints Int       @default(0) @map("totalpoints")
+  passed      Boolean   @default(false)
+  startedAt   DateTime  @default(now()) @map("startedat")
+  submittedAt DateTime? @map("submittedat")
+  createdAt   DateTime  @default(now()) @map("createdat")
+
+  test ModuleTest @relation(fields: [testId], references: [id], onDelete: Cascade)
+  user User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([testId, userId])
+  @@map("TestAttempt")
+}
+
+model TestUnlock {
+  id          String   @id @default(cuid())
+  testId      String   @map("testid")
+  userId      String   @map("userid")
+  unlockedBy  String   @map("unlockedby")
+  createdAt   DateTime @default(now()) @map("createdat")
+
+  test ModuleTest @relation(fields: [testId], references: [id], onDelete: Cascade)
+  user User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([testId, userId])
+  @@map("TestUnlock")
+}
+
