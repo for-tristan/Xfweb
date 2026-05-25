@@ -3273,8 +3273,8 @@ body {
 }
 
 @media (max-width: 1140px) {
- .nav-links:not(.active) li:nth-child(2) a,
-.nav-links:not(.active) li:nth-child(7) a
+ .nav-links:not(.active) li:nth-child(2),
+.nav-links:not(.active) li:nth-child(7)
 { display: none !important; }
   .nav-links { gap: 16px !important; }
   .nav-links a { font-size: 11px !important; }
@@ -3283,11 +3283,38 @@ body {
 }
 
 @media (max-width: 900px) {
+   .menu-toggle {
+    margin-left: 8px !important;
+  }
+  .nav-actions .nav-logout-btn {
+    margin-right: 4px !important;
+  }
   .navbar { padding: 16px clamp(12px, 3vw, 40px) !important; }
   .nav-links { gap: 14px !important; }
   .nav-links a { font-size: 10px !important; letter-spacing: 0.5px !important; }
   .nav-actions { overflow: visible !important; }
   button[title="Notifications"] { display: flex !important; }
+  
+}
+
+@media (max-width: 900px) {
+   .menu-toggle {
+    margin-left: 8px !important;
+  }
+  .nav-actions .nav-logout-btn {
+    margin-right: 4px !important;
+  }
+  .nav-actions button[title="Notifications"],
+  .nav-actions button[title="Search"] {
+    display: flex !important;
+    position: relative !important;
+    z-index: 1001 !important;
+  }
+  .nav-actions {
+    overflow: visible !important;
+    position: relative !important;
+    z-index: 1001 !important;
+  }
 }
 
 /* ── MOBILE MENU SLIDE ANIMATION ── */
@@ -3299,7 +3326,7 @@ body {
     width: 280px !important;
     height: 100vh !important;
     flex-direction: column !important;
-    background: rgba(7,7,7,0.98) !important;
+    background: var(--dark-gray, rgba(7,7,7,0.98)) !important;
     backdrop-filter: blur(24px) !important;
     padding: 80px 30px 30px !important;
     gap: 0 !important;
@@ -3307,28 +3334,6 @@ body {
     z-index: 999 !important;
     border-left: 1px solid rgba(220,20,60,0.15) !important;
   }
-  .nav-links.active {
-    right: 0 !important;
-  }
-  .nav-links li {
-    width: 100% !important;
-  }
-  .nav-links a {
-    display: block !important;
-    width: 100% !important;
-    padding: 14px 16px !important;
-    font-size: 13px !important;
-    letter-spacing: 2px !important;
-    border-bottom: 1px solid rgba(255,255,255,0.04) !important;
-    transition: background 0.2s ease, color 0.2s ease !important;
-  }
-  .nav-links a:hover,
-  .nav-links a.active {
-    background: rgba(220,20,60,0.08) !important;
-    color: var(--primary-red) !important;
-    padding-left: 22px !important;
-  }
-  .menu-toggle {
-    z-index: 1000 !important;
-  }
+  .nav-links.active { right: 0 !important; }
+  .menu-toggle { z-index: 1000 !important; }
 }
