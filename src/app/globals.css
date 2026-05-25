@@ -3293,6 +3293,13 @@ body {
   .nav-actions button { display: flex !important; }
   .nav-links.active ~ .nav-actions,
   .nav-actions { z-index: 998 !important; }
+  .nav-links.active::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: -1;
+}
 
   .nav-links {
     position: fixed !important;

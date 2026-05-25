@@ -836,7 +836,7 @@ useEffect(() => {
       {/* ═══════════════════════════════════════════════════
           NAVIGATION
           ═══════════════════════════════════════════════════ */}
-      <nav className={`navbar${scrolled ? ' scrolled' : ''}`} id="navbar">
+        <nav className={`navbar${scrolled ? ' scrolled' : ''}`} id="navbar" onClick={(e) => { if (e.target === e.currentTarget || (e.target as HTMLElement).classList.contains('nav-links')) setMobileMenuOpen(false); }}>
         <a href="#home" className="logo" onClick={(e) => { e.preventDefault(); scrollToSection('home'); }}>X<span>.</span>Foundry</a>
 
         <ul className={`nav-links${mobileMenuOpen ? ' active' : ''}`} id="navLinks">
