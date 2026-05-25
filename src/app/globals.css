@@ -3255,7 +3255,6 @@ body {
   .nav-links a { font-size: 12px !important; }
   .nav-actions .nav-user-name { display: none !important; }
 }
-
 @media (max-width: 1300px) {
   .nav-links { gap: 18px !important; }
   .nav-links a { font-size: 11px !important; }
@@ -3263,7 +3262,6 @@ body {
   .nav-actions .nav-logout-btn { padding: 6px 10px !important; font-size: 10px !important; }
   .nav-actions .nav-search-btn:first-of-type { display: none !important; }
 }
-
 @media (max-width: 1250px) {
   .nav-links { gap: 18px !important; }
   .nav-links a { font-size: 11px !important; }
@@ -3271,54 +3269,31 @@ body {
   .nav-actions .nav-logout-btn { padding: 6px 10px !important; font-size: 9px !important; }
   .nav-actions .nav-search-btn:first-of-type { display: none !important; }
 }
-
 @media (max-width: 1140px) {
- .nav-links:not(.active) li:nth-child(2),
-.nav-links:not(.active) li:nth-child(7)
-{ display: none !important; }
+  .nav-links:not(.active) li:nth-child(2),
+  .nav-links:not(.active) li:nth-child(7)
+  { display: none !important; }
   .nav-links { gap: 16px !important; }
   .nav-links a { font-size: 11px !important; }
   .nav-actions .nav-logout-btn { font-size: 8px !important; padding: 5px 8px !important; }
   .nav-auth-btn-filled { display: none !important; }
 }
 
+/* ── MOBILE ── */
 @media (max-width: 900px) {
-   .menu-toggle {
-    margin-left: 8px !important;
-  }
-  .nav-actions .nav-logout-btn {
-    margin-right: 4px !important;
-  }
   .navbar { padding: 16px clamp(12px, 3vw, 40px) !important; }
   .nav-links { gap: 14px !important; }
   .nav-links a { font-size: 10px !important; letter-spacing: 0.5px !important; }
-  .nav-actions { overflow: visible !important; }
-  button[title="Notifications"] { display: flex !important; }
-  
-}
+  .menu-toggle { margin-left: 8px !important; z-index: 1000 !important; }
+  .nav-actions .nav-logout-btn { margin-right: 4px !important; }
+  .nav-actions { gap: 10px !important; overflow: visible !important; position: relative !important; z-index: 1001 !important; }
+  .nav-actions button:has(.fa-bell) { display: flex !important; position: relative !important; z-index: 1001 !important; }
+  .nav-actions button:has(.fa-search) { display: flex !important; }
+  .nav-actions button:has(.fa-moon),
+  .nav-actions button:has(.fa-sun) { display: flex !important; }
+  .nav-actions .nav-user-btn { display: flex !important; }
+  .nav-actions .nav-logout-btn { display: flex !important; }
 
-@media (max-width: 900px) {
-   .menu-toggle {
-    margin-left: 8px !important;
-  }
-  .nav-actions .nav-logout-btn {
-    margin-right: 4px !important;
-  }
-  .nav-actions button[title="Notifications"],
-  .nav-actions button[title="Search"] {
-    display: flex !important;
-    position: relative !important;
-    z-index: 1001 !important;
-  }
-  .nav-actions {
-    overflow: visible !important;
-    position: relative !important;
-    z-index: 1001 !important;
-  }
-}
-
-/* ── MOBILE MENU SLIDE ANIMATION ── */
-@media (max-width: 900px) {
   .nav-links {
     position: fixed !important;
     top: 0 !important;
@@ -3335,5 +3310,4 @@ body {
     border-left: 1px solid rgba(220,20,60,0.15) !important;
   }
   .nav-links.active { right: 0 !important; }
-  .menu-toggle { z-index: 1000 !important; }
 }
