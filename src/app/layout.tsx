@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://x-foundry.com',
+    url: 'https://xfoundryy.vercel.app',
     siteName: 'X.Foundry',
     title: 'X.Foundry - Building The Future',
     description: 'The best way to predict the future is to create it.',

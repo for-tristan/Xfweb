@@ -1,5 +1,5 @@
 export default function sitemap() {
-  const baseUrl = 'https://x-foundry.com';
+  const baseUrl = 'https://xfoundryy.vercel.app';
   return [
     { url: baseUrl, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 1 },
     { url: `${baseUrl}/#services`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },

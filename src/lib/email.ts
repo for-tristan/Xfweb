@@ -117,7 +117,7 @@ export async function sendEnrollmentStatusEmail(data: {
             </div>
             <p style="color: #444; font-size: 15px; line-height: 1.8; margin: 0 0 24px;">Hello ${data.userName},<br><br>${message}</p>
             <div style="text-align: center; padding-top: 20px; border-top: 1px solid #eee;">
-              <a href="https://x-foundry.com" style="display: inline-block; padding: 12px 32px; background: ${isApproved ? '#22c55e' : '#dc143c'}; color: white; text-decoration: none; border-radius: 6px; font-weight: 700; font-size: 14px;">${isApproved ? 'Go to Dashboard' : 'Visit X.Foundry'}</a>
+              <a href="https://xfoundryy.vercel.app" style="display: inline-block; padding: 12px 32px; background: ${isApproved ? '#22c55e' : '#dc143c'}; color: white; text-decoration: none; border-radius: 6px; font-weight: 700; font-size: 14px;">${isApproved ? 'Go to Dashboard' : 'Visit X.Foundry'}</a>
             </div>
             <p style="color: #999; font-size: 11px; margin-top: 28px; text-align: center;">This is an automated email from X.Foundry. Please do not reply to this message.</p>
           </div>

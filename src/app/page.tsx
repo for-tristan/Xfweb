@@ -1462,23 +1462,13 @@ useEffect(() => {
                         </div>
                       )}
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+                    
                       <div className="form-group" style={{ marginBottom: 0 }}>
                         <label>Phone</label>
-                        <input type="tel" placeholder="+1 (555) 000-0000" value={signupPhone} onChange={(e) => setSignupPhone(e.target.value)} />
+                        <input type="tel" placeholder="+201234567890" value={signupPhone} onChange={(e) => setSignupPhone(e.target.value)} />
                       </div>
-                      <div className="form-group" style={{ marginBottom: 0 }}>
-                        <label>Role</label>
-                        <select value={signupRole} onChange={(e) => setSignupRole(e.target.value)} style={{ width: '100%', padding: '14px 18px', background: 'var(--input-bg)', border: '1px solid var(--border-color)', color: 'var(--text-light)', fontFamily: "'Space Grotesk', sans-serif", fontSize: 15, fontWeight: 600, outline: 'none' }}>
-                          <option value="student">Student</option>
-                          <option value="professional">Professional</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div className="form-group">
-                      <label>Company</label>
-                      <input type="text" placeholder="Your company (optional)" value={signupCompany} onChange={(e) => setSignupCompany(e.target.value)} />
-                    </div>
+                     
+                  
                     <button type="submit" className="submit-btn" disabled={signupLoading} style={{ marginTop: 8 }}>
                       {signupLoading ? <><i className="fas fa-spinner fa-spin"></i> Creating Account...</> : <><i className="fas fa-user-plus"></i> Create Account</>}
                     </button>
@@ -1981,9 +1971,7 @@ useEffect(() => {
                       <h3 style={{ fontFamily: "'Orbitron', sans-serif", fontWeight: 900, fontSize: 18, marginBottom: 4, color: 'var(--text-light)' }}>Messages</h3>
                       <p style={{ color: 'var(--text-dim)', fontSize: 14 }}>Chat with your friends</p>
                     </div>
-                    <button onClick={() => { setDashboardOpen(false); setChatOpen(true); }} className="submit-btn" style={{ width: 'auto', padding: '10px 20px', fontSize: 13, display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <i className="fas fa-expand"></i> Open Chat
-                    </button>
+                   
                   </div>
                   {friends.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-dim)' }}>

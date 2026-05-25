@@ -3236,3 +3236,26 @@ body {
     transform: none !important;
 }
 }
+
+@media (max-width: 1400px) {
+  .navbar { padding: 18px clamp(20px, 4vw, 60px) !important; }
+  .nav-links { gap: 28px !important; }
+  .nav-links a { font-size: 13px !important; }
+}
+@media (max-width: 1250px) {
+  .nav-links { gap: 18px !important; }
+  .nav-links a { font-size: 11px !important;  }
+  .nav-actions { gap: 2px !important; }
+  .nav-auth-btn { font-size: 10px !important; }
+}
+@media (max-width: 1100px) {
+  .nav-links { gap: 18px !important; }
+  .nav-links a { font-size: 11px !important; letter-spacing: 1px !important; }
+  .nav-actions { gap: 2px !important; }
+  .nav-auth-btn { font-size: 10px !important; padding: 7px 14px !important; }
+}
+@media (max-width: 900px) {
+  .navbar { padding: 16px clamp(12px, 3vw, 40px) !important; }
+  .nav-links { gap: 14px !important; }
+  .nav-links a { font-size: 10px !important; letter-spacing: 0.5px !important; }
+}

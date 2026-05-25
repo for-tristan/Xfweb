@@ -311,10 +311,6 @@ export function AuthModal({
                       <label style={labelStyle}>PHONE <span style={{ opacity: 0.5 }}>(optional)</span></label>
                       <input type="tel" value={signupPhone} onChange={(e) => setSignupPhone(e.target.value)} placeholder="+20..." style={inputStyle} />
                     </div>
-                    <div style={{ marginBottom: 20 }}>
-                      <label style={labelStyle}>COMPANY <span style={{ opacity: 0.5 }}>(optional)</span></label>
-                      <input type="text" value={signupCompany} onChange={(e) => setSignupCompany(e.target.value)} placeholder="Your company" style={inputStyle} />
-                    </div>
                     <button type="submit" disabled={signupLoading} style={{ ...primaryBtnStyle, opacity: signupLoading ? 0.7 : 1, cursor: signupLoading ? 'not-allowed' : 'pointer' }}>
                       {signupLoading ? <><i className="fas fa-spinner fa-spin" style={{ marginRight: 8 }} />Creating Account...</> : 'Create Account'}
                     </button>
