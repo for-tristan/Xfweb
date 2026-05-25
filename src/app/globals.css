@@ -1592,7 +1592,7 @@ body.xf-body {
     background: var(--primary-red);
     border-radius: 50%;
     animation: float linear infinite;
-    opacity: 0.4;
+    opacity: 0.6;
 }
 @keyframes float {
     0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
@@ -2563,7 +2563,7 @@ body.xf-body {
     .footer-grid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 768px) {
-    .navbar { padding: 14px 16px; }
+     .navbar { padding: 20px clamp(20px, 5vw, 60px) !important; }
     .navbar.scrolled { padding: 10px 16px; }
     .logo { font-size: 16px; flex-shrink: 0; }
     .hero { padding: 0 20px; }

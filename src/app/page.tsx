@@ -803,9 +803,27 @@ useEffect(() => {
 
   return (
     <>
+
+     {/* ──── RESPONSIVE NAV ──── */}
+      <style>{`
+        @media (max-width: 1024px) {
+          .navbar { padding: 22px 40px !important; }
+          .nav-links { gap: 28px !important; }
+        }
+        @media (max-width: 768px) {
+          .navbar { padding: 16px 24px !important; }
+          .nav-links a { font-size: 11px !important; letter-spacing: 1px !important; }
+        }
+        @media (max-width: 480px) {
+          .navbar { padding: 14px 16px !important; }
+          .logo { font-size: 18px !important; letter-spacing: 2px !important; }
+        }
+      `}</style>
+
+
       {/* ──── GLOBAL PARTICLES ──── */}
       {particles.length > 0 && (
-      <div className="global-particles">
+      <div className="global-particles" style={{ zIndex: 9 }}>
       {particles.map((p) => (
           <div key={p.id} className="particle" style={{ left: p.left, width: p.size, height: p.size, animationDuration: p.duration, animationDelay: p.delay }} />
         ))}
