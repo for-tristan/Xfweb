@@ -3243,6 +3243,12 @@ body {
 .nav-links a { transition: font-size 0.3s ease, letter-spacing 0.3s ease !important; }
 .nav-actions { transition: gap 0.3s ease !important; }
 
+@media (max-width: 1570px) {
+  .navbar { padding: 20px clamp(20px, 4vw, 60px) !important; }
+  .nav-links { gap: 24px !important; }
+  .nav-links a { font-size: 13px !important; }
+  .nav-actions .nav-user-name { display: none !important; }
+}
 @media (max-width: 1400px) {
   .navbar { padding: 18px clamp(20px, 4vw, 60px) !important; }
   .nav-links { gap: 24px !important; }
@@ -3258,7 +3264,7 @@ body {
   .nav-actions .nav-search-btn:first-of-type { display: none !important; }
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1140px) {
   .nav-links li:nth-child(2) a, /* Services */
   .nav-links li:nth-child(7) a  /* Team */
   { display: none !important; }
