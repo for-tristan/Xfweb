@@ -3237,16 +3237,30 @@ body {
 }
 }
 
+/* ── RESPONSIVE NAVBAR ── */
+.navbar { transition: padding 0.3s ease !important; }
+.nav-links { transition: gap 0.3s ease !important; }
+.nav-links a { transition: font-size 0.3s ease, letter-spacing 0.3s ease !important; }
+.nav-actions { transition: gap 0.3s ease !important; }
+
 @media (max-width: 1400px) {
   .navbar { padding: 18px clamp(20px, 4vw, 60px) !important; }
   .nav-links { gap: 28px !important; }
   .nav-links a { font-size: 13px !important; }
+  .nav-links a[href="/admin"] { font-size: 10px !important; }
+  .nav-actions .nav-user-name { display: none !important; }
+  .nav-actions .nav-logout-btn { font-size: 10px !important; padding: 7px 12px !important; }
 }
 @media (max-width: 1250px) {
   .nav-links { gap: 18px !important; }
-  .nav-links a { font-size: 11px !important;  }
+  .nav-links a { font-size: 11px !important; }
   .nav-actions { gap: 2px !important; }
   .nav-auth-btn { font-size: 10px !important; }
+}
+@media (max-width: 1200px) {
+  .nav-actions { gap: 0px !important; }
+  .nav-actions .nav-logout-btn { padding: 6px 10px !important; font-size: 9px !important; }
+  .nav-links a[href="/admin"] { padding: 4px 8px !important; border: 1px solid rgba(220,20,60,0.3) !important; font-size: 9px !important; }
 }
 @media (max-width: 1100px) {
   .nav-links { gap: 18px !important; }
