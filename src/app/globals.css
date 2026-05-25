@@ -3273,9 +3273,9 @@ body {
 }
 
 @media (max-width: 1140px) {
-  .nav-links li:nth-child(2) a, /* Services */
-  .nav-links li:nth-child(7) a  /* Team */
-  { display: none !important; }
+ .nav-links:not(.active) li:nth-child(2) a,
+.nav-links:not(.active) li:nth-child(7) a
+{ display: none !important; }
   .nav-links { gap: 16px !important; }
   .nav-links a { font-size: 11px !important; }
   .nav-actions .nav-logout-btn { font-size: 8px !important; padding: 5px 8px !important; }
@@ -3286,4 +3286,49 @@ body {
   .navbar { padding: 16px clamp(12px, 3vw, 40px) !important; }
   .nav-links { gap: 14px !important; }
   .nav-links a { font-size: 10px !important; letter-spacing: 0.5px !important; }
+  .nav-actions { overflow: visible !important; }
+  button[title="Notifications"] { display: flex !important; }
+}
+
+/* ── MOBILE MENU SLIDE ANIMATION ── */
+@media (max-width: 900px) {
+  .nav-links {
+    position: fixed !important;
+    top: 0 !important;
+    right: -100% !important;
+    width: 280px !important;
+    height: 100vh !important;
+    flex-direction: column !important;
+    background: rgba(7,7,7,0.98) !important;
+    backdrop-filter: blur(24px) !important;
+    padding: 80px 30px 30px !important;
+    gap: 0 !important;
+    transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    z-index: 999 !important;
+    border-left: 1px solid rgba(220,20,60,0.15) !important;
+  }
+  .nav-links.active {
+    right: 0 !important;
+  }
+  .nav-links li {
+    width: 100% !important;
+  }
+  .nav-links a {
+    display: block !important;
+    width: 100% !important;
+    padding: 14px 16px !important;
+    font-size: 13px !important;
+    letter-spacing: 2px !important;
+    border-bottom: 1px solid rgba(255,255,255,0.04) !important;
+    transition: background 0.2s ease, color 0.2s ease !important;
+  }
+  .nav-links a:hover,
+  .nav-links a.active {
+    background: rgba(220,20,60,0.08) !important;
+    color: var(--primary-red) !important;
+    padding-left: 22px !important;
+  }
+  .menu-toggle {
+    z-index: 1000 !important;
+  }
 }
