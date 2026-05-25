@@ -3256,6 +3256,14 @@ body {
   .nav-actions .nav-user-name { display: none !important; }
 }
 
+@media (max-width: 1300px) {
+  .nav-links { gap: 18px !important; }
+  .nav-links a { font-size: 11px !important; }
+  .nav-actions { gap: 0px !important; }
+  .nav-actions .nav-logout-btn { padding: 6px 10px !important; font-size: 10px !important; }
+  .nav-actions .nav-search-btn:first-of-type { display: none !important; }
+}
+
 @media (max-width: 1250px) {
   .nav-links { gap: 18px !important; }
   .nav-links a { font-size: 11px !important; }
