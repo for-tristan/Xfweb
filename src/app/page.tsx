@@ -1116,8 +1116,8 @@ useEffect(() => {
           <div className="section-divider"></div>
           <p className="section-desc" style={{ marginTop: 22 }}>Everything you need to know about X-Foundry courses and services.</p>
         </div>
-        <div style={{ maxWidth: 800, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {[
+       {/*  <div style={{ maxWidth: 800, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
+         {[
             { q: 'How do I enroll in a course?', a: 'Sign up for a free account, browse our courses, and click "Enroll Now". Fill in your experience level and motivation, then submit your request. An admin will review and approve it, usually within 24 hours.' },
             { q: 'Are the courses really free?', a: 'Yes! All X-Foundry courses are currently 100% free. We believe quality tech education should be accessible to everyone. This may change in the future, but enrolled students will always have access.' },
             { q: 'How long do the courses take to complete?', a: 'Course durations vary. The ML Engineer Bootcamp is 8 weeks, and Linux Basics is 4 weeks. You can learn at your own pace — all course materials remain accessible even after the official duration ends.' },
@@ -1129,7 +1129,7 @@ useEffect(() => {
           ].map((faq, i) => (
             <FaqItem key={i} question={faq.q} answer={faq.a} index={i} />
           ))}
-        </div>
+        </div> */}
       </section>
 
       {/* ═══════════════════════════════════════════════════
