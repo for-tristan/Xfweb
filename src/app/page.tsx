@@ -1101,20 +1101,16 @@ useEffect(() => {
           <div className="section-divider"></div>
           <p className="section-desc" style={{ marginTop: 22 }}>Everything you need to know about X-Foundry courses and services.</p>
         </div>
-       {/*  <div style={{ maxWidth: 800, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
+         <div style={{ maxWidth: 800, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
          {[
-            { q: 'How do I enroll in a course?', a: 'Sign up for a free account, browse our courses, and click "Enroll Now". Fill in your experience level and motivation, then submit your request. An admin will review and approve it, usually within 24 hours.' },
-            { q: 'Are the courses really free?', a: 'Yes! All X-Foundry courses are currently 100% free. We believe quality tech education should be accessible to everyone. This may change in the future, but enrolled students will always have access.' },
-            { q: 'How long do the courses take to complete?', a: 'Course durations vary. The ML Engineer Bootcamp is 8 weeks, and Linux Basics is 4 weeks. You can learn at your own pace — all course materials remain accessible even after the official duration ends.' },
-            { q: 'Will I receive a certificate?', a: 'Yes, upon completing all course modules and meeting the requirements, you will receive a certificate of completion that you can add to your resume or LinkedIn profile.' },
-            { q: 'How do I request a custom software project?', a: 'Navigate to our Contact section or use the "Request Quote" button on any service page. Fill in your project details, and our team will get back to you within 24 hours with a tailored proposal.' },
-            { q: 'What technologies do you work with?', a: 'We specialize in modern tech stacks including React, Next.js, Python, TensorFlow, PyTorch, Node.js, Docker, AWS, and more. We choose the right tools for each project based on requirements and scalability needs.' },
-            { q: 'Can I cancel my enrollment?', a: 'Yes, you can cancel your enrollment request at any time from your dashboard under "My Enrollments". If you have already been approved, you can still cancel and your progress will be saved if you decide to re-enroll later.' },
-            { q: 'How do I contact support?', a: `You can reach us through the Contact form on our website, via email at ${contactEmail}, or through our Discord community. We also have an AI assistant (XAI) available on every page to answer quick questions.` },
+            { q: 'how do these programs work?', a: `We dont teach you We Guide, instruct and test you throughout the program, we show you how to do it yourself and work efficiently , dependently and be more productive at what you wanna Learn. ` },
+            { q: 'Are the programs really free?', a: 'Yes! For now since we are in our pre-production phase, all courses are completely free of charge.' },
+            { q: 'What technologies do you work with?', a: 'We specialize in various technologies including python, java, Frontend Development, and Backend Development, Software Engineering, and more.' },
+            { q: 'How do I request a custom project?', a: 'Navigate to our Contact section or use the "Request Quote" button on any service page. Fill in your project details, and our team will get back to you within 24 hours.' },
           ].map((faq, i) => (
             <FaqItem key={i} question={faq.q} answer={faq.a} index={i} />
           ))}
-        </div> */}
+        </div> 
       </section>
 
       {/* ═══════════════════════════════════════════════════
