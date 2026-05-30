@@ -1,0 +1,15 @@
+# Caddyfile — LOCAL DEVELOPMENT ONLY
+# This file is NOT used in production (site is deployed on Vercel)
+# Port 81 is used for local dev to avoid conflicts with Next.js on port 3000
+
+:81 {
+        # Default: proxy all requests to the Next.js dev server
+        handle {
+                reverse_proxy localhost:3000 {
+                        header_up Host {host}
+                        header_up X-Forwarded-For {remote_host}
+                        header_up X-Forwarded-Proto {scheme}
+                        header_up X-Real-IP {remote_host}
+                }
+        }
+}
