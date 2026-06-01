@@ -537,7 +537,7 @@ useEffect(() => {
   // Theme: initialize from localStorage
   const [theme, setTheme] = useState<string>(() => {
     if (typeof window === 'undefined') return 'light';
-    const saved = localStorage.getItem('x-foundry-theme') || 'light';
+    const saved = localStorage.getItem('x-foundry-theme') || 'oled';
     // Backwards compat: map old 'dark' or 'vaulta' to light
     if (saved === 'dark' || saved === 'vaulta') return 'light';
     return saved;

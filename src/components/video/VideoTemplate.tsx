@@ -10,11 +10,11 @@ import { Scene4 } from './video_scenes/Scene4';
 import { Scene5 } from './video_scenes/Scene5';
 
 export const SCENE_DURATIONS: Record<string, number> = {
-  intro: 5000,
-  services: 6000,
-  programs: 6000,
-  performance: 5000,
-  outro: 6000,
+  intro: 3000,
+  services: 4000,
+  programs: 4000,
+  performance: 3000,
+  outro: 4000,
 };
 
 const SCENE_COMPONENTS: Record<string, React.ComponentType> = {

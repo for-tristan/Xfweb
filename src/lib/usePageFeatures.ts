@@ -99,7 +99,7 @@ export function usePageFeatures() {
   // Multi-theme: crimson, midnight, oled, phantom, synthwave, frost, light, sand
   const [theme, setTheme] = useState<string>(() => {
     if (typeof window === 'undefined') return 'light';
-    return localStorage.getItem('x-foundry-theme') || 'light';
+    return localStorage.getItem('x-foundry-theme') || 'oled';
   });
 
   // ── UI ──

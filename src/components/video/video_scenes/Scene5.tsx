@@ -64,7 +64,6 @@ export function Scene5() {
           transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
           style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-dim)', fontSize: 18, fontWeight: 300, letterSpacing: '0.02em' }}
         >
-          coming very very. soon
         </motion.div>
       </motion.div>
     </motion.div>

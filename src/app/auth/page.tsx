@@ -52,7 +52,7 @@ function AuthContent() {
 
   // Theme — read from localStorage only, no picker on auth page
   useEffect(() => {
-    const t = localStorage.getItem('x-foundry-theme') || 'light';
+    const t = localStorage.getItem('x-foundry-theme') || 'oled';
     document.documentElement.setAttribute('data-theme', t);
   }, []);
 
