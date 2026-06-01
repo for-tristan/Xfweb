@@ -65,6 +65,17 @@
   text-rendering: optimizeLegibility;
 }
 
+/* Global keyboard focus indicator — WCAG 2.1 Level A (2.4.7 Focus Visible) */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+/* Remove default focus ring for mouse users */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
 html {
   max-width: 100%;
   overflow-x: hidden;
@@ -2868,6 +2879,7 @@ select optgroup {
     padding: 20px;
     z-index: 10001;
     animation: vModalOverlayIn 0.2s ease;
+    overflow-y: auto;
 }
 .v-modal-overlay.v-modal-overlay-top {
     align-items: flex-start;
@@ -3516,6 +3528,10 @@ select optgroup {
     .page-hero, .course-hero { min-height: 40vh; padding: 120px 24px 60px; }
     .what-learn { grid-template-columns: 1fr; }
     .cta-section { padding: 60px 24px; }
+    .course-card { grid-template-columns: 1fr !important; }
+    .contact-container { grid-template-columns: 1fr !important; }
+    .quote-form { padding: 24px !important; }
+    .services-grid { grid-template-columns: 1fr !important; }
 }
 
 /* ========================================

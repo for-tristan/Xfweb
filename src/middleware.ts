@@ -19,6 +19,14 @@ const RATE_LIMITS: Record<string, RateLimitConfig> = {
   // General API — moderate limits
   '/api/chat': { windowMs: 60 * 1000, maxRequests: 30 },                   // 30 messages per minute
   '/api/quotes': { windowMs: 60 * 60 * 1000, maxRequests: 10 },            // 10 quotes per hour
+  // AI endpoints — strict limits (costs money per token)
+  '/api/ai/chat': { windowMs: 60 * 1000, maxRequests: 15 },                // 15 AI messages per minute
+  '/api/ai/upload': { windowMs: 60 * 1000, maxRequests: 10 },              // 10 uploads per minute
+  // Game & friend spam prevention
+  '/api/games/submit': { windowMs: 60 * 1000, maxRequests: 10 },           // 10 score submissions per minute
+  '/api/friends': { windowMs: 60 * 1000, maxRequests: 10 },                // 10 friend actions per minute
+  // Email abuse prevention
+  '/api/auth/resend-verification': { windowMs: 60 * 60 * 1000, maxRequests: 5 }, // 5 resends per hour
 };
 
 // Clean up expired entries every 5 minutes
@@ -104,5 +112,8 @@ export const config = {
     '/api/auth/:path*',
     '/api/chat/:path*',
     '/api/quotes/:path*',
+    '/api/ai/:path*',
+    '/api/games/submit',
+    '/api/friends/:path*',
   ],
 };

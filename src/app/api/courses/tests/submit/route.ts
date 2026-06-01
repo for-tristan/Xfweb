@@ -3,15 +3,16 @@ import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
-  const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+  try {
+    const user = await getCurrentUser();
+    if (!user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 
-  const body = await request.json();
-  const { testId, answers, startedAt } = body;
+    const body = await request.json();
+    const { testId, answers, startedAt } = body;
 
-  if (!testId || !answers) {
-    return NextResponse.json({ error: 'testId and answers are required' }, { status: 400 });
-  }
+    if (!testId || !answers) {
+      return NextResponse.json({ error: 'testId and answers are required' }, { status: 400 });
+    }
 
   // Verify the test is unlocked for this user
   const unlock = await db.testUnlock.findUnique({
@@ -119,4 +120,8 @@ export async function POST(request: NextRequest) {
       submittedAt: attempt.submittedAt,
     },
   });
+  } catch (error) {
+    console.error('Test submit error:', error);
+    return NextResponse.json({ error: 'Failed to submit test' }, { status: 500 });
+  }
 }

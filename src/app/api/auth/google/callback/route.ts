@@ -29,7 +29,8 @@ export async function GET(request: NextRequest) {
     }
 
     // SECURITY: Use environment variable for base URL
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `https://${request.headers.get('host') || 'localhost:3000'}`;
+    const host = request.headers.get('host');
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (host ? `https://${host}` : 'http://localhost:3000');
     const redirectUri = `${baseUrl}/api/auth/google/callback`;
 
     // Exchange code for tokens

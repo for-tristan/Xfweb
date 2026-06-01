@@ -13,6 +13,18 @@ async function requireAdmin() {
   return { error: null, user };
 }
 
+// Keys that should never be sent to the client even in admin responses
+const SENSITIVE_KEY_PATTERNS = [
+  'smtp_pass', 'secret', 'api_key', 'token', 'password',
+  'database_url', 'session_secret', 'private_key',
+  'google_secret', 'github_secret', 'cloudinary_api_secret',
+];
+
+function isSensitiveKey(key: string): boolean {
+  const lower = key.toLowerCase();
+  return SENSITIVE_KEY_PATTERNS.some(pattern => lower.includes(pattern));
+}
+
 export async function GET() {
   try {
     const { error } = await requireAdmin();
@@ -22,7 +34,13 @@ export async function GET() {
 
     const settingsMap: Record<string, string> = {};
     for (const setting of settings) {
-      settingsMap[setting.key] = setting.value;
+      // Mask sensitive values — show only last 4 chars
+      if (isSensitiveKey(setting.key)) {
+        const val = setting.value;
+        settingsMap[setting.key] = val.length > 4 ? '••••' + val.slice(-4) : '••••';
+      } else {
+        settingsMap[setting.key] = setting.value;
+      }
     }
 
     return NextResponse.json({ settings: settingsMap });

@@ -124,7 +124,7 @@ async function sendEmail(payload: EmailPayload): Promise<boolean> {
         });
         // Close connection immediately — don't let it linger
         transport.close();
-        console.log(`[Email] Sent via Gmail to ${toStr}${attempt > 1 ? ` (attempt ${attempt})` : ''}`);
+        console.log(`[Email] Sent via Gmail${attempt > 1 ? ` (attempt ${attempt})` : ''}`);
         return true;
       } catch (error: any) {
         // Always close on error too
@@ -169,7 +169,7 @@ async function sendEmail(payload: EmailPayload): Promise<boolean> {
       if (error) {
         console.error('[Email] Resend fallback error:', error.message);
       } else {
-        console.log(`[Email] Sent via Resend (fallback) to ${toStr}`);
+        console.log('[Email] Sent via Resend (fallback)');
         return true;
       }
     } catch (err: any) {
@@ -215,7 +215,7 @@ function emailWrapper(content: string): string {
       </div>
       ${content}
       <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid ${COLOR_BORDER};">
-        <p style="color: #a3a3a3; font-size: 12px; line-height: 1.5; margin: 0;">XFoundry<br>xfoundryy.vercel.app</p>
+        <p style="color: #a3a3a3; font-size: 12px; line-height: 1.5; margin: 0;">XFoundry<br>${process.env.NEXT_PUBLIC_BASE_URL || 'xfoundryy.vercel.app'}</p>
       </div>
     </div>
   `;
@@ -299,7 +299,7 @@ export async function sendEnrollmentStatusEmail(data: {
       <p style="font-size: 14px; color: ${COLOR_LIGHT}; margin: 0 0 24px;">${sanitizeHtml(data.courseName)}</p>
       <p style="font-size: 15px; color: ${COLOR_TEXT}; line-height: 1.7; margin: 0 0 8px;">Hi ${sanitizeHtml(data.userName)},</p>
       <p style="font-size: 15px; color: #404040; line-height: 1.7; margin: 0 0 28px;">${message}</p>
-      ${button(isApproved ? 'Go to Dashboard' : 'Visit XFoundry', 'https://xfoundryy.vercel.app')}
+      ${button(isApproved ? 'Go to Dashboard' : 'Visit XFoundry', process.env.NEXT_PUBLIC_BASE_URL || 'https://xfoundryy.vercel.app')}
     `),
   });
 }

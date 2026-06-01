@@ -1067,31 +1067,122 @@ function ChatContent() {
 
         /* ═══ Responsive ═══ */
         @media (max-width: 768px) {
+          .zai-chat-page {
+            padding-top: 70px;
+          }
           .zai-chat-sidebar {
             position: fixed;
             top: 0;
             left: 0;
             bottom: 0;
+            width: 280px;
+            min-width: 280px;
             z-index: 100;
-            padding-top: 80px;
+            padding-top: 70px;
           }
           .zai-chat-sidebar:not(.open) {
-            margin-left: -260px;
+            margin-left: -280px;
           }
           .zai-suggestions-grid {
             grid-template-columns: 1fr;
           }
+          .zai-chat-header {
+            padding: 8px 12px;
+            min-height: 46px;
+          }
+          .zai-header-title {
+            font-size: 0.88rem;
+          }
+          .zai-model-pill {
+            font-size: 0.58rem;
+            padding: 3px 8px;
+          }
           .zai-messages-list {
-            padding: 16px 12px;
+            padding: 12px 8px;
+            gap: 14px;
+          }
+          .zai-msg {
+            gap: 8px;
+          }
+          .zai-msg-avatar {
+            width: 26px;
+            height: 26px;
+            min-width: 26px;
+            border-radius: 8px;
+          }
+          .zai-msg-content {
+            max-width: 92%;
+            padding: 10px 14px;
+            font-size: 0.88rem;
+            border-radius: 16px;
+          }
+          .zai-empty-state {
+            padding: 24px 16px;
+          }
+          .zai-empty-title {
+            font-size: 1.25rem;
+          }
+          .zai-empty-sub {
+            font-size: 0.82rem;
           }
           .zai-input-wrapper {
-            padding: 6px 8px 8px;
+            padding: 6px 8px 10px;
           }
           .zai-input-container {
             max-width: 100%;
           }
+          .zai-textarea {
+            font-size: 16px !important;
+          }
+          .zai-input-bar {
+            padding: 8px 10px 8px 4px;
+            border-radius: 14px;
+          }
+          .zai-attach-btn {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            font-size: 0.85rem;
+          }
+          .zai-send-btn {
+            width: 30px;
+            height: 30px;
+            min-width: 30px;
+            font-size: 0.75rem;
+          }
+          .zai-input-disclaimer {
+            font-size: 0.62rem;
+          }
+          .zai-file-chip {
+            font-size: 0.72rem;
+          }
+          .zai-file-chip-name {
+            max-width: 120px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .zai-chat-page {
+            padding-top: 64px;
+          }
+          .zai-chat-sidebar {
+            width: 260px;
+            min-width: 260px;
+            padding-top: 64px;
+          }
+          .zai-chat-sidebar:not(.open) {
+            margin-left: -260px;
+          }
+          .zai-messages-list {
+            padding: 10px 6px;
+            gap: 12px;
+          }
           .zai-msg-content {
-            max-width: 92%;
+            padding: 8px 12px;
+            font-size: 0.86rem;
+          }
+          .zai-empty-title {
+            font-size: 1.15rem;
           }
         }
       `}</style>

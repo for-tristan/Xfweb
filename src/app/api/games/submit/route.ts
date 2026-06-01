@@ -28,16 +28,32 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid difficulty' }, { status: 400 });
     }
 
+    // Validate numeric ranges
+    const numScore = parseInt(score);
+    const numCorrect = parseInt(correct);
+    const numTotal = parseInt(total);
+    const numTimeSpent = parseInt(timeSpent);
+
+    if (isNaN(numScore) || isNaN(numCorrect) || isNaN(numTotal) || isNaN(numTimeSpent)) {
+      return NextResponse.json({ error: 'Score, correct, total, and timeSpent must be numbers' }, { status: 400 });
+    }
+    if (numScore < 0 || numCorrect < 0 || numTotal <= 0 || numTimeSpent < 0) {
+      return NextResponse.json({ error: 'Invalid score values' }, { status: 400 });
+    }
+    if (numCorrect > numTotal) {
+      return NextResponse.json({ error: 'Correct answers cannot exceed total' }, { status: 400 });
+    }
+
     const gameScore = await db.gameScore.create({
       data: {
         userId: user.id,
         game,
         language,
         difficulty,
-        score: parseInt(score),
-        correct: parseInt(correct),
-        total: parseInt(total),
-        timeSpent: parseInt(timeSpent),
+        score: numScore,
+        correct: numCorrect,
+        total: numTotal,
+        timeSpent: numTimeSpent,
       },
     });
 

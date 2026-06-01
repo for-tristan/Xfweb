@@ -117,32 +117,37 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-  if (user.role !== 'admin') return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+  try {
+    const user = await getCurrentUser();
+    if (!user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    if (user.role !== 'admin') return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
 
-  const body = await request.json();
-  const { moduleId, title, description, timeLimit, passingScore } = body;
+    const body = await request.json();
+    const { moduleId, title, description, timeLimit, passingScore } = body;
 
-  if (!moduleId || !title) {
-    return NextResponse.json({ error: 'moduleId and title are required' }, { status: 400 });
+    if (!moduleId || !title) {
+      return NextResponse.json({ error: 'moduleId and title are required' }, { status: 400 });
+    }
+
+    // Verify module exists
+    const module = await db.courseModule.findUnique({ where: { id: moduleId } });
+    if (!module) return NextResponse.json({ error: 'Module not found' }, { status: 404 });
+
+    const test = await db.moduleTest.create({
+      data: {
+        moduleId,
+        title,
+        description: description || '',
+        timeLimit: timeLimit !== undefined ? timeLimit : 30,
+        passingScore: passingScore !== undefined ? passingScore : 70,
+      },
+    });
+
+    return NextResponse.json({ test }, { status: 201 });
+  } catch (error) {
+    console.error('Admin tests create error:', error);
+    return NextResponse.json({ error: 'Failed to create test' }, { status: 500 });
   }
-
-  // Verify module exists
-  const module = await db.courseModule.findUnique({ where: { id: moduleId } });
-  if (!module) return NextResponse.json({ error: 'Module not found' }, { status: 404 });
-
-  const test = await db.moduleTest.create({
-    data: {
-      moduleId,
-      title,
-      description: description || '',
-      timeLimit: timeLimit !== undefined ? timeLimit : 30,
-      passingScore: passingScore !== undefined ? passingScore : 70,
-    },
-  });
-
-  return NextResponse.json({ test }, { status: 201 });
 }
 
 export async function PUT(request: NextRequest) {
