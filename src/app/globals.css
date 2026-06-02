@@ -30,15 +30,15 @@
   --warning-color: #f59e0b;
   --info-color: #6640ff;
 
-  /* Accent Colors */
-  --accent-purple: #a58fff;
+  /* Accent Colors — derived from theme accent for automatic theme adaptation */
+  --accent-purple: color-mix(in srgb, var(--accent) 55%, white);
 
   /* Vaulta-specific — all derived from theme accent for dynamic switching */
   --v-badge-border: color-mix(in srgb, var(--accent) 10%, transparent);
   --v-badge-text: var(--accent);
   --v-card-line: color-mix(in srgb, var(--accent) 8%, transparent);
-  --v-gradient: linear-gradient(299deg, var(--accent-purple), var(--accent-dark) 55.69%, var(--accent-purple) 104%);
-  --v-gradient-reverse: linear-gradient(344deg, color-mix(in srgb, var(--accent-purple) 80%, transparent), color-mix(in srgb, var(--accent-dark) 80%, transparent) 55.69%, color-mix(in srgb, var(--accent-purple) 80%, transparent) 102%);
+  --v-gradient: linear-gradient(299deg, color-mix(in srgb, var(--accent) 80%, white), var(--accent-dark) 55%, color-mix(in srgb, var(--accent) 80%, white));
+  --v-gradient-reverse: linear-gradient(344deg, color-mix(in srgb, var(--accent) 70%, transparent), color-mix(in srgb, var(--accent-dark) 70%, transparent) 55%, color-mix(in srgb, var(--accent) 70%, transparent));
 
   /* Font families */
   --font-heading: 'Inter Tight', sans-serif;
@@ -346,7 +346,6 @@ html {
     --error-color: #ef4444;
     --warning-color: #f59e0b;
     --info-color: #1976d2;
-    --accent-purple: #7c3aed;
 
     /* Scrollbar */
     --sb-track: #f5f5f5;
@@ -372,7 +371,6 @@ html {
     --input-bg: rgba(107, 155, 245, 0.05);
     --border-color: rgba(107, 155, 245, 0.1);
     --info-color: #6b9bf5;
-    --accent-purple: #9098e8;
 }
 
 [data-theme="oled"] {
@@ -390,7 +388,6 @@ html {
     --card-bg: #0c0c0c;
     --input-bg: rgba(255, 255, 255, 0.03);
     --border-color: rgba(255, 255, 255, 0.06);
-    --accent-purple: #c86070;
 }
 
 [data-theme="phantom"] {
@@ -409,7 +406,6 @@ html {
     --input-bg: rgba(74, 186, 114, 0.04);
     --border-color: rgba(74, 186, 114, 0.1);
     --success-color: #4aba72;
-    --accent-purple: #60c080;
 }
 
 [data-theme="synthwave"] {
@@ -427,7 +423,6 @@ html {
     --card-bg: #1a0e30;
     --input-bg: rgba(192, 106, 218, 0.04);
     --border-color: rgba(192, 106, 218, 0.1);
-    --accent-purple: #c06ada;
 }
 
 [data-theme="frost"] {
@@ -446,7 +441,6 @@ html {
     --input-bg: rgba(90, 175, 224, 0.04);
     --border-color: rgba(90, 175, 224, 0.1);
     --info-color: #5aafe0;
-    --accent-purple: #5098c0;
 }
 
 [data-theme="sand"] {
@@ -468,7 +462,6 @@ html {
     --error-color: #dc2626;
     --warning-color: #d97706;
     --info-color: #0369a1;
-    --accent-purple: #7c3aed;
 }
 
 /* ── EXTRA DARK THEMES ── */
@@ -490,7 +483,6 @@ html {
     --border-color: rgba(168, 216, 48, 0.08);
     --success-color: #a8d830;
     --info-color: #50c8d8;
-    --accent-purple: #b860c8;
 }
 
 [data-theme="crimson-night"] {
@@ -509,7 +501,6 @@ html {
     --input-bg: rgba(216, 176, 64, 0.04);
     --border-color: rgba(216, 176, 64, 0.08);
     --warning-color: #d8b040;
-    --accent-purple: #c87090;
 }
 
 [data-theme="aurora"] {
@@ -529,7 +520,6 @@ html {
     --border-color: rgba(48, 184, 136, 0.08);
     --success-color: #30b888;
     --info-color: #5090c0;
-    --accent-purple: #7888c8;
 }
 
 [data-theme="volcano"] {
@@ -549,7 +539,6 @@ html {
     --border-color: rgba(216, 112, 48, 0.08);
     --warning-color: #d87030;
     --error-color: #c84040;
-    --accent-purple: #a878c0;
 }
 
 [data-theme="slate"] {
@@ -568,7 +557,6 @@ html {
     --input-bg: rgba(154, 160, 184, 0.04);
     --border-color: rgba(154, 160, 184, 0.08);
     --info-color: #7098c0;
-    --accent-purple: #a888d0;
 }
 
 [data-theme="deep-ocean"] {
@@ -587,7 +575,6 @@ html {
     --input-bg: rgba(48, 152, 184, 0.04);
     --border-color: rgba(48, 152, 184, 0.08);
     --info-color: #3098b8;
-    --accent-purple: #7888c8;
 }
 
 /* ── NEW WARM DARK THEMES ── */
@@ -609,7 +596,6 @@ html {
     --border-color: rgba(200, 120, 96, 0.08);
     --warning-color: #c87860;
     --error-color: #b84040;
-    --accent-purple: #a878b0;
 }
 
 [data-theme="espresso"] {
@@ -628,7 +614,6 @@ html {
     --input-bg: rgba(200, 168, 120, 0.04);
     --border-color: rgba(200, 168, 120, 0.08);
     --warning-color: #c8a878;
-    --accent-purple: #a888b8;
 }
 
 [data-theme="moss"] {
@@ -647,7 +632,6 @@ html {
     --input-bg: rgba(106, 154, 96, 0.04);
     --border-color: rgba(106, 154, 96, 0.08);
     --success-color: #6a9a60;
-    --accent-purple: #8880b0;
 }
 
 [data-theme="twilight"] {
@@ -665,7 +649,6 @@ html {
     --card-bg: #1c1624;
     --input-bg: rgba(184, 120, 160, 0.04);
     --border-color: rgba(184, 120, 160, 0.08);
-    --accent-purple: #b878a0;
     --info-color: #6898b8;
 }
 
@@ -690,7 +673,6 @@ html {
     --error-color: #dc2626;
     --warning-color: #d97706;
     --info-color: #6d28d9;
-    --accent-purple: #8b5cf6;
 }
 
 [data-theme="mint"] {
@@ -712,7 +694,6 @@ html {
     --error-color: #dc2626;
     --warning-color: #d97706;
     --info-color: #0284c7;
-    --accent-purple: #7c3aed;
 }
 
 [data-theme="rose-gold"] {
@@ -734,7 +715,6 @@ html {
     --error-color: #dc2626;
     --warning-color: #d97706;
     --info-color: #0369a1;
-    --accent-purple: #8a6aaa;
 }
 
 [data-theme="honey"] {
@@ -756,7 +736,6 @@ html {
     --error-color: #dc2626;
     --warning-color: #b88820;
     --info-color: #0369a1;
-    --accent-purple: #7c3aed;
 }
 
 /* ── NEW WARM LIGHT THEMES ── */
@@ -780,7 +759,6 @@ html {
     --error-color: #dc2626;
     --warning-color: #d97706;
     --info-color: #0369a1;
-    --accent-purple: #7c3aed;
 }
 
 [data-theme="sage"] {
@@ -802,7 +780,6 @@ html {
     --error-color: #dc2626;
     --warning-color: #d97706;
     --info-color: #0284c7;
-    --accent-purple: #7c3aed;
 }
 
 [data-theme="peach"] {
@@ -824,7 +801,6 @@ html {
     --error-color: #dc2626;
     --warning-color: #d97706;
     --info-color: #0369a1;
-    --accent-purple: #8868a8;
 }
 
 /* ── CRIMSON THEME (original default, now a separate option) ── */
@@ -844,7 +820,6 @@ html {
     --card-bg: #111111;
     --input-bg: rgba(255, 255, 255, 0.03);
     --border-color: rgba(255, 255, 255, 0.08);
-    --accent-purple: #a855f7;
 }
 
 /* ═══ END MULTI-THEME DEFINITIONS ═══ */
@@ -1013,8 +988,12 @@ select optgroup {
     cursor: none !important;
 }
 
-@media (hover: none) and (pointer: coarse) {
-    .cursor-dot { display: none !important; }
+@media (hover: none), (pointer: coarse) {
+    .cursor-dot,
+    .cursor-ring,
+    .cursor-particle,
+    .cursor-particles { display: none !important; }
+    .cursor-active *, .cursor-active *::before, .cursor-active *::after { cursor: auto !important; }
     body, *, *::before, *::after { cursor: auto !important; }
 }
 
@@ -1147,7 +1126,7 @@ select optgroup {
     justify-content: center;
     border-radius: 999px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 8px 32px !important;
+    padding: 14px 32px !important;
     box-shadow: none !important;
 }
 
@@ -1210,7 +1189,7 @@ select optgroup {
 .nav-links a {
     color: var(--text-dim);
     text-decoration: none;
-    font-weight: 500; font-size: 0.9rem;
+    font-weight: 500; font-size: 1rem;
     letter-spacing: 0;
     text-transform: none;
     position: relative;
@@ -1255,6 +1234,25 @@ select optgroup {
     justify-self: end;
 }
 
+/* Mobile Menu toggle button — lives in the navbar grid for perfect alignment */
+.nav-menu-toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-light);
+    font-weight: 700;
+    font-size: 1.1rem;
+    font-family: inherit;
+    line-height: 1;
+    padding: 0;
+    letter-spacing: 0;
+    transition: color 0.3s ease;
+}
+.nav-menu-toggle:hover {
+    color: var(--accent);
+}
+
 /* Compact inline nav — visible between 1570px and 1140px only */
 .nav-links-compact {
     display: none;
@@ -1266,7 +1264,7 @@ select optgroup {
 .nav-links-compact a {
     color: var(--text-dim);
     text-decoration: none;
-    font-weight: 500; font-size: 0.9rem;
+    font-weight: 500; font-size: 1rem;
     letter-spacing: 0;
     text-transform: none;
     position: relative;
@@ -1515,8 +1513,8 @@ select optgroup {
 /* ═══ VAULTA GLASS UTILITIES ═══ */
 .v-glass-card {
     background: color-mix(in srgb, var(--card-bg) 60%, transparent);
-    backdrop-filter: blur(20px) saturate(1.6);
-    -webkit-backdrop-filter: blur(20px) saturate(1.6);
+    backdrop-filter: blur(12px) saturate(1.3);
+    -webkit-backdrop-filter: blur(12px) saturate(1.3);
     border: 0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent);
     border-radius: 12px;
 }
@@ -1571,8 +1569,8 @@ select optgroup {
 /* Game Select Cards — Vaulta */
 .game-card {
     background: color-mix(in srgb, var(--card-bg) 60%, transparent);
-    backdrop-filter: blur(20px) saturate(1.6);
-    -webkit-backdrop-filter: blur(20px) saturate(1.6);
+    backdrop-filter: blur(12px) saturate(1.3);
+    -webkit-backdrop-filter: blur(12px) saturate(1.3);
     border: 0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent);
     border-radius: 12px;
     padding: 28px 24px;
@@ -1594,14 +1592,14 @@ select optgroup {
     pointer-events: none;
 }
 @media (hover: hover) {
-    .game-card:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--accent) 30%, transparent); backdrop-filter: blur(28px) saturate(1.8); box-shadow: 0 12px 40px color-mix(in srgb, var(--accent) 20%, transparent); }
+    .game-card:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--accent) 30%, transparent); backdrop-filter: blur(16px) saturate(1.4); box-shadow: 0 12px 40px color-mix(in srgb, var(--accent) 20%, transparent); }
     .game-card:hover::after { transform: translateX(0); }
 }
 .game-card.selected {
     background: color-mix(in srgb, var(--accent) 8%, transparent);
     border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
     box-shadow: 0 12px 40px color-mix(in srgb, var(--accent) 15%, transparent);
-    backdrop-filter: blur(24px) saturate(1.8);
+    backdrop-filter: blur(14px) saturate(1.4);
 }
 .game-card .card-icon-wrap {
     width: 44px; height: 44px; border-radius: 10px;
@@ -1748,7 +1746,7 @@ select optgroup {
 .game-option::after {
     content: '';
     position: absolute; inset: 0;
-    background: rgba(255,255,255,0.04);
+    background: color-mix(in srgb, var(--text-light) 4%, transparent);
     transform: translateX(-100%);
     transition: transform 0.4s ease;
     pointer-events: none;
@@ -1788,8 +1786,8 @@ select optgroup {
 /* Game Config Panel — Vaulta */
 .game-config-panel {
     background: color-mix(in srgb, var(--card-bg) 60%, transparent);
-    backdrop-filter: blur(20px) saturate(1.6);
-    -webkit-backdrop-filter: blur(20px) saturate(1.6);
+    backdrop-filter: blur(12px) saturate(1.3);
+    -webkit-backdrop-filter: blur(12px) saturate(1.3);
     border: 0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent);
     border-radius: 12px; padding: 24px 22px; margin-bottom: 24px;
     animation: slideInUp 0.4s ease both;
@@ -1803,8 +1801,8 @@ select optgroup {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     margin: 0 auto 32px;
     background: color-mix(in srgb, var(--card-bg) 50%, transparent);
-    backdrop-filter: blur(24px) saturate(1.6);
-    -webkit-backdrop-filter: blur(24px) saturate(1.6);
+    backdrop-filter: blur(14px) saturate(1.4);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
     box-shadow: 0 12px 40px color-mix(in srgb, var(--accent) 15%, transparent);
     transition: box-shadow 0.5s ease;
 }
@@ -1873,7 +1871,7 @@ select optgroup {
 }
 .btn {
     padding: 12px 20px;
-    font-family: 'Inter Tight', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 13px; font-weight: 600;
     text-transform: none; letter-spacing: 0.02em;
     border: none; border-radius: 10px;
@@ -2067,8 +2065,8 @@ select optgroup {
 }
 .service-card {
     background: color-mix(in srgb, var(--card-bg) 60%, transparent);
-    backdrop-filter: blur(20px) saturate(1.6);
-    -webkit-backdrop-filter: blur(20px) saturate(1.6);
+    backdrop-filter: blur(12px) saturate(1.3);
+    -webkit-backdrop-filter: blur(12px) saturate(1.3);
     padding: 52px 40px;
     position: relative; overflow: hidden;
     transition: all 0.4s cubic-bezier(0.22,1,0.36,1);
@@ -2088,8 +2086,8 @@ select optgroup {
 .service-card:hover { 
     background: color-mix(in srgb, var(--card-bg) 80%, transparent); 
     border-color: color-mix(in srgb, var(--accent) 30%, transparent);
-    backdrop-filter: blur(28px) saturate(1.8);
-    -webkit-backdrop-filter: blur(28px) saturate(1.8);
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
     transform: translateY(-4px);
     box-shadow: 0 12px 40px color-mix(in srgb, var(--accent) 15%, transparent);
 }
@@ -2173,8 +2171,8 @@ select optgroup {
 }
 .project-card {
     background: color-mix(in srgb, var(--card-bg) 60%, transparent);
-    backdrop-filter: blur(20px) saturate(1.6);
-    -webkit-backdrop-filter: blur(20px) saturate(1.6);
+    backdrop-filter: blur(12px) saturate(1.3);
+    -webkit-backdrop-filter: blur(12px) saturate(1.3);
     overflow: hidden; position: relative;
     transition: all 0.4s cubic-bezier(0.22,1,0.36,1);
     border: 0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent);
@@ -2183,8 +2181,8 @@ select optgroup {
 .project-card:hover { 
     background: color-mix(in srgb, var(--card-bg) 80%, transparent); 
     border-color: color-mix(in srgb, var(--accent) 30%, transparent);
-    backdrop-filter: blur(28px) saturate(1.8);
-    -webkit-backdrop-filter: blur(28px) saturate(1.8);
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
     transform: translateY(-4px);
     box-shadow: 0 12px 40px color-mix(in srgb, var(--accent) 15%, transparent);
 }
@@ -2259,8 +2257,8 @@ select optgroup {
 .course-card {
     display: grid; grid-template-columns: 260px 1fr;
     background: color-mix(in srgb, var(--card-bg) 60%, transparent);
-    backdrop-filter: blur(20px) saturate(1.6);
-    -webkit-backdrop-filter: blur(20px) saturate(1.6);
+    backdrop-filter: blur(12px) saturate(1.3);
+    -webkit-backdrop-filter: blur(12px) saturate(1.3);
     margin-bottom: 1px;
     border-left: 2px solid transparent;
     transition: all 0.4s cubic-bezier(0.22,1,0.36,1);
@@ -2274,8 +2272,8 @@ select optgroup {
 .course-card:hover { 
     border-left-color: var(--accent);
     border-color: color-mix(in srgb, var(--accent) 30%, transparent);
-    backdrop-filter: blur(28px) saturate(1.8);
-    -webkit-backdrop-filter: blur(28px) saturate(1.8);
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
     transform: translateY(-4px);
     box-shadow: 0 12px 40px color-mix(in srgb, var(--accent) 15%, transparent);
 }
@@ -2567,7 +2565,7 @@ select optgroup {
     display: block; font-size: 11px; font-weight: 600;
     margin-bottom: 8px; color: var(--text-dim);
     text-transform: none; letter-spacing: 0.5px;
-    font-family: 'Inter Tight', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
 }
 .form-group select,
 .form-group textarea {
@@ -2584,37 +2582,40 @@ select optgroup {
     outline: none;
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 8%, transparent);
 }
-.form-group textarea { resize: vertical; min-height: 120px; border-radius: 12px; padding: 14px 18px; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-light); font-family: 'Inter Tight', sans-serif; font-size: 15px; font-weight: 600; }
+.form-group textarea { resize: vertical; min-height: 120px; border-radius: 10px; padding: 14px 18px; background: var(--input-bg); border: 1px solid color-mix(in srgb, var(--accent) 12%, var(--border-color)); color: var(--text-light); font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 600; }
 .form-group select option { background: var(--card-bg); }
 .submit-btn {
-    width: 100%; padding: 18px;
-    background: var(--primary-red); color: white;
-    border: none;
-    font-family: 'Inter Tight', sans-serif;
+    width: 100%; padding: 14px 20px;
+    background: var(--accent); color: white;
+    border: none; border-radius: 10px;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 13px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 3px;
-    transition: all 0.35s ease;
+    text-transform: uppercase; letter-spacing: 2px;
+    transition: all 0.35s cubic-bezier(0.22,1,0.36,1);
     display: flex; align-items: center; justify-content: center; gap: 10px;
     position: relative; overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 4px 20px color-mix(in srgb, var(--accent) 20%, transparent);
 }
 .submit-btn::after {
     content: '';
     position: absolute; inset: 0;
-    background: rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.08);
     transform: translateX(-100%);
     transition: transform 0.4s ease;
     pointer-events: none;
 }
 .submit-btn:hover::after { transform: translateX(0); }
 @media (hover: hover) {
-    .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px color-mix(in srgb, var(--accent) 30%, transparent); }
+    .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px color-mix(in srgb, var(--accent) 35%, transparent); }
 }
 
 .form-success { display: none; text-align: center; padding: 48px; }
 .form-success.show { display: block; }
 .success-icon {
     width: 72px; height: 72px;
-    background: var(--primary-red);
+    background: var(--accent);
+    border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     margin: 0 auto 24px;
     font-size: 32px; color: white;
@@ -2794,6 +2795,7 @@ select optgroup {
     .footer-grid { grid-template-columns: 1fr; }
     .team-grid { grid-template-columns: 1fr; max-width: 340px; margin: 0 auto; }
     .nav-actions { gap: 4px; }
+    .nav-menu-toggle { font-size: 1rem; }
     .nav-auth-btn { padding: 5px 10px; font-size: 9px; letter-spacing: 0.5px; }
     .nav-auth-btn-filled { padding: 5px 10px; font-size: 9px; letter-spacing: 0.5px; }
     .nav-auth-btn-inline { padding: 5px 10px; font-size: 9px; letter-spacing: 0.5px; }
@@ -2808,6 +2810,7 @@ select optgroup {
     .navbar { padding: 4px 12px !important; }
     .navbar.scrolled { padding: 4px 12px !important; }
     .nav-pill-wrapper { padding: 3px 8px; }
+    .nav-menu-toggle { font-size: 0.95rem; }
     .theme-toggle, .nav-search-btn { width: 30px !important; height: 30px !important; font-size: 13px !important; flex-shrink: 0; }
     .nav-auth-btn { padding: 5px 8px; font-size: 9px; }
     .nav-auth-btn-filled { padding: 5px 8px; font-size: 9px; }
@@ -2890,8 +2893,8 @@ select optgroup {
 
 .v-modal {
     background: color-mix(in srgb, var(--card-bg) 92%, transparent);
-    backdrop-filter: blur(24px) saturate(1.6);
-    -webkit-backdrop-filter: blur(24px) saturate(1.6);
+    backdrop-filter: blur(14px) saturate(1.4);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
     border: 1px solid color-mix(in srgb, var(--border-color) 60%, transparent);
     border-radius: 16px;
     box-shadow:
@@ -3055,8 +3058,8 @@ select optgroup {
 }
 .auth-modal {
     background: color-mix(in srgb, var(--card-bg) 92%, transparent);
-    backdrop-filter: blur(24px) saturate(1.6);
-    -webkit-backdrop-filter: blur(24px) saturate(1.6);
+    backdrop-filter: blur(14px) saturate(1.4);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
     border: 1px solid color-mix(in srgb, var(--border-color) 60%, transparent);
     border-radius: 16px;
     box-shadow:
@@ -3145,8 +3148,8 @@ select optgroup {
 }
 .dashboard-modal {
     background: color-mix(in srgb, var(--card-bg) 92%, transparent);
-    backdrop-filter: blur(24px) saturate(1.6);
-    -webkit-backdrop-filter: blur(24px) saturate(1.6);
+    backdrop-filter: blur(14px) saturate(1.4);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
     border: 1px solid color-mix(in srgb, var(--border-color) 60%, transparent);
     border-radius: 16px;
     box-shadow:
@@ -3162,8 +3165,8 @@ select optgroup {
     border-bottom: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
 }
 .dashboard-modal-header h2 {
-    font-family: var(--font-heading, 'Inter Tight'), sans-serif;
-    font-weight: 800; font-size: 20px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 20px;
     color: var(--text-light);
     letter-spacing: -0.5px;
 }
@@ -3174,29 +3177,31 @@ select optgroup {
 }
 .dashboard-modal-tabs::-webkit-scrollbar { display: none; }
 .dash-tab {
-    padding: 14px 20px;
+    padding: 12px 18px;
     background: none; border: none;
     font-size: 11px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 2px;
+    text-transform: uppercase; letter-spacing: 1.5px;
     color: var(--text-dim);
     border-bottom: 2px solid transparent;
     transition: all 0.3s ease;
-    font-family: var(--font-heading, 'Inter Tight'), sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
     white-space: nowrap;
     cursor: pointer;
+    border-radius: 8px 8px 0 0;
 }
 .dash-tab.active {
-    color: var(--text-light);
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
     border-bottom-color: var(--accent);
 }
-.dash-tab:hover { color: var(--text-light); }
+.dash-tab:hover { color: var(--text-light); background: color-mix(in srgb, var(--accent) 5%, transparent); }
 .dashboard-modal-body { padding: 28px 32px 32px; }
 .nav-auth-btn {
     padding: 12px 16px;
-    font-family: 'Inter Tight', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 16px; font-weight: 500;
     text-transform: none; letter-spacing: 0;
-    border: 1px solid var(--border-color); border-radius: 8px;
+    border: 1px solid var(--border-color); border-radius: 10px;
     transition: all 0.3s ease;
     text-decoration: none;
     display: inline-flex; align-items: center; gap: 8px;
@@ -3261,8 +3266,8 @@ select optgroup {
     display: flex; align-items: center; gap: 8px;
     padding: 6px 16px 6px 6px;
     background: color-mix(in srgb, var(--card-bg) 60%, transparent);
-    backdrop-filter: blur(20px) saturate(1.6);
-    -webkit-backdrop-filter: blur(20px) saturate(1.6);
+    backdrop-filter: blur(12px) saturate(1.3);
+    -webkit-backdrop-filter: blur(12px) saturate(1.3);
     border: 1px solid color-mix(in srgb, var(--text-light) 12%, var(--border-color));
     border-radius: 24px;
     color: var(--text-light);
@@ -3415,7 +3420,7 @@ select optgroup {
 
 /* Sidebar */
 .sidebar { position: sticky; top: 120px; height: fit-content; }
-.sidebar-card { background: color-mix(in srgb, var(--card-bg) 60%, transparent); backdrop-filter: blur(20px) saturate(1.6); -webkit-backdrop-filter: blur(20px) saturate(1.6); border: 0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent); border-radius: 12px; padding: 32px; }
+.sidebar-card { background: color-mix(in srgb, var(--card-bg) 60%, transparent); backdrop-filter: blur(12px) saturate(1.3); -webkit-backdrop-filter: blur(12px) saturate(1.3); border: 0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent); border-radius: 12px; padding: 32px; }
 .sidebar-card h3 { font-family: 'Inter Tight', sans-serif; font-size: 16px; font-weight: 600; margin-bottom: 20px; letter-spacing: 0.02em; color: var(--text-light); }
 .roadmap-link { display: flex; align-items: center; gap: 12px; padding: 16px 20px; background: color-mix(in srgb, var(--accent) 8%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent); color: var(--text-light); text-decoration: none; font-weight: 700; font-size: 14px; transition: all 0.3s ease; margin-bottom: 16px; }
 .roadmap-link:hover { background: var(--primary-red); border-color: var(--primary-red); transform: translateX(4px); color: white; }
@@ -3676,8 +3681,8 @@ body {
   background: color-mix(in srgb, var(--card-bg) 80%, transparent);
   border: 1px solid color-mix(in srgb, var(--text-light) 8%, var(--border-color));
   border-radius: 12px;
-  backdrop-filter: blur(24px) saturate(1.4);
-  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  backdrop-filter: blur(14px) saturate(1.4);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
   pointer-events: auto;
   cursor: pointer;
   max-width: 380px;
@@ -3924,7 +3929,7 @@ body {
     width: 300px !important; height: 100vh !important;
     flex-direction: column !important;
     background: var(--dark-gray) !important;
-    backdrop-filter: blur(24px) !important;
+    backdrop-filter: blur(14px) !important;
     padding: 0 24px 32px !important;
     gap: 0 !important;
     transform: translateX(100%) !important;
@@ -4004,10 +4009,8 @@ body {
    MOBILE MENU — ENHANCED
    ======================================== */
 
-/* StaggeredMenu: hidden on desktop, shown on mobile */
-.staggered-menu-mobile-only {
-    display: none;
-}
+/* StaggeredMenu: visibility now handled via .sm-mobile-only class + portal
+   (see StaggeredMenu.tsx <style> block) — this wrapper is no longer used */
 
 /* Desktop-only utility class: visible above 900px */
 .desktop-only {
@@ -4457,8 +4460,8 @@ body {
     .nav-inline-auth {
         display: inline-flex !important;
     }
-    .staggered-menu-mobile-only {
-        display: block;
+    .nav-menu-toggle {
+        display: none !important; /* StaggeredMenu has its own toggle inside the portal */
     }
 }
 
@@ -4701,14 +4704,14 @@ body {
   z-index: 0;
 }
 
-/* Section divider for scroll-based design */
-.section-divider {
+/* Section divider for scroll-based design (scoped — only used via .scroll-section-divider) */
+.scroll-section-divider {
   width: 100%;
   height: 120px;
   position: relative;
   overflow: hidden;
 }
-.section-divider::after {
+.scroll-section-divider::after {
   content: '';
   position: absolute;
   left: 50%;
@@ -4886,16 +4889,16 @@ body {
   background: var(--v-gradient);
   color: #fff;
   border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
-  border-radius: 0.5rem;
+  border-radius: 10px;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   transition: all 0.3s ease;
   cursor: pointer;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-family: 'Inter Tight', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 25%, transparent);
 }
 .v-btn-primary:hover {
@@ -4907,16 +4910,16 @@ body {
   background: var(--black);
   color: var(--text-light);
   border: 1px solid var(--border-color);
-  border-radius: 0.5rem;
+  border-radius: 10px;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   transition: all 0.3s ease;
   cursor: pointer;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-family: 'Inter Tight', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
 }
 .v-btn-secondary:hover {
   border-color: var(--accent-dark);
@@ -4938,8 +4941,8 @@ body {
   border: 1px solid var(--border-color);
   border-radius: 1rem;
   background: color-mix(in srgb, var(--black) 70%, transparent);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -5199,8 +5202,8 @@ body {
 .v-service-card:hover {
   border-color: color-mix(in srgb, var(--accent) 40%, transparent);
   transform: translateY(-4px) scale(1.02);
-  backdrop-filter: blur(28px) saturate(1.8);
-  -webkit-backdrop-filter: blur(28px) saturate(1.8);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
   box-shadow:
     0 0 15px color-mix(in srgb, var(--accent) 15%, transparent),
     0 0 30px color-mix(in srgb, var(--accent) 8%, transparent),
@@ -5287,8 +5290,8 @@ body {
 .v-course-card:hover {
   border-color: color-mix(in srgb, var(--accent) 40%, transparent);
   transform: translateY(-3px);
-  backdrop-filter: blur(28px) saturate(1.8);
-  -webkit-backdrop-filter: blur(28px) saturate(1.8);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
   box-shadow:
     0 0 15px color-mix(in srgb, var(--accent) 15%, transparent),
     0 0 30px color-mix(in srgb, var(--accent) 8%, transparent),
@@ -5466,10 +5469,10 @@ body {
   background: var(--v-gradient);
   color: #fff;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 10px;
   font-size: 13px;
-  font-weight: 500;
-  font-family: 'Inter Tight', sans-serif;
+  font-weight: 600;
+  font-family: 'Space Grotesk', sans-serif;
   cursor: pointer;
   transition: all 0.3s ease;
   display: inline-flex;
@@ -6076,6 +6079,35 @@ body {
 .v-projects-grid > .v-project-card:hover {
   transform: scale(1.04);
   z-index: 2;
+}
+
+/* ── Auth Page — Split Layout Responsive ── */
+.auth-left-panel {
+  display: flex;
+}
+.auth-right-panel {
+  display: flex;
+}
+
+@media (max-width: 1024px) {
+  .auth-left-panel {
+    display: none !important;
+  }
+  .auth-right-panel {
+    width: 100% !important;
+    min-width: unset !important;
+    border-left: none !important;
+    background: var(--black) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-right-panel {
+    padding: 24px 16px !important;
+  }
+  .v-auth-card {
+    border-radius: 16px !important;
+  }
 }
 
 /* ── Vaulta Responsive ── */

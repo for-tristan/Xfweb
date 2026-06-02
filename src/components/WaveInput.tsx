@@ -7,7 +7,7 @@ interface WaveInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   children?: React.ReactNode; // For password strength bars, mismatch messages, etc.
 }
 
-export function WaveInput({ label, children, value, ...rest }: WaveInputProps) {
+export function WaveInput({ label, children, value, style, className, ...rest }: WaveInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Add/remove .has-value class based on whether input has content
@@ -43,7 +43,7 @@ export function WaveInput({ label, children, value, ...rest }: WaveInputProps) {
   ));
 
   return (
-    <div className="wave-group">
+    <div className={`wave-group${className ? ` ${className}` : ''}`} style={style}>
       <input
         ref={inputRef}
         className="input"

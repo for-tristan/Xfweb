@@ -25,7 +25,10 @@ export function useCustomCursor(
 ) {
   useEffect(() => {
     // Hide on devices without hover capability (touch / mobile)
-    if (!window.matchMedia('(hover: hover)').matches) {
+    const hasHover = window.matchMedia('(hover: hover)').matches;
+    const isCoarse = window.matchMedia('(pointer: coarse)').matches;
+    const isTouchDevice = !hasHover || isCoarse;
+    if (isTouchDevice) {
       const dot = dotRef.current;
       if (dot) dot.style.display = 'none';
       return;
@@ -100,6 +103,7 @@ export function useCustomCursor(
     // ── Click → Particle Burst ──
     const onClick = (e: MouseEvent) => {
       spawnParticles(e.clientX, e.clientY);
+      ensureLoopRunning();
       const dot = dotRef.current;
       if (dot) {
         dot.classList.add('clicked');
@@ -107,11 +111,22 @@ export function useCustomCursor(
       }
     };
 
-    // ── Particle animation loop ──
-    let particleAnimId: number;
+    // ── Particle animation loop (only runs when particles exist) ──
+    let particleAnimId: number = 0;
+    let loopRunning = false;
     const animateParticles = () => {
       updateParticles();
-      particleAnimId = requestAnimationFrame(animateParticles);
+      if (particles.length > 0) {
+        particleAnimId = requestAnimationFrame(animateParticles);
+      } else {
+        loopRunning = false;
+      }
+    };
+    const ensureLoopRunning = () => {
+      if (!loopRunning) {
+        loopRunning = true;
+        particleAnimId = requestAnimationFrame(animateParticles);
+      }
     };
 
     // ── Hover Detection ──
@@ -141,7 +156,7 @@ export function useCustomCursor(
     document.addEventListener('click', onClick);
     document.addEventListener('mouseover', onOver);
     document.addEventListener('mouseout', onOut);
-    animateParticles();
+    // Don't start particle loop here — it starts on-demand when particles are spawned
     document.body.classList.add('cursor-active');
 
     return () => {

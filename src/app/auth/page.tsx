@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useCustomCursor } from '@/hooks/useCustomCursor';
 import { WaveInput } from '@/components/WaveInput';
 import { Logo } from '@/components/Logo';
+import VideoTemplate from '@/components/video/VideoTemplate';
 
 
 function getPasswordStrength(pw: string): string {
@@ -34,7 +35,7 @@ function generateParticles(count: number) {
 
 export default function AuthPage() {
   return (
-    <Suspense fallback={<div style={{ width: '100vw', height: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div className="xf-loader"><span /><span /><span /></div></div>}>
+    <Suspense fallback={<div style={{ width: '100vw', height: '100vh', background: 'var(--black)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div className="xf-loader"><span /><span /><span /></div></div>}>
       <AuthContent />
     </Suspense>
   );
@@ -48,7 +49,7 @@ function AuthContent() {
 
   // Particles
   const [particles, setParticles] = useState<Array<{id:number;left:string;size:string;duration:string;delay:string}>>([]);
-  useEffect(() => { setParticles(generateParticles(50)); }, []);
+  useEffect(() => { setParticles(generateParticles(30)); }, []);
 
   // Theme — read from localStorage only, no picker on auth page
   useEffect(() => {
@@ -214,41 +215,148 @@ function AuthContent() {
     setResendLoading(false);
   }, [verificationEmail, toast]);
 
+  // Determine subtitle text
+  const subtitleText = verificationStep === 'pending'
+    ? 'Verify your email to get started'
+    : forgotStep !== 'idle'
+      ? 'Reset your password'
+      : tab === 'signin'
+        ? 'Welcome back! Sign in to continue'
+        : 'Create your account to get started';
+
   return (
     <>
       <title>Sign In | XFoundry</title>
 
-      {/* ═══ Particles (same as home page) ═══ */}
-      {particles.length > 0 && (
-        <div className="global-particles" style={{ zIndex: 9 }}>
-          {particles.map((p) => (
-            <div key={p.id} className="particle" style={{ left: p.left, width: p.size, height: p.size, animationDuration: p.duration, animationDelay: p.delay }} />
-          ))}
-        </div>
-      )}
-
       {/* ═══ Custom Cursor ═══ */}
       <div className="cursor-dot" ref={dotRef} />
 
-      {/* ═══ Full-page Vaulta Hero-style layout ═══ */}
-      <div className="v-hero" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
-        {/* Subtle radial gradient overlay for depth */}
-        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 30% 20%, color-mix(in srgb, var(--accent) 8%, transparent) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, color-mix(in srgb, var(--accent-purple, var(--accent)) 6%, transparent) 0%, transparent 50%)', pointerEvents: 'none' }} />
+      {/* ═══ Split Layout: Video Left | Auth Right ═══ */}
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        background: 'var(--black)',
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        {/* ═══ Particles ═══ */}
+        {particles.length > 0 && (
+          <div className="global-particles" style={{ zIndex: 1 }}>
+            {particles.map((p) => (
+              <div key={p.id} className="particle" style={{ left: p.left, width: p.size, height: p.size, animationDuration: p.duration, animationDelay: p.delay }} />
+            ))}
+          </div>
+        )}
 
+        {/* ── Left Panel: Video Animation ── */}
+        <div className="auth-left-panel" style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+          overflow: 'hidden',
+          background: 'var(--black)',
+        }}>
+          {/* Gradient overlay for visual depth */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'radial-gradient(ellipse at 40% 30%, color-mix(in srgb, var(--accent) 6%, transparent) 0%, transparent 50%), radial-gradient(ellipse at 60% 70%, color-mix(in srgb, var(--accent) 4%, transparent) 0%, transparent 50%)',
+            pointerEvents: 'none',
+            zIndex: 1,
+          }} />
 
+          {/* Video Template */}
+          <div style={{ position: 'relative', width: '100%', maxWidth: 680, aspectRatio: '4/3', zIndex: 2 }}>
+            <VideoTemplate />
+          </div>
 
-        {/* ═══ Auth Card Container ═══ */}
-        <div style={{ width: '100%', maxWidth: 460, padding: '20px', position: 'relative', zIndex: 10 }}>
+          {/* Left panel bottom text */}
+          <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', marginTop: 32, padding: '0 40px' }}>
+            <h2 style={{
+              fontFamily: "'Inter Tight', sans-serif",
+              fontSize: 'clamp(20px, 2.5vw, 28px)',
+              fontWeight: 600,
+              color: 'var(--text-light)',
+              marginBottom: 8,
+              letterSpacing: '-0.02em',
+            }}>
+              Build Something <span style={{
+                background: 'linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 60%, var(--text-light)), var(--accent))',
+                backgroundSize: '200% 100%',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                animation: 'v-gradient-shift 4s ease infinite',
+              }}>Extraordinary</span>
+            </h2>
+            <p style={{
+              color: 'var(--text-dim)',
+              fontSize: 14,
+              fontFamily: "'Space Grotesk', sans-serif",
+              lineHeight: 1.6,
+              maxWidth: 400,
+              margin: '0 auto',
+            }}>
+              Join XFoundry and unlock a world of digital possibilities.
+            </p>
+          </div>
+
+          {/* Decorative floating orbs */}
+          <div className="orb orb-1" style={{ opacity: 0.5 }} />
+          <div className="orb orb-2" style={{ opacity: 0.4 }} />
+        </div>
+
+        {/* ── Right Panel: Auth Form ── */}
+        <div className="auth-right-panel" style={{
+          width: 520,
+          minWidth: 360,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+          padding: '40px 32px',
+          background: 'color-mix(in srgb, var(--black) 92%, transparent)',
+          borderLeft: '1px solid color-mix(in srgb, var(--accent) 8%, var(--border-color))',
+          overflowY: 'auto',
+        }}>
+          {/* Right panel gradient accent */}
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 200,
+            background: 'radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 70%)',
+            pointerEvents: 'none',
+          }} />
+
           {/* Logo */}
-          <div style={{ textAlign: 'center', marginBottom: 36 }}>
+          <div style={{ textAlign: 'center', marginBottom: 32, position: 'relative', zIndex: 2 }}>
             <a href="/" style={{ textDecoration: 'none', display: 'inline-block' }}>
-              <Logo style={{ height: 48, width: 'auto', filter: 'drop-shadow(0 0 8px color-mix(in srgb, var(--accent) 40%, transparent))' }} />
+              <Logo style={{ height: 44, width: 'auto', filter: 'drop-shadow(0 0 12px color-mix(in srgb, var(--accent) 50%, transparent))' }} />
             </a>
-            <p style={{ color: 'var(--text-dim)', fontSize: 14, marginTop: 10, fontFamily: "'Space Grotesk', sans-serif", lineHeight: 1.6 }}>
-              {verificationStep === 'pending' ? 'Verify your email to get started' : forgotStep !== 'idle' ? 'Reset your password' : tab === 'signin' ? 'Welcome back! Sign in to continue' : 'Create your account to get started'}
+            <p style={{
+              color: 'var(--text-dim)',
+              fontSize: 14,
+              marginTop: 12,
+              fontFamily: "'Space Grotesk', sans-serif",
+              lineHeight: 1.6,
+            }}>
+              {subtitleText}
             </p>
             {authMessage && (
-              <p style={{ color: 'var(--accent)', fontSize: 13, marginTop: 8, fontFamily: "'Space Grotesk', sans-serif", lineHeight: 1.4, fontWeight: 600 }}>
+              <p style={{
+                color: 'var(--accent)',
+                fontSize: 13,
+                marginTop: 8,
+                fontFamily: "'Space Grotesk', sans-serif",
+                lineHeight: 1.4,
+                fontWeight: 600,
+              }}>
                 {authMessage}
               </p>
             )}
@@ -256,28 +364,46 @@ function AuthContent() {
 
           {/* ═══ Glassmorphic Auth Card ═══ */}
           <div className="v-auth-card" style={{
-            background: 'color-mix(in srgb, var(--black) 25%, transparent)',
-            backdropFilter: 'blur(24px)',
-            WebkitBackdropFilter: 'blur(24px)',
-            border: '1px solid color-mix(in srgb, var(--accent) 10%, var(--border-color))',
-            borderRadius: 16,
+            width: '100%',
+            maxWidth: 420,
+            background: 'color-mix(in srgb, var(--card-bg) 40%, transparent)',
+            backdropFilter: 'blur(32px)',
+            WebkitBackdropFilter: 'blur(32px)',
+            border: '1px solid color-mix(in srgb, var(--accent) 12%, var(--border-color))',
+            borderRadius: 20,
             overflow: 'hidden',
-            boxShadow: '0 0 60px color-mix(in srgb, var(--accent) 6%, transparent), 0 25px 50px rgba(0,0,0,0.3), inset 0 1px 0 color-mix(in srgb, rgba(255,255,255,0.06) 30%, transparent)',
+            boxShadow: `
+              0 0 80px color-mix(in srgb, var(--accent) 8%, transparent),
+              0 32px 64px rgba(0,0,0,0.25),
+              inset 0 1px 0 color-mix(in srgb, rgba(255,255,255,0.08) 40%, transparent)
+            `,
+            position: 'relative',
+            zIndex: 2,
           }}>
             {verificationStep === 'pending' ? (
               /* ═══ Verification ═══ */
-              <div style={{ padding: '32px 28px' }}>
+              <div style={{ padding: '36px 28px' }}>
                 <div style={{ textAlign: 'center', marginBottom: 24 }}>
-                  <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '2px solid color-mix(in srgb, var(--accent) 25%, transparent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-                    <i className="fa-solid fa-envelope" style={{ fontSize: 24, color: 'var(--accent)' }}></i>
+                  <div style={{
+                    width: 72,
+                    height: 72,
+                    borderRadius: '50%',
+                    background: 'var(--v-gradient)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: 16,
+                    boxShadow: '0 8px 32px color-mix(in srgb, var(--accent) 30%, transparent)',
+                  }}>
+                    <i className="fa-solid fa-envelope" style={{ fontSize: 28, color: '#fff' }}></i>
                   </div>
                   <p style={{ color: 'var(--text-dim)', fontSize: 14, lineHeight: 1.6 }}>
                     A 6-digit code was sent to <strong style={{ color: 'var(--text-light)' }}>{verificationEmail}</strong>
                   </p>
                 </div>
                 <form onSubmit={handleVerifyEmail}>
-                  <WaveInput label="6-Digit Code" type="text" value={verificationCode} onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 6); setVerificationCode(v); }} required maxLength={6} autoFocus style={{ textAlign: 'center', fontSize: 24, letterSpacing: 10, fontWeight: 700, fontFamily: "'Orbitron', sans-serif" }} />
-                  <button type="submit" className="v-btn-primary" disabled={verificationLoading} style={{ marginTop: 8, width: '100%', justifyContent: 'center' }}>
+                  <WaveInput label="6-Digit Code" type="text" value={verificationCode} onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 6); setVerificationCode(v); }} required maxLength={6} autoFocus style={{ textAlign: 'center', fontSize: 24, letterSpacing: 10, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif" }} />
+                  <button type="submit" className="v-btn-primary" disabled={verificationLoading} style={{ marginTop: 12, width: '100%', justifyContent: 'center' }}>
                     {verificationLoading ? <><i className="fa-solid fa-spinner fa-spin"></i> Verifying...</> : <><i className="fa-solid fa-check"></i> Verify Email</>}
                   </button>
                 </form>
@@ -289,9 +415,24 @@ function AuthContent() {
               </div>
             ) : forgotStep === 'email' ? (
               /* ═══ Forgot Password — Email ═══ */
-              <div style={{ padding: '32px 28px' }}>
-                <h2 style={{ fontFamily: "'Inter Tight', sans-serif", fontSize: 20, fontWeight: 600, color: 'var(--text-light)', marginBottom: 8 }}>Forgot Password</h2>
-                <p style={{ color: 'var(--text-dim)', fontSize: 14, marginBottom: 20, lineHeight: 1.6 }}>
+              <div style={{ padding: '36px 28px' }}>
+                <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                  <div style={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: '50%',
+                    background: 'color-mix(in srgb, var(--accent) 10%, transparent)',
+                    border: '2px solid color-mix(in srgb, var(--accent) 25%, transparent)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: 12,
+                  }}>
+                    <i className="fa-solid fa-key" style={{ fontSize: 24, color: 'var(--accent)' }}></i>
+                  </div>
+                </div>
+                <h2 style={{ fontFamily: "'Inter Tight', sans-serif", fontSize: 20, fontWeight: 600, color: 'var(--text-light)', marginBottom: 8, textAlign: 'center' }}>Forgot Password</h2>
+                <p style={{ color: 'var(--text-dim)', fontSize: 14, marginBottom: 20, lineHeight: 1.6, textAlign: 'center' }}>
                   Enter the email associated with your account and we&apos;ll send you a verification code.
                 </p>
                 <form onSubmit={handleForgotSubmit}>
@@ -308,13 +449,13 @@ function AuthContent() {
               </div>
             ) : forgotStep === 'code' ? (
               /* ═══ Forgot Password — Code ═══ */
-              <div style={{ padding: '32px 28px' }}>
-                <h2 style={{ fontFamily: "'Inter Tight', sans-serif", fontSize: 20, fontWeight: 600, color: 'var(--text-light)', marginBottom: 8 }}>Verify Code</h2>
-                <p style={{ color: 'var(--text-dim)', fontSize: 14, marginBottom: 20, lineHeight: 1.6 }}>
+              <div style={{ padding: '36px 28px' }}>
+                <h2 style={{ fontFamily: "'Inter Tight', sans-serif", fontSize: 20, fontWeight: 600, color: 'var(--text-light)', marginBottom: 8, textAlign: 'center' }}>Verify Code</h2>
+                <p style={{ color: 'var(--text-dim)', fontSize: 14, marginBottom: 20, lineHeight: 1.6, textAlign: 'center' }}>
                   A 6-digit code was sent to <strong style={{ color: 'var(--text-light)' }}>{forgotEmail}</strong>. Enter it below with your new password.
                 </p>
                 <form onSubmit={handleResetSubmit}>
-                  <WaveInput label="6-Digit Code" type="text" value={resetCode} onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 6); setResetCode(v); }} required maxLength={6} autoFocus style={{ textAlign: 'center', fontSize: 24, letterSpacing: 10, fontWeight: 700, fontFamily: "'Orbitron', sans-serif" }} />
+                  <WaveInput label="6-Digit Code" type="text" value={resetCode} onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 6); setResetCode(v); }} required maxLength={6} autoFocus style={{ textAlign: 'center', fontSize: 24, letterSpacing: 10, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif" }} />
                   <WaveInput label="New Password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
                   <button type="submit" className="v-btn-primary" disabled={resetLoading} style={{ marginTop: 8, width: '100%', justifyContent: 'center' }}>
                     {resetLoading ? <><i className="fa-solid fa-spinner fa-spin"></i> Resetting...</> : <><i className="fa-solid fa-check"></i> Reset Password</>}
@@ -330,28 +471,56 @@ function AuthContent() {
               /* ═══ Main Sign In / Sign Up ═══ */
               <>
                 {/* Tabs */}
-                <div style={{ display: 'flex', borderBottom: '1px solid color-mix(in srgb, var(--accent) 10%, var(--border-color))' }}>
+                <div style={{
+                  display: 'flex',
+                  borderBottom: '1px solid color-mix(in srgb, var(--accent) 10%, var(--border-color))',
+                  background: 'color-mix(in srgb, var(--accent) 3%, transparent)',
+                }}>
                   <button
                     onClick={() => setTab('signin')}
-                    style={{ flex: 1, padding: '16px', background: tab === 'signin' ? 'color-mix(in srgb, var(--accent) 8%, transparent)' : 'transparent', border: 'none', borderBottom: tab === 'signin' ? '2px solid var(--accent)' : '2px solid transparent', color: tab === 'signin' ? 'var(--accent)' : 'var(--text-dim)', fontSize: 14, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", cursor: 'pointer', transition: 'all 0.2s' }}
+                    style={{
+                      flex: 1,
+                      padding: '16px',
+                      background: tab === 'signin' ? 'color-mix(in srgb, var(--accent) 8%, transparent)' : 'transparent',
+                      border: 'none',
+                      borderBottom: tab === 'signin' ? '2.5px solid var(--accent)' : '2.5px solid transparent',
+                      color: tab === 'signin' ? 'var(--accent)' : 'var(--text-dim)',
+                      fontSize: 14,
+                      fontWeight: 700,
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      cursor: 'pointer',
+                      transition: 'all 0.25s ease',
+                    }}
                   >
                     Sign In
                   </button>
                   <button
                     onClick={() => setTab('signup')}
-                    style={{ flex: 1, padding: '16px', background: tab === 'signup' ? 'color-mix(in srgb, var(--accent) 8%, transparent)' : 'transparent', border: 'none', borderBottom: tab === 'signup' ? '2px solid var(--accent)' : '2px solid transparent', color: tab === 'signup' ? 'var(--accent)' : 'var(--text-dim)', fontSize: 14, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", cursor: 'pointer', transition: 'all 0.2s' }}
+                    style={{
+                      flex: 1,
+                      padding: '16px',
+                      background: tab === 'signup' ? 'color-mix(in srgb, var(--accent) 8%, transparent)' : 'transparent',
+                      border: 'none',
+                      borderBottom: tab === 'signup' ? '2.5px solid var(--accent)' : '2.5px solid transparent',
+                      color: tab === 'signup' ? 'var(--accent)' : 'var(--text-dim)',
+                      fontSize: 14,
+                      fontWeight: 700,
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      cursor: 'pointer',
+                      transition: 'all 0.25s ease',
+                    }}
                   >
                     Create Account
                   </button>
                 </div>
 
-                <div style={{ padding: '28px' }}>
+                <div style={{ padding: '28px 28px 32px' }}>
                   {tab === 'signin' ? (
                     <form onSubmit={handleLogin}>
                       <WaveInput label="Email" type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} required autoFocus />
                       <WaveInput label="Password" type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} required />
                       <div style={{ textAlign: 'right', marginBottom: 8 }}>
-                        <button type="button" onClick={() => { setForgotStep('email'); setForgotEmail(loginEmail); }} style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: 12, fontWeight: 600, fontFamily: "'Space Grotesk', sans-serif", cursor: 'pointer' }}>
+                        <button type="button" onClick={() => { setForgotStep('email'); setForgotEmail(loginEmail); }} style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: 12, fontWeight: 600, fontFamily: "'Space Grotesk', sans-serif", cursor: 'pointer', transition: 'opacity 0.2s' }}>
                           Forgot Password?
                         </button>
                       </div>
@@ -382,12 +551,57 @@ function AuthContent() {
                       </button>
                     </form>
                   )}
+
+                  {/* Divider */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '20px 0' }}>
+                    <div style={{ flex: 1, height: 1, background: 'var(--border-color)' }} />
+                    <span style={{ color: 'var(--text-dim)', fontSize: 12, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 500 }}>or</span>
+                    <div style={{ flex: 1, height: 1, background: 'var(--border-color)' }} />
+                  </div>
+
+                  {/* Switch tab link */}
+                  <div style={{ textAlign: 'center' }}>
+                    <span style={{ color: 'var(--text-dim)', fontSize: 13, fontFamily: "'Space Grotesk', sans-serif" }}>
+                      {tab === 'signin' ? "Don't have an account? " : 'Already have an account? '}
+                    </span>
+                    <button
+                      onClick={() => setTab(tab === 'signin' ? 'signup' : 'signin')}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--accent)',
+                        fontSize: 13,
+                        fontWeight: 600,
+                        fontFamily: "'Space Grotesk', sans-serif",
+                        cursor: 'pointer',
+                        transition: 'opacity 0.2s',
+                      }}
+                    >
+                      {tab === 'signin' ? 'Create one' : 'Sign in'}
+                    </button>
+                  </div>
                 </div>
               </>
             )}
           </div>
 
-
+          {/* Back to home */}
+          <a href="/" style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            color: 'var(--text-dim)',
+            fontSize: 13,
+            fontFamily: "'Space Grotesk', sans-serif",
+            marginTop: 24,
+            textDecoration: 'none',
+            transition: 'color 0.2s',
+            position: 'relative',
+            zIndex: 2,
+          }}>
+            <i className="fa-solid fa-arrow-left" style={{ fontSize: 11 }} />
+            Back to home
+          </a>
         </div>
       </div>
     </>

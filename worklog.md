@@ -446,3 +446,28 @@ Stage Summary:
 5. **Lint and build verification**
    - No lint errors introduced on the games page
    - Dev server compiles `/games` route successfully (200 response)
+
+---
+Task ID: 8
+Agent: Main
+Task: Enlarge nav pill, add video animation to auth page, redesign auth page
+
+Work Log:
+- Enlarged nav pill: padding 8px 32px → 12px 44px, font-size 0.9rem → 1rem, gap 28px → 32px
+- Also updated compact nav links to match new font-size (1rem)
+- Completely redesigned auth page from centered single-card to split layout
+- Left panel: VideoTemplate animation with gradient orbs, tagline "Build Something Extraordinary"
+- Right panel: auth form with glassmorphic card, accent gradient header, logo, forms
+- Added responsive CSS: left panel hidden on ≤1024px, form fills screen on mobile
+- Added tab switcher with "or" divider between signin/signup
+- Added "Back to home" link below auth card
+- Updated verification/forgot password forms with gradient icon circles
+- Changed verification code font from Orbitron to Space Grotesk
+- Build succeeded, pushed to for-tristan/XFoundry-coorp
+
+Stage Summary:
+- Nav pill is now noticeably larger with bigger padding and font
+- Auth page has split layout: video animation left, form right
+- Auth page is vibrant with gradient orbs, accent borders, glassmorphic card
+- Responsive: left panel hides on mobile, form goes full-width
+- Commit: 41ac9d8

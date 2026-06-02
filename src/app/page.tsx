@@ -361,7 +361,7 @@ export default function Home() {
   // EFFECTS
   // ═══════════════════════════════════════════════════
 useEffect(() => {
-  setParticles(generateParticles(50));
+  setParticles(generateParticles(75));
 }, []);
   // Minimum 3-second loader display
   useEffect(() => {
@@ -1367,6 +1367,7 @@ useEffect(() => {
           <p>&copy; {new Date().getFullYear()} X-Foundry. All Rights Reserved.</p>
         </div>
       </footer>
+
       </>
       )}
       {/* ═══════════════════════════════════════════════════
@@ -1415,7 +1416,7 @@ useEffect(() => {
           <div className="auth-modal" style={{ maxWidth: 640 }}>
             <div className="auth-modal-header">
               <h2 style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ width: 40, height: 40, background: 'rgba(220,20,60,0.1)', border: '1px solid rgba(220,20,60,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8 }}>
+                <span style={{ width: 40, height: 40, background: 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8 }}>
                   <i className={svc.icon} style={{ color: 'var(--accent)', fontSize: 16 }}></i>
                 </span>
                 {svc.title}
@@ -1482,19 +1483,19 @@ useEffect(() => {
               {/* ── PROFILE TAB ── */}
               {dashTab === 'profile' && (
                 <div style={{ maxWidth: 480, margin: '0 auto' }}>
-                  <h3 style={{ fontFamily: "'Orbitron', sans-serif", fontWeight: 900, fontSize: 18, marginBottom: 4, color: 'var(--text-light)' }}>My Profile</h3>
+                  <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, marginBottom: 4, color: 'var(--text-light)' }}>My Profile</h3>
                   <p style={{ color: 'var(--text-dim)', marginBottom: 28, fontSize: 14 }}>Manage your account details and profile picture</p>
 
                   {/* Avatar */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 28 }}>
                     <div style={{ position: 'relative', display: 'inline-flex' }}>
-                      <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'rgba(220,20,60,0.1)', border: '2px solid rgba(220,20,60,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary-red)', fontSize: 24, fontWeight: 900, overflow: 'hidden' }}>
+                      <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '2px solid color-mix(in srgb, var(--accent) 30%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', fontSize: 24, fontWeight: 900, overflow: 'hidden' }}>
                         {user?.avatar
                           ? <img src={user.avatar} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                           : <span>{user?.name.charAt(0).toUpperCase()}</span>
                         }
                       </div>
-                      <label style={{ position: 'absolute', bottom: -2, right: -2, width: 26, height: 26, borderRadius: '50%', background: 'var(--primary-red)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid var(--dark-gray)' }}>
+                      <label style={{ position: 'absolute', bottom: -2, right: -2, width: 26, height: 26, borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid var(--card-bg)' }}>
                         <i className={`fa-solid fa-${avatarUploading ? 'spinner fa-spin' : 'camera'}`} style={{ fontSize: 10, color: 'var(--text-light)' }}></i>
                         <input type="file" accept="image/*" onChange={handleAvatarUpload} style={{ display: 'none' }} />
                       </label>
@@ -1503,7 +1504,7 @@ useEffect(() => {
                       <div style={{ fontWeight: 700, fontSize: 16, color: 'var(--text-light)', marginBottom: 2 }}>{user?.name}</div>
                       <div style={{ fontSize: 13, color: 'var(--text-dim)' }}>{user?.email}</div>
                       {user?.username && <div style={{ fontSize: 12, color: 'var(--text-dim)' }}>@{user.username}</div>}
-                      <div style={{ marginTop: 4, padding: '2px 10px', borderRadius: 2, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, background: 'rgba(220,20,60,0.1)', color: 'var(--primary-red)', border: '1px solid rgba(220,20,60,0.2)', display: 'inline-block' }}>{user?.role}</div>
+                      <div style={{ marginTop: 4, padding: '2px 10px', borderRadius: 9999, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, background: 'color-mix(in srgb, var(--accent) 10%, transparent)', color: 'var(--accent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)', display: 'inline-block' }}>{user?.role}</div>
                     </div>
                   </div>
 
@@ -1513,7 +1514,7 @@ useEffect(() => {
                     <WaveInput label="Username" type="text" value={profileUsername} onChange={(e) => setProfileUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))} />
                     <WaveInput label="Phone" type="tel" value={profilePhone} onChange={(e) => setProfilePhone(e.target.value)} />
                     <WaveInput label="Company" type="text" value={profileCompany} onChange={(e) => setProfileCompany(e.target.value)} />
-                    <button type="submit" disabled={profileSaving} className="submit-btn" style={{ width: '100%', opacity: profileSaving ? 0.6 : 1 }}>
+                    <button type="submit" disabled={profileSaving} className="submit-btn" style={{ width: '100%', opacity: profileSaving ? 0.6 : 1, fontFamily: "'Space Grotesk', sans-serif" }}>
                       {profileSaving ? <><i className="fa-solid fa-spinner fa-spin" style={{ marginRight: 8 }}></i> Saving...</> : <><i className="fa-solid fa-save" style={{ marginRight: 8 }}></i> Save Profile</>}
                     </button>
                   </form>
@@ -1531,13 +1532,13 @@ useEffect(() => {
                           fontWeight: 700,
                           fontFamily: "'Space Grotesk', sans-serif",
                           cursor: 'pointer',
-                          borderRadius: 2,
+                          borderRadius: 10,
                         }}
                       >
                         <i className="fa-solid fa-trash-alt" style={{ marginRight: 8 }}></i>Delete Account
                       </button>
                     ) : (
-                      <div style={{ background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 4, padding: 16 }}>
+                      <div style={{ background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 10, padding: 16 }}>
                         <p style={{ color: 'var(--error-color)', fontSize: 13, fontWeight: 700, marginBottom: 8 }}>
                           <i className="fa-solid fa-exclamation-triangle" style={{ marginRight: 6 }}></i>
                           This action is PERMANENT. Enter your password to confirm.
@@ -1552,7 +1553,7 @@ useEffect(() => {
                         <div style={{ display: 'flex', gap: 8 }}>
                           <button
                             onClick={() => { setDeleteStep('confirm'); setDeletePassword(''); }}
-                            style={{ flex: 1, padding: '10px 0', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-dim)', fontSize: 12, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", cursor: 'pointer', borderRadius: 2 }}
+                            style={{ flex: 1, padding: '10px 0', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-dim)', fontSize: 12, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", cursor: 'pointer', borderRadius: 10 }}
                           >
                             Cancel
                           </button>
@@ -1568,7 +1569,7 @@ useEffect(() => {
                               setDeleteLoading(false);
                             }}
                             disabled={deleteLoading || !deletePassword}
-                            style={{ flex: 1, padding: '10px 0', background: 'var(--error-color)', border: 'none', color: 'var(--text-light)', fontSize: 12, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", cursor: deleteLoading ? 'not-allowed' : 'pointer', borderRadius: 2, opacity: deleteLoading ? 0.6 : 1 }}
+                            style={{ flex: 1, padding: '10px 0', background: 'var(--error-color)', border: 'none', color: 'var(--text-light)', fontSize: 12, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", cursor: deleteLoading ? 'not-allowed' : 'pointer', borderRadius: 10, opacity: deleteLoading ? 0.6 : 1 }}
                           >
                             {deleteLoading ? <><i className="fa-solid fa-spinner fa-spin" style={{ marginRight: 6 }}></i>Deleting...</> : <><i className="fa-solid fa-skull-crossbones" style={{ marginRight: 6 }}></i>Delete Forever</>}
                           </button>
@@ -1582,7 +1583,7 @@ useEffect(() => {
               {/* ── COURSES TAB ── */}
               {dashTab === 'courses' && (
                 <div>
-                  <h3 style={{ fontFamily: "'Orbitron', sans-serif", fontWeight: 900, fontSize: 18, marginBottom: 4, color: 'var(--text-light)' }}>Available Courses</h3>
+                  <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, marginBottom: 4, color: 'var(--text-light)' }}>Available Courses</h3>
                   <p style={{ color: 'var(--text-dim)', marginBottom: 24, fontSize: 14 }}>Enroll in our free courses and start learning today</p>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
                     {availableCourses.map((course) => {
@@ -1591,13 +1592,13 @@ useEffect(() => {
                       const isPending = eStatus === 'pending';
                       const isDeclined = eStatus === 'declined';
                       return (
-                        <div key={course.id} style={{ background: 'var(--card-bg)', border: '1px solid var(--border-color)', padding: 24 }}>
+                        <div key={course.id} style={{ background: 'var(--card-bg)', border: '1px solid color-mix(in srgb, var(--accent) 12%, var(--border-color))', padding: 24, borderRadius: 12 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-                            <div style={{ width: 40, height: 40, background: 'rgba(220,20,60,0.1)', border: '1px solid rgba(220,20,60,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary-red)', fontSize: 16 }}>
+                            <div style={{ width: 40, height: 40, background: 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', fontSize: 16, borderRadius: 10 }}>
                               <i className={course.icon}></i>
                             </div>
                             <div>
-                              <div style={{ fontSize: 11, color: 'var(--primary-red)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 2 }}>{course.category}</div>
+                              <div style={{ fontSize: 11, color: 'var(--accent)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 2 }}>{course.category}</div>
                               <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-light)' }}>{course.name}</div>
                             </div>
                           </div>
@@ -1607,7 +1608,7 @@ useEffect(() => {
                             <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--text-dim)' }}><i className="fa-solid fa-clock" style={{ color: 'var(--accent)', fontSize: 11 }}></i>{course.duration}</span>
                             <span style={{ background: 'rgba(76,175,80,0.1)', color: 'var(--success-color)', padding: '2px 8px', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, border: '1px solid rgba(76,175,80,0.2)' }}>{course.price}</span>
                           </div>
-                          <button className="submit-btn" disabled={isApproved || isPending} onClick={() => openEnrollModal(course)} style={{ padding: '10px 0', fontSize: 11, letterSpacing: 2, marginTop: 0, opacity: (isApproved || isPending) ? 0.5 : 1 }}>
+                          <button className="submit-btn" disabled={isApproved || isPending} onClick={() => openEnrollModal(course)} style={{ padding: '10px 0', fontSize: 11, letterSpacing: 1.5, marginTop: 0, opacity: (isApproved || isPending) ? 0.5 : 1, borderRadius: 8, fontFamily: "'Space Grotesk', sans-serif" }}>
                             {isApproved ? <><i className="fa-solid fa-check" style={{ marginRight: 4 }} />Enrolled</> : isPending ? <><i className="fa-solid fa-hourglass-half" style={{ marginRight: 4 }} />Pending...</> : isDeclined ? <><i className="fa-solid fa-redo"></i> Re-apply</> : <><i className="fa-solid fa-plus"></i> Enroll Now</>}
                           </button>
                         </div>
@@ -1620,16 +1621,16 @@ useEffect(() => {
               {/* ── MY ENROLLMENTS TAB ── */}
               {dashTab === 'my-enrollments' && (
                 <div>
-                  <h3 style={{ fontFamily: "'Orbitron', sans-serif", fontWeight: 900, fontSize: 18, marginBottom: 4, color: 'var(--text-light)' }}>My Enrollments</h3>
+                  <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, marginBottom: 4, color: 'var(--text-light)' }}>My Enrollments</h3>
                   <p style={{ color: 'var(--text-dim)', marginBottom: 24, fontSize: 14 }}>Track your enrollment requests and their status</p>
                   {enrollmentsLoading ? (
                     <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}><i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 24, color: 'var(--accent)' }}></i></div>
                   ) : enrollments.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-dim)' }}>
                       <i className="fa-solid fa-book-open" style={{ fontSize: 36, opacity: 0.5, display: 'block', marginBottom: 12 }}></i>
-                      <h4 style={{ fontFamily: "'Orbitron', sans-serif", fontWeight: 700, fontSize: 16, color: 'var(--text-light)', marginBottom: 8 }}>No enrollments yet</h4>
+                      <h4 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 16, color: 'var(--text-light)', marginBottom: 8 }}>No enrollments yet</h4>
                       <p style={{ fontSize: 14 }}>Browse our courses and submit an enrollment request</p>
-                      <button className="btn btn-primary" style={{ marginTop: 16, fontSize: 11, padding: '10px 24px' }} onClick={() => setDashTab('courses')}>Browse Courses</button>
+                      <button className="btn btn-primary" style={{ marginTop: 16, fontSize: 11, padding: '10px 24px', fontFamily: "'Space Grotesk', sans-serif" }} onClick={() => setDashTab('courses')}>Browse Courses</button>
                     </div>
                   ) : (
                     <div>
@@ -1641,9 +1642,9 @@ useEffect(() => {
                         };
                         const st = statusStyles[enr.status] || statusStyles.pending;
                         return (
-                          <div key={enr.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', background: 'var(--card-bg)', border: '1px solid var(--border-color)', marginBottom: 8, flexWrap: 'wrap', gap: 12 }}>
+                          <div key={enr.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', background: 'var(--card-bg)', border: '1px solid color-mix(in srgb, var(--accent) 12%, var(--border-color))', marginBottom: 8, flexWrap: 'wrap', gap: 12, borderRadius: 10 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                              <div style={{ width: 40, height: 40, background: 'rgba(220,20,60,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary-red)', fontSize: 14 }}>
+                              <div style={{ width: 40, height: 40, background: 'color-mix(in srgb, var(--accent) 10%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', fontSize: 14, borderRadius: 10 }}>
                                 <i className={enr.courseId === 'ml-bootcamp' ? 'fa-solid fa-brain' : 'fa-solid fa-terminal'}></i>
                               </div>
                               <div>
@@ -1655,7 +1656,7 @@ useEffect(() => {
                               </div>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                              <span style={{ padding: '4px 14px', borderRadius: 2, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, background: st.bg, color: st.color, border: st.border }}>
+                              <span style={{ padding: '4px 14px', borderRadius: 9999, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, background: st.bg, color: st.color, border: st.border }}>
                                 {st.label}
                               </span>
                               <span style={{ fontSize: 12, color: 'var(--text-dim)', display: 'flex', alignItems: 'center', gap: 4 }}><i className="fa-solid fa-clock" style={{ color: 'var(--accent)', fontSize: 11 }}></i>{enr.duration}</span>
@@ -1675,7 +1676,7 @@ useEffect(() => {
                                   cursor: 'pointer',
                                   opacity: cancelLoading === enr.id ? 0.5 : 1,
                                   transition: 'all 0.2s',
-                                  borderRadius: 2,
+                                  borderRadius: 10,
                                   display: 'flex',
                                   alignItems: 'center',
                                   gap: 6,
@@ -1698,7 +1699,7 @@ useEffect(() => {
               {/* ── REQUEST QUOTE TAB ── */}
               {dashTab === 'request-quote' && (
                 <div>
-                  <h3 style={{ fontFamily: "'Orbitron', sans-serif", fontWeight: 900, fontSize: 18, marginBottom: 4, color: 'var(--text-light)' }}>Request a Quote</h3>
+                  <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, marginBottom: 4, color: 'var(--text-light)' }}>Request a Quote</h3>
                   <p style={{ color: 'var(--text-dim)', marginBottom: 24, fontSize: 14 }}>Tell us about your project and we&apos;ll get back to you within 24 hours</p>
                   <form onSubmit={handleDashQuote}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
@@ -1732,7 +1733,7 @@ useEffect(() => {
                       </select>
                     </div>
                     <WaveTextarea label="Project Details *" value={dqDescription} onChange={(e) => setDqDescription(e.target.value)} required />
-                    <button type="submit" className="submit-btn" disabled={dqLoading}>
+                    <button type="submit" className="submit-btn" disabled={dqLoading} style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                       {dqLoading ? <><i className="fa-solid fa-spinner fa-spin"></i> Submitting...</> : <><i className="fa-solid fa-paper-plane"></i> Submit Quote Request</>}
                     </button>
                   </form>
@@ -1742,25 +1743,25 @@ useEffect(() => {
               {/* ── MY QUOTES TAB ── */}
               {dashTab === 'my-quotes' && (
                 <div>
-                  <h3 style={{ fontFamily: "'Orbitron', sans-serif", fontWeight: 900, fontSize: 18, marginBottom: 4, color: 'var(--text-light)' }}>My Quotes</h3>
+                  <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, marginBottom: 4, color: 'var(--text-light)' }}>My Quotes</h3>
                   <p style={{ color: 'var(--text-dim)', marginBottom: 24, fontSize: 14 }}>Track the status of your quote requests</p>
                   {quotesLoading ? (
                     <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}><i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 24, color: 'var(--accent)' }}></i></div>
                   ) : quotes.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-dim)' }}>
                       <i className="fa-solid fa-clipboard-list" style={{ fontSize: 36, opacity: 0.5, display: 'block', marginBottom: 12 }}></i>
-                      <h4 style={{ fontFamily: "'Orbitron', sans-serif", fontWeight: 700, fontSize: 16, color: 'var(--text-light)', marginBottom: 8 }}>No quotes yet</h4>
+                      <h4 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 16, color: 'var(--text-light)', marginBottom: 8 }}>No quotes yet</h4>
                       <p style={{ fontSize: 14 }}>Submit a quote request to get started</p>
-                      <button className="btn btn-primary" style={{ marginTop: 16, fontSize: 11, padding: '10px 24px' }} onClick={() => setDashTab('request-quote')}>Request a Quote</button>
+                      <button className="btn btn-primary" style={{ marginTop: 16, fontSize: 11, padding: '10px 24px', fontFamily: "'Space Grotesk', sans-serif" }} onClick={() => setDashTab('request-quote')}>Request a Quote</button>
                     </div>
                   ) : (
                     <div>
                       {quotes.map((q) => (
-                        <div key={q.id} style={{ background: 'var(--card-bg)', border: '1px solid var(--border-color)', padding: 20, marginBottom: 12 }}>
+                        <div key={q.id} style={{ background: 'var(--card-bg)', border: '1px solid color-mix(in srgb, var(--accent) 12%, var(--border-color))', padding: 20, marginBottom: 12, borderRadius: 10 }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
-                            <span style={{ fontFamily: "'Orbitron', sans-serif", fontWeight: 700, fontSize: 14, color: 'var(--text-light)' }}>{q.serviceType}</span>
+                            <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 14, color: 'var(--text-light)' }}>{q.serviceType}</span>
                             <span style={{
-                              padding: '3px 10px', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5,
+                              padding: '3px 10px', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, borderRadius: 9999,
                               background: q.status === 'pending' ? 'rgba(255,193,7,0.1)' : q.status === 'reviewed' ? 'rgba(33,150,243,0.1)' : 'rgba(76,175,80,0.1)',
                               color: q.status === 'pending' ? 'var(--warning-color)' : q.status === 'reviewed' ? '#2196f3' : 'var(--success-color)',
                               border: `1px solid ${q.status === 'pending' ? 'rgba(255,193,7,0.2)' : q.status === 'reviewed' ? 'rgba(33,150,243,0.2)' : 'rgba(76,175,80,0.2)'}`,
@@ -1781,19 +1782,19 @@ useEffect(() => {
               {/* ── FRIENDS TAB ── */}
               {dashTab === 'friends' && (
                 <div style={{ maxWidth: 560, margin: '0 auto', minHeight: 400 }}>
-                  <h3 style={{ fontFamily: "'Orbitron', sans-serif", fontWeight: 900, fontSize: 18, marginBottom: 4, color: 'var(--text-light)' }}>Friends</h3>
+                  <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, marginBottom: 4, color: 'var(--text-light)' }}>Friends</h3>
                   <p style={{ color: 'var(--text-dim)', marginBottom: 24, fontSize: 14 }}>Manage your friends and friend requests</p>
 
                   {/* Add Friend */}
-                  <form onSubmit={handleAddFriend} style={{ display: 'flex', gap: 10, marginBottom: 28 }}>
+                  <form onSubmit={handleAddFriend} style={{ display: 'flex', gap: 12, marginBottom: 28, alignItems: 'flex-end' }}>
                     <WaveInput
                       label="Enter username to add..."
                       type="text"
                       value={addFriendUsername}
                       onChange={(e) => setAddFriendUsername(e.target.value)}
-                      style={{ flex: 1 }}
+                      style={{ flex: 1, marginBottom: 0 }}
                     />
-                    <button type="submit" disabled={addFriendLoading} className="submit-btn" style={{ width: 'auto', padding: '10px 20px', opacity: addFriendLoading ? 0.6 : 1, fontSize: 13 }}>
+                    <button type="submit" disabled={addFriendLoading} className="submit-btn" style={{ width: 'auto', padding: '10px 20px', opacity: addFriendLoading ? 0.6 : 1, fontSize: 13, borderRadius: 10, fontFamily: "'Space Grotesk', sans-serif", flexShrink: 0 }}>
                       {addFriendLoading ? <><i className="fa-solid fa-spinner fa-spin" style={{ marginRight: 6 }}></i>Sending...</> : <><i className="fa-solid fa-user-plus" style={{ marginRight: 6 }}></i>Add</>}
                     </button>
                   </form>
@@ -1801,21 +1802,21 @@ useEffect(() => {
                   {/* Pending Requests */}
                   {pendingRequests.length > 0 && (
                     <div style={{ marginBottom: 24 }}>
-                      <h4 style={{ fontFamily: "'Orbitron', sans-serif", fontWeight: 700, fontSize: 12, color: 'var(--primary-red)', marginBottom: 12, letterSpacing: 1, textTransform: 'uppercase' }}>
+                      <h4 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 12, color: 'var(--accent)', marginBottom: 12, letterSpacing: 1, textTransform: 'uppercase' }}>
                         <i className="fa-solid fa-inbox" style={{ marginRight: 6 }}></i>Pending Requests ({pendingRequests.length})
                       </h4>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                         {pendingRequests.map((req) => (
-                          <div key={req.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'var(--card-bg)', border: '1px solid var(--border-color)', borderRadius: 2 }}>
-                            <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(220,20,60,0.1)', border: '1px solid rgba(220,20,60,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary-red)', fontSize: 13, fontWeight: 700, overflow: 'hidden', flexShrink: 0 }}>
+                          <div key={req.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'var(--card-bg)', border: '1px solid color-mix(in srgb, var(--accent) 12%, var(--border-color))', borderRadius: 10 }}>
+                            <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', fontSize: 13, fontWeight: 700, overflow: 'hidden', flexShrink: 0 }}>
                               {req.avatar ? <img src={req.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} /> : req.name.charAt(0).toUpperCase()}
                             </div>
                             <div style={{ flex: 1, overflow: 'hidden' }}>
                               <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-light)' }}>{req.name}</div>
                               <div style={{ fontSize: 11, color: 'var(--text-dim)' }}>@{req.username}</div>
                             </div>
-                            <button onClick={() => handleAcceptFriend(req.id)} style={{ padding: '6px 14px', borderRadius: 2, border: 'none', background: 'var(--primary-red)', color: 'var(--text-light)', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif" }}>Accept</button>
-                            <button onClick={() => handleRejectFriend(req.id)} style={{ padding: '6px 14px', borderRadius: 2, border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-dim)', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif" }}>Decline</button>
+                            <button onClick={() => handleAcceptFriend(req.id)} style={{ padding: '6px 14px', borderRadius: 8, border: 'none', background: 'var(--accent)', color: 'var(--text-light)', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif" }}>Accept</button>
+                            <button onClick={() => handleRejectFriend(req.id)} style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-dim)', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif" }}>Decline</button>
                           </div>
                         ))}
                       </div>
@@ -1825,20 +1826,20 @@ useEffect(() => {
                   {/* Sent Requests */}
                   {sentRequests.length > 0 && (
                     <div style={{ marginBottom: 24 }}>
-                      <h4 style={{ fontFamily: "'Orbitron', sans-serif", fontWeight: 700, fontSize: 12, color: 'var(--text-dim)', marginBottom: 12, letterSpacing: 1, textTransform: 'uppercase' }}>
+                      <h4 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 12, color: 'var(--text-dim)', marginBottom: 12, letterSpacing: 1, textTransform: 'uppercase' }}>
                         <i className="fa-solid fa-paper-plane" style={{ marginRight: 6 }}></i>Sent Requests ({sentRequests.length})
                       </h4>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                         {sentRequests.map((req) => (
-                          <div key={req.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'var(--card-bg)', border: '1px solid var(--border-color)', borderRadius: 2 }}>
-                            <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-dim)', fontSize: 13, fontWeight: 700, overflow: 'hidden', flexShrink: 0 }}>
+                          <div key={req.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'var(--card-bg)', border: '1px solid color-mix(in srgb, var(--accent) 12%, var(--border-color))', borderRadius: 10 }}>
+                            <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'color-mix(in srgb, var(--accent) 5%, transparent)', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-dim)', fontSize: 13, fontWeight: 700, overflow: 'hidden', flexShrink: 0 }}>
                               {req.avatar ? <img src={req.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} /> : req.name.charAt(0).toUpperCase()}
                             </div>
                             <div style={{ flex: 1, overflow: 'hidden' }}>
                               <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-light)' }}>{req.name}</div>
                               <div style={{ fontSize: 11, color: 'var(--text-dim)' }}>@{req.username} <span style={{ color: 'var(--warning-color)', fontSize: 10 }}>&middot; Pending</span></div>
                             </div>
-                            <button onClick={() => handleCancelSentRequest(req.id)} style={{ padding: '6px 14px', borderRadius: 2, border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-dim)', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif" }}>
+                            <button onClick={() => handleCancelSentRequest(req.id)} style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-dim)', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif" }}>
                               <i className="fa-solid fa-times" style={{ fontSize: 10, marginRight: 4 }}></i>Cancel
                             </button>
                           </div>
@@ -1848,7 +1849,7 @@ useEffect(() => {
                   )}
 
                   {/* Friends List */}
-                  <h4 style={{ fontFamily: "'Orbitron', sans-serif", fontWeight: 700, fontSize: 12, color: 'var(--text-dim)', marginBottom: 12, letterSpacing: 1, textTransform: 'uppercase' }}>
+                  <h4 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 12, color: 'var(--text-dim)', marginBottom: 12, letterSpacing: 1, textTransform: 'uppercase' }}>
                     <i className="fa-solid fa-users" style={{ marginRight: 6 }}></i>All Friends ({friends.length})
                   </h4>
                   {friendsLoading ? (
@@ -1856,24 +1857,24 @@ useEffect(() => {
                   ) : friends.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-dim)' }}>
                       <i className="fa-solid fa-user-friends" style={{ fontSize: 36, opacity: 0.5, display: 'block', marginBottom: 12 }}></i>
-                      <h4 style={{ fontFamily: "'Orbitron', sans-serif", fontWeight: 700, fontSize: 16, color: 'var(--text-light)', marginBottom: 8 }}>No friends yet</h4>
+                      <h4 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 16, color: 'var(--text-light)', marginBottom: 8 }}>No friends yet</h4>
                       <p style={{ fontSize: 14 }}>Add a friend by their username to get started</p>
                     </div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                       {friends.map((f) => (
-                        <div key={f.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'var(--card-bg)', border: '1px solid var(--border-color)', borderRadius: 2 }}>
-                          <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(220,20,60,0.1)', border: '1px solid rgba(220,20,60,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary-red)', fontSize: 13, fontWeight: 700, overflow: 'hidden', flexShrink: 0 }}>
+                        <div key={f.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'var(--card-bg)', border: '1px solid color-mix(in srgb, var(--accent) 12%, var(--border-color))', borderRadius: 10 }}>
+                          <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', fontSize: 13, fontWeight: 700, overflow: 'hidden', flexShrink: 0 }}>
                             {f.avatar ? <img src={f.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} /> : f.name.charAt(0).toUpperCase()}
                           </div>
                           <div style={{ flex: 1, overflow: 'hidden' }}>
                             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-light)' }}>{f.name}</div>
                             <div style={{ fontSize: 11, color: 'var(--text-dim)' }}>@{f.username}</div>
                           </div>
-                          <button onClick={() => { setDashTab('messages'); }} style={{ padding: '6px 14px', borderRadius: 2, border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--primary-red)', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <button onClick={() => { setDashTab('messages'); }} style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--accent)', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", display: 'flex', alignItems: 'center', gap: 6 }}>
                             <i className="fa-solid fa-comment" style={{ fontSize: 10 }}></i> Message
                           </button>
-                          <button onClick={() => handleRemoveFriend(f.id)} style={{ padding: '6px 14px', borderRadius: 2, border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-dim)', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif" }}>
+                          <button onClick={() => handleRemoveFriend(f.id)} style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-dim)', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif" }}>
                             <i className="fa-solid fa-user-minus" style={{ fontSize: 10 }}></i>
                           </button>
                         </div>
@@ -1887,7 +1888,7 @@ useEffect(() => {
                 <div style={{ maxWidth: 560, margin: '0 auto', minHeight: 400 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                     <div>
-                      <h3 style={{ fontFamily: "'Orbitron', sans-serif", fontWeight: 900, fontSize: 18, marginBottom: 4, color: 'var(--text-light)' }}>Messages</h3>
+                      <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, marginBottom: 4, color: 'var(--text-light)' }}>Messages</h3>
                       <p style={{ color: 'var(--text-dim)', fontSize: 14 }}>Chat with your friends</p>
                     </div>
                    
@@ -1895,15 +1896,15 @@ useEffect(() => {
                   {friends.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-dim)' }}>
                       <i className="fa-solid fa-comment-dots" style={{ fontSize: 36, opacity: 0.5, display: 'block', marginBottom: 12 }}></i>
-                      <h4 style={{ fontFamily: "'Orbitron', sans-serif", fontWeight: 700, fontSize: 16, color: 'var(--text-light)', marginBottom: 8 }}>No conversations</h4>
+                      <h4 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 16, color: 'var(--text-light)', marginBottom: 8 }}>No conversations</h4>
                       <p style={{ fontSize: 14 }}>Add friends first to start messaging</p>
-                      <button className="btn btn-primary" style={{ marginTop: 16, fontSize: 11, padding: '10px 24px' }} onClick={() => setDashTab('friends')}>Go to Friends</button>
+                      <button className="btn btn-primary" style={{ marginTop: 16, fontSize: 11, padding: '10px 24px', fontFamily: "'Space Grotesk', sans-serif" }} onClick={() => setDashTab('friends')}>Go to Friends</button>
                     </div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                       {friends.map((f) => (
-                        <button key={f.id} onClick={() => { setSelectedChatFriend(f); setDashboardOpen(false); setChatOpen(true); }} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: 'var(--card-bg)', border: '1px solid var(--border-color)', borderRadius: 2, cursor: 'pointer', textAlign: 'left', width: '100%', color: 'var(--text-light)', transition: 'border-color 0.2s' }}>
-                          <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(220,20,60,0.1)', border: '1px solid rgba(220,20,60,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary-red)', fontSize: 14, fontWeight: 700, overflow: 'hidden', flexShrink: 0 }}>
+                        <button key={f.id} onClick={() => { setSelectedChatFriend(f); setDashboardOpen(false); setChatOpen(true); }} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: 'var(--card-bg)', border: '1px solid color-mix(in srgb, var(--accent) 12%, var(--border-color))', borderRadius: 10, cursor: 'pointer', textAlign: 'left', width: '100%', color: 'var(--text-light)', transition: 'border-color 0.2s' }}>
+                          <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', fontSize: 14, fontWeight: 700, overflow: 'hidden', flexShrink: 0 }}>
                             {f.avatar ? <img src={f.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} /> : f.name.charAt(0).toUpperCase()}
                           </div>
                           <div style={{ flex: 1 }}>
@@ -1934,15 +1935,15 @@ useEffect(() => {
           ═══════════════════════════════════════════════════ */}
       {enrollModalOpen && enrollCourse && (
         <div className="modal-overlay" onClick={() => setEnrollModalOpen(false)}>
-          <div className="modal-content auth-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 520 }}>
+          <div className="modal-content auth-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 520, borderRadius: 16, border: "1px solid color-mix(in srgb, var(--accent) 15%, var(--border-color))" }}>
             <button className="modal-close" onClick={() => setEnrollModalOpen(false)}>
               <i className="fa-solid fa-times"></i>
             </button>
 
             <div style={{ textAlign: 'center', marginBottom: 28 }}>
             
-              <h2 style={{ fontFamily: "'Orbitron', sans-serif", fontWeight: 900, fontSize: 18, letterSpacing: 2, textTransform: 'uppercase', color: 'var(--text-light)', marginBottom: 4 }}>Enrollment Request</h2>
-              <p style={{ color: 'var(--primary-red)', fontSize: 13, fontWeight: 700 }}>{enrollCourse.name}</p>
+              <h2 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, letterSpacing: 2, textTransform: 'uppercase', color: 'var(--text-light)', marginBottom: 4 }}>Enrollment Request</h2>
+              <p style={{ color: 'var(--accent)', fontSize: 14, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif" }}>{enrollCourse.name}</p>
               <p style={{ color: 'var(--text-dim)', fontSize: 13, marginTop: 6 }}>Fill in your details below. Your request will be reviewed by an admin.</p>
             </div>
 
@@ -1956,7 +1957,7 @@ useEffect(() => {
                   value={erExperience}
                   onChange={(e) => setErExperience(e.target.value)}
                   required
-                  style={{ width: '100%', padding: '14px 18px', background: 'var(--input-bg)', border: '1px solid var(--border-color)', color: 'var(--text-light)', fontFamily: "'Space Grotesk', sans-serif", fontSize: 15, fontWeight: 600, outline: 'none' }}
+                  style={{ width: '100%', padding: '14px 18px', background: 'var(--input-bg)', border: '1px solid color-mix(in srgb, var(--accent) 15%, var(--border-color))', borderRadius: 10, color: 'var(--text-light)', fontFamily: "'Space Grotesk', sans-serif", fontSize: 15, fontWeight: 600, outline: 'none' }}
                 >
                   <option value="">Select your level...</option>
                   <option value="Beginner">Beginner - No prior experience</option>
@@ -1978,13 +1979,13 @@ useEffect(() => {
                 type="submit"
                 className="submit-btn"
                 disabled={enrollLoading}
-                style={{ width: '100%', opacity: enrollLoading ? 0.6 : 1, padding: '16px', fontSize: 13, letterSpacing: 3 }}
+                style={{ width: '100%', opacity: enrollLoading ? 0.6 : 1, padding: '14px', fontSize: 13, letterSpacing: 1.5, borderRadius: 10, fontFamily: "'Space Grotesk', sans-serif" }}
               >
                 {enrollLoading ? <><i className="fa-solid fa-spinner fa-spin" style={{ marginRight: 8 }}></i> Submitting...</> : <><i className="fa-solid fa-paper-plane" style={{ marginRight: 8 }}></i> Submit Enrollment Request</>}
               </button>
 
               <p style={{ textAlign: 'center', color: 'var(--text-dim)', fontSize: 11, marginTop: 16, lineHeight: 1.6 }}>
-                <i className="fa-solid fa-info-circle" style={{ marginRight: 4 }}></i>
+                <i className="fa-solid fa-info-circle" style={{ marginRight: 4, color: 'var(--accent)' }}></i>
                 Your request will be reviewed by an admin. You&apos;ll be notified once approved.
               </p>
             </form>

@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { NavActions } from '@/lib/PageModals';
 import { darkThemes, lightThemes } from './ThemePicker';
 import { Logo } from './Logo';
 import GlassSurface from './GlassSurface';
-import StaggeredMenu from './StaggeredMenu';
+import StaggeredMenu, { StaggeredMenuHandle } from './StaggeredMenu';
 
 interface NavbarProps {
   scrolled: boolean;
@@ -47,6 +47,18 @@ export function Navbar({
   onAcceptFriend, onRejectFriend,
 }: NavbarProps) {
   const isHome = activePage === 'home';
+  const staggeredMenuRef = useRef<StaggeredMenuHandle>(null);
+
+  // Close mobile menu when viewport grows past 1570px
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 1570 && staggeredMenuRef.current?.isOpen()) {
+        staggeredMenuRef.current.close();
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const isActive = (section: string) => {
     if (isHome && activeNav) return activeNav === section;
@@ -175,17 +187,19 @@ export function Navbar({
       <NavActions
         theme={theme} onToggleTheme={onToggleTheme} onChangeTheme={onChangeTheme} onSearchOpen={onSearchOpen}
         user={user} onOpenAuth={onOpenAuth} onLogout={onLogout}
-        mobileMenuOpen={mobileMenuOpen} onToggleMobile={() => setMobileMenuOpen(!mobileMenuOpen)}
+        mobileMenuOpen={mobileMenuOpen} onToggleMobile={() => staggeredMenuRef.current?.toggle()}
         notifOpen={notifOpen} setNotifOpen={setNotifOpen}
         notifications={notifications} unreadCount={unreadCount}
         loadNotifications={loadNotifications} setNotifications={setNotifications as any} setUnreadCount={setUnreadCount as any}
         dashboardOpen={dashboardOpen} setDashboardOpen={setDashboardOpen}
       />
 
-      {/* StaggeredMenu — mobile menu for ≤1570px, logged-in only */}
+      {/* StaggeredMenu — mobile menu for ≤1570px, logged-in only.
+          Rendered via portal to document.body (inside component) to avoid
+          CSS containment issues from the navbar. CSS hides it above 1570px. */}
       {user && (
-      <div className="staggered-menu-mobile-only">
         <StaggeredMenu
+          ref={staggeredMenuRef}
           position="right"
           items={staggeredMenuItems}
           displayItemNumbering={true}
@@ -196,9 +210,9 @@ export function Navbar({
           accentColor="var(--accent, #dc143c)"
           isFixed={true}
           closeOnClickAway={true}
+          hideToggle={false}
           onMenuOpen={() => setMobileMenuOpen(true)}
           onMenuClose={() => setMobileMenuOpen(false)}
-          // Extra props for the Vaulta panel content
           user={user}
           theme={theme}
           onChangeTheme={onChangeTheme}
@@ -211,7 +225,6 @@ export function Navbar({
           onRejectFriend={onRejectFriend}
           setDashboardOpen={setDashboardOpen}
         />
-      </div>
       )}
     </nav>
   );

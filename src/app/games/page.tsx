@@ -519,7 +519,7 @@ export default function GamesPage() {
           <div style={{
             width: `${((currentQ + (showResult ? 1 : 0)) / questions.length) * 100}%`,
             height: '100%',
-            background: 'linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 70%, var(--accent-purple)))',
+            background: 'linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 70%, white))',
             borderRadius: 8, transition: 'width 0.5s cubic-bezier(0.22,1,0.36,1)',
             backgroundSize: '200% 100%',
             animation: 'progressShine 2s linear infinite',
@@ -538,20 +538,18 @@ export default function GamesPage() {
 
         {/* Code display */}
         <div style={{
-          background: 'color-mix(in srgb, var(--card-bg) 80%, transparent)',
-          backdropFilter: 'blur(20px) saturate(1.6)',
-          WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
-          border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
+          background: 'var(--input-bg)',
+          border: '0.5px solid var(--border-color)',
           borderRadius: 12, padding: isMobile ? '16px 12px' : '20px 24px',
           marginBottom: 24, overflowX: 'auto',
           animation: 'slideInUp 0.4s ease 0.1s both',
           transition: 'border-color 0.3s ease',
-          borderColor: showResult ? (isCorrect ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)') : 'color-mix(in srgb, var(--text-light) 10%, transparent)',
+          borderColor: showResult ? (isCorrect ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)') : 'var(--border-color)',
         }}>
           <pre style={{
             fontFamily: "'Fira Code', 'Courier New', monospace",
             fontSize: isMobile ? 12 : 14, lineHeight: 1.7,
-            color: '#e0e0e0', margin: 0, whiteSpace: 'pre',
+            color: 'var(--text-light)', margin: 0, whiteSpace: 'pre',
           }}>
             {q.code}
           </pre>

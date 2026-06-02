@@ -240,7 +240,7 @@ export function AuthModal({
                 </p>
               </div>
               <form onSubmit={onVerifyEmail}>
-                <WaveInput label="6-Digit Code" type="text" value={verificationCode} onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 6); setVerificationCode(v); }} required maxLength={6} autoFocus style={{ textAlign: 'center', fontSize: 24, letterSpacing: 10, fontWeight: 700, fontFamily: "'Orbitron', sans-serif" }} />
+                <WaveInput label="6-Digit Code" type="text" value={verificationCode} onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 6); setVerificationCode(v); }} required maxLength={6} autoFocus style={{ textAlign: 'center', fontSize: 24, letterSpacing: 10, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif" }} />
                 <button type="submit" className="v-btn-primary" disabled={verificationLoading} style={{ marginTop: 8, width: '100%', justifyContent: 'center' }}>
                   {verificationLoading ? <><i className="fa-solid fa-spinner fa-spin"></i> Verifying...</> : <><i className="fa-solid fa-check"></i> Verify Email</>}
                 </button>
@@ -289,7 +289,7 @@ export function AuthModal({
                 A 6-digit code was sent to <strong style={{ color: 'var(--text-light)' }}>{forgotEmail}</strong>. Enter it below along with your new password.
               </p>
               <form onSubmit={onResetSubmit}>
-                <WaveInput label="6-Digit Code" type="text" value={resetCode} onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 6); setResetCode(v); }} required maxLength={6} autoFocus style={{ textAlign: 'center', fontSize: 24, letterSpacing: 10, fontWeight: 700, fontFamily: "'Orbitron', sans-serif" }} />
+                <WaveInput label="6-Digit Code" type="text" value={resetCode} onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 6); setResetCode(v); }} required maxLength={6} autoFocus style={{ textAlign: 'center', fontSize: 24, letterSpacing: 10, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif" }} />
                 <WaveInput label="New Password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
                 <button type="submit" className="v-btn-primary" disabled={resetLoading} style={{ marginTop: 8, width: '100%', justifyContent: 'center' }}>
                   {resetLoading ? <><i className="fa-solid fa-spinner fa-spin"></i> Resetting Password...</> : <><i className="fa-solid fa-check"></i> Reset Password</>}
@@ -442,7 +442,7 @@ export function NavActions({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [notifOpen, setNotifOpen]);
 
-  // Close mobile menu on route change / resize
+  // Close mobile menu when viewport grows past 1570px
   useEffect(() => {
     if (!mobileMenuOpen) return;
     const handleResize = () => { if (window.innerWidth > 1570) onToggleMobile(); };
@@ -535,6 +535,18 @@ export function NavActions({
           <button className="nav-auth-btn-inline" onClick={() => onOpenAuth('signin')}>Sign In</button>
           <button className="nav-auth-btn-inline nav-auth-btn-inline-filled" onClick={() => onOpenAuth('signup')}>Sign Up</button>
         </div>
+      )}
+      {/* Mobile Menu toggle — in the navbar grid so it aligns with logo/pill at every breakpoint */}
+      {user && (
+        <button
+          className="nav-menu-toggle"
+          onClick={onToggleMobile}
+          aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={mobileMenuOpen}
+          type="button"
+        >
+          <span className="nav-menu-toggle-label">{mobileMenuOpen ? 'Close' : 'Menu'}</span>
+        </button>
       )}
     </div>
   );
@@ -654,7 +666,7 @@ export function ProfileModal({
 
         <div className="dashboard-modal-body">
           <div style={{ maxWidth: 480, margin: '0 auto' }}>
-            <h3 style={{ fontFamily: "'Orbitron', sans-serif", fontWeight: 900, fontSize: 18, marginBottom: 4, color: 'var(--text-light)' }}>My Profile</h3>
+            <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, marginBottom: 4, color: 'var(--text-light)' }}>My Profile</h3>
             <p style={{ color: 'var(--text-dim)', marginBottom: 28, fontSize: 14 }}>Manage your account details and profile picture</p>
 
             {/* Avatar */}
@@ -666,7 +678,7 @@ export function ProfileModal({
                     : <span>{user.name.charAt(0).toUpperCase()}</span>
                   }
                 </div>
-                <label style={{ position: 'absolute', bottom: -2, right: -2, width: 26, height: 26, borderRadius: '50%', background: 'var(--primary-red)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid var(--dark-gray)' }}>
+                <label style={{ position: 'absolute', bottom: -2, right: -2, width: 26, height: 26, borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid var(--card-bg)' }}>
                   <i className={`fa-solid fa-${avatarUploading ? 'spinner fa-spin' : 'camera'}`} style={{ fontSize: 10, color: 'var(--text-light)' }}></i>
                   <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} style={{ display: 'none' }} />
                 </label>
@@ -674,7 +686,7 @@ export function ProfileModal({
               <div>
                 <div style={{ fontWeight: 700, fontSize: 16, color: 'var(--text-light)', marginBottom: 2 }}>{user.name}</div>
                 <div style={{ fontSize: 13, color: 'var(--text-dim)' }}>{user.email}</div>
-                <div style={{ marginTop: 4, padding: '2px 10px', borderRadius: 2, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, background: 'color-mix(in srgb, var(--accent) 10%, transparent)', color: 'var(--accent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)', display: 'inline-block' }}>{user.role}</div>
+                <div style={{ marginTop: 4, padding: '2px 10px', borderRadius: 9999, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, background: 'color-mix(in srgb, var(--accent) 10%, transparent)', color: 'var(--accent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)', display: 'inline-block' }}>{user.role}</div>
               </div>
             </div>
 
@@ -690,7 +702,7 @@ export function ProfileModal({
             </form>
 
             <div style={{ marginTop: 20, textAlign: 'center' }}>
-              <a href="/" style={{ color: 'var(--primary-red)', fontSize: 13, fontWeight: 600, fontFamily: "'Space Grotesk', sans-serif", textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <a href="/" style={{ color: 'var(--accent)', fontSize: 13, fontWeight: 600, fontFamily: "'Space Grotesk', sans-serif", textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                 <i className="fa-solid fa-home" style={{ fontSize: 11 }} /> Go to Full Dashboard
                 <i className="fa-solid fa-arrow-right" style={{ fontSize: 10 }} />
               </a>

@@ -147,8 +147,8 @@ export function ThemePicker({ currentTheme, onThemeChange }: ThemePickerProps) {
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 8,
-          padding: '6px 12px',
+          gap: 6,
+          padding: '6px 8px',
           background: 'var(--input-bg)',
           border: '1px solid var(--border-color)',
           borderRadius: 6,
@@ -162,14 +162,13 @@ export function ThemePicker({ currentTheme, onThemeChange }: ThemePickerProps) {
         }}
       >
         <span style={{
-          width: 12,
-          height: 12,
+          width: 14,
+          height: 14,
           borderRadius: '50%',
           background: current.accent,
           border: '2px solid var(--border-color)',
           flexShrink: 0,
         }} />
-        <span>{current.name}</span>
         <i className={`fa-solid fa-chevron-${open ? 'up' : 'down'}`} style={{ fontSize: 9, opacity: 0.5 }} />
       </button>
 

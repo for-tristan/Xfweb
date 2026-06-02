@@ -187,7 +187,10 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
   ]);
 
   useEffect(() => {
-    setSvgSupported(supportsSVGFilters());
+    // SVG displacement-map filters are extremely GPU-expensive when applied
+    // via backdrop-filter. The CSS fallback (blur + saturate) looks nearly
+    // identical at a fraction of the cost, so we skip SVG filters entirely.
+    setSvgSupported(false);
   }, []);
 
   useEffect(() => {
@@ -264,8 +267,8 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
           return {
             ...baseStyles,
             background: 'rgba(255, 255, 255, 0.03)',
-            backdropFilter: 'blur(24px) saturate(1.8) brightness(1.1)',
-            WebkitBackdropFilter: 'blur(24px) saturate(1.8) brightness(1.1)',
+            backdropFilter: 'blur(16px) saturate(1.6) brightness(1.1)',
+            WebkitBackdropFilter: 'blur(16px) saturate(1.6) brightness(1.1)',
             border: '1px solid rgba(255, 255, 255, 0.1)',
             boxShadow: 'none',
           };
@@ -282,8 +285,8 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
           return {
             ...baseStyles,
             background: 'rgba(255, 255, 255, 0.04)',
-            backdropFilter: 'blur(24px) saturate(1.8) brightness(1.05)',
-            WebkitBackdropFilter: 'blur(24px) saturate(1.8) brightness(1.05)',
+            backdropFilter: 'blur(16px) saturate(1.6) brightness(1.05)',
+            WebkitBackdropFilter: 'blur(16px) saturate(1.6) brightness(1.05)',
             border: '1px solid rgba(255, 255, 255, 0.15)',
             boxShadow: 'none',
           };
@@ -305,86 +308,8 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
       className={`${glassSurfaceClasses} ${focusVisibleClasses} ${className}`}
       style={getContainerStyles()}
     >
-      <svg
-        className="w-full h-full pointer-events-none absolute inset-0 opacity-0 -z-10"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <defs>
-          <filter
-            id={filterId}
-            colorInterpolationFilters="sRGB"
-            x="0%"
-            y="0%"
-            width="100%"
-            height="100%"
-          >
-            <feImage
-              ref={feImageRef}
-              x="0"
-              y="0"
-              width="100%"
-              height="100%"
-              preserveAspectRatio="none"
-              result="map"
-            />
-
-            <feDisplacementMap
-              ref={redChannelRef}
-              in="SourceGraphic"
-              in2="map"
-              id="redchannel"
-              result="dispRed"
-            />
-            <feColorMatrix
-              in="dispRed"
-              type="matrix"
-              values="1 0 0 0 0
-                      0 0 0 0 0
-                      0 0 0 0 0
-                      0 0 0 1 0"
-              result="red"
-            />
-
-            <feDisplacementMap
-              ref={greenChannelRef}
-              in="SourceGraphic"
-              in2="map"
-              id="greenchannel"
-              result="dispGreen"
-            />
-            <feColorMatrix
-              in="dispGreen"
-              type="matrix"
-              values="0 0 0 0 0
-                      0 1 0 0 0
-                      0 0 0 0 0
-                      0 0 0 1 0"
-              result="green"
-            />
-
-            <feDisplacementMap
-              ref={blueChannelRef}
-              in="SourceGraphic"
-              in2="map"
-              id="bluechannel"
-              result="dispBlue"
-            />
-            <feColorMatrix
-              in="dispBlue"
-              type="matrix"
-              values="0 0 0 0 0
-                      0 0 0 0 0
-                      0 0 1 0 0
-                      0 0 0 1 0"
-              result="blue"
-            />
-
-            <feBlend in="red" in2="green" mode="screen" result="rg" />
-            <feBlend in="rg" in2="blue" mode="screen" result="output" />
-            <feGaussianBlur ref={gaussianBlurRef} in="output" stdDeviation="0.7" />
-          </filter>
-        </defs>
-      </svg>
+      {/* SVG filter removed — CSS backdrop-filter fallback provides
+          the same visual quality at a fraction of the GPU cost */}
 
       <div className="w-full h-full flex items-center justify-center p-2 rounded-[inherit] relative z-10">
         {children}

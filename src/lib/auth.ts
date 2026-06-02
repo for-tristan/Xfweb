@@ -57,6 +57,9 @@ export function createSessionToken(userId: string): string {
  *
  * Best minimal fix: Store session tokens in a Session model and validate against it.
  */
+export const SESSION_INACTIVITY_DAYS = 3;
+export const SESSION_MAX_AGE_MS = SESSION_INACTIVITY_DAYS * 24 * 60 * 60 * 1000;
+
 export async function verifySessionToken(userId: string, token: string): Promise<boolean> {
   if (!SESSION_SECRET) return false;
 
@@ -72,6 +75,15 @@ export async function verifySessionToken(userId: string, token: string): Promise
     await db.session.delete({ where: { token } }).catch(() => {});
     return false;
   }
+
+  // ── Rolling expiry: extend session by 3 days on each valid request ──
+  // If the user is active, their session keeps getting renewed.
+  // If they don't visit for 3 days, the session naturally expires.
+  const newExpiresAt = new Date(Date.now() + SESSION_MAX_AGE_MS);
+  await db.session.update({
+    where: { token },
+    data: { expiresAt: newExpiresAt },
+  }).catch(() => {});
 
   return true;
 }
@@ -125,7 +137,7 @@ export async function getCurrentUser(): Promise<{
  */
 export async function createSession(userId: string): Promise<string> {
   const token = createSessionToken(userId);
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+  const expiresAt = new Date(Date.now() + SESSION_MAX_AGE_MS); // 3 days (rolling)
 
   await db.session.upsert({
     where: { token },
