@@ -1076,7 +1076,7 @@ export default function GamesPage() {
           <div className="container-max" style={{ paddingLeft: isMobile ? 16 : undefined, paddingRight: isMobile ? 16 : undefined }}>
 
             {phase === 'select' && (
-              <div className="reveal-up">
+              <div>
                 {renderGameSelect()}
                 {selectedGame && <div>{renderConfigPanel()}</div>}
 
@@ -1094,10 +1094,10 @@ export default function GamesPage() {
               </div>
             )}
 
-            {phase === 'loading' && <div className="reveal-up">{renderLoading()}</div>}
-            {phase === 'playing' && <div className="reveal-up">{renderPlaying()}</div>}
-            {phase === 'results' && <div className="reveal-up">{renderResults()}</div>}
-            {phase === 'leaderboard' && <div className="reveal-up">{renderLeaderboard()}</div>}
+            {phase === 'loading' && <div>{renderLoading()}</div>}
+            {phase === 'playing' && <div>{renderPlaying()}</div>}
+            {phase === 'results' && <div>{renderResults()}</div>}
+            {phase === 'leaderboard' && <div>{renderLeaderboard()}</div>}
 
           </div>
         </section>
