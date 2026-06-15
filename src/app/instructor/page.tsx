@@ -603,19 +603,8 @@ export default function InstructorPage() {
         {/* ═══ NAV ═══ */}
         <Navbar activePage="instructor" scrolled={true} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} user={user} scrollToSection={scrollToSection} theme={theme} onToggleTheme={toggleTheme} onChangeTheme={changeTheme} onSearchOpen={() => setSearchOpen(true)} onOpenAuth={openAuthModal} onLogout={handleLogout} notifOpen={notifOpen} setNotifOpen={setNotifOpen} notifications={notifications} unreadCount={unreadCount} loadNotifications={loadNotifications} setNotifications={setNotifications} setUnreadCount={setUnreadCount} dashboardOpen={dashboardOpen} setDashboardOpen={setDashboardOpen} />
 
-        {/* ═══ HERO ═══ */}
-        <section className="course-hero" style={{ minHeight: '30vh' }}>
-          <div className="hero-content">
-            <h1 style={{ fontFamily: "var(--font-heading)" }}>Instructor<br /><span className="v-highlight">Dashboard</span></h1>
-            <div className="hero-meta" style={{ marginTop: 24 }}>
-              <div className="v-step-badge"><i className="fa-solid fa-chalkboard-user" /> Courses</div>
-              <div className="v-step-badge"><i className="fa-solid fa-chart-line" /> Analytics</div>
-            </div>
-          </div>
-        </section>
-
         {/* ═══ STATS OVERVIEW ═══ */}
-        <section className="section" style={{ paddingTop: 60, paddingBottom: 40 }}>
+        <section className="section" style={{ paddingTop: 100, paddingBottom: 40 }}>
           <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20 }}>
             {[
               { label: 'Total Students', val: analytics?.totalStudents ?? '—', color: 'var(--accent)', icon: 'fa-users', num: '01' },

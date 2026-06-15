@@ -15,9 +15,8 @@ import {
   getShuffledQuestions,
 } from '@/lib/gameQuestions';
 
-import { SearchModal, AuthModal, AuthGate, ProfileModal, HeroEffects } from '@/lib/PageModals';
+import { SearchModal, AuthModal, AuthGate, ProfileModal } from '@/lib/PageModals';
 import GradualBlur from '@/components/GradualBlur';
-import ScrollFadeSection from '@/components/ScrollFadeSection';
 
 // ═══════════════════════════════════════════
 // HELPERS
@@ -1027,30 +1026,8 @@ export default function GamesPage() {
       {renderNavbar()}
 
       {!(loading || minLoading) && <div className="page-transition-enter">
-        {/* HERO — pinned with scroll fade */}
-        <ScrollFadeSection pin fadeDistance="60vh" zIndex={1}>
-        <section className="course-hero">
-          <HeroEffects />
-          <div className="hero-content">
-            <h1 style={{ fontFamily: "var(--font-heading)" }}>Code<br /><span className="v-highlight">Games</span></h1>
-            <div className="hero-meta" style={{ marginTop: 24 }}>
-              <div className="v-step-badge"><i className="fa-solid fa-bug" /> Debug</div>
-              <div className="v-step-badge"><i className="fa-solid fa-terminal" /> Predict</div>
-              <div className="v-step-badge"><i className="fa-solid fa-puzzle-piece" /> Complete</div>
-            </div>
-            <div className="breadcrumb" style={{ marginTop: 24 }}>
-              <Link href="/" style={{ color: 'var(--text-dim)' }}>Home</Link> <span>/</span> <span style={{ color: 'var(--text-light)' }}>Games</span>
-            </div>
-          </div>
-          <div className="scroll-indicator" style={{ left: 0, right: 0 }}>
-            <span>Scroll</span>
-            <div className="scroll-line"></div>
-          </div>
-        </section>
-        </ScrollFadeSection>
-
         {/* MAIN CONTENT */}
-        <section style={{ background: 'var(--black)', marginTop: '-15vh', padding: '0 60px 160px', position: 'relative', zIndex: 2 }}>
+        <section style={{ background: 'var(--black)', padding: '0 60px 160px', position: 'relative', zIndex: 2, paddingTop: 80 }}>
           <div className="container-max" style={{ paddingLeft: isMobile ? 16 : undefined, paddingRight: isMobile ? 16 : undefined }}>
 
             {phase === 'select' && (

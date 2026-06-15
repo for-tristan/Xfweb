@@ -4,11 +4,10 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { usePageFeatures } from '@/lib/usePageFeatures';
-import { SearchModal, AuthModal, AuthGate, ProfileModal, HeroEffects } from '@/lib/PageModals';
+import { SearchModal, AuthModal, AuthGate, ProfileModal } from '@/lib/PageModals';
 import { Navbar } from '@/components/Navbar';
 import { Logo } from '@/components/Logo';
 import GradualBlur from '@/components/GradualBlur';
-import ScrollFadeSection from '@/components/ScrollFadeSection';
 
 // ═══════════════════════════════════════════════════
 // TYPES
@@ -409,14 +408,7 @@ export default function DashboardPage() {
         <AuthGate loading={loading} minLoading={minLoading} user={user} onSignIn={() => openAuthModal('signin', 'Sign in to access your dashboard')} onSignUp={() => openAuthModal('signup')} />
         {renderModals()}
         {renderNavbar()}
-        {!(loading || minLoading) && <ScrollFadeSection pin fadeDistance="60vh" zIndex={1}>
-        <section className="course-hero" style={{ minHeight: 300 }}>
-          <div className="hero-content">
-            <h1 style={{ fontFamily: "var(--font-heading)" }}>Dashboard</h1>
-            <p className="page-subtitle">Sign in to view your learning dashboard</p>
-          </div>
-        </section>
-        </ScrollFadeSection>}
+
       </>
     );
   }
@@ -436,29 +428,8 @@ export default function DashboardPage() {
       {renderNavbar('dashboard')}
 
       {!(loading || minLoading) && <div className="page-transition-enter">
-        {/* HERO — pinned with scroll fade */}
-        <ScrollFadeSection pin fadeDistance="60vh" zIndex={1}>
-        <section className="course-hero">
-          <HeroEffects />
-          <div className="hero-content">
-            <h1 className="v-hero-title" style={{ fontFamily: "var(--font-heading)" }}>My<br /><span className="v-highlight">Dashboard</span></h1>
-            <div className="hero-meta" style={{ marginTop: 24 }}>
-              <div className="v-step-badge"><i className="fa-solid fa-chart-line" /> Progress</div>
-              <div className="v-step-badge"><i className="fa-solid fa-crosshairs" /> Study</div>
-            </div>
-            <div className="breadcrumb" style={{ marginTop: 24 }}>
-              <Link href="/" style={{ color: 'var(--text-dim)' }}>Home</Link> <span>/</span> <span style={{ color: 'var(--text-light)' }}>Dashboard</span>
-            </div>
-          </div>
-          <div className="scroll-indicator" style={{ left: 0, right: 0 }}>
-            <span>Scroll</span>
-            <div className="scroll-line"></div>
-          </div>
-        </section>
-        </ScrollFadeSection>
-
         {/* MAIN CONTENT */}
-        <section style={{ background: 'var(--black)', marginTop: '-15vh', padding: '0 60px 160px', position: 'relative', zIndex: 2 }}>
+        <section style={{ background: 'var(--black)', padding: '0 60px 160px', position: 'relative', zIndex: 2, paddingTop: 80 }}>
           <div className="container-max" style={{ paddingLeft: isMobile ? 16 : undefined, paddingRight: isMobile ? 16 : undefined }}>
 
             {/* Welcome */}

@@ -6,10 +6,9 @@ import { useRouter, useParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { WaveInput } from '@/components/WaveInput';
 import { usePageFeatures, type Enrollment } from '@/lib/usePageFeatures';
-import { SearchModal, AuthModal, AuthGate, ProfileModal, HeroEffects } from '@/lib/PageModals';
+import { SearchModal, AuthModal, AuthGate, ProfileModal } from '@/lib/PageModals';
 import { Navbar } from '@/components/Navbar';
 import { Logo } from '@/components/Logo';
-import ScrollFadeSection from '@/components/ScrollFadeSection';
 import dynamic from 'next/dynamic';
 
 const TestModal = dynamic(() => import('@/components/TestModal'), { ssr: false });
@@ -372,13 +371,6 @@ export default function DynamicCoursePage() {
         <ProfileModal open={dashboardOpen} onClose={() => setDashboardOpen(false)} user={user} profileName={profileName} setProfileName={setProfileName} profileUsername={profileUsername} setProfileUsername={setProfileUsername} profilePhone={profilePhone} setProfilePhone={setProfilePhone} profileCompany={profileCompany} setProfileCompany={setProfileCompany} profileSaving={profileSaving} avatarUploading={avatarUploading} onProfileSave={handleProfileSave} onAvatarUpload={handleAvatarUpload} onAvatarUploaded={handleAvatarUploaded} />
 
         {!(loading || minLoading) && <Navbar activePage="courses" scrolled={scrolled} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} user={user} scrollToSection={scrollToSection} theme={theme} onToggleTheme={toggleTheme} onChangeTheme={changeTheme} onSearchOpen={() => setSearchOpen(true)} onOpenAuth={openAuthModal} onLogout={handleLogout} notifOpen={notifOpen} setNotifOpen={setNotifOpen} notifications={notifications} unreadCount={unreadCount} loadNotifications={loadNotifications} setNotifications={setNotifications} setUnreadCount={setUnreadCount} dashboardOpen={dashboardOpen} setDashboardOpen={setDashboardOpen} />}
-
-        {!(loading || minLoading) && <section className="course-hero" style={{ minHeight: 300 }}>
-          <div className="hero-content" style={{ paddingTop: 120 }}>
-            <div style={{ width: 320, height: 32, borderRadius: 4, background: 'rgba(255,255,255,0.06)', marginBottom: 16 }} />
-            <div style={{ width: 480, height: 16, borderRadius: 4, background: 'rgba(255,255,255,0.04)' }} />
-          </div>
-        </section>}
       </>
     );
   }
@@ -402,11 +394,11 @@ export default function DynamicCoursePage() {
 
         {!(loading || minLoading) && <Navbar activePage="courses" scrolled={scrolled} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} user={user} scrollToSection={scrollToSection} theme={theme} onToggleTheme={toggleTheme} onChangeTheme={changeTheme} onSearchOpen={() => setSearchOpen(true)} onOpenAuth={openAuthModal} onLogout={handleLogout} notifOpen={notifOpen} setNotifOpen={setNotifOpen} notifications={notifications} unreadCount={unreadCount} loadNotifications={loadNotifications} setNotifications={setNotifications} setUnreadCount={setUnreadCount} dashboardOpen={dashboardOpen} setDashboardOpen={setDashboardOpen} />}
 
-        {!(loading || minLoading) && <section className="course-hero" style={{ minHeight: 400 }}>
-          <div className="hero-content" style={{ paddingTop: 120 }}>
-            <h1>Course Not Found</h1>
-            <p className="page-subtitle">The course you&apos;re looking for doesn&apos;t exist or has been removed.</p>
-            <div style={{ marginTop: 24, display: 'flex', gap: 16 }}>
+        {!(loading || minLoading) && <section style={{ minHeight: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: 120 }}>
+          <div style={{ textAlign: 'center', padding: '0 20px' }}>
+            <h1 style={{ fontFamily: "var(--font-heading)", fontSize: 32, color: 'var(--text-light)', marginBottom: 12 }}>Course Not Found</h1>
+            <p className="page-subtitle" style={{ color: 'var(--text-dim)', marginBottom: 24 }}>The course you&apos;re looking for doesn&apos;t exist or has been removed.</p>
+            <div style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>
               <Link href="/#courses" onClick={(e) => { e.preventDefault(); router.push('/'); setTimeout(() => document.getElementById('courses')?.scrollIntoView({ behavior: 'smooth' }), 300); }} className="btn btn-primary"><i className="fa-solid fa-arrow-left" /> View All Programs</Link>
               <Link href="/" className="btn btn-secondary"><i className="fa-solid fa-home" /> Go Home</Link>
             </div>
@@ -498,40 +490,28 @@ export default function DynamicCoursePage() {
 
       {/* HERO */}
       {!(loading || minLoading) && <div className="page-transition-enter">
-<ScrollFadeSection pin fadeDistance="50vh" zIndex={1}>
-      <section className="course-hero">
-        <HeroEffects />
-        <div className="hero-content">
-          <h1>{course.title.split('&').length > 1 ? (
-            <>
-              {course.title.split('&')[0].trim()}&amp;<br />
-              <span className="v-highlight">{course.title.split('&')[1].trim()}</span>
-            </>
-          ) : (
-            <>
-              {course.title.split(' ').slice(0, Math.ceil(course.title.split(' ').length / 2)).join(' ')}<br />
-              <span className="v-highlight">{course.title.split(' ').slice(Math.ceil(course.title.split(' ').length / 2)).join(' ')}</span>
-            </>
-          )}</h1>
-          <div className="hero-meta">
-            <div className="meta-pill"><i className="fa-solid fa-clock" /> {course.duration}</div>
-            <div className="meta-pill"><i className="fa-solid fa-signal" /> {course.level} Level</div>
-            <div className="meta-pill"><i className="fa-solid fa-tag" /> {course.price}</div>
-          </div>
-          <div className="breadcrumb" style={{ marginTop: 24 }}>
-            <Link href="/" style={{ color: 'var(--text-dim)' }}>Home</Link> <span>/</span> <Link href="/#courses" style={{ color: 'var(--text-dim)' }}>Programs</Link> <span>/</span> <span style={{ color: 'var(--text-light)' }}>{course.title}</span>
-          </div>
-        </div>
-        <div className="scroll-indicator" style={{ left: 0, right: 0 }}>
-          <span>Scroll</span>
-          <div className="scroll-line"></div>
-        </div>
-      </section>
-      </ScrollFadeSection>
 
       {/* MAIN CONTENT */}
-      <section style={{ background: 'var(--black)', marginTop: '-20vh', padding: '0 60px 80px', position: 'relative', overflow: 'hidden', zIndex: 2 }}>
+      <section style={{ background: 'var(--black)', padding: '0 60px 80px', position: 'relative', overflow: 'hidden', zIndex: 2, paddingTop: 80 }}>
         <div className="container-max">
+          {/* Course header */}
+          <div style={{ marginBottom: 32 }}>
+            <div className="breadcrumb" style={{ marginBottom: 16 }}>
+              <Link href="/" style={{ color: 'var(--text-dim)' }}>Home</Link> <span>/</span> <Link href="/#courses" style={{ color: 'var(--text-dim)' }}>Programs</Link> <span>/</span> <span style={{ color: 'var(--text-light)' }}>{course.title}</span>
+            </div>
+            <h1 style={{ fontFamily: "var(--font-heading)", fontSize: 36, fontWeight: 800, color: 'var(--text-light)' }}>
+              {course.title.split('&').length > 1 ? (
+                <>{course.title.split('&')[0].trim()}&amp; <span className="v-highlight">{course.title.split('&')[1].trim()}</span></>
+              ) : (
+                <>{course.title.split(' ').slice(0, Math.ceil(course.title.split(' ').length / 2)).join(' ')} <span className="v-highlight">{course.title.split(' ').slice(Math.ceil(course.title.split(' ').length / 2)).join(' ')}</span></>
+              )}
+            </h1>
+            <div style={{ display: 'flex', gap: 12, marginTop: 12, flexWrap: 'wrap' }}>
+              <div className="meta-pill"><i className="fa-solid fa-clock" /> {course.duration}</div>
+              <div className="meta-pill"><i className="fa-solid fa-signal" /> {course.level} Level</div>
+              <div className="meta-pill"><i className="fa-solid fa-tag" /> {course.price}</div>
+            </div>
+          </div>
           <div className="course-layout">
             <div className="course-main reveal-up">
               <h2>About This Course</h2>

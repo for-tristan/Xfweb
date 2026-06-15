@@ -963,19 +963,8 @@ export default function AdminPage() {
         {/* ═══ NAV ═══ */}
         <Navbar activePage="admin" scrolled={true} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} user={user} scrollToSection={scrollToSection} theme={theme} onToggleTheme={toggleTheme} onChangeTheme={changeTheme} onSearchOpen={() => setSearchOpen(true)} onOpenAuth={openAuthModal} onLogout={handleLogout} notifOpen={notifOpen} setNotifOpen={setNotifOpen} notifications={notifications} unreadCount={unreadCount} loadNotifications={loadNotifications} setNotifications={setNotifications} setUnreadCount={setUnreadCount} dashboardOpen={dashboardOpen} setDashboardOpen={setDashboardOpen} />
 
-        {/* ═══ HERO ═══ */}
-        <section className="course-hero" style={{ minHeight: '35vh' }}>
-          <div className="hero-content">
-            <h1 style={{ fontFamily: "var(--font-heading)" }}>Admin<br /><span className="v-highlight">Panel</span></h1>
-            <div className="hero-meta" style={{ marginTop: 24 }}>
-              <div className="v-step-badge"><i className="fa-solid fa-shield-halved" /> Management</div>
-              <div className="v-step-badge"><i className="fa-solid fa-chart-line" /> Analytics</div>
-            </div>
-          </div>
-        </section>
-
         {/* ═══ STATS ═══ */}
-        <section className="section" style={{ paddingTop: 60, paddingBottom: 60 }}>
+        <section className="section" style={{ paddingTop: 100, paddingBottom: 60 }}>
           <div className="section-header reveal">
             <span className="section-tag"></span>
             <h2 className="section-title">Platform <span className="v-highlight">Statistics</span></h2>

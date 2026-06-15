@@ -4,10 +4,9 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { usePageFeatures } from '@/lib/usePageFeatures';
-import { SearchModal, AuthModal, AuthGate, ProfileModal, HeroEffects } from '@/lib/PageModals';
+import { SearchModal, AuthModal, AuthGate, ProfileModal } from '@/lib/PageModals';
 import { Navbar } from '@/components/Navbar';
 import { Logo } from '@/components/Logo';
-import ScrollFadeSection from '@/components/ScrollFadeSection';
 
 interface ServiceFeature {
   id: string;
@@ -117,13 +116,6 @@ export default function DynamicServicePage() {
         <ProfileModal open={dashboardOpen} onClose={() => setDashboardOpen(false)} user={user} profileName={profileName} setProfileName={setProfileName} profileUsername={profileUsername} setProfileUsername={setProfileUsername} profilePhone={profilePhone} setProfilePhone={setProfilePhone} profileCompany={profileCompany} setProfileCompany={setProfileCompany} profileSaving={profileSaving} avatarUploading={avatarUploading} onProfileSave={handleProfileSave} onAvatarUpload={handleAvatarUpload} onAvatarUploaded={handleAvatarUploaded} />
 
         {!(loading || minLoading) && <Navbar activePage="services" scrolled={scrolled} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} user={user} scrollToSection={scrollToSection} theme={theme} onToggleTheme={toggleTheme} onChangeTheme={changeTheme} onSearchOpen={() => setSearchOpen(true)} onOpenAuth={openAuthModal} onLogout={handleLogout} notifOpen={notifOpen} setNotifOpen={setNotifOpen} notifications={notifications} unreadCount={unreadCount} loadNotifications={loadNotifications} setNotifications={setNotifications} setUnreadCount={setUnreadCount} dashboardOpen={dashboardOpen} setDashboardOpen={setDashboardOpen} />}
-
-        {!(loading || minLoading) && <section className="page-hero" style={{ minHeight: 300 }}>
-          <div className="page-hero-content" style={{ paddingTop: 120 }}>
-            <div style={{ width: 320, height: 32, borderRadius: 4, background: 'rgba(255,255,255,0.06)', marginBottom: 16 }} />
-            <div style={{ width: 480, height: 16, borderRadius: 4, background: 'rgba(255,255,255,0.04)' }} />
-          </div>
-        </section>}
       </>
     );
   }
@@ -146,11 +138,11 @@ export default function DynamicServicePage() {
 
         {!(loading || minLoading) && <Navbar activePage="services" scrolled={scrolled} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} user={user} scrollToSection={scrollToSection} theme={theme} onToggleTheme={toggleTheme} onChangeTheme={changeTheme} onSearchOpen={() => setSearchOpen(true)} onOpenAuth={openAuthModal} onLogout={handleLogout} notifOpen={notifOpen} setNotifOpen={setNotifOpen} notifications={notifications} unreadCount={unreadCount} loadNotifications={loadNotifications} setNotifications={setNotifications} setUnreadCount={setUnreadCount} dashboardOpen={dashboardOpen} setDashboardOpen={setDashboardOpen} />}
 
-        {!(loading || minLoading) && <section className="page-hero" style={{ minHeight: 400 }}>
-          <div className="page-hero-content" style={{ paddingTop: 120 }}>
-            <h1 className="page-title">Service Not Found</h1>
-            <p className="page-subtitle">The service you&apos;re looking for doesn&apos;t exist or has been removed.</p>
-            <div style={{ marginTop: 24, display: 'flex', gap: 16 }}>
+        {!(loading || minLoading) && <section style={{ minHeight: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: 120 }}>
+          <div style={{ textAlign: 'center', padding: '0 20px' }}>
+            <h1 className="page-title" style={{ fontFamily: "var(--font-heading)", fontSize: 32, color: 'var(--text-light)', marginBottom: 12 }}>Service Not Found</h1>
+            <p className="page-subtitle" style={{ color: 'var(--text-dim)', marginBottom: 24 }}>The service you&apos;re looking for doesn&apos;t exist or has been removed.</p>
+            <div style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>
               <Link href="/#services" onClick={(e) => { e.preventDefault(); router.push('/'); setTimeout(() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' }), 300); }} className="btn btn-primary"><i className="fa-solid fa-arrow-left" /> View All Services</Link>
               <Link href="/" className="btn btn-secondary"><i className="fa-solid fa-home" /> Go Home</Link>
             </div>
@@ -242,26 +234,20 @@ export default function DynamicServicePage() {
 
       {/* HERO */}
       {!(loading || minLoading) && <div className="page-transition-enter">
-<ScrollFadeSection pin fadeDistance="50vh" zIndex={1}>
-      <section className="page-hero">
-        <HeroEffects />
-        <div className="page-hero-content">
-          <h1 className="page-title"><span className="v-highlight">{service.title}</span></h1>
-          <p className="page-subtitle">{service.description}</p>
-          <div className="breadcrumb">
-            <Link href="/" style={{ color: 'var(--text-dim)' }}>Home</Link> <span>/</span> <Link href="/#services" style={{ color: 'var(--text-dim)' }}>Services</Link> <span>/</span> <span style={{ color: 'var(--text-light)' }}>{service.title}</span>
-          </div>
-        </div>
-        <div className="scroll-indicator" style={{ left: 0, right: 0 }}>
-          <span>Scroll</span>
-          <div className="scroll-line"></div>
-        </div>
-      </section>
-      </ScrollFadeSection>
 
       {/* MAIN CONTENT */}
-      <section style={{ background: 'var(--black)', marginTop: '-20vh', padding: '0 60px 80px', position: 'relative', overflow: 'hidden', zIndex: 2 }}>
+      <section style={{ background: 'var(--black)', padding: '0 60px 80px', position: 'relative', overflow: 'hidden', zIndex: 2, paddingTop: 80 }}>
         <div className="container-max">
+          {/* Service header */}
+          <div style={{ marginBottom: 32 }}>
+            <div className="breadcrumb" style={{ marginBottom: 16 }}>
+              <Link href="/" style={{ color: 'var(--text-dim)' }}>Home</Link> <span>/</span> <Link href="/#services" style={{ color: 'var(--text-dim)' }}>Services</Link> <span>/</span> <span style={{ color: 'var(--text-light)' }}>{service.title}</span>
+            </div>
+            <h1 style={{ fontFamily: "var(--font-heading)", fontSize: 36, fontWeight: 800, color: 'var(--text-light)' }}>
+              <span className="v-highlight">{service.title}</span>
+            </h1>
+            {service.description && <p className="page-subtitle" style={{ marginTop: 8, color: 'var(--text-dim)', fontSize: 16 }}>{service.description}</p>}
+          </div>
           <div className="service-layout">
             <div className="service-main reveal-up">
               <h2>What We Deliver</h2>

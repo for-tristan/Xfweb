@@ -5,12 +5,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { usePageFeatures } from '@/lib/usePageFeatures';
-import { SearchModal, AuthModal, AuthGate, ProfileModal, HeroEffects } from '@/lib/PageModals';
+import { SearchModal, AuthModal, AuthGate, ProfileModal } from '@/lib/PageModals';
 import { Navbar } from '@/components/Navbar';
 import { Logo } from '@/components/Logo';
 import ConfirmModal from '@/components/ConfirmModal';
 import GradualBlur from '@/components/GradualBlur';
-import ScrollFadeSection from '@/components/ScrollFadeSection';
 
 export default function StudyFocusPage() {
   const { toast } = useToast();
@@ -260,29 +259,8 @@ export default function StudyFocusPage() {
       <AuthGate loading={loading} minLoading={minLoading} user={user} onSignIn={() => openAuthModal('signin', 'Sign in to access Study Focus')} onSignUp={() => openAuthModal('signup')} />
 
       {!(loading || minLoading) && <div className="page-transition-enter">
-        {/* HERO — pinned with scroll fade */}
-        <ScrollFadeSection pin fadeDistance="60vh" zIndex={1}>
-        <section className="course-hero">
-          <HeroEffects />
-          <div className="hero-content">
-            <h1 style={{ fontFamily: "var(--font-heading)" }}>Study<br /><span className="v-highlight">Focus</span></h1>
-            <div className="hero-meta" style={{ marginTop: 24 }}>
-              <div className="v-step-badge"><i className="fa-solid fa-trophy" /> Leaderboard</div>
-              <div className="v-step-badge"><i className="fa-solid fa-chart-line" /> Weekly Stats</div>
-            </div>
-            <div className="breadcrumb" style={{ marginTop: 24 }}>
-            <Link href="/" style={{ color: 'var(--text-dim)' }}>Home</Link> <span>/</span> <span style={{ color: 'var(--text-light)' }}>Study Focus</span>
-            </div>
-          </div>
-          <div className="scroll-indicator" style={{ left: 0, right: 0 }}>
-            <span>Scroll</span>
-            <div className="scroll-line"></div>
-          </div>
-        </section>
-        </ScrollFadeSection>
-
         {/* MAIN CONTENT */}
-        <section style={{ background: 'var(--black)', marginTop: '-15vh', padding: '0 60px 160px', position: 'relative', zIndex: 2 }}>
+        <section style={{ background: 'var(--black)', padding: '0 60px 160px', position: 'relative', zIndex: 2, paddingTop: 80 }}>
           <div className="container-max">
             <div className="study-focus-grid">
 
