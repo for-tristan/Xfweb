@@ -429,7 +429,7 @@ export default function DashboardPage() {
 
       {!(loading || minLoading) && <div className="page-transition-enter">
         {/* MAIN CONTENT */}
-        <section style={{ background: 'var(--black)', padding: '100px 60px 160px', position: 'relative', zIndex: 2 }}>
+        <section style={{ background: 'var(--black)', padding: '140px 60px 160px', position: 'relative', zIndex: 2 }}>
           <div className="container-max" style={{ paddingLeft: isMobile ? 16 : undefined, paddingRight: isMobile ? 16 : undefined }}>
 
             {/* Welcome */}

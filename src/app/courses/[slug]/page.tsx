@@ -493,7 +493,7 @@ export default function DynamicCoursePage() {
       {!(loading || minLoading) && <div className="page-transition-enter">
 
       {/* MAIN CONTENT */}
-      <section style={{ background: 'var(--black)', padding: '100px 60px 80px', position: 'relative', overflow: 'hidden', zIndex: 2 }}>
+      <section style={{ background: 'var(--black)', padding: '140px 60px 80px', position: 'relative', overflow: 'hidden', zIndex: 2 }}>
         <div className="container-max" style={{ paddingLeft: isMobile ? 16 : undefined, paddingRight: isMobile ? 16 : undefined }}>
           {/* Course header */}
           <div style={{ marginBottom: 32 }}>

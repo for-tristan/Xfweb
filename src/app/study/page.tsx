@@ -260,7 +260,7 @@ export default function StudyFocusPage() {
 
       {!(loading || minLoading) && <div className="page-transition-enter">
         {/* MAIN CONTENT */}
-        <section style={{ background: 'var(--black)', padding: `${isMobile ? '100px 16px' : '100px 60px'} 160px`, position: 'relative', zIndex: 2 }}>
+        <section style={{ background: 'var(--black)', padding: `${isMobile ? '140px 16px' : '140px 60px'} 160px`, position: 'relative', zIndex: 2 }}>
           <div className="container-max">
             <div className="study-focus-grid">
 
