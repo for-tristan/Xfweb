@@ -4,11 +4,10 @@ import { useEffect, useRef } from 'react';
 
 /**
  * ParticlesBackground — Pure canvas implementation.
- * No external library dependency. Renders floating circles
- * that drift gently across the viewport.
+ * Theme-dynamic: watches `data-theme` attribute on <html> and
+ * recalculates particle color whenever the theme changes.
  *
- * Container and canvas both have pointer-events: none so
- * all clicks pass through to page content (footer, links, etc.).
+ * Canvas has pointer-events: none so all clicks pass through.
  */
 
 interface Particle {
@@ -21,10 +20,27 @@ interface Particle {
   opacityDir: number;
 }
 
+function computeColor(): string {
+  try {
+    const bg = getComputedStyle(document.documentElement).getPropertyValue('--black').trim();
+    const hex = bg.replace('#', '');
+    if (hex.length >= 6) {
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 2);
+      const b = parseInt(hex.substring(4, 6), 16);
+      const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      // Light background → dark subtle particles; dark background → light subtle particles
+      return lum > 0.5 ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.25)';
+    }
+  } catch {}
+  return 'rgba(255,255,255,0.25)';
+}
+
 export default function ParticlesBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>(0);
   const particlesRef = useRef<Particle[]>([]);
+  const colorRef = useRef<string>('rgba(255,255,255,0.25)');
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -34,19 +50,20 @@ export default function ParticlesBackground() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Determine particle color based on theme background
-    let particleColor = 'rgba(255,255,255,0.6)';
-    try {
-      const bg = getComputedStyle(document.documentElement).getPropertyValue('--black').trim();
-      const hex = bg.replace('#', '');
-      if (hex.length >= 6) {
-        const r = parseInt(hex.substring(0, 2), 16);
-        const g = parseInt(hex.substring(2, 4), 2);
-        const b = parseInt(hex.substring(4, 6), 16);
-        const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-        particleColor = lum > 0.5 ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.6)';
-      }
-    } catch {}
+    // Initial color
+    colorRef.current = computeColor();
+
+    // Watch for theme changes via MutationObserver on data-theme attribute
+    const observer = new MutationObserver(() => {
+      // Small delay so CSS variables have updated
+      setTimeout(() => {
+        colorRef.current = computeColor();
+      }, 50);
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
 
     const resize = () => {
       canvas.width = window.innerWidth;
@@ -74,6 +91,8 @@ export default function ParticlesBackground() {
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      const color = colorRef.current;
+
       for (const p of particles) {
         // Move
         p.x += p.vx;
@@ -85,15 +104,15 @@ export default function ParticlesBackground() {
         if (p.y < -10) p.y = canvas.height + 10;
         if (p.y > canvas.height + 10) p.y = -10;
 
-        // Animate opacity
-        p.opacity += p.opacityDir * 0.005;
-        if (p.opacity >= 1) { p.opacity = 1; p.opacityDir = -1; }
+        // Animate opacity (subtle pulsing, capped lower)
+        p.opacity += p.opacityDir * 0.004;
+        if (p.opacity >= 0.6) { p.opacity = 0.6; p.opacityDir = -1; }
         if (p.opacity <= 0) { p.opacity = 0; p.opacityDir = 1; }
 
         // Draw
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = particleColor;
+        ctx.fillStyle = color;
         ctx.globalAlpha = p.opacity;
         ctx.fill();
       }
@@ -107,6 +126,7 @@ export default function ParticlesBackground() {
     return () => {
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener('resize', resize);
+      observer.disconnect();
     };
   }, []);
 
