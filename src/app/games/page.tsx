@@ -103,27 +103,37 @@ export default function GamesPage() {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [phase, startTime]);
 
+  // ── Reveal check helper ──
+  const checkReveals = useCallback(() => {
+    document.querySelectorAll('.reveal, .reveal-up, .reveal-scale, .reveal-left, .reveal-right').forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      const inView = rect.top < window.innerHeight - 60 && rect.bottom > 60;
+      if (inView) el.classList.add('visible');
+      else el.classList.remove('visible');
+    });
+  }, []);
+
   // ── Effects ──
   useEffect(() => {
     window.scrollTo(0, 0);
-    const onScroll = () => {
-      document.querySelectorAll('.reveal, .reveal-up, .reveal-scale, .reveal-left, .reveal-right').forEach((el) => {
-        const rect = el.getBoundingClientRect();
-        const inView = rect.top < window.innerHeight - 60 && rect.bottom > 60;
-        if (inView) el.classList.add('visible');
-        else el.classList.remove('visible');
-      });
-    };
     const checkBottom = () => setAtBottom(window.innerHeight + window.scrollY >= document.body.scrollHeight - 80);
-    window.addEventListener('scroll', onScroll);
+    window.addEventListener('scroll', checkReveals);
     window.addEventListener('scroll', checkBottom);
-    onScroll();
+    checkReveals();
     checkBottom();
     return () => {
-      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('scroll', checkReveals);
       window.removeEventListener('scroll', checkBottom);
     };
-  }, []);
+  }, [checkReveals]);
+
+  // Re-check reveals when loading finishes (content mounts after loading)
+  useEffect(() => {
+    if (!loading && !minLoading) {
+      const t = setTimeout(checkReveals, 50);
+      return () => clearTimeout(t);
+    }
+  }, [loading, minLoading, checkReveals]);
 
   // ── Game Logic ──
 

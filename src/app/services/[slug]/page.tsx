@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { usePageFeatures } from '@/lib/usePageFeatures';
@@ -80,24 +80,33 @@ export default function DynamicServicePage() {
       .finally(() => setFetching(false));
   }, [slug]);
 
+  // ── Reveal check helper ──
+  const checkReveals = useCallback(() => {
+    document.querySelectorAll('.reveal, .reveal-up, .reveal-scale, .reveal-left, .reveal-right').forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      const inView = rect.top < window.innerHeight - 60 && rect.bottom > 60;
+      if (inView) el.classList.add('visible');
+      else el.classList.remove('visible');
+    });
+  }, []);
+
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    // Scroll reveal
-    const onScroll = () => {
-      document.querySelectorAll('.reveal, .reveal-up, .reveal-scale, .reveal-left, .reveal-right').forEach((el) => {
-        const rect = el.getBoundingClientRect();
-        const inView = rect.top < window.innerHeight - 60 && rect.bottom > 60;
-        if (inView) el.classList.add('visible');
-        else el.classList.remove('visible');
-      });
-    };
-    window.addEventListener('scroll', onScroll);
-    onScroll();
+    window.addEventListener('scroll', checkReveals);
+    checkReveals();
     return () => {
-      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('scroll', checkReveals);
     };
-  }, []);
+  }, [checkReveals]);
+
+  // Re-check reveals when loading finishes (content mounts after loading)
+  useEffect(() => {
+    if (!loading && !minLoading) {
+      const t = setTimeout(checkReveals, 50);
+      return () => clearTimeout(t);
+    }
+  }, [loading, minLoading, checkReveals]);
 
   // Loading skeleton
   if (fetching) {
