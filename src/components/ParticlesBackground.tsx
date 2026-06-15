@@ -4,8 +4,9 @@ import { useEffect, useRef } from 'react';
 
 /**
  * ParticlesBackground — Pure canvas implementation.
- * Theme-dynamic: checks data-theme attribute on EVERY frame
- * so there is zero lag and zero missed updates.
+ * Theme-dynamic: reads the --accent CSS variable every frame
+ * so particle color automatically matches the current theme.
+ * Caches the result and only recalculates when data-theme changes.
  *
  * Canvas has pointer-events: none so all clicks pass through.
  */
@@ -25,10 +26,18 @@ const LIGHT_THEMES = new Set([
   'honey', 'clay', 'sage', 'peach',
 ]);
 
-// Color for dark backgrounds — subtle white
-const DARK_BG_COLOR = 'rgba(255,255,255,0.22)';
-// Color for light backgrounds — subtle dark
-const LIGHT_BG_COLOR = 'rgba(0,0,0,0.15)';
+/**
+ * Parse a hex color string into RGB components.
+ */
+function hexToRgb(hex: string): [number, number, number] | null {
+  const h = hex.replace('#', '');
+  if (h.length < 6) return null;
+  return [
+    parseInt(h.substring(0, 2), 16),
+    parseInt(h.substring(2, 4), 16),
+    parseInt(h.substring(4, 6), 16),
+  ];
+}
 
 export default function ParticlesBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -66,19 +75,56 @@ export default function ParticlesBackground() {
     }
     particlesRef.current = particles;
 
-    // Cache last known theme to avoid string ops on every single particle
-    let lastTheme: string | null = null;
-    let currentColor = DARK_BG_COLOR;
+    // Cache: only recalculate color when theme attribute changes
+    let lastTheme: string | null = '__UNINIT__';
+    let particleR = 255;
+    let particleG = 255;
+    let particleB = 255;
+    let particleAlpha = 0.25; // for dark bg
+    let colorDirty = true;
+
+    const recalcColor = () => {
+      const themeAttr = document.documentElement.getAttribute('data-theme') || '';
+      const isLight = LIGHT_THEMES.has(themeAttr);
+
+      // Read --accent from computed styles (updated by CSS when data-theme changes)
+      const accentRaw = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+      const rgb = hexToRgb(accentRaw);
+
+      if (rgb) {
+        // Use the theme's accent color at low opacity
+        particleR = rgb[0];
+        particleG = rgb[1];
+        particleB = rgb[2];
+      } else {
+        // Fallback: white on dark, dark on light
+        if (isLight) {
+          particleR = 0; particleG = 0; particleB = 0;
+        } else {
+          particleR = 255; particleG = 255; particleB = 255;
+        }
+      }
+
+      // Lower alpha for light themes (dark particles on light bg need less opacity)
+      particleAlpha = isLight ? 0.15 : 0.25;
+
+      colorDirty = true;
+      lastTheme = themeAttr;
+    };
 
     const animate = () => {
-      // Check theme on every frame — getAttribute is extremely cheap
-      const themeAttr = document.documentElement.getAttribute('data-theme');
-      if (themeAttr !== lastTheme) {
-        lastTheme = themeAttr;
-        currentColor = LIGHT_THEMES.has(themeAttr || '') ? LIGHT_BG_COLOR : DARK_BG_COLOR;
+      // Check if theme changed — recalc color only when needed
+      const currentTheme = document.documentElement.getAttribute('data-theme') || '';
+      if (currentTheme !== lastTheme) {
+        recalcColor();
       }
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const r = particleR;
+      const g = particleG;
+      const b = particleB;
+      const a = particleAlpha;
 
       for (const p of particles) {
         // Move
@@ -99,7 +145,7 @@ export default function ParticlesBackground() {
         // Draw
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = currentColor;
+        ctx.fillStyle = `rgba(${r},${g},${b},${a})`;
         ctx.globalAlpha = p.opacity;
         ctx.fill();
       }
