@@ -1028,11 +1028,6 @@ export default function GamesPage() {
 
       {!(loading || minLoading) && <div className="page-transition-enter">
         {/* HERO — pinned with scroll fade */}
-        <ScrollFadeSection pin fadeDistance="60vh" zIndex={1}>
-        <section className="course-hero">
-         
-        </section>
-        </ScrollFadeSection>
 
         {/* MAIN CONTENT */}
         <section style={{ background: 'var(--black)', marginTop: '-15vh', padding: '0 60px 160px', position: 'relative', zIndex: 2 }}>
