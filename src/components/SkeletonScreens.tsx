@@ -2,10 +2,7 @@
 
 import React from 'react';
 
-// ═══════════════════════════════════════════════════
-// SKELETON SCREEN COMPONENTS
 // Pulsing animation skeleton placeholders for loading states
-// ═══════════════════════════════════════════════════
 
 const skeletonBase: React.CSSProperties = {
   background: 'var(--border-color, rgba(255,255,255,0.08))',
@@ -105,9 +102,6 @@ export function SkeletonButton({ width = 120, height = 40, style }: SkeletonButt
   );
 }
 
-// ═══════════════════════════════════════════════════
-// PRE-BUILT SKELETON LAYOUTS
-// ═══════════════════════════════════════════════════
 
 /** Hero section skeleton (title + subtitle + buttons) */
 export function SkeletonHero() {
@@ -200,7 +194,6 @@ export function SkeletonAuthGate() {
       flexDirection: 'column',
       gap: 24,
     }}>
-      {/* Logo Animation */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
         <span style={{
           fontFamily: "'Orbitron', sans-serif",
@@ -214,7 +207,6 @@ export function SkeletonAuthGate() {
         </span>
       </div>
 
-      {/* Animated loading bar */}
       <div style={{ width: 200, height: 2, background: 'var(--border-color, rgba(255,255,255,0.08))', borderRadius: 2, overflow: 'hidden' }}>
         <div style={{
           width: '40%',

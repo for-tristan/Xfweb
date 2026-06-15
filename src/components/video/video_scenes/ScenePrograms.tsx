@@ -31,7 +31,6 @@ export function ScenePrograms() {
       exit={{ opacity: 0, x: -60 }}
       transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
     >
-      {/* Sub-label */}
       <motion.div
         className="mb-8"
         style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 13, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--text-dim)' }}

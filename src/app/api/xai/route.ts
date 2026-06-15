@@ -6,7 +6,6 @@ const SYSTEM_PROMPT = `You are XAI, an AI assistant for X-Foundry — a tech com
 
 export async function POST(request: NextRequest) {
   try {
-    // SECURITY: Require authentication — prevent anonymous AI cost abuse
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
@@ -18,7 +17,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
-    // SECURITY: Cap message length to prevent cost abuse
     if (message.length > 1000) {
       return NextResponse.json({ error: 'Message too long (max 1000 characters)' }, { status: 400 });
     }

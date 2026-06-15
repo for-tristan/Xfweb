@@ -18,9 +18,6 @@ import {
 import { SearchModal, AuthModal, AuthGate, ProfileModal } from '@/lib/PageModals';
 import GradualBlur from '@/components/GradualBlur';
 
-// ═══════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════
 
 function useIsMobile(breakpoint = 768) {
   const [mobile, setMobile] = useState(false);
@@ -39,9 +36,6 @@ function formatTime(seconds: number) {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-// ═══════════════════════════════════════════
-// MAIN PAGE
-// ═══════════════════════════════════════════
 
 export default function GamesPage() {
   const router = useRouter();
@@ -66,7 +60,6 @@ export default function GamesPage() {
     scrollToSection,
   } = usePageFeatures();
 
-  // ── Game State ──
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
   const [selectedLang, setSelectedLang] = useState('python');
   const [selectedDiff, setSelectedDiff] = useState('easy');
@@ -84,14 +77,12 @@ export default function GamesPage() {
   const [scoreAnimated, setScoreAnimated] = useState(false);
   const [atBottom, setAtBottom] = useState(false);
 
-  // ── Leaderboard State ──
   const [lbData, setLbData] = useState<any[]>([]);
   const [lbGame, setLbGame] = useState('all');
   const [lbLang, setLbLang] = useState('all');
   const [lbDiff, setLbDiff] = useState('all');
   const [lbLoading, setLbLoading] = useState(false);
 
-  // ── Timer ──
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -103,7 +94,6 @@ export default function GamesPage() {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [phase, startTime]);
 
-  // ── Reveal check helper ──
   const checkReveals = useCallback(() => {
     document.querySelectorAll('.reveal, .reveal-up, .reveal-scale, .reveal-left, .reveal-right').forEach((el) => {
       const rect = el.getBoundingClientRect();
@@ -113,7 +103,6 @@ export default function GamesPage() {
     });
   }, []);
 
-  // ── Effects ──
   useEffect(() => {
     window.scrollTo(0, 0);
     const checkBottom = () => setAtBottom(window.innerHeight + window.scrollY >= document.body.scrollHeight - 80);
@@ -135,7 +124,6 @@ export default function GamesPage() {
     }
   }, [loading, minLoading, checkReveals]);
 
-  // ── Game Logic ──
 
   const startGame = useCallback(async () => {
     if (!selectedGame) return;
@@ -236,14 +224,10 @@ export default function GamesPage() {
     loadLeaderboard();
   }, [loadLeaderboard]);
 
-  // ── Shared Navbar ──
   const renderNavbar = () => (loading || minLoading) ? null : (
     <Navbar activePage="games" scrolled={scrolled} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} user={user} scrollToSection={scrollToSection} theme={theme} onToggleTheme={toggleTheme} onChangeTheme={changeTheme} onSearchOpen={() => setSearchOpen(true)} onOpenAuth={openAuthModal} onLogout={handleLogout} notifOpen={notifOpen} setNotifOpen={setNotifOpen} notifications={notifications} unreadCount={unreadCount} loadNotifications={loadNotifications} setNotifications={setNotifications as any} setUnreadCount={setUnreadCount as any} dashboardOpen={dashboardOpen} setDashboardOpen={setDashboardOpen} />
   );
 
-  // ═══════════════════════════════════════════
-  // RENDER: Phase Select
-  // ═══════════════════════════════════════════
   const renderGameSelect = () => (
     <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? 12 : 20, marginBottom: 40 }}>
       {GAMES.map((g, i) => {
@@ -273,7 +257,6 @@ export default function GamesPage() {
 
   const renderConfigPanel = () => (
     <div className="game-config-panel">
-      {/* Language picker */}
       <div style={{ marginBottom: 16 }}>
         <div style={{
           fontSize: 9, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase',
@@ -297,7 +280,6 @@ export default function GamesPage() {
           })}
         </div>
       </div>
-      {/* Difficulty picker */}
       <div style={{ marginBottom: 20 }}>
         <div style={{
           fontSize: 9, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase',
@@ -321,7 +303,6 @@ export default function GamesPage() {
           })}
         </div>
       </div>
-      {/* Start button */}
       <button
         className="game-btn-primary"
         onClick={startGame}
@@ -332,9 +313,6 @@ export default function GamesPage() {
     </div>
   );
 
-  // ═══════════════════════════════════════════
-  // RENDER: Loading
-  // ═══════════════════════════════════════════
   const renderLoading = () => {
     const gameInfo = GAMES.find(g => g.id === selectedGame);
     const langInfo = LANGUAGES.find(l => l.id === selectedLang);
@@ -342,7 +320,6 @@ export default function GamesPage() {
 
     return (
       <div style={{ maxWidth: 500, margin: '0 auto', textAlign: 'center', padding: '60px 20px' }} key={`loading-${phaseKey}`}>
-        {/* Spinning icon */}
         <div style={{
           width: 80, height: 80, margin: '0 auto 28px',
           borderRadius: '50%',
@@ -354,7 +331,6 @@ export default function GamesPage() {
           <i className={gameInfo?.icon || 'fa-solid fa-code'} style={{ fontSize: 28, color: 'var(--accent)', animation: 'spinSlow 3s linear infinite', display: 'inline-block' }} />
         </div>
 
-        {/* Main text */}
         <div style={{
           fontFamily: "var(--font-heading)", fontSize: isMobile ? 16 : 18, fontWeight: 700,
           color: 'var(--text-light)', marginBottom: 8,
@@ -363,7 +339,6 @@ export default function GamesPage() {
           Getting Questions Ready
         </div>
 
-        {/* Subtext with typing dots */}
         <div style={{
           fontSize: 12, color: 'var(--text-dim)', fontFamily: "var(--font-body)",
           marginBottom: 32,
@@ -372,7 +347,6 @@ export default function GamesPage() {
           Loading {diffInfo?.name} {langInfo?.name} challenges<span className="loading-dots" />
         </div>
 
-        {/* Game info pills */}
         <div style={{
           display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap',
           animation: 'slideInUp 0.4s ease 0.15s both',
@@ -421,7 +395,6 @@ export default function GamesPage() {
           )}
         </div>
 
-        {/* Animated progress bar */}
         <div style={{
           width: 200, margin: '28px auto 0',
           height: 3, background: 'var(--input-bg)',
@@ -439,9 +412,6 @@ export default function GamesPage() {
     );
   };
 
-  // ═══════════════════════════════════════════
-  // RENDER: Game Playing
-  // ═══════════════════════════════════════════
   const renderPlaying = () => {
     const q = questions[currentQ];
     if (!q) return null;
@@ -453,7 +423,6 @@ export default function GamesPage() {
 
     return (
       <div style={{ maxWidth: 800, margin: '0 auto' }} key={`q-${currentQ}-${phaseKey}`}>
-        {/* Header bar */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           marginBottom: 20, flexWrap: 'wrap', gap: 12,
@@ -505,7 +474,6 @@ export default function GamesPage() {
           </div>
         </div>
 
-        {/* Progress bar */}
         <div style={{
           width: '100%', height: 4, background: 'var(--input-bg)',
           borderRadius: 8, marginBottom: 24, overflow: 'hidden',
@@ -520,7 +488,6 @@ export default function GamesPage() {
           }} />
         </div>
 
-        {/* Question counter */}
         <div style={{
           fontSize: 10, fontWeight: 700, color: 'var(--text-dim)',
           letterSpacing: 0.02, marginBottom: 12,
@@ -530,7 +497,6 @@ export default function GamesPage() {
           Question {currentQ + 1} of {questions.length}
         </div>
 
-        {/* Code display */}
         <div style={{
           background: 'var(--input-bg)',
           border: '0.5px solid var(--border-color)',
@@ -549,7 +515,6 @@ export default function GamesPage() {
           </pre>
         </div>
 
-        {/* Question prompt */}
         <div style={{
           fontSize: 13, fontWeight: 700, color: 'var(--text-light)',
           marginBottom: 16, fontFamily: "var(--font-body)",
@@ -560,7 +525,6 @@ export default function GamesPage() {
           {selectedGame === 'code-completion' && <><i className="fa-solid fa-puzzle-piece" style={{ marginRight: 6 }} />Fill in the blank:</>}
         </div>
 
-        {/* Options */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
           {q.options.map((opt, idx) => {
             const letter = String.fromCharCode(65 + idx);
@@ -605,7 +569,6 @@ export default function GamesPage() {
           })}
         </div>
 
-        {/* Explanation */}
         {showResult && (
           <div style={{
             background: isCorrect ? 'rgba(34,197,94,0.05)' : 'rgba(239,68,68,0.05)',
@@ -629,7 +592,6 @@ export default function GamesPage() {
           </div>
         )}
 
-        {/* Next button */}
         {showResult && (
           <button
             className="game-btn-primary"
@@ -640,7 +602,6 @@ export default function GamesPage() {
           </button>
         )}
 
-        {/* Quit button */}
         <button
           className="game-btn-secondary quit"
           onClick={() => { if (timerRef.current) clearInterval(timerRef.current); setPhase('select'); setPhaseKey(k => k + 1); }}
@@ -652,9 +613,6 @@ export default function GamesPage() {
     );
   };
 
-  // ═══════════════════════════════════════════
-  // RENDER: Results
-  // ═══════════════════════════════════════════
   const renderResults = () => {
     const accuracy = questions.length > 0 ? Math.round((correctCount / questions.length) * 100) : 0;
     const gameInfo = GAMES.find(g => g.id === selectedGame);
@@ -675,7 +633,6 @@ export default function GamesPage() {
           {gameInfo?.name} — {LANGUAGES.find(l => l.id === selectedLang)?.name} — {DIFFICULTIES.find(d => d.id === selectedDiff)?.name}
         </div>
 
-        {/* Score circle */}
         <div className={`game-score-circle${scoreAnimated ? ' animated' : ''}`}>
           <div style={{
             fontFamily: "var(--font-heading)", fontSize: isMobile ? 28 : 36, fontWeight: 700,
@@ -688,7 +645,6 @@ export default function GamesPage() {
           </div>
         </div>
 
-        {/* Stats grid */}
         <div style={{
           display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 32,
         }}>
@@ -748,9 +704,6 @@ export default function GamesPage() {
     );
   };
 
-  // ═══════════════════════════════════════════
-  // RENDER: Leaderboard
-  // ═══════════════════════════════════════════
   const renderLeaderboard = () => (
     <div style={{ maxWidth: 900, margin: '0 auto' }} key={`lb-${phaseKey}`}>
       <div style={{
@@ -778,7 +731,6 @@ export default function GamesPage() {
         </button>
       </div>
 
-      {/* Filters */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap', animation: 'slideInUp 0.4s ease 0.1s both' }}>
         <select
           value={lbGame}
@@ -803,7 +755,6 @@ export default function GamesPage() {
         </select>
       </div>
 
-      {/* Leaderboard list */}
       {lbLoading ? (
         <div style={{
           background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
@@ -857,7 +808,6 @@ export default function GamesPage() {
                   onMouseEnter={(e) => { if (!isMe) (e.currentTarget as HTMLElement).style.borderColor = 'color-mix(in srgb, var(--accent) 25%, transparent)'; }}
                   onMouseLeave={(e) => { if (!isMe) (e.currentTarget as HTMLElement).style.borderColor = isTop3 ? `${rankColor}30` : 'color-mix(in srgb, var(--text-light) 10%, transparent)'; }}
                 >
-                  {/* Rank */}
                   <div style={{
                     width: 28, height: 28, borderRadius: '50%',
                     background: isTop3 ? `${rankColor}15` : 'var(--input-bg)',
@@ -931,7 +881,6 @@ export default function GamesPage() {
                 onMouseEnter={(e) => { if (!isMe) (e.currentTarget as HTMLElement).style.borderColor = 'color-mix(in srgb, var(--accent) 25%, transparent)'; }}
                 onMouseLeave={(e) => { if (!isMe) (e.currentTarget as HTMLElement).style.borderColor = isTop3 ? `${rankColor}20` : 'color-mix(in srgb, var(--text-light) 10%, transparent)'; }}
               >
-                {/* Rank */}
                 <div style={{
                   width: 32, height: 32, borderRadius: '50%',
                   background: isTop3 ? `${rankColor}15` : 'var(--input-bg)',
@@ -945,7 +894,6 @@ export default function GamesPage() {
                   )}
                 </div>
 
-                {/* Player */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
                   <div style={{
                     width: 30, height: 30, borderRadius: '50%',
@@ -977,7 +925,6 @@ export default function GamesPage() {
                   </div>
                 </div>
 
-                {/* Score */}
                 <div>
                   <div style={{
                     fontFamily: "var(--font-heading)", fontSize: 15, fontWeight: 700,
@@ -991,7 +938,6 @@ export default function GamesPage() {
                   </div>
                 </div>
 
-                {/* Games */}
                 <div style={{ textAlign: 'center' }}>
                   <div style={{
                     fontFamily: "var(--font-heading)", fontSize: 14, fontWeight: 700,
@@ -1004,7 +950,6 @@ export default function GamesPage() {
                   </div>
                 </div>
 
-                {/* Time */}
                 <div style={{ textAlign: 'right' }}>
                   <div style={{
                     fontFamily: "var(--font-heading)", fontSize: 13, fontWeight: 700,
@@ -1024,9 +969,6 @@ export default function GamesPage() {
     </div>
   );
 
-  // ═══════════════════════════════════════════
-  // MAIN RENDER
-  // ═══════════════════════════════════════════
   return (
     <>
       <title>Code Games | XFoundry</title>
@@ -1036,7 +978,6 @@ export default function GamesPage() {
       {renderNavbar()}
 
       {!(loading || minLoading) && <div className="page-transition-enter">
-        {/* MAIN CONTENT */}
         <section style={{ background: 'var(--black)', padding: '140px 60px 160px', position: 'relative', zIndex: 2 }}>
           <div className="container-max" style={{ paddingLeft: isMobile ? 16 : undefined, paddingRight: isMobile ? 16 : undefined }}>
 
@@ -1045,7 +986,6 @@ export default function GamesPage() {
                 {renderGameSelect()}
                 {selectedGame && <div>{renderConfigPanel()}</div>}
 
-                {/* Leaderboard quick access */}
                 <div style={{ textAlign: 'center', marginTop: 20 }}>
                   <button
                     className="game-btn-secondary trophy"
@@ -1068,7 +1008,6 @@ export default function GamesPage() {
         </section>
       </div>}
 
-      {/* FOOTER */}
       {!(loading || minLoading) &&<footer className="v-footer" style={{ marginTop: 80 }}>
   <div className="v-footer-grid">
     <div className="v-footer-brand">
@@ -1113,7 +1052,6 @@ export default function GamesPage() {
   </div>
 </footer>}
 
-      {/* Modals */}
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} query={searchQuery} setQuery={setSearchQuery} results={filteredSearch} onSelect={(link) => { if (link.startsWith('#')) { scrollToSection(link.replace('#', '')); } else { router.push(link); } }} />
       <AuthModal
         open={authModalOpen}

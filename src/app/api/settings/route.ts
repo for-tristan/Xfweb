@@ -19,7 +19,6 @@ export async function GET() {
 
     const settingsMap: Record<string, string> = {};
     for (const setting of settings) {
-      // SECURITY: Filter out sensitive settings from public endpoint
       if (!isSensitiveKey(setting.key)) {
         settingsMap[setting.key] = setting.value;
       }

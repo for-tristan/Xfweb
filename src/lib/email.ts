@@ -2,19 +2,13 @@ import { Resend } from 'resend';
 import nodemailer from 'nodemailer';
 import type SMTPTransport from 'nodemailer/lib/smtp-transport';
 
-// ─── Email Provider Configuration ─────────────────────────────────
 // Primary: Gmail SMTP (with App Password — fast + reliable)
 // Fallback: Resend (if Gmail fails)
 //
-// WHY GMAIL WAS SLOW BEFORE:
 // 1. Port 587 + STARTTLS = extra handshake round-trip (~3-5s wasted)
-//    FIX: Port 465 + implicit TLS = connection starts encrypted immediately
 // 2. Old timeouts were too long = hung connections blocked everything
-//    FIX: Tighter timeouts + quick retry with fresh connection
 // 3. Old code used regular Gmail password = auth failures
-//    FIX: App Password (16-char code from Google) = works reliably
 
-// ─── Gmail SMTP (Primary) ─────────────────────────────────────────
 // Setup: https://myaccount.google.com/apppasswords
 // 1. Enable 2FA on your Google account
 // 2. Generate an App Password (name it "XFoundry")
@@ -26,14 +20,12 @@ const SMTP_PORT = parseInt(process.env.SMTP_PORT || '465'); // 465 = implicit TL
 const SMTP_USER = process.env.SMTP_USER || '';
 const SMTP_PASS = process.env.SMTP_PASS || '';
 
-// ─── Resend (Fallback) ────────────────────────────────────────────
 // Free tier: 100 emails/day. Just needs RESEND_API_KEY.
 // Only used if Gmail fails. Sign up at https://resend.com
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
 const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
 
-// ─── Gmail SMTP Transporter ──────────────────────────────────────
 // Key optimizations for Vercel serverless:
 // - Port 465 + secure:true = implicit TLS (saves STARTTLS round-trip)
 // - Tight timeouts = fail fast, retry quickly with fresh connection
@@ -58,7 +50,6 @@ function createSmtpTransporter(): nodemailer.Transporter<SMTPTransport.SentMessa
   return nodemailer.createTransport(options);
 }
 
-// ─── Provider Detection ──────────────────────────────────────────
 
 function isGmailConfigured(): boolean {
   return SMTP_HOST.length > 0 && SMTP_USER.length > 0 && SMTP_PASS.length > 0;
@@ -77,7 +68,6 @@ function getConfiguredProviders(): string {
 
 console.log(`[Email] Provider: ${getConfiguredProviders()}`);
 
-// ─── Core Send Function ───────────────────────────────────────────
 
 interface EmailPayload {
   to: string | string[];
@@ -106,7 +96,6 @@ interface EmailPayload {
 async function sendEmail(payload: EmailPayload): Promise<boolean> {
   const toStr = Array.isArray(payload.to) ? payload.to.join(', ') : payload.to;
 
-  // ── Try Gmail SMTP first ────────────────────────────────────────
   if (isGmailConfigured()) {
     // Fresh transporter for each attempt — avoids stale connections
     // in Vercel serverless where functions freeze between invocations
@@ -148,7 +137,6 @@ async function sendEmail(payload: EmailPayload): Promise<boolean> {
     }
   }
 
-  // ── Fallback: Resend API ────────────────────────────────────────
   if (isResendConfigured()) {
     try {
       const resend = new Resend(RESEND_API_KEY);
@@ -177,7 +165,6 @@ async function sendEmail(payload: EmailPayload): Promise<boolean> {
     }
   }
 
-  // ── Nothing worked ──────────────────────────────────────────────
   console.error(
     '[Email] All providers failed! Configure:\n' +
     '  - SMTP_PASS = Gmail App Password (primary) — https://myaccount.google.com/apppasswords\n' +
@@ -186,7 +173,6 @@ async function sendEmail(payload: EmailPayload): Promise<boolean> {
   return false;
 }
 
-// ─── SECURITY: HTML Sanitization ──────────────────────────────────
 
 function sanitizeHtml(text: string): string {
   return text
@@ -197,7 +183,6 @@ function sanitizeHtml(text: string): string {
     .replace(/'/g, '&#x27;');
 }
 
-// ─── Shared Email Layout ──────────────────────────────────────────
 // Clean, minimalist design. Inspired by Stripe/Vercel email style.
 
 const EMAIL_FONT = `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif`;
@@ -237,7 +222,6 @@ function button(text: string, url: string): string {
   `;
 }
 
-// ─── Email Templates ──────────────────────────────────────────────
 
 export async function sendInquiryEmail(data: {
   name: string;

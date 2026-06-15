@@ -23,7 +23,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // SECURITY: Password must contain uppercase, lowercase, and a number
     if (!/[A-Z]/.test(newPassword)) {
       return NextResponse.json(
         { error: 'Password must contain at least one uppercase letter' },
@@ -91,7 +90,6 @@ export async function POST(request: NextRequest) {
       }),
     ]);
 
-    // SECURITY: Invalidate all sessions for this user after password change
     await deleteAllUserSessions(user.id);
 
     return NextResponse.json({

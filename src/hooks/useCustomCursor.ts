@@ -25,7 +25,6 @@ export function useClickSplash() {
     const isTouchDevice = !hasHover || isCoarse;
     if (isTouchDevice) return;
 
-    // ── Particle Burst State ──
     const particles: Particle[] = [];
     let particleContainer: HTMLDivElement | null = null;
 
@@ -79,13 +78,11 @@ export function useClickSplash() {
       }
     };
 
-    // ── Click → Particle Burst ──
     const onClick = (e: MouseEvent) => {
       spawnParticles(e.clientX, e.clientY);
       ensureLoopRunning();
     };
 
-    // ── Particle animation loop (only runs when particles exist) ──
     let particleAnimId: number = 0;
     let loopRunning = false;
     const animateParticles = () => {
@@ -103,7 +100,6 @@ export function useClickSplash() {
       }
     };
 
-    // ── Init ──
     createParticleContainer();
     document.addEventListener('click', onClick);
 

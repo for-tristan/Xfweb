@@ -72,7 +72,6 @@ export async function POST(request: NextRequest) {
 
   // Parse the client-sent start time (when the student actually began the test)
   // Falls back to current time if not provided (backward compat)
-  // SECURITY: Validate startedAt is not in the future and not more than 24h ago
   let startTime = new Date();
   if (startedAt) {
     const parsed = new Date(startedAt);

@@ -35,7 +35,6 @@ export default function StudyFocusPage() {
     scrollToSection,
   } = usePageFeatures();
 
-  // ── Study Timer State ──
   const [timerRunning, setTimerRunning] = useState(false);
   const [timerSeconds, setTimerSeconds] = useState(0);
   const [todaySeconds, setTodaySeconds] = useState(0);
@@ -54,7 +53,6 @@ export default function StudyFocusPage() {
   const timerStartRef = useRef<number | null>(0);
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // ── Helpers ──
   const formatTimer = (secs: number) => {
     const m = Math.floor(secs / 60);
     const s = secs % 60;
@@ -69,7 +67,6 @@ export default function StudyFocusPage() {
     return `${h}h ${m}m`;
   };
 
-  // ── API Calls ──
   const leaderboardLoadedRef = useRef(false);
   const statsLoadedRef = useRef(false);
 
@@ -149,7 +146,6 @@ export default function StudyFocusPage() {
     timerStartRef.current = null;
   };
 
-  // ── Reveal check helper ──
   const checkReveals = useCallback(() => {
     document.querySelectorAll('.reveal, .reveal-up, .reveal-scale, .reveal-left, .reveal-right').forEach((el) => {
       const rect = el.getBoundingClientRect();
@@ -159,7 +155,6 @@ export default function StudyFocusPage() {
     });
   }, []);
 
-  // ── Effects ──
   useEffect(() => {
     window.scrollTo(0, 0);
 
@@ -245,10 +240,8 @@ export default function StudyFocusPage() {
       <meta property="og:title" content="Study Focus | XFoundry" />
       <meta property="og:description" content="Track study time, compete on the leaderboard, and stay focused." />
 
-      {/* SEARCH MODAL */}
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} query={searchQuery} setQuery={setSearchQuery} results={filteredSearch} onSelect={(link) => router.push(link)} />
 
-      {/* AUTH MODAL */}
       <AuthModal open={authModalOpen} onClose={() => setAuthModalOpen(false)} tab={authTab} setTab={setAuthTab} message={authMessage}
         loginEmail={loginEmail} setLoginEmail={setLoginEmail} loginPassword={loginPassword} setLoginPassword={setLoginPassword} loginLoading={loginLoading} onLogin={handleLogin}
         signupName={signupName} setSignupName={setSignupName} signupEmail={signupEmail} setSignupEmail={setSignupEmail} signupPassword={signupPassword} setSignupPassword={setSignupPassword} signupConfirmPassword={signupConfirmPassword} setSignupConfirmPassword={setSignupConfirmPassword}
@@ -259,21 +252,16 @@ export default function StudyFocusPage() {
         verificationStep={verificationStep} setVerificationStep={setVerificationStep} verificationEmail={verificationEmail} verificationCode={verificationCode} setVerificationCode={setVerificationCode} verificationLoading={verificationLoading} onVerifyEmail={handleVerifyEmail} onResendVerification={handleResendVerification} resendLoading={resendLoading}
       />
 
-      {/* PROFILE MODAL */}
       <ProfileModal open={dashboardOpen} onClose={() => setDashboardOpen(false)} user={user} profileName={profileName} setProfileName={setProfileName} profileUsername={profileUsername} setProfileUsername={setProfileUsername} profilePhone={profilePhone} setProfilePhone={setProfilePhone} profileCompany={profileCompany} setProfileCompany={setProfileCompany} profileSaving={profileSaving} avatarUploading={avatarUploading} onProfileSave={handleProfileSave} onAvatarUpload={handleAvatarUpload} onAvatarUploaded={handleAvatarUploaded} />
 
-      {/* NAVBAR */}
       {!(loading || minLoading) && <Navbar activePage="study" scrolled={scrolled} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} user={user} scrollToSection={scrollToSection} theme={theme} onToggleTheme={toggleTheme} onChangeTheme={changeTheme} onSearchOpen={() => setSearchOpen(true)} onOpenAuth={openAuthModal} onLogout={handleLogout} notifOpen={notifOpen} setNotifOpen={setNotifOpen} notifications={notifications} unreadCount={unreadCount} loadNotifications={loadNotifications} setNotifications={setNotifications} setUnreadCount={setUnreadCount} dashboardOpen={dashboardOpen} setDashboardOpen={setDashboardOpen} />}
 
       <AuthGate loading={loading} minLoading={minLoading} user={user} onSignIn={() => openAuthModal('signin', 'Sign in to access Study Focus')} onSignUp={() => openAuthModal('signup')} />
 
       {!(loading || minLoading) && <div className="page-transition-enter">
-        {/* MAIN CONTENT */}
         <section style={{ background: 'var(--black)', padding: `${isMobile ? '140px 16px' : '140px 60px'} 160px`, position: 'relative', zIndex: 2 }}>
           <div className="container-max">
             <div className="study-focus-grid">
-
-              {/* ── TIMER CARD ── */}
               <div className="reveal-up reveal-delay-1 study-card" style={{
                 background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
                 backdropFilter: 'blur(20px) saturate(1.6)',
@@ -335,7 +323,6 @@ export default function StudyFocusPage() {
 
                 {/* Bottom section — controls + stats pinned to bottom */}
                 <div style={{ marginTop: 'auto', paddingTop: 16, borderTop: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)' }}>
-                  {/* Control Buttons */}
                   <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
                     {!timerRunning ? (
                       <button
@@ -392,7 +379,6 @@ export default function StudyFocusPage() {
                     )}
                   </div>
 
-                  {/* Stats */}
                   <div className="study-stats-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                     <div className="study-stats-box" style={{
                       background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)',
@@ -425,8 +411,6 @@ export default function StudyFocusPage() {
                   </div>
                 </div>
               </div>
-
-              {/* ── LEADERBOARD CARD ── */}
               <div className="reveal-up reveal-delay-2 study-card" style={{
                 background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
                 backdropFilter: 'blur(20px) saturate(1.6)',
@@ -437,7 +421,7 @@ export default function StudyFocusPage() {
               }}>
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, transparent, var(--accent), transparent)' }} />
                 <h3 style={{ fontFamily: "var(--font-heading)", fontSize: 18, fontWeight: 700, color: 'var(--text-light)', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 10 }}>
-                 
+
                   Study LeaderBoard
                 </h3>
                 <p style={{ fontSize: 12, color: 'var(--text-dim)', marginBottom: 24, fontFamily: "var(--font-body)" }}>Top learners in the last 30 days</p>
@@ -484,7 +468,6 @@ export default function StudyFocusPage() {
                               transition: 'all 0.2s',
                             }}
                           >
-                            {/* Rank */}
                             <div className="study-leaderboard-rank" style={{
                               width: 32, height: 32, borderRadius: '50%',
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -500,7 +483,6 @@ export default function StudyFocusPage() {
                               )}
                             </div>
 
-                            {/* Avatar */}
                             <div className="study-leaderboard-avatar" style={{
                               width: 38, height: 38, borderRadius: '50%', flexShrink: 0,
                               background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)',
@@ -517,7 +499,6 @@ export default function StudyFocusPage() {
                               }
                             </div>
 
-                            {/* Name & Info */}
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div className="study-leaderboard-name" style={{
                                 fontSize: 14, fontWeight: 700,
@@ -532,7 +513,6 @@ export default function StudyFocusPage() {
                               </div>
                             </div>
 
-                            {/* Hours */}
                             <div style={{ textAlign: 'right', flexShrink: 0 }}>
                               <div className="study-leaderboard-hours" style={{
                                 fontFamily: "var(--font-heading)", fontSize: 16, fontWeight: 700,
@@ -570,7 +550,6 @@ export default function StudyFocusPage() {
         danger
       />
 
-      {/* FOOTER */}
       {!(loading || minLoading) &&<footer className="v-footer" style={{ marginTop: 80 }}>
   <div className="v-footer-grid">
     <div className="v-footer-brand">

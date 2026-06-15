@@ -16,7 +16,7 @@ export function Scene4() {
   }, []);
 
   return (
-    <motion.div 
+    <motion.div
       className="absolute inset-0 flex flex-col items-center justify-center z-10"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -34,8 +34,8 @@ export function Scene4() {
             BUILT
           </motion.div>
         </div>
-        
-        <motion.div 
+
+        <motion.div
           className="absolute -bottom-3 left-0 h-[2px] rounded-full"
           style={{ background: 'var(--primary-red)' }}
           initial={{ width: 0 }}

@@ -159,7 +159,6 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
   const { action } = body;
 
-  // ── ADD QUESTION ──
   if (action === 'addQuestion') {
     const { testId, questionText, options, correctAnswer, points } = body;
 
@@ -187,7 +186,6 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ question });
   }
 
-  // ── DELETE QUESTION ──
   if (action === 'deleteQuestion') {
     const { testId, questionId } = body;
 
@@ -202,7 +200,6 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ message: 'Question deleted' });
   }
 
-  // ── UNLOCK TEST FOR USER ──
   if (action === 'unlock') {
     const { testId, userId } = body;
 
@@ -243,7 +240,6 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ message: 'Test unlocked for user' });
   }
 
-  // ── LOCK TEST FOR USER ──
   if (action === 'lock') {
     const { testId, userId } = body;
 
@@ -290,7 +286,6 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ message: 'Test locked for user' });
   }
 
-  // ── RESET SINGLE ATTEMPT ──
   if (action === 'resetAttempt') {
     const { testId, userId } = body;
 
@@ -305,7 +300,6 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ message: 'Attempt reset for user' });
   }
 
-  // ── RESET ALL ATTEMPTS ──
   if (action === 'resetAllAttempts') {
     const { testId } = body;
 
@@ -320,7 +314,6 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ message: `All attempts reset (${result.count} deleted)` });
   }
 
-  // ── UPDATE TEST ──
   const { id, title, description, timeLimit, passingScore } = body;
 
   if (!id) {

@@ -2,7 +2,6 @@
 
 import * as React from "react"
 
-// ── Types ──
 export type ToastVariant = "default" | "success" | "destructive"
 
 export interface ToastData {
@@ -13,7 +12,6 @@ export interface ToastData {
   duration?: number
 }
 
-// ── State management ──
 const TOAST_LIMIT = 3
 const DEFAULT_DURATION = 4000 // 4 seconds — iPhone-like auto-dismiss
 
@@ -73,7 +71,6 @@ function dispatch(action: Action) {
   listeners.forEach((listener) => listener(memoryState))
 }
 
-// ── Public API ──
 type ToastInput = Omit<ToastData, "id">
 
 function toast(input: ToastInput | string) {

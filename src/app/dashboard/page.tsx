@@ -9,9 +9,6 @@ import { Navbar } from '@/components/Navbar';
 import { Logo } from '@/components/Logo';
 import GradualBlur from '@/components/GradualBlur';
 
-// ═══════════════════════════════════════════════════
-// TYPES
-// ═══════════════════════════════════════════════════
 
 interface Enrollment {
   id: string;
@@ -51,9 +48,6 @@ interface StudyStats {
   sessions: { date: string; duration: number }[];
 }
 
-// ═══════════════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════════════
 
 function formatDuration(secs: number): string {
   if (secs < 60) return `${secs}s`;
@@ -85,9 +79,6 @@ function getLast7Days(): string[] {
   return days;
 }
 
-// ═══════════════════════════════════════════════════
-// COMPONENTS
-// ═══════════════════════════════════════════════════
 
 function StatCard({ label, value, icon, color, sub, compact }: { label: string; value: string | number; icon: string; color: string; sub?: string; compact?: boolean }) {
   return (
@@ -211,11 +202,7 @@ function WeekChart({ sessions }: { sessions: { date: string; duration: number }[
   );
 }
 
-// ═══════════════════════════════════════════════════
-// MAIN PAGE
-// ═══════════════════════════════════════════════════
 
-// ── Mobile hook ──
 function useIsMobile(breakpoint = 768) {
   const [mobile, setMobile] = useState(false);
   useEffect(() => {
@@ -249,7 +236,6 @@ export default function DashboardPage() {
     scrollToSection,
   } = usePageFeatures();
 
-  // ── Data ──
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [progress, setProgress] = useState<ProgressEntry[]>([]);
@@ -257,7 +243,6 @@ export default function DashboardPage() {
   const [dataLoading, setDataLoading] = useState(true);
   const [atBottom, setAtBottom] = useState(false);
 
-  // ── Data Loading ──
   const loadedRef = useRef(false);
 
   const loadDashboardData = useCallback(async () => {
@@ -313,7 +298,6 @@ export default function DashboardPage() {
     loadDashboardData();
   }, [loadDashboardData]);
 
-  // ── Computed ──
   const approvedEnrollments = enrollments.filter(e => e.status === 'approved');
   const testsPassed = testResults.filter(t => t.passed).length;
   const avgProgress = progress.length > 0
@@ -325,7 +309,6 @@ export default function DashboardPage() {
     ? studyStats.sessions.reduce((best, s) => s.duration > (best?.duration || 0) ? s : best, studyStats.sessions[0])
     : null;
 
-  // ── Status badge ──
   const statusBadge = (status?: string) => {
     const s = status || 'pending';
     const config: Record<string, { color: string; label: string }> = {
@@ -349,7 +332,6 @@ export default function DashboardPage() {
     );
   };
 
-  // ── Reveal check helper ──
   const checkReveals = useCallback(() => {
     document.querySelectorAll('.reveal, .reveal-up, .reveal-scale, .reveal-left, .reveal-right').forEach((el) => {
       const rect = el.getBoundingClientRect();
@@ -359,7 +341,6 @@ export default function DashboardPage() {
     });
   }, []);
 
-  // ── Effects ──
   useEffect(() => {
     window.scrollTo(0, 0);
 
@@ -382,12 +363,10 @@ export default function DashboardPage() {
     }
   }, [loading, minLoading, checkReveals]);
 
-  // ── Shared Navbar ──
   const renderNavbar = (activeLink?: string) => (loading || minLoading) ? null : (
     <Navbar activePage={activeLink || 'dashboard'} scrolled={scrolled} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} user={user} scrollToSection={scrollToSection} theme={theme} onToggleTheme={toggleTheme} onChangeTheme={changeTheme} onSearchOpen={() => setSearchOpen(true)} onOpenAuth={openAuthModal} onLogout={handleLogout} notifOpen={notifOpen} setNotifOpen={setNotifOpen} notifications={notifications} unreadCount={unreadCount} loadNotifications={loadNotifications} setNotifications={setNotifications} setUnreadCount={setUnreadCount} dashboardOpen={dashboardOpen} setDashboardOpen={setDashboardOpen} />
   );
 
-  // ── Shared Modals ──
   const renderModals = () => (
     <>
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} query={searchQuery} setQuery={setSearchQuery} results={filteredSearch} onSelect={(link) => router.push(link)} />
@@ -404,14 +383,10 @@ export default function DashboardPage() {
     </>
   );
 
-  // ── Loading skeleton ──
   const Skeleton = ({ w, h }: { w: string; h: string }) => (
     <div style={{ width: w, height: h, borderRadius: 12, background: 'var(--input-bg)', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
   );
 
-  // ═══════════════════════════════════════════════════
-  // RENDER: Not logged in
-  // ═══════════════════════════════════════════════════
   if (!user && !loading) {
     return (
       <>
@@ -423,9 +398,6 @@ export default function DashboardPage() {
     );
   }
 
-  // ═══════════════════════════════════════════════════
-  // RENDER: Main Dashboard
-  // ═══════════════════════════════════════════════════
   return (
     <>
       <title>Dashboard | XFoundry</title>
@@ -434,15 +406,12 @@ export default function DashboardPage() {
       <AuthGate loading={loading} minLoading={minLoading} user={user} onSignIn={() => openAuthModal('signin', 'Sign in to access your dashboard')} onSignUp={() => openAuthModal('signup')} />
       {renderModals()}
 
-      {/* NAVBAR */}
       {renderNavbar('dashboard')}
 
       {!(loading || minLoading) && <div className="page-transition-enter">
-        {/* MAIN CONTENT */}
         <section style={{ background: 'var(--black)', padding: '140px 60px 160px', position: 'relative', zIndex: 2 }}>
           <div className="container-max" style={{ paddingLeft: isMobile ? 16 : undefined, paddingRight: isMobile ? 16 : undefined }}>
 
-            {/* Welcome */}
             <div className="reveal-up" style={{ marginBottom: isMobile ? 24 : 36, display: 'flex', alignItems: 'center', gap: isMobile ? 12 : 16 }}>
               <div style={{
                 width: isMobile ? 36 : 44, height: isMobile ? 36 : 44, borderRadius: '50%',
@@ -471,8 +440,6 @@ export default function DashboardPage() {
                 </p>
               </div>
             </div>
-
-            {/* ─── 4 OVERVIEW CARDS ─── */}
             <div className="reveal-up reveal-delay-1" style={{
               display: 'grid',
               gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
@@ -511,13 +478,10 @@ export default function DashboardPage() {
                 compact={isMobile}
               />
             </div>
-
-            {/* ─── MAIN GRID: Courses + Tests ─── */}
             <div style={{
               display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '3fr 2fr', gap: isMobile ? 16 : 20, marginBottom: isMobile ? 24 : 36,
             }}>
 
-              {/* Enrolled Courses */}
               <div className="reveal-up reveal-delay-2" style={{
                 background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
                 backdropFilter: 'blur(20px) saturate(1.6)',
@@ -619,7 +583,6 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Recent Test Results */}
               <div className="reveal-up reveal-delay-3" style={{
                 background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
                 backdropFilter: 'blur(20px) saturate(1.6)',
@@ -695,8 +658,6 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
-
-            {/* ─── STUDY ACTIVITY ─── */}
             <div className="reveal-up reveal-delay-4" style={{
               background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
               backdropFilter: 'blur(20px) saturate(1.6)',
@@ -710,7 +671,6 @@ export default function DashboardPage() {
                 <Skeleton w="100%" h="140px" />
               ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 280px', gap: isMobile ? 20 : 28 }}>
-                  {/* Weekly Chart */}
                   <div>
                     <div style={{
                       fontSize: 10, fontWeight: 700, color: 'var(--text-dim)',
@@ -722,7 +682,6 @@ export default function DashboardPage() {
                     <WeekChart sessions={studyStats?.sessions || []} />
                   </div>
 
-                  {/* Study Stats */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {[
                       { label: 'Today', value: formatDuration(studyStats?.todaySeconds || 0), icon: 'fa-sun', color: 'var(--warning-color)' },
@@ -771,7 +730,6 @@ export default function DashboardPage() {
         </section>
       </div>}
 
-      {/* FOOTER */}
       {!(loading || minLoading) &&<footer className="v-footer" style={{ marginTop: 80 }}>
   <div className="v-footer-grid">
     <div className="v-footer-brand">

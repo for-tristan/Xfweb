@@ -14,7 +14,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/?error=oauth_failed', request.url));
     }
 
-    // SECURITY: Verify state parameter to prevent CSRF
     const cookieStore = request.cookies;
     const storedState = cookieStore.get('oauth_state')?.value;
     if (!state || !storedState || state !== storedState) {
@@ -28,7 +27,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/?error=oauth_not_configured', request.url));
     }
 
-    // SECURITY: Use environment variable for base URL
     const host = request.headers.get('host');
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (host ? `https://${host}` : 'http://localhost:3000');
     const redirectUri = `${baseUrl}/api/auth/google/callback`;
@@ -79,7 +77,6 @@ export async function GET(request: NextRequest) {
     if (existingLink) {
       user = existingLink.user;
     } else {
-      // SECURITY: Do NOT auto-link by email. This prevents account takeover attacks
       // where an attacker creates an OAuth account with a victim's email.
       // Users must link accounts manually via account settings (with password confirmation).
       user = await db.user.findUnique({ where: { email: gUser.email } });
@@ -113,8 +110,6 @@ export async function GET(request: NextRequest) {
           suffix++;
         }
 
-        // SECURITY: Use randomBytes for placeholder password instead of Math.random
-        // SECURITY: Google verifies emails, so set emailVerified for Google OAuth users
         user = await db.user.create({
           data: {
             name,

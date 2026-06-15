@@ -55,7 +55,6 @@ export default function ScrollFadeSection({
     if (!container || !inner) return;
 
     if (!pin) {
-      // ── NON-PINNED: simple scroll-based fade ──
       const rect = container.getBoundingClientRect();
       const windowH = window.innerHeight;
       const fadeStart = windowH * 0.8;
@@ -71,7 +70,6 @@ export default function ScrollFadeSection({
       return;
     }
 
-    // ── PINNED: position: fixed based pinning ──
     const rect = container.getBoundingClientRect();
     const innerHeight = inner.offsetHeight;
     const fadePx = fadePxRef.current;

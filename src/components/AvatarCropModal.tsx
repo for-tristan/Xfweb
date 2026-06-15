@@ -186,7 +186,6 @@ export function AvatarCropModal({ open, imageFile, onClose, onCropComplete }: Av
         flexDirection: 'column',
         boxShadow: '0 0 0 1px color-mix(in srgb, var(--accent) 8%, transparent), 0 24px 80px rgba(0,0,0,0.5), 0 0 120px color-mix(in srgb, var(--accent) 6%, transparent)',
       }}>
-        {/* Header */}
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -229,7 +228,6 @@ export function AvatarCropModal({ open, imageFile, onClose, onCropComplete }: Av
           </button>
         </div>
 
-        {/* Crop area */}
         <div style={{
           padding: '16px 20px',
           overflow: 'hidden',
@@ -261,7 +259,6 @@ export function AvatarCropModal({ open, imageFile, onClose, onCropComplete }: Av
           </ReactCrop>
         </div>
 
-        {/* Aspect ratio selector */}
         <div style={{
           padding: '12px 20px',
           borderTop: '1px solid color-mix(in srgb, var(--border-color) 50%, transparent)',
@@ -304,7 +301,6 @@ export function AvatarCropModal({ open, imageFile, onClose, onCropComplete }: Av
           ))}
         </div>
 
-        {/* Actions */}
         <div style={{
           padding: '16px 20px',
           borderTop: '1px solid color-mix(in srgb, var(--border-color) 50%, transparent)',

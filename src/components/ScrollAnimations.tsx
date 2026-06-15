@@ -2,7 +2,6 @@
 import { useEffect, useRef, useCallback, ReactNode } from 'react';
 
 // =============================================
-// SCROLL REVEAL OBSERVER HOOK
 // Uses IntersectionObserver + CSS transitions
 // Animations replay when scrolling back and forth
 // =============================================
@@ -29,7 +28,6 @@ function useRevealOnScroll(threshold = 0.1) {
 }
 
 // =============================================
-// SECTION REVEAL — Fade + Slide via CSS
 // =============================================
 export function SectionReveal({ children, direction = 'up', delay = 0, className = '' }: {
   children: React.ReactNode;
@@ -63,7 +61,6 @@ export function SectionReveal({ children, direction = 'up', delay = 0, className
 }
 
 // =============================================
-// STAGGER REVEAL — Children animate one by one
 // =============================================
 export function StaggerReveal({ children, className = '', staggerDelay = 80, direction = 'up' }: {
   children: React.ReactNode;
@@ -100,7 +97,6 @@ export function StaggerReveal({ children, className = '', staggerDelay = 80, dir
 }
 
 // =============================================
-// SCROLL PROGRESS BAR — Top of page
 // =============================================
 export function ScrollProgressBar() {
   const barRef = useRef<HTMLDivElement>(null);
@@ -122,7 +118,6 @@ export function ScrollProgressBar() {
 }
 
 // =============================================
-// PARALLAX LAYER — Smooth scroll-linked movement
 // =============================================
 export function ParallaxLayer({ children, speed = 0.3, className = '' }: {
   children: React.ReactNode;
@@ -155,7 +150,6 @@ export function ParallaxLayer({ children, speed = 0.3, className = '' }: {
 }
 
 // =============================================
-// TEXT SPLIT ANIMATION — Character-by-character reveal
 // =============================================
 export function TextSplitReveal({ text, className = '', tag = 'h2', delay = 0 }: {
   text: string;
@@ -194,7 +188,6 @@ export function TextSplitReveal({ text, className = '', tag = 'h2', delay = 0 }:
 }
 
 // =============================================
-// COUNTER ANIMATION — Numbers count up on scroll
 // =============================================
 export function CounterAnimation({ target, suffix = '', className = '' }: {
   target: number;
@@ -232,7 +225,6 @@ export function CounterAnimation({ target, suffix = '', className = '' }: {
 }
 
 // =============================================
-// MAGNETIC BUTTON — Moves toward cursor on hover
 // =============================================
 export function MagneticButton({ children, className = '', strength = 0.3, onClick }: {
   children: React.ReactNode;
@@ -264,7 +256,6 @@ export function MagneticButton({ children, className = '', strength = 0.3, onCli
 }
 
 // =============================================
-// TILT CARD — 3D tilt on hover
 // =============================================
 export function TiltCard({ children, className = '', glare = true }: {
   children: React.ReactNode;
@@ -306,7 +297,6 @@ export function TiltCard({ children, className = '', glare = true }: {
 }
 
 // =============================================
-// GLOW BUTTON — Neon glow effect
 // =============================================
 export function GlowButton({ children, className = '', onClick }: {
   children: React.ReactNode;
@@ -321,7 +311,6 @@ export function GlowButton({ children, className = '', onClick }: {
 }
 
 // =============================================
-// FLOATING PARTICLES — CSS-animated background particles
 // =============================================
 export function FloatingParticles({ count = 20, className = '' }: {
   count?: number;
@@ -356,7 +345,6 @@ export function FloatingParticles({ count = 20, className = '' }: {
 }
 
 // =============================================
-// MORPHING SHAPE — SVG blob background decoration
 // =============================================
 export function MorphingShape({ className = '' }: { className?: string }) {
   return (

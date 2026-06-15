@@ -103,10 +103,8 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
   const itemEntranceTweenRef = useRef<gsap.core.Tween | null>(null);
   const backdropRef = useRef<HTMLDivElement | null>(null);
 
-  // ── Mount guard (for portal — SSR-safe) ──
   useEffect(() => { setMounted(true); }, []);
 
-  // ── GSAP position reset ──
   // Uses CSS transform (translateX) via GSAP to position panel + prelayers off-screen.
   // CSS has clip-path:inset(0 0 0 100%) as a safety net to prevent flash before GSAP.
   // GSAP autoAlpha:1 overrides the clip-path and sets visibility:visible.
@@ -148,7 +146,6 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
     gsapReadyRef.current = true;
   }, [menuButtonColor, position]);
 
-  // ── Initialize GSAP AFTER portal is mounted ──
   // CRITICAL: When isFixed=true, the first render goes to React tree (non-portal),
   // then mounted=true triggers a re-render with createPortal to document.body.
   // The portal creates NEW DOM nodes that refs now point to.
@@ -169,7 +166,6 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted]);
 
-  // ── Force-close on route change ──
   const pathname = usePathname();
   const prevPathRef = useRef(pathname);
   useEffect(() => {
@@ -450,13 +446,11 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
     };
   }, [closeOnClickAway, open, closeMenu]);
 
-  // ── Overlay content (rendered via portal when isFixed) ──
   const overlayContent = (
     <div
       className={`sm-scope pointer-events-none ${isFixed ? 'sm-mobile-only fixed top-0 left-0 w-screen h-screen' : 'w-full h-full'}`}
       data-lenis-prevent
     >
-      {/* Backdrop blur overlay */}
       <div
         ref={backdropRef}
         className="sm-backdrop"
@@ -581,9 +575,7 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
               )}
             </ul>
 
-            {/* VAULTA EXTRAS */}
             <div className="sm-vaulta-extras mt-auto pt-8 flex flex-col gap-6">
-              {/* Theme selector */}
               {onChangeTheme && theme && (
                 <div className="flex items-center gap-4">
                   <label className="sm-extras-label flex items-center gap-2" htmlFor="sm-theme-select">
@@ -701,7 +693,6 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
       </div>
 
       <style>{`
-/* ═══ Theme-aware CSS variables ═══ */
 .sm-scope {
   --sm-panel-bg: var(--card-bg, #111111);
   --sm-panel-text: var(--text-light, #efefef);
@@ -725,7 +716,6 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
   --sm-panel-input-bg: rgba(0,0,0,0.03);
 }
 
-/* ═══ Mobile-only visibility ═══ */
 .sm-scope.sm-mobile-only {
   display: none;
 }
@@ -735,7 +725,6 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
   }
 }
 
-/* ═══ Backdrop ═══ */
 .sm-scope .sm-backdrop { position: fixed; inset: 0; z-index: 1; background: rgba(0,0,0,0.35); backdrop-filter: blur(8px) saturate(1.2); -webkit-backdrop-filter: blur(8px) saturate(1.2); opacity: 0; visibility: hidden; cursor: pointer; pointer-events: none; }
 [data-theme="light"] .sm-scope .sm-backdrop,
 [data-theme="sand"] .sm-scope .sm-backdrop,
@@ -747,7 +736,6 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
 [data-theme="sage"] .sm-scope .sm-backdrop,
 [data-theme="peach"] .sm-scope .sm-backdrop { background: rgba(255,255,255,0.4); backdrop-filter: blur(8px) saturate(1.1); -webkit-backdrop-filter: blur(8px) saturate(1.1); }
 
-/* ═══ Layout ═══ */
 /* When menu is CLOSED, prevent backdrop & panel from intercepting clicks.
    When menu is OPEN (data-open present), allow pointer events. */
 .staggered-menu-wrapper:not([data-open]) .sm-backdrop,
@@ -769,7 +757,6 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
 .sm-scope .sm-toggle-line { display: block; height: 1em; line-height: 1; }
 
 
-/* ═══ Panel ═══ */
 /* clip-path hides the panel until GSAP sets autoAlpha:1 (which overrides
    visibility:hidden) and xPercent to slide it off-screen. This prevents
    a flash of the panel at its default position before GSAP initializes.
@@ -792,7 +779,6 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
 .sm-scope .sm-prelayer { position: absolute; top: 0; right: 0; height: 100%; width: 100%; }
 .sm-scope .sm-panel-inner { flex: 1; display: flex; flex-direction: column; gap: 1.25rem; }
 
-/* ═══ Nav items ═══ */
 .sm-scope .sm-panel-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.35rem; }
 .sm-scope .sm-panel-itemWrap { position: relative; overflow: hidden; line-height: 1; }
 .sm-scope .sm-panel-item { position: relative; color: var(--sm-panel-text); font-weight: 700; font-size: clamp(2.2rem, 5.5vw, 3.8rem); cursor: pointer; line-height: 1.15; letter-spacing: -1.5px; text-transform: uppercase; transition: color 0.25s; display: block; text-decoration: none; padding-right: 3.5rem; }
@@ -802,17 +788,14 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
 .sm-scope .sm-panel-item-highlight:hover { color: var(--sm-accent, #dc143c) !important; text-shadow: 0 0 18px color-mix(in srgb, var(--sm-accent, #dc143c) 35%, transparent); }
 .sm-scope .sm-panel-item-highlight::after { color: var(--sm-accent, #dc143c) !important; }
 
-/* ═══ Item numbers ═══ */
 .sm-scope .sm-panel-list[data-numbering] { counter-reset: smItem; }
 .sm-scope .sm-panel-list[data-numbering] .sm-panel-item::after { counter-increment: smItem; content: counter(smItem, decimal-leading-zero); position: absolute; top: 0; right: 0; font-size: 0.35em; font-weight: 500; color: var(--sm-accent, #ff0000); letter-spacing: 1px; pointer-events: none; user-select: none; opacity: var(--sm-num-opacity, 0); transition: opacity 0.3s ease; line-height: 1; }
 
-/* ═══ Vaulta Extras ═══ */
 .sm-scope .sm-vaulta-extras { color: var(--sm-panel-text); }
 .sm-scope .sm-extras-label { font-size: 0.8rem; font-weight: 700; color: var(--sm-panel-text-dim); text-transform: uppercase; letter-spacing: 0.1em; white-space: nowrap; }
 .sm-scope .sm-extras-select { flex: 1; font-size: 0.95rem; background: var(--sm-panel-input-bg); border: 1px solid var(--sm-panel-border); border-radius: 10px; padding: 0.65rem 0.9rem; color: var(--sm-panel-text); cursor: pointer; outline: none; transition: border-color 0.2s; }
 .sm-scope .sm-extras-select:focus { border-color: var(--sm-accent); }
 
-/* ═══ Notifications ═══ */
 .sm-scope .sm-notif-item { font-size: 0.85rem; padding: 0.7rem 0.85rem; border-radius: 10px; cursor: pointer; transition: all 0.2s; color: var(--sm-panel-text-dim); }
 .sm-scope .sm-notif-unread { color: var(--sm-panel-text); background: color-mix(in srgb, var(--sm-accent) 10%, transparent); }
 .sm-scope .sm-notif-item:hover { background: color-mix(in srgb, var(--sm-accent) 6%, transparent); }
@@ -821,14 +804,12 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
 .sm-scope .sm-notif-time { font-size: 0.7rem; color: var(--sm-panel-text-dim); white-space: nowrap; margin-left: auto; }
 .sm-scope .sm-notif-msg { margin: 0; font-size: 0.78rem; line-height: 1.4; color: var(--sm-panel-text-dim); opacity: 0.85; padding-left: 1.3rem; }
 
-/* ═══ Auth buttons ═══ */
 .sm-scope .sm-auth-btn { font-size: 1rem; font-weight: 700; padding: 0.85rem 1.5rem; border-radius: 12px; cursor: pointer; transition: all 0.2s; text-align: center; }
 .sm-scope .sm-auth-signin { background: transparent; border: 1.5px solid var(--sm-panel-border); color: var(--sm-panel-text); }
 .sm-scope .sm-auth-signin:hover { border-color: var(--sm-accent); color: var(--sm-accent); }
 .sm-scope .sm-auth-signup { background: var(--sm-accent); border: none; color: #fff; }
 .sm-scope .sm-auth-signup:hover { opacity: 0.9; }
 
-/* ═══ Profile pill ═══ */
 .sm-scope .sm-profile-pill { display: flex; align-items: center; gap: 0.9rem; width: 100%; text-align: left; font-size: 1rem; font-weight: 500; color: var(--sm-panel-text); background: transparent; border: 1.5px solid var(--sm-panel-border); border-radius: 14px; padding: 0.85rem 1rem; cursor: pointer; transition: border-color 0.2s; }
 .sm-scope .sm-profile-pill:hover { border-color: var(--sm-accent); }
 .sm-scope .sm-profile-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--sm-accent); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 800; flex-shrink: 0; }
@@ -836,11 +817,9 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
 .sm-scope .sm-profile-name { font-weight: 700; font-size: 1rem; color: var(--sm-panel-text); }
 .sm-scope .sm-profile-email { font-size: 0.8rem; color: var(--sm-panel-text-dim); }
 
-/* ═══ Logout ═══ */
 .sm-scope .sm-logout-btn { display: flex; align-items: center; gap: 0.7rem; width: 100%; text-align: left; font-size: 1rem; font-weight: 500; color: var(--sm-panel-text-dim); background: transparent; border: 1.5px solid color-mix(in srgb, var(--sm-panel-border) 60%, transparent); border-radius: 12px; padding: 0.7rem 1rem; cursor: pointer; transition: all 0.2s; }
 .sm-scope .sm-logout-btn:hover { color: var(--sm-accent); border-color: var(--sm-accent); }
 
-/* ═══ Responsive ═══ */
 @media (max-width: 1570px) { .sm-scope .sm-toggle { font-size: 1rem; } }
 @media (max-width: 1024px) { .sm-scope .staggered-menu-panel { width: 100%; left: 0; right: 0; } .sm-scope .sm-prelayers { width: 100%; } }
 @media (max-width: 900px) { .sm-scope .staggered-menu-header { top: 16px; height: 56px; padding-right: 1.25em; } }

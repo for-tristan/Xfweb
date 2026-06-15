@@ -88,7 +88,6 @@ export default function ConfirmModal({
           animation: 'confirmSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
       >
-        {/* Header */}
         <div style={{
           padding: '20px 24px 16px',
           display: 'flex', alignItems: 'center', gap: 14,
@@ -112,7 +111,6 @@ export default function ConfirmModal({
           </div>
         </div>
 
-        {/* Body */}
         <div style={{
           padding: '0 24px 20px',
           fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6,
@@ -121,7 +119,6 @@ export default function ConfirmModal({
           {message}
         </div>
 
-        {/* Actions */}
         <div style={{
           padding: '16px 24px', borderTop: '1px solid color-mix(in srgb, var(--border-color) 50%, transparent)',
           display: 'flex', justifyContent: 'flex-end', gap: 10,

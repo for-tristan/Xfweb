@@ -91,7 +91,6 @@ export async function PUT(request: NextRequest) {
       select: { id: true, name: true, email: true, role: true, avatar: true, createdAt: true },
     });
 
-    // SECURITY: Invalidate all sessions for this user after role change
     // so they need to re-login with their new permissions
     await deleteAllUserSessions(userId);
 
@@ -153,7 +152,6 @@ export async function DELETE(request: NextRequest) {
       }
     }
 
-    // SECURITY: Delete related records in a transaction to prevent partial deletes
     await db.$transaction([
       db.certificate.deleteMany({ where: { userId } }),
       db.moduleStudy.deleteMany({ where: { userId } }),

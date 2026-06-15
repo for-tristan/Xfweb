@@ -16,7 +16,6 @@ export async function GET() {
     const allCourses = await db.course.findMany({ select: { id: true, slug: true } });
     const courseMap = new Map(allCourses.map(c => [c.slug, c.id]));
 
-    // FIX: Get unique course CUIDs and batch-fetch module counts using groupBy
     const uniqueCourseIds = [...new Set(progressRecords.map(r => {
       const cuid = courseMap.get(r.courseId);
       return cuid || r.courseId;

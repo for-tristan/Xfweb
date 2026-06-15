@@ -26,7 +26,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // SECURITY: Validate email format
     if (!EMAIL_REGEX.test(email)) {
       return NextResponse.json(
         { error: 'Please provide a valid email address' },
@@ -34,7 +33,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // SECURITY: Password complexity requirements
     if (password.length < MIN_PASSWORD_LENGTH) {
       return NextResponse.json(
         { error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters long` },
@@ -42,7 +40,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // SECURITY: Password must contain uppercase, lowercase, and a number
     if (!/[A-Z]/.test(password)) {
       return NextResponse.json(
         { error: 'Password must contain at least one uppercase letter' },
@@ -62,7 +59,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // SECURITY: Normalize email to lowercase
     const normalizedEmail = email.toLowerCase().trim();
 
     // Check if user already exists
@@ -83,7 +79,6 @@ export async function POST(request: NextRequest) {
       username = generateUsername(name);
     }
 
-    // SECURITY: Ensure uniqueness with crypto-secure random suffix
     let usernameExists = await db.user.findUnique({ where: { username } });
     const baseUsername = username;
     while (usernameExists) {

@@ -102,7 +102,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ moduleStudies });
     }
 
-    // ── Main progress listing ──
 
     // Build where clause for course progress
     const progressWhere: Record<string, unknown> = {};

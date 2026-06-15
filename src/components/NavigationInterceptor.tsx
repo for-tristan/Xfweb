@@ -2,12 +2,9 @@
 
 import { useEffect } from 'react';
 
-// ═══════════════════════════════════════════════════
-// NAVIGATION INTERCEPTOR
 // Listens for clicks on internal <a> and Next <Link> elements
 // and dispatches a custom event so PageTransition can start
 // its curtain animation before the route change completes.
-// ═══════════════════════════════════════════════════
 
 export default function NavigationInterceptor() {
   useEffect(() => {

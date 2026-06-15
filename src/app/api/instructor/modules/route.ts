@@ -127,7 +127,6 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json();
 
-    // ── UNLOCK MODULE (single) ──
     if (body.userId && body.moduleId && !body.unlockAll) {
       const { userId, moduleId } = body;
 
@@ -167,7 +166,6 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ message: 'Module unlocked' });
     }
 
-    // ── UNLOCK ALL MODULES (bulk) ──
     if (body.userId && body.courseId && body.unlockAll) {
       const { userId, courseId } = body;
 
@@ -197,7 +195,6 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ created });
     }
 
-    // ── UPDATE MODULE CONTENT ──
     const { id, title, description, content, moduleOrder } = body;
     if (!id) {
       return NextResponse.json({ error: 'id is required' }, { status: 400 });
@@ -241,7 +238,6 @@ export async function DELETE(request: NextRequest) {
     const body = await request.json();
     const { moduleId, userId } = body;
 
-    // ── REMOVE MODULE UNLOCK (lock for a specific user) ──
     if (moduleId && userId) {
       const mod = await db.courseModule.findUnique({ where: { id: moduleId } });
       if (!mod) {
@@ -276,7 +272,6 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ message: 'Module locked successfully', deleted: result.count });
     }
 
-    // ── DELETE MODULE ENTIRELY ──
     if (!moduleId) {
       return NextResponse.json({ error: 'moduleId is required' }, { status: 400 });
     }

@@ -17,14 +17,12 @@ export function generateCertificatePDF(
   });
 
   // =========================
-  // PAGE
   // =========================
 
   const W = 297;
   const H = 210;
 
   // =========================
-  // COLORS
   // =========================
 
   const BG: [number, number, number] = [250, 247, 242];
@@ -42,14 +40,12 @@ export function generateCertificatePDF(
   const LIGHT: [number, number, number] = [165, 165, 165];
 
   // =========================
-  // BACKGROUND
   // =========================
 
   doc.setFillColor(...BG);
   doc.rect(0, 0, W, H, 'F');
 
   // =========================
-  // OUTER FRAME
   // =========================
 
   doc.setDrawColor(...GOLD);
@@ -62,7 +58,6 @@ export function generateCertificatePDF(
   doc.rect(14, 14, W - 28, H - 28);
 
   // =========================
-  // WATERMARK
   // =========================
 
   doc.setTextColor(240, 236, 228);
@@ -76,7 +71,6 @@ export function generateCertificatePDF(
   });
 
   // =========================
-  // TOP BRAND
   // =========================
 
   doc.setTextColor(...RED);
@@ -96,7 +90,6 @@ export function generateCertificatePDF(
   doc.line(W / 2 - 20, 39, W / 2 + 20, 39);
 
   // =========================
-  // TITLE
   // =========================
 
   doc.setTextColor(...DARK);
@@ -116,7 +109,6 @@ export function generateCertificatePDF(
   });
 
   // =========================
-  // CERTIFICATION TEXT
   // =========================
 
   doc.setFont('helvetica', 'normal');
@@ -134,7 +126,6 @@ export function generateCertificatePDF(
   );
 
   // =========================
-  // USER NAME
   // =========================
 
   doc.setFont('times', 'bold');
@@ -161,7 +152,6 @@ export function generateCertificatePDF(
   );
 
   // =========================
-  // DESCRIPTION
   // =========================
 
   doc.setFont('helvetica', 'normal');
@@ -179,7 +169,6 @@ export function generateCertificatePDF(
   );
 
   // =========================
-  // COURSE NAME
   // =========================
 
   doc.setFont('times', 'bolditalic');
@@ -191,9 +180,8 @@ export function generateCertificatePDF(
     align: 'center',
   });
 
-  
+
    // =========================
-  // SIGNATURES
   // =========================
 
   const sigY = 165;
@@ -202,7 +190,6 @@ export function generateCertificatePDF(
   doc.setLineWidth(0.4);
 
   // =========================
-  // LEFT SIGNATURE
   // =========================
 
   doc.line(92, sigY, 132, sigY);
@@ -228,7 +215,6 @@ export function generateCertificatePDF(
   });
 
   // =========================
-  // RIGHT SIGNATURE
   // =========================
 
   doc.line(165, sigY, 205, sigY);
@@ -254,7 +240,6 @@ export function generateCertificatePDF(
   });
 
   // =========================
-  // FOOTER INFO
   // =========================
 
   doc.setFont('helvetica', 'normal');
@@ -278,7 +263,6 @@ export function generateCertificatePDF(
   );
 
   // =========================
-  // BOTTOM ACCENT
   // =========================
 
   doc.setDrawColor(...GOLD_LIGHT);

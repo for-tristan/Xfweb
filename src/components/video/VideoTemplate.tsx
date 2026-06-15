@@ -49,7 +49,6 @@ export default function VideoTemplate({
   }, [currentSceneKey, onSceneChange]);
 
 
-
   const baseSceneKey = currentSceneKey.replace(/_r[12]$/, '') as keyof typeof SCENE_DURATIONS;
   const SceneComponent = SCENE_COMPONENTS[baseSceneKey];
 

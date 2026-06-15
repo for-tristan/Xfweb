@@ -26,7 +26,6 @@ export default function CertificateModal({ open, onClose, data, loading }: Certi
   const handleDownloadPDF = useCallback(async () => {
     if (!data) return;
     try {
-      // FIX: Use the actual courseId from certificate data instead of hardcoded 'ml-bootcamp'
       const res = await fetch(`/api/courses/certificate?courseId=${encodeURIComponent(data.certificateId)}&format=pdf`);
       if (res.ok) {
         const blob = await res.blob();
@@ -48,7 +47,6 @@ export default function CertificateModal({ open, onClose, data, loading }: Certi
 
   return (
     <>
-      {/* Print-only styles */}
       <style>{`
         @media print {
           body * {
@@ -79,7 +77,6 @@ export default function CertificateModal({ open, onClose, data, loading }: Certi
         }
       `}</style>
 
-      {/* Overlay */}
       <div
         className="cert-no-print"
         data-lenis-prevent
@@ -97,7 +94,6 @@ export default function CertificateModal({ open, onClose, data, loading }: Certi
         }}
         onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       >
-        {/* Modal container */}
         <div
           style={{
             background: 'color-mix(in srgb, var(--card-bg) 92%, transparent)',
@@ -112,7 +108,6 @@ export default function CertificateModal({ open, onClose, data, loading }: Certi
             boxShadow: '0 0 0 1px color-mix(in srgb, var(--accent) 8%, transparent), 0 24px 80px rgba(0,0,0,0.5), 0 0 120px color-mix(in srgb, var(--accent) 6%, transparent)',
           }}
         >
-          {/* Modal header */}
           <div
             className="cert-no-print"
             style={{
@@ -198,7 +193,6 @@ export default function CertificateModal({ open, onClose, data, loading }: Certi
             </div>
           </div>
 
-          {/* Certificate content */}
           <div style={{ padding: 24 }}>
             {loading ? (
               <div style={{ textAlign: 'center', padding: '60px 20px' }}>
@@ -225,7 +219,6 @@ export default function CertificateModal({ open, onClose, data, loading }: Certi
                     fontFamily: 'Georgia, "Times New Roman", serif',
                   }}
                 >
-                  {/* Inner decorative border */}
                   <div
                     style={{
                       position: 'absolute',
@@ -237,16 +230,13 @@ export default function CertificateModal({ open, onClose, data, loading }: Certi
                       pointerEvents: 'none',
                     }}
                   />
-                  {/* Corner accents */}
                   <div style={{ position: 'absolute', top: 8, left: 8, width: 30, height: 30, borderTop: '2px solid #dc143c', borderLeft: '2px solid #dc143c' }} />
                   <div style={{ position: 'absolute', top: 8, right: 8, width: 30, height: 30, borderTop: '2px solid #dc143c', borderRight: '2px solid #dc143c' }} />
                   <div style={{ position: 'absolute', bottom: 8, left: 8, width: 30, height: 30, borderBottom: '2px solid #dc143c', borderLeft: '2px solid #dc143c' }} />
                   <div style={{ position: 'absolute', bottom: 8, right: 8, width: 30, height: 30, borderBottom: '2px solid #dc143c', borderRight: '2px solid #dc143c' }} />
 
-                  {/* Decorative top line */}
                   <div style={{ width: 80, height: 2, background: 'var(--primary-red)', marginBottom: 20 }} />
 
-                  {/* Brand */}
                   <div
                     style={{
                       fontFamily: '"Orbitron", sans-serif',
@@ -260,7 +250,6 @@ export default function CertificateModal({ open, onClose, data, loading }: Certi
                     X.FOUNDRY
                   </div>
 
-                  {/* Title */}
                   <h1
                     style={{
                       fontSize: 36,
@@ -275,7 +264,6 @@ export default function CertificateModal({ open, onClose, data, loading }: Certi
                     Certificate of Completion
                   </h1>
 
-                  {/* Decorative divider */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
                     <div style={{ width: 60, height: 1, background: 'var(--primary-red)' }} />
                     <div style={{ width: 8, height: 8, border: '1px solid #dc143c', transform: 'rotate(45deg)' }} />
@@ -287,7 +275,6 @@ export default function CertificateModal({ open, onClose, data, loading }: Certi
                     This certifies that
                   </p>
 
-                  {/* Student name */}
                   <h2
                     style={{
                       fontSize: 38,
@@ -309,7 +296,6 @@ export default function CertificateModal({ open, onClose, data, loading }: Certi
                     has successfully completed the course
                   </p>
 
-                  {/* Course name */}
                   <h3
                     style={{
                       fontSize: 26,
@@ -322,7 +308,6 @@ export default function CertificateModal({ open, onClose, data, loading }: Certi
                     {data.courseName}
                   </h3>
 
-                  {/* Bottom info row */}
                   <div
                     style={{
                       display: 'flex',
@@ -332,7 +317,6 @@ export default function CertificateModal({ open, onClose, data, loading }: Certi
                       gap: 20,
                     }}
                   >
-                    {/* Completion date */}
                     <div style={{ textAlign: 'center' }}>
                       <p style={{ fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>
                         Date of Completion
@@ -342,7 +326,6 @@ export default function CertificateModal({ open, onClose, data, loading }: Certi
                       </p>
                     </div>
 
-                    {/* Certificate ID */}
                     <div style={{ textAlign: 'center' }}>
                       <p style={{ fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>
                         Certificate ID
@@ -353,7 +336,6 @@ export default function CertificateModal({ open, onClose, data, loading }: Certi
                     </div>
                   </div>
 
-                  {/* Signature line */}
                   <div
                     style={{
                       display: 'flex',
@@ -369,7 +351,6 @@ export default function CertificateModal({ open, onClose, data, loading }: Certi
                     </div>
                   </div>
 
-                  {/* Bottom decorative line */}
                   <div style={{ width: 80, height: 2, background: 'var(--primary-red)', marginTop: 20 }} />
                 </div>
               </div>

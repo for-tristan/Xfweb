@@ -50,7 +50,6 @@ export default function DraggableScroll({ children, className = '', autoSpeed = 
     halfWidth.current = track.scrollWidth / 2;
   }, []);
 
-  // ── Normalize position into the [-halfWidth, 0] range ──
   // This keeps targetPos and currentPos always within one loop cycle
   const normalizePosition = useCallback((pos: number) => {
     if (halfWidth.current <= 0) return pos;
@@ -59,7 +58,6 @@ export default function DraggableScroll({ children, className = '', autoSpeed = 
     return pos;
   }, []);
 
-  // ── Core animation loop ──
   const animate = useCallback(() => {
     // Auto-scroll: move target leftward when not dragging and not paused
     if (autoSpeed > 0 && !isDragging.current && !autoPaused.current) {
@@ -99,7 +97,6 @@ export default function DraggableScroll({ children, className = '', autoSpeed = 
     }
   }, [animate]);
 
-  // ── Pause / Resume auto-scroll ──
   const pauseAutoScroll = useCallback(() => {
     autoPaused.current = true;
     if (resumeTimer.current) clearTimeout(resumeTimer.current);
@@ -112,7 +109,6 @@ export default function DraggableScroll({ children, className = '', autoSpeed = 
     }, delay);
   }, []);
 
-  // ── Apply momentum (clamped) ──
   const applyMomentum = useCallback(() => {
     if (dragDistance.current < 5) return;
     const raw = velocity.current * 6;
@@ -120,7 +116,6 @@ export default function DraggableScroll({ children, className = '', autoSpeed = 
     targetPos.current += clamped;
   }, []);
 
-  // ── End drag ──
   const endDrag = useCallback(() => {
     if (!isDragging.current) return;
     isDragging.current = false;
@@ -129,7 +124,6 @@ export default function DraggableScroll({ children, className = '', autoSpeed = 
     resumeAutoScroll();
   }, [applyMomentum, resumeAutoScroll]);
 
-  // ── Drag handlers ──
   const onMouseDown = useCallback((e: React.MouseEvent) => {
     isDragging.current = true;
     dragDistance.current = 0;
@@ -173,7 +167,6 @@ export default function DraggableScroll({ children, className = '', autoSpeed = 
 
   const onMouseEnter = useCallback(() => {}, []);
 
-  // ── Touch support ──
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -222,7 +215,6 @@ export default function DraggableScroll({ children, className = '', autoSpeed = 
     };
   }, [pauseAutoScroll, resumeAutoScroll, applyMomentum]);
 
-  // ── Init ──
   useEffect(() => {
     measureHalfWidth();
     startAnimation();

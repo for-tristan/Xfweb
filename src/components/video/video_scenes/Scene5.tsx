@@ -19,7 +19,7 @@ export function Scene5() {
   }, []);
 
   return (
-    <motion.div 
+    <motion.div
       className="absolute inset-0 flex flex-col items-center justify-center z-10"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -50,7 +50,7 @@ export function Scene5() {
           XFOUNDRY
         </motion.div>
 
-        <motion.div 
+        <motion.div
           className="h-[1px] mb-8 rounded-full"
           style={{ background: 'var(--primary-red)' }}
           initial={{ width: 0 }}

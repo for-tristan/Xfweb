@@ -26,7 +26,6 @@ export function useScroll3D(containerRef: React.RefObject<HTMLDivElement | null>
     if (!container) return;
 
     const ctx = gsap.context(() => {
-      // ── Section 3D scroll animations ──
       const sections = container.querySelectorAll('.v-section');
       sections.forEach((section) => {
         // Animate IN: fade + scale + subtle rotation as section enters viewport
@@ -62,7 +61,6 @@ export function useScroll3D(containerRef: React.RefObject<HTMLDivElement | null>
         });
       });
 
-      // ── Hero — more dramatic depth effect ──
       const hero = container.querySelector('.v-hero');
       if (hero) {
         gsap.fromTo(
@@ -83,7 +81,6 @@ export function useScroll3D(containerRef: React.RefObject<HTMLDivElement | null>
         );
       }
 
-      // ── Card 3D tilt on scroll ──
       // Reuse the sections already queried above — one ScrollTrigger per section
       // for all its cards (much cheaper than one trigger per card)
       sections.forEach((section) => {

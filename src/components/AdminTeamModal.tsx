@@ -5,9 +5,6 @@ import { useToast } from '@/hooks/use-toast';
 import { WaveInput } from '@/components/WaveInput';
 import { WaveTextarea } from '@/components/WaveTextarea';
 
-// ═══════════════════════════════════════════════════
-// TYPES
-// ═══════════════════════════════════════════════════
 
 interface TeamMember {
   id: string;
@@ -40,9 +37,6 @@ interface AdminTeamModalProps {
   onTeamSaved?: () => void;
 }
 
-// ═══════════════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════════════
 
 const emptyForm: FormData = {
   name: '',
@@ -68,9 +62,6 @@ function memberToForm(m: TeamMember): FormData {
   };
 }
 
-// ═══════════════════════════════════════════════════
-// ADMIN TEAM MODAL
-// ═══════════════════════════════════════════════════
 
 export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalProps) {
   const { toast } = useToast();
@@ -85,7 +76,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
   const [formVisible, setFormVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // ─── Responsive Detection ───────────────────────
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)');
     const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
@@ -94,7 +84,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  // ─── Fetch Members ──────────────────────────────
   const fetchMembers = useCallback(async () => {
     setLoading(true);
     try {
@@ -123,7 +112,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
     }
   }, [open, fetchMembers]);
 
-  // ─── Form Handlers ──────────────────────────────
   const resetForm = () => {
     setForm(emptyForm);
     setEditingId(null);
@@ -151,7 +139,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
     resetForm();
   };
 
-  // ─── Save (Create / Update) ─────────────────────
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.role.trim()) {
@@ -200,7 +187,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
     setSaving(false);
   };
 
-  // ─── Delete ─────────────────────────────────────
   const handleDelete = async (id: string) => {
     setSaving(true);
     try {
@@ -226,12 +212,8 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
     setSaving(false);
   };
 
-  // ─── Early Return ───────────────────────────────
   if (!open) return null;
 
-  // ═══════════════════════════════════════════════
-  // STYLES (shared)
-  // ═══════════════════════════════════════════════
 
   const inputStyle: React.CSSProperties = {
     width: '100%',
@@ -262,9 +244,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
     flexDirection: 'column',
   };
 
-  // ═══════════════════════════════════════════════
-  // RENDER
-  // ═══════════════════════════════════════════════
 
   return (
     <div
@@ -309,7 +288,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
           paddingRight: isMobile ? 'env(safe-area-inset-right, 0px)' : 0,
         }}
       >
-        {/* ─── Header ──────────────────────────── */}
         <div
           style={{
             padding: isMobile ? '12px 16px' : '16px 24px',
@@ -362,8 +340,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
             <i className="fa-solid fa-times" />
           </button>
         </div>
-
-        {/* ─── Scrollable Body ─────────────────── */}
         <div
           style={{
             flex: 1,
@@ -374,7 +350,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
             gap: 24,
           }}
         >
-          {/* ── Add Member Toggle ──────────────── */}
           {!formVisible && (
             <button
               onClick={handleStartAdd}
@@ -410,8 +385,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
               Add New Team Member
             </button>
           )}
-
-          {/* ── Add / Edit Form ────────────────── */}
           {formVisible && (
             <form
               onSubmit={handleSave}
@@ -425,7 +398,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
                 gap: 16,
               }}
             >
-              {/* Form Title */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <i className={editingId ? 'fa-solid fa-user-edit' : 'fa-solid fa-user-plus'} style={{ color: 'var(--accent)', fontSize: 14 }} />
                 <span
@@ -527,7 +499,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
                 />
               </div>
 
-              {/* Form Actions */}
               <div
                 style={{
                   display: 'flex',
@@ -600,8 +571,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
               </div>
             </form>
           )}
-
-          {/* ── Divider ────────────────────────── */}
           <div
             style={{
               height: 1,
@@ -609,8 +578,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
               margin: 0,
             }}
           />
-
-          {/* ── Members List Header ─────────────── */}
           <div
             style={{
               display: 'flex',
@@ -654,8 +621,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
               )}
             </span>
           </div>
-
-          {/* ── Members List ───────────────────── */}
           {loading ? (
             <div
               style={{
@@ -761,7 +726,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
                     )}
                   </div>
 
-                  {/* Info */}
                   <div
                     style={{
                       flex: 1,
@@ -826,7 +790,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
                       </p>
                     )}
 
-                    {/* Social Links */}
                     {(member.linkedinUrl || member.githubUrl) && (
                       <div style={{ display: 'flex', gap: 8, marginTop: 2 }}>
                         {member.linkedinUrl && (
@@ -874,7 +837,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
                       </div>
                     )}
 
-                    {/* Delete Confirmation */}
                     {deleteConfirmId === member.id && (
                       <div
                         style={{

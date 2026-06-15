@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
 import { SkeletonHero, SkeletonSectionHeader, SkeletonServiceCard, SkeletonCourseCard } from '@/components/SkeletonScreens';
-// WordSpinner removed — replaced by .xf-loader CSS dots
 import { ChatModal } from '@/components/ChatModal';
 import ConfirmModal from '@/components/ConfirmModal';
 import VideoTemplate from '@/components/video/VideoTemplate';
@@ -21,10 +20,6 @@ import GradualBlur from '@/components/GradualBlur';
 import ScrollFadeSection from '@/components/ScrollFadeSection';
 import DraggableScroll from '@/components/DraggableScroll';
 
-
-// ═══════════════════════════════════════════════════
-// TYPES
-// ═══════════════════════════════════════════════════
 
 interface User {
   id: string;
@@ -77,9 +72,7 @@ interface Course {
   enrollmentCount?: number;
 }
 
-// ═══════════════════════════════════════════════════
 // DATA (dynamic fallback)
-// ═══════════════════════════════════════════════════
 
 const fallbackCourses: Course[] = [];
 
@@ -100,9 +93,6 @@ const staticSearchData = [
 
 
 //
-// ═══════════════════════════════════════════════════
-// FAQ COMPONENT
-// ═══════════════════════════════════════════════════
 
 // Character-by-character reveal component (Vaulta SplitText style)
 // Reveals once on scroll into view — does NOT re-hide on scroll away to prevent lag spikes
@@ -155,9 +145,6 @@ function FaqItem({ question, answer, index }: { question: string; answer: string
   );
 }
 
-// ═══════════════════════════════════════════════════
-// ENROLL BUTTON COMPONENT
-// ═══════════════════════════════════════════════════
 
 function EnrollButton({ courseId, courseName, onEnroll, status }: {
   courseId: string;
@@ -193,32 +180,25 @@ function EnrollButton({ courseId, courseName, onEnroll, status }: {
   );
 }
 
-// ═══════════════════════════════════════════════════
-// MAIN COMPONENT
-// ═══════════════════════════════════════════════════
 
 export default function Home() {
   const { toast } = useToast();
   const router = useRouter();
 
-  // ── Auth ──
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [minLoading, setMinLoading] = useState(true);
 
-  // ── Modals ──
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authTab, setAuthTab] = useState<'signin' | 'signup'>('signin');
   const [authMessage, setAuthMessage] = useState('');
   const [dashboardOpen, setDashboardOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
-  // ── Login Form ──
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
 
-  // ── Signup Form ──
   const [signupName, setSignupName] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
@@ -228,7 +208,6 @@ export default function Home() {
   const [signupRole, setSignupRole] = useState('student');
   const [signupLoading, setSignupLoading] = useState(false);
 
-  // ── Forgot Password ──
   const [forgotStep, setForgotStep] = useState<'idle' | 'email' | 'code'>('idle');
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotLoading, setForgotLoading] = useState(false);
@@ -236,17 +215,14 @@ export default function Home() {
   const [newPassword, setNewPassword] = useState('');
   const [resetLoading, setResetLoading] = useState(false);
 
-  // ── Email Verification ──
   const [verificationStep, setVerificationStep] = useState<'idle' | 'pending'>('idle');
   const [verificationEmail, setVerificationEmail] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [verificationLoading, setVerificationLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
 
-  // ── Dashboard ──
   const [dashTab, setDashTab] = useState('profile');
 
-  // ── Profile Edit ──
   const [profileName, setProfileName] = useState('');
   const [profileUsername, setProfileUsername] = useState('');
   const [profilePhone, setProfilePhone] = useState('');
@@ -261,7 +237,6 @@ export default function Home() {
   const [quotes, setQuotes] = useState<QuoteRequest[]>([]);
   const [quotesLoading, setQuotesLoading] = useState(false);
 
-  // ── Dashboard Quote Form ──
   const [dqName, setDqName] = useState('');
   const [dqEmail, setDqEmail] = useState('');
   const [dqPhone, setDqPhone] = useState('');
@@ -271,7 +246,6 @@ export default function Home() {
   const [dqDescription, setDqDescription] = useState('');
   const [dqLoading, setDqLoading] = useState(false);
 
-  // ── Contact Quote Form ──
   const [cqFirstName, setCqFirstName] = useState('');
   const [cqLastName, setCqLastName] = useState('');
   const [cqEmail, setCqEmail] = useState('');
@@ -283,22 +257,17 @@ export default function Home() {
   const [cqSuccess, setCqSuccess] = useState(false);
 
 
-
-  // ── Service Detail Modal ──
-  // ── Enrollment Request Modal ──
   const [enrollModalOpen, setEnrollModalOpen] = useState(false);
   const [enrollCourse, setEnrollCourse] = useState<Course | null>(null);
   const [erExperience, setErExperience] = useState('');
   const [erMotivation, setErMotivation] = useState('');
   const [enrollLoading, setEnrollLoading] = useState(false);
 
-  // ── Notifications ──
   const [notifications, setNotifications] = useState<Array<{id:string;title:string;message:string;read:boolean;createdAt:string;type?:string}>>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifLoading, setNotifLoading] = useState(false);
 
-  // ── Cancel enrollment ──
   const [cancelLoading, setCancelLoading] = useState<string | null>(null);
 
   // Confirm modals
@@ -320,8 +289,6 @@ export default function Home() {
   const [serviceModal, setServiceModal] = useState<string | null>(null);
 
 
-
-  // ── Friends ──
   const [friends, setFriends] = useState<Array<{id:string;friendId:string;name:string;username:string;avatar:string|null;createdAt:string}>>([]);
   const [pendingRequests, setPendingRequests] = useState<Array<{id:string;friendId:string;name:string;username:string;avatar:string|null;createdAt:string}>>([]);
   const [sentRequests, setSentRequests] = useState<Array<{id:string;friendId:string;name:string;username:string;avatar:string|null;createdAt:string}>>([]);
@@ -331,7 +298,6 @@ export default function Home() {
   const [chatOpen, setChatOpen] = useState(false);
   const [selectedChatFriend, setSelectedChatFriend] = useState<{id:string;friendId:string;name:string;username:string;avatar:string|null;createdAt:string} | null>(null);
 
-  // ── UI ──
   const [scrolled, setScrolled] = useState(false);
   const [atBottom, setAtBottom] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -340,11 +306,6 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
 
 
-
-
-  // ═══════════════════════════════════════════════════
-  // EFFECTS
-  // ═══════════════════════════════════════════════════
   // Minimum 3-second loader display
   useEffect(() => {
     const timer = setTimeout(() => setMinLoading(false), 3000);
@@ -394,7 +355,6 @@ export default function Home() {
   }, []);
 
 
-
   const loadNotifications = useCallback(async () => {
     try {
       const res = await fetch('/api/notifications');
@@ -406,7 +366,6 @@ export default function Home() {
     } catch { /* err */ }
   }, []);
 
-  // ── Friends ──
   const loadFriends = useCallback(async () => {
     setFriendsLoading(true);
     try {
@@ -573,11 +532,6 @@ export default function Home() {
     return () => document.removeEventListener('keydown', onKey);
   }, []);
 
-
-
-  // ═══════════════════════════════════════════════════
-  // HANDLERS
-  // ═══════════════════════════════════════════════════
 
   const handleThemeToggle = () => {
     const lightThemeIds = ['light', 'sand', 'lavender', 'mint', 'rose-gold', 'honey', 'clay', 'sage', 'peach'];
@@ -775,7 +729,6 @@ export default function Home() {
     setCqSuccess(false);
   };
 
-  // ── Profile & Avatar ──
   const loadProfileData = () => {
     if (user) {
       setProfileName(user.name || '');
@@ -968,38 +921,15 @@ export default function Home() {
     ? dynamicSearchData.filter((i) => i.title.toLowerCase().includes(searchQuery.toLowerCase()) || i.desc.toLowerCase().includes(searchQuery.toLowerCase()))
     : [];
 
-  // ═══════════════════════════════════════════════════
-  // RENDER
-  // ═══════════════════════════════════════════════════
 
   return (
     <>
-
-     {/* ──── RESPONSIVE NAV ──── */}
-
-
-      {/* ═══════════════════════════════════════════════════
-          NAVIGATION
-          ═══════════════════════════════════════════════════ */}
         {!(authLoading || minLoading) && <Navbar activePage="home" activeNav={activeNav} scrolled={scrolled} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} user={user} scrollToSection={scrollToSection} onNavClick={(e: React.MouseEvent<HTMLElement>) => { if (e.target === e.currentTarget || (e.target as HTMLElement).classList.contains('nav-links')) setMobileMenuOpen(false); }} theme={theme} onToggleTheme={handleThemeToggle} onChangeTheme={handleChangeTheme} onSearchOpen={() => setSearchOpen(true)} onOpenAuth={openAuthModal} onLogout={handleLogout} notifOpen={notifOpen} setNotifOpen={setNotifOpen} notifications={notifications} unreadCount={unreadCount} loadNotifications={loadNotifications} setNotifications={setNotifications as any} setUnreadCount={setUnreadCount as any} dashboardOpen={dashboardOpen} setDashboardOpen={setDashboardOpen} onAcceptFriend={handleAcceptFriend} onRejectFriend={handleRejectFriend} />}
-
-      {/* ═══════════════════════════════════════════════════
-          HERO SECTION
-          ═══════════════════════════════════════════════════ */}
       {(authLoading || minLoading) ? (
         <div className="xf-loader"><div className="xf-loader-dot" /><div className="xf-loader-dot" /><div className="xf-loader-dot" /></div>
       ) : (
       <>
-
-      {/* ═══════════════════════════════════════════════════
-          SCROLL PROGRESS BAR
-          ═══════════════════════════════════════════════════ */}
       <ScrollProgressBar />
-
-      {/* ═══════════════════════════════════════════════════
-          GRADUAL BLUR — bottom page-level scroll blur
-          Fades out when scrolled to the bottom so copyright stays clear
-          ═══════════════════════════════════════════════════ */}
       {!atBottom && (
         <GradualBlur
           target="page"
@@ -1013,10 +943,6 @@ export default function Home() {
           zIndex={50}
         />
       )}
-
-      {/* ═══════════════════════════════════════════════════
-          HERO — Pinned + Fade on Scroll
-          ═══════════════════════════════════════════════════ */}
       <ScrollFadeSection pin fadeDistance="60vh" zIndex={1}>
       <section className="v-hero" id="home">
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', position: 'relative', zIndex: 10 }}>
@@ -1035,10 +961,6 @@ export default function Home() {
         </div>
       </section>
       </ScrollFadeSection>
-
-      {/* ═══════════════════════════════════════════════════
-          SERVICES SECTION — Pinned Fade
-          ═══════════════════════════════════════════════════ */}
       <section className="v-section" id="services">
         <SectionReveal direction="up" delay={0}>
           <div className="v-section-header">
@@ -1067,10 +989,6 @@ export default function Home() {
         </div>
         </StaggerReveal>
       </section>
-
-      {/* ═══════════════════════════════════════════════════
-          PROJECTS SECTION — Horizontal Showcase
-          ═══════════════════════════════════════════════════ */}
       <section className="v-section" id="projects">
 
         <SectionReveal direction="up" delay={0}>
@@ -1110,7 +1028,6 @@ export default function Home() {
                 </div>
               </div>
             ))}
-            {/* Duplicate set for seamless infinite loop */}
             {dynamicProjects.map((project) => (
               <div key={`dup-${project.id}`} className="v-project-showcase-card" data-category={project.category} aria-hidden="true">
                 <div className="v-project-showcase-img">
@@ -1144,10 +1061,6 @@ export default function Home() {
           <span>Drag to explore</span>
         </div>
       </section>
-
-      {/* ═══════════════════════════════════════════════════
-          COURSES SECTION
-          ═══════════════════════════════════════════════════ */}
       <section className="v-section" id="courses">
 
         <SectionReveal direction="up" delay={0}>
@@ -1192,10 +1105,6 @@ export default function Home() {
         </div>
         </StaggerReveal>
       </section>
-
-      {/* ═══════════════════════════════════════════════════
-          FAQ SECTION
-          ═══════════════════════════════════════════════════ */}
       <section className="v-section" id="faq">
         <SectionReveal direction="up" delay={0}>
           <div className="v-section-header">
@@ -1217,10 +1126,6 @@ export default function Home() {
         </div>
         </StaggerReveal>
       </section>
-
-      {/* ═══════════════════════════════════════════════════
-          TEAM SECTION
-          ═══════════════════════════════════════════════════ */}
       <section className="v-section" id="team">
 
         <SectionReveal direction="up" delay={0}>
@@ -1263,10 +1168,6 @@ export default function Home() {
         </div>
         </StaggerReveal>
       </section>
-
-      {/* ═══════════════════════════════════════════════════
-          CONTACT SECTION
-          ═══════════════════════════════════════════════════ */}
       <section className="v-section" id="contact">
 
         <SectionReveal direction="up" delay={0}>
@@ -1355,10 +1256,6 @@ export default function Home() {
             </SectionReveal>
         </div>
       </section>
-
-      {/* ═══════════════════════════════════════════════════
-          FOOTER
-          ═══════════════════════════════════════════════════ */}
       <footer className="v-footer">
 
         <div className="v-footer-grid">
@@ -1407,14 +1304,7 @@ export default function Home() {
 
       </>
       )}
-      {/* ═══════════════════════════════════════════════════
-          SEARCH MODAL
-          ═══════════════════════════════════════════════════ */}
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} query={searchQuery} setQuery={setSearchQuery} results={filteredSearch} onSelect={(link) => { if (link.startsWith('#')) { scrollToSection(link.replace('#', '')); } else { router.push(link); } }} />
-
-      {/* ═══════════════════════════════════════════════════
-          AUTH MODAL (shared component)
-          ═══════════════════════════════════════════════════ */}
       <AuthModal
         open={authModalOpen}
         onClose={() => { setAuthModalOpen(false); setForgotStep('idle'); }}
@@ -1440,12 +1330,6 @@ export default function Home() {
         verificationStep={verificationStep} setVerificationStep={setVerificationStep} verificationEmail={verificationEmail} verificationCode={verificationCode} setVerificationCode={setVerificationCode} verificationLoading={verificationLoading} onVerifyEmail={async (e: React.FormEvent) => { e.preventDefault(); if (!verificationCode) { toast({ title: 'Error', description: 'Please enter the verification code', variant: 'destructive' }); return; } setVerificationLoading(true); try { const res = await fetch('/api/auth/verify-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: verificationEmail, code: verificationCode }) }); const data = await res.json(); if (res.ok) { setUser(data.user); setAuthModalOpen(false); setVerificationStep('idle'); setVerificationCode(''); toast({ title: 'Email Verified!', description: 'Your account is now active. Welcome to XFoundry!' }); } else { toast({ title: 'Verification Failed', description: data.error, variant: 'destructive' }); } } catch { toast({ title: 'Error', description: 'Something went wrong', variant: 'destructive' }); } setVerificationLoading(false); }} onResendVerification={async () => { if (!verificationEmail) return; setResendLoading(true); try { const res = await fetch('/api/auth/resend-verification', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: verificationEmail }) }); const data = await res.json(); if (res.ok) { toast({ title: 'Code Resent!', description: 'A new verification code has been sent.' }); } else { toast({ title: 'Error', description: data.error, variant: 'destructive' }); } } catch { toast({ title: 'Error', description: 'Something went wrong', variant: 'destructive' }); } setResendLoading(false); }} resendLoading={resendLoading}
       />
 
-      {/* ═══════════════════════════════════════════════════
-          DASHBOARD MODAL
-          ═══════════════════════════════════════════════════ */}
-      {/* ═══════════════════════════════════════════════════
-          SERVICE DETAIL MODAL
-          ═══════════════════════════════════════════════════ */}
       {serviceModal && servicesDataMap[serviceModal] && (() => {
         const svc = servicesDataMap[serviceModal];
         return (
@@ -1517,13 +1401,11 @@ export default function Home() {
             </div>
 
             <div className="dashboard-modal-body">
-              {/* ── PROFILE TAB ── */}
               {dashTab === 'profile' && (
                 <div style={{ maxWidth: 480, margin: '0 auto' }}>
                   <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, marginBottom: 4, color: 'var(--text-light)' }}>My Profile</h3>
                   <p style={{ color: 'var(--text-dim)', marginBottom: 28, fontSize: 14 }}>Manage your account details and profile picture</p>
 
-                  {/* Avatar */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 28 }}>
                     <div style={{ position: 'relative', display: 'inline-flex' }}>
                       <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '2px solid color-mix(in srgb, var(--accent) 30%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', fontSize: 24, fontWeight: 900, overflow: 'hidden' }}>
@@ -1545,7 +1427,6 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Profile Form */}
                   <form onSubmit={handleProfileSave}>
                     <WaveInput label="Full Name" type="text" value={profileName} onChange={(e) => setProfileName(e.target.value)} />
                     <WaveInput label="Username" type="text" value={profileUsername} onChange={(e) => setProfileUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))} />
@@ -1616,8 +1497,6 @@ export default function Home() {
                   </div>
                 </div>
               )}
-
-              {/* ── COURSES TAB ── */}
               {dashTab === 'courses' && (
                 <div>
                   <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, marginBottom: 4, color: 'var(--text-light)' }}>Available Courses</h3>
@@ -1654,8 +1533,6 @@ export default function Home() {
                   </div>
                 </div>
               )}
-
-              {/* ── MY ENROLLMENTS TAB ── */}
               {dashTab === 'my-enrollments' && (
                 <div>
                   <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, marginBottom: 4, color: 'var(--text-light)' }}>My Enrollments</h3>
@@ -1730,10 +1607,6 @@ export default function Home() {
                   )}
                 </div>
               )}
-
-
-
-              {/* ── REQUEST QUOTE TAB ── */}
               {dashTab === 'request-quote' && (
                 <div>
                   <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, marginBottom: 4, color: 'var(--text-light)' }}>Request a Quote</h3>
@@ -1776,8 +1649,6 @@ export default function Home() {
                   </form>
                 </div>
               )}
-
-              {/* ── MY QUOTES TAB ── */}
               {dashTab === 'my-quotes' && (
                 <div>
                   <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, marginBottom: 4, color: 'var(--text-light)' }}>My Quotes</h3>
@@ -1815,14 +1686,11 @@ export default function Home() {
                   )}
                 </div>
               )}
-
-              {/* ── FRIENDS TAB ── */}
               {dashTab === 'friends' && (
                 <div style={{ maxWidth: 560, margin: '0 auto', minHeight: 400 }}>
                   <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, marginBottom: 4, color: 'var(--text-light)' }}>Friends</h3>
                   <p style={{ color: 'var(--text-dim)', marginBottom: 24, fontSize: 14 }}>Manage your friends and friend requests</p>
 
-                  {/* Add Friend */}
                   <form onSubmit={handleAddFriend} style={{ display: 'flex', gap: 12, marginBottom: 28, alignItems: 'flex-end' }}>
                     <WaveInput
                       label="Enter username to add..."
@@ -1836,7 +1704,6 @@ export default function Home() {
                     </button>
                   </form>
 
-                  {/* Pending Requests */}
                   {pendingRequests.length > 0 && (
                     <div style={{ marginBottom: 24 }}>
                       <h4 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 12, color: 'var(--accent)', marginBottom: 12, letterSpacing: 1, textTransform: 'uppercase' }}>
@@ -1860,7 +1727,6 @@ export default function Home() {
                     </div>
                   )}
 
-                  {/* Sent Requests */}
                   {sentRequests.length > 0 && (
                     <div style={{ marginBottom: 24 }}>
                       <h4 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 12, color: 'var(--text-dim)', marginBottom: 12, letterSpacing: 1, textTransform: 'uppercase' }}>
@@ -1885,7 +1751,6 @@ export default function Home() {
                     </div>
                   )}
 
-                  {/* Friends List */}
                   <h4 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 12, color: 'var(--text-dim)', marginBottom: 12, letterSpacing: 1, textTransform: 'uppercase' }}>
                     <i className="fa-solid fa-users" style={{ marginRight: 6 }}></i>All Friends ({friends.length})
                   </h4>
@@ -1920,7 +1785,6 @@ export default function Home() {
                   )}
                 </div>
               )}
-              {/* ── MESSAGES TAB ── */}
               {dashTab === 'messages' && (
                 <div style={{ maxWidth: 560, margin: '0 auto', minHeight: 400 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
@@ -1928,7 +1792,7 @@ export default function Home() {
                       <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, marginBottom: 4, color: 'var(--text-light)' }}>Messages</h3>
                       <p style={{ color: 'var(--text-dim)', fontSize: 14 }}>Chat with your friends</p>
                     </div>
-                   
+
                   </div>
                   {friends.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-dim)' }}>
@@ -1960,16 +1824,9 @@ export default function Home() {
         </div>
       )}
 
-      {/* Chat Modal */}
       {chatOpen && user && (
         <ChatModal open={chatOpen} onClose={() => { setChatOpen(false); setSelectedChatFriend(null); }} user={user} friends={friends} initialFriend={selectedChatFriend} />
       )}
-
-
-
-      {/* ═══════════════════════════════════════════════════
-          ENROLLMENT REQUEST MODAL
-          ═══════════════════════════════════════════════════ */}
       {enrollModalOpen && enrollCourse && (
         <div className="modal-overlay" onClick={() => setEnrollModalOpen(false)}>
           <div className="modal-content auth-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 520, borderRadius: 16, border: "1px solid color-mix(in srgb, var(--accent) 15%, var(--border-color))" }}>
@@ -1978,7 +1835,7 @@ export default function Home() {
             </button>
 
             <div style={{ textAlign: 'center', marginBottom: 28 }}>
-            
+
               <h2 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, letterSpacing: 2, textTransform: 'uppercase', color: 'var(--text-light)', marginBottom: 4 }}>Enrollment Request</h2>
               <p style={{ color: 'var(--accent)', fontSize: 14, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif" }}>{enrollCourse.name}</p>
               <p style={{ color: 'var(--text-dim)', fontSize: 13, marginTop: 6 }}>Fill in your details below. Your request will be reviewed by an admin.</p>

@@ -7,7 +7,6 @@ import { usePageFeatures } from '@/lib/usePageFeatures';
 import ConfirmModal from '@/components/ConfirmModal';
 import ReactMarkdown from 'react-markdown';
 import { Navbar } from '@/components/Navbar';
-// WordSpinner removed — replaced by .xf-loader CSS dots
 import { SearchModal, AuthModal, AuthGate } from '@/lib/PageModals';
 import { WaveInput } from '@/components/WaveInput';
 import { WaveTextarea } from '@/components/WaveTextarea';
@@ -256,16 +255,13 @@ export default function AdminPage() {
 
   const moduleCounts: Record<string, number> = {};
 
-  // ── Notifications (from usePageFeatures) ──
 
-  // ── Module Management ──
   const [adminModules, setAdminModules] = useState<CourseModuleItem[]>([]);
   const [modulesLoading, setModulesLoading] = useState(false);
   const [modulesCourseFilter, setModulesCourseFilter] = useState('all');
   const [seedLoading, setSeedLoading] = useState(false);
   const [allModules, setAllModules] = useState<CourseModuleItem[]>([]); // all modules for unlock panel
 
-  // ── Quotes Management ──
   const [adminQuotes, setAdminQuotes] = useState<AdminQuote[]>([]);
   const [quotesLoading, setQuotesLoading] = useState(false);
   const [quoteFilter, setQuoteFilter] = useState('all');
@@ -284,7 +280,6 @@ export default function AdminPage() {
     setQuoteActionLoading(null);
   };
 
-  // ── Team Management ──
   interface TeamMember { id: string; name: string; role: string; bio: string; avatar: string; icon: string; linkedinUrl: string; githubUrl: string; displayOrder: number; createdAt: string; updatedAt: string; }
   const [adminTeam, setAdminTeam] = useState<TeamMember[]>([]);
   const [teamLoading, setTeamLoading] = useState(false);
@@ -316,7 +311,6 @@ export default function AdminPage() {
 
   const [unlockLoading, setUnlockLoading] = useState<string | null>(null);
   const [atBottom, setAtBottom] = useState(false);
-  // ── Theme (from usePageFeatures) ──
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
@@ -331,7 +325,6 @@ export default function AdminPage() {
     return () => { observer.disconnect(); window.removeEventListener('scroll', checkBottom); };
   }, [loading]);
 
-  // ── Auth check (admin role verified in usePageFeatures + adminCheckedRef effect) ──
 
   const fetchEnrollments = useCallback(async (status?: string) => {
     try { const p = status && status !== 'all' ? `?status=${status}` : ''; const r = await fetch(`/api/admin/enrollments${p}`); if (r.ok) setEnrollments((await r.json()).enrollments); } catch {}
@@ -435,7 +428,6 @@ export default function AdminPage() {
     }, { confirmLabel: 'Reset', danger: true, icon: 'fa-solid fa-undo' });
   };
 
-  // ── Send Certificate ──
   const [certSending, setCertSending] = useState<string | null>(null);
   const handleSendCertificate = (p: ProgressEntry) => {
     if (p.completionPercentage !== 100) {
@@ -461,7 +453,6 @@ export default function AdminPage() {
     }, { confirmLabel: 'Send', danger: false, icon: 'fa-solid fa-certificate' });
   };
 
-  // ── Module Study Data ──
   interface ModuleStudyEntry {
     moduleId: string;
     moduleTitle: string;
@@ -473,7 +464,6 @@ export default function AdminPage() {
   const [studyData, setStudyData] = useState<Record<string, ModuleStudyEntry[]>>({});
   const [studyLoading, setStudyLoading] = useState<string | null>(null);
 
-  // ── Services Management ──
   const [services, setServices] = useState<AdminService[]>([]);
   const [servicesLoading, setServicesLoading] = useState(false);
   const [showServiceForm, setShowServiceForm] = useState(false);
@@ -545,7 +535,6 @@ export default function AdminPage() {
     setServiceFeatures(prev => prev.filter((_, i) => i !== idx));
   };
 
-  // ── Projects Management ──
   interface AdminProject {
     id: string;
     title: string;
@@ -640,7 +629,6 @@ export default function AdminPage() {
     setProjectForm(f => ({ ...f, title, slug: title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') }));
   };
 
-  // ── Courses Management ──
   const [courses, setCourses] = useState<AdminCourse[]>([]);
   const [coursesLoading, setCoursesLoading] = useState(false);
   const [showCourseForm, setShowCourseForm] = useState(false);
@@ -762,7 +750,6 @@ export default function AdminPage() {
     }, { confirmLabel: 'Delete', danger: true, icon: 'fa-solid fa-trash-alt' });
   };
 
-  // ── Tests Management ──
   interface AdminTest { id: string; moduleId: string; title: string; description: string; timeLimit: number; passingScore: number; questionCount: number; attemptCount: number; moduleTitle: string; createdAt: string; }
   interface AdminTestFull { id: string; moduleId: string; title: string; description: string; timeLimit: number; passingScore: number; createdAt: string; updatedAt: string; module: { id: string; title: string; courseId: string }; questions: { id: string; questionText: string; questionType: string; options: string; correctAnswer: number; points: number; questionOrder: number; createdAt: string }[]; attempts: { id: string; userId: string; score: number; totalPoints: number; passed: boolean; startedAt: string; submittedAt: string | null; createdAt: string; user: { id: string; name: string; email: string; avatar: string | null } }[]; unlocks: { id: string; userId: string; unlockedBy: string; createdAt: string; user: { id: string; name: string; email: string } }[]; }
   const [adminTests, setAdminTests] = useState<AdminTest[]>([]);
@@ -959,11 +946,7 @@ export default function AdminPage() {
     <>
 
       <div style={{ minHeight: '100vh', background: 'var(--black)', color: 'var(--text-light)', fontFamily: "var(--font-body)", fontWeight: 400 }}>
-
-        {/* ═══ NAV ═══ */}
         <Navbar activePage="admin" scrolled={true} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} user={user} scrollToSection={scrollToSection} theme={theme} onToggleTheme={toggleTheme} onChangeTheme={changeTheme} onSearchOpen={() => setSearchOpen(true)} onOpenAuth={openAuthModal} onLogout={handleLogout} notifOpen={notifOpen} setNotifOpen={setNotifOpen} notifications={notifications} unreadCount={unreadCount} loadNotifications={loadNotifications} setNotifications={setNotifications} setUnreadCount={setUnreadCount} dashboardOpen={dashboardOpen} setDashboardOpen={setDashboardOpen} />
-
-        {/* ═══ STATS ═══ */}
         <section className="section" style={{ paddingTop: 100, paddingBottom: 60 }}>
           <div className="section-header reveal">
             <span className="section-tag"></span>
@@ -986,11 +969,8 @@ export default function AdminPage() {
             ))}
           </div>
         </section>
-
-        {/* ═══ DATA SECTION ═══ */}
         <section className="section" style={{ paddingTop: 48, paddingBottom: 60 }}>
 
-          {/* Tabs */}
           <div className="projects-filter reveal" style={{ display: 'flex', justifyContent: 'center', gap: 0, marginBottom: 56 }}>
             <button className={`filter-btn${tab === 'enrollments' ? ' active' : ''}`} onClick={() => setTab('enrollments')}>
               <i className="fa-solid fa-user-graduate" style={{ marginRight: 8 }}></i>Enrollments{pendingCount > 0 ? ` (${pendingCount})` : ''}
@@ -1026,8 +1006,6 @@ export default function AdminPage() {
               <i className="fa-solid fa-chart-bar" style={{ marginRight: 8 }}></i>Analytics
             </button>
           </div>
-
-          {/* ── ENROLLMENTS ── */}
           {tab === 'enrollments' && (
             <>
               <div className="projects-filter reveal" style={{ justifyContent: 'center', marginBottom: 48 }}>
@@ -1050,7 +1028,6 @@ export default function AdminPage() {
                       <div key={e.id} className="project-card reveal" style={{ padding: '32px 40px', display: 'flex', flexDirection: 'column', gap: 24 }}>
                         {/* Top row: user + course */}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
-                          {/* User info */}
                           <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, minWidth: 250 }}>
                             <div style={{ width: 48, height: 48, borderRadius: '50%', background: e.user.avatar ? 'transparent' : 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', fontSize: 16, fontWeight: 700, flexShrink: 0, overflow: 'hidden' }}>
                               {e.user.avatar
@@ -1070,7 +1047,6 @@ export default function AdminPage() {
                           </div>
                         </div>
 
-                        {/* Details row */}
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 20, paddingLeft: 64 }}>
                           <div>
                             <div style={{ fontSize: 10, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>Course</div>
@@ -1092,7 +1068,6 @@ export default function AdminPage() {
                           )}
                         </div>
 
-                        {/* Actions */}
                         <div style={{ display: 'flex', gap: 12, paddingLeft: 64, paddingTop: 16, borderTop: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)' }}>
                           {e.status === 'pending' && (
                             <>
@@ -1115,8 +1090,6 @@ export default function AdminPage() {
               )}
             </>
           )}
-
-          {/* ── USERS ── */}
           {tab === 'users' && (
             users.length === 0 ? (
               <div className="reveal" style={{ textAlign: 'center', padding: '100px 20px' }}>
@@ -1194,8 +1167,6 @@ export default function AdminPage() {
               </div>
             )
           )}
-
-          {/* ── STUDENT PROGRESS ── */}
           {tab === 'progress' && (
             progressLoading ? (
               <div className="reveal" style={{ textAlign: 'center', padding: '60px 20px' }}>
@@ -1210,7 +1181,6 @@ export default function AdminPage() {
               </div>
             ) : (
               <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-                {/* Summary Cards */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 48 }} className="reveal">
                   {(() => {
                     const total = studentProgress.length;
@@ -1234,14 +1204,12 @@ export default function AdminPage() {
                   })()}
                 </div>
 
-                {/* Progress List */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   {studentProgress.map((p, idx) => {
                     const pc = progressColor(p.completionPercentage);
                     return (
                       <div key={p.id} className={`project-card reveal reveal-delay-${Math.min(idx + 1, 5)}`} style={{ padding: '28px 40px', display: 'flex', flexDirection: 'column', gap: 16 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
-                          {/* Student info */}
                           <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, minWidth: 250 }}>
                             <div style={{ width: 48, height: 48, borderRadius: '50%', background: p.user.avatar ? 'transparent' : 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', fontSize: 16, fontWeight: 700, flexShrink: 0, overflow: 'hidden' }}>
                               {p.user.avatar
@@ -1366,7 +1334,6 @@ export default function AdminPage() {
                               </div>
                             )}
 
-                            {/* Module Study Tracking Data */}
                             {studyData[`${p.userId}-${p.courseId}`] && editingProgress !== p.id && (
                               <div style={{ marginTop: 16, padding: '16px 20px', background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
   backdropFilter: 'blur(20px) saturate(1.6)',
@@ -1400,7 +1367,6 @@ export default function AdminPage() {
                               </div>
                             )}
                           </div>
-                          {/* Circular percentage indicator */}
                           <div style={{ width: 72, height: 72, borderRadius: '50%', border: `2px solid color-mix(in srgb, var(--text-light) 10%, transparent)`, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', flexShrink: 0 }}>
                             <svg width="72" height="72" style={{ position: 'absolute', top: 0, left: 0, transform: 'rotate(-90deg)' }}>
                               <circle cx="36" cy="36" r="30" fill="none" stroke="color-mix(in srgb, var(--text-light) 10%, transparent)" strokeWidth="3" />
@@ -1419,12 +1385,9 @@ export default function AdminPage() {
               </div>
             )
           )}
-
-          {/* ── MODULES ── */}
           {tab === 'modules' && (
             <>
             <div className="reveal" style={{ maxWidth: 1100, margin: '0 auto' }}>
-              {/* Controls */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
                 <div style={{ display: 'flex', gap: 0, alignItems: 'center' }}>
                   <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5 }}>Filter Course: ‎ ‎ ‎   </span>
@@ -1440,7 +1403,6 @@ export default function AdminPage() {
                 <div style={{ textAlign: 'center', padding: 60 }}><i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 32, color: 'var(--accent)' }}></i></div>
               ) : (
                 <>
-                  {/* Section A: Course Modules Overview */}
                   <div style={{ marginBottom: 48 }}>
                     <h3 style={{ fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: 16, marginBottom: 20, color: 'var(--text-light)', display: 'flex', alignItems: 'center', gap: 10 }}>
                       <i className="fa-solid fa-book" style={{ color: 'var(--accent)' }}></i>Course Modules
@@ -1484,7 +1446,6 @@ export default function AdminPage() {
                     })()}
                   </div>
 
-                  {/* Section B: Per-Student Module Access Control */}
                   <div>
                     <h3 style={{ fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: 16, marginBottom: 20, color: 'var(--text-light)', display: 'flex', alignItems: 'center', gap: 10 }}>
                       <i className="fa-solid fa-key" style={{ color: 'var(--accent)' }}></i>Student Module Access
@@ -1496,8 +1457,6 @@ export default function AdminPage() {
             </div>
             </>
           )}
-
-          {/* ── QUOTES ── */}
           {tab === 'quotes' && (
             <>
               <div className="projects-filter reveal" style={{ justifyContent: 'center', marginBottom: 48 }}>
@@ -1601,8 +1560,6 @@ export default function AdminPage() {
               })()}
             </>
           )}
-
-          {/* ── TEAM ── */}
           {tab === 'team' && (
             <div className="reveal">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
@@ -1664,8 +1621,6 @@ export default function AdminPage() {
               )}
             </div>
           )}
-
-          {/* ── TESTS ── */}
           {tab === 'tests' && (
             <div className="reveal" style={{ maxWidth: 1100, margin: '0 auto' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
@@ -1740,14 +1695,12 @@ export default function AdminPage() {
                         </div>
                       </div>
 
-                      {/* Test detail panel */}
                       {selectedTestId === t.id && (
                         <div style={{ marginTop: 20, paddingTop: 20, borderTop: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)' }}>
                           {!selectedTest ? (
                             <div style={{ textAlign: 'center', padding: 30 }}><i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 20, color: 'var(--accent)' }}></i></div>
                           ) : (
                             <>
-                              {/* Questions section */}
                               <div style={{ marginBottom: 24 }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                                   <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-light)' }}>
@@ -1947,8 +1900,6 @@ export default function AdminPage() {
               )}
             </div>
           )}
-
-          {/* ── ANALYTICS ── */}
           {tab === 'analytics' && (
             !analytics ? (
               <div className="reveal" style={{ textAlign: 'center', padding: '60px 20px' }}>
@@ -1957,7 +1908,6 @@ export default function AdminPage() {
               </div>
             ) : (
               <div className="reveal" style={{ maxWidth: 1000, margin: '0 auto' }}>
-                {/* Summary Cards */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 48 }}>
                   {[
                     { label: 'Total Users', val: analytics.totalUsers, icon: 'fa-users', color: 'var(--accent)' },
@@ -1975,7 +1925,6 @@ export default function AdminPage() {
                   ))}
                 </div>
 
-                {/* Course Popularity */}
                 <h3 style={{ fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: 16, color: 'var(--text-light)', marginBottom: 20 }}>
                   <i className="fa-solid fa-chart-bar" style={{ color: 'var(--accent)', marginRight: 8 }}></i>Course Popularity
                 </h3>
@@ -1999,7 +1948,6 @@ export default function AdminPage() {
                   })}
                 </div>
 
-                {/* Recent Activity */}
                 <h3 style={{ fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: 16, color: 'var(--text-light)', marginBottom: 20 }}>
                   <i className="fa-solid fa-stream" style={{ color: 'var(--accent)', marginRight: 8 }}></i>Recent Activity
                 </h3>
@@ -2025,7 +1973,6 @@ export default function AdminPage() {
               </div>
             )
           )}
-          {/* ── SERVICES ── */}
           {tab === 'services' && (
             <div className="reveal" style={{ maxWidth: 1100, margin: '0 auto' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
@@ -2059,7 +2006,6 @@ export default function AdminPage() {
                   </div>
                   <WaveTextarea label="Description" value={serviceForm.description} onChange={e => setServiceForm(f => ({ ...f, description: e.target.value }))} rows={3} style={{ marginBottom: 16 }} />
 
-                  {/* Features */}
                   <div style={{ marginBottom: 16 }}>
                     <label style={{ fontSize: 10, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
                       <i className="fa-solid fa-list" style={{ color: 'var(--accent)' }}></i>Features ({serviceFeatures.length})
@@ -2156,8 +2102,6 @@ export default function AdminPage() {
               )}
             </div>
           )}
-
-          {/* ── PROJECTS ── */}
           {tab === 'projects' && (
             <div className="reveal" style={{ maxWidth: 1100, margin: '0 auto' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
@@ -2170,7 +2114,6 @@ export default function AdminPage() {
                 </button>
               </div>
 
-              {/* Project Form Modal */}
               {showProjectForm && (
                 <div style={{ background: 'color-mix(in srgb, var(--card-bg) 80%, transparent)', backdropFilter: 'blur(20px)', border: '1px solid color-mix(in srgb, var(--text-light) 10%, transparent)', borderRadius: 16, padding: 28, marginBottom: 28 }}>
                   <h4 style={{ color: 'var(--text-light)', marginBottom: 20, fontSize: 16 }}>{editingProject ? 'Edit Project' : 'New Project'}</h4>
@@ -2223,7 +2166,6 @@ export default function AdminPage() {
                 </div>
               )}
 
-              {/* Projects List */}
               {projectsLoading ? (
                 <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-dim)' }}><i className="fa-solid fa-spinner fa-spin" style={{ marginRight: 8 }}></i>Loading projects...</div>
               ) : adminProjects.length === 0 ? (
@@ -2262,8 +2204,6 @@ export default function AdminPage() {
               )}
             </div>
           )}
-
-          {/* ── COURSES ── */}
           {tab === 'courses' && (
             <div className="reveal" style={{ maxWidth: 1100, margin: '0 auto' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
@@ -2309,7 +2249,6 @@ export default function AdminPage() {
                   <WaveTextarea label="Description" value={courseForm.description} onChange={e => setCourseForm(f => ({ ...f, description: e.target.value }))} rows={3} style={{ marginBottom: 16 }} />
                   <WaveTextarea label="Prerequisites" value={courseForm.prerequisites} onChange={e => setCourseForm(f => ({ ...f, prerequisites: e.target.value }))} rows={2} style={{ marginBottom: 16 }} />
 
-                  {/* Features */}
                   <div style={{ marginBottom: 16 }}>
                     <label style={{ fontSize: 10, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
                       <i className="fa-solid fa-list" style={{ color: 'var(--accent)' }}></i>Features ({courseForm.features.length})
@@ -2385,7 +2324,6 @@ export default function AdminPage() {
                         </div>
                       </div>
 
-                      {/* Course details */}
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 16, paddingLeft: 64 }}>
                         {c.duration && (
                           <div>
@@ -2421,7 +2359,6 @@ export default function AdminPage() {
                         </div>
                       )}
 
-                      {/* Expanded modules view */}
                       {expandedCourseId === c.id && (
                         <div style={{ marginTop: 8, padding: '20px 24px', background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
   backdropFilter: 'blur(20px) saturate(1.6)',
@@ -2528,8 +2465,6 @@ export default function AdminPage() {
             </div>
           )}
         </section>
-
-        {/* ═══ FOOTER ═══ */}
         <footer className="v-footer">
           <div className="v-footer-bottom" style={{ border: 'none' }}>
             <p><span style={{ color: 'var(--accent)' }}>XFoundry</span> — Admin Panel — {new Date().getFullYear()}</p>

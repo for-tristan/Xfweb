@@ -6,7 +6,6 @@ import { useToast } from '@/hooks/use-toast';
 import ConfirmModal from '@/components/ConfirmModal';
 import { AvatarCropModal } from '@/components/AvatarCropModal';
 import { ThemePicker } from '@/components/ThemePicker';
-// WordSpinner removed — replaced by .xf-loader CSS dots
 import { WaveInput } from '@/components/WaveInput';
 import type { User } from './usePageFeatures';
 
@@ -57,9 +56,6 @@ function useFocusTrap(containerRef: React.RefObject<HTMLElement | null>, isActiv
   }, [isActive, containerRef]);
 }
 
-// ═══════════════════════════════════════════════════
-// SEARCH MODAL
-// ═══════════════════════════════════════════════════
 
 interface SearchModalProps {
   open: boolean;
@@ -146,9 +142,6 @@ export function SearchModal({ open, onClose, query, setQuery, results, onSelect 
   );
 }
 
-// ═══════════════════════════════════════════════════
-// AUTH MODAL
-// ═══════════════════════════════════════════════════
 
 interface AuthModalProps {
   open: boolean;
@@ -361,9 +354,6 @@ export function AuthModal({
   );
 }
 
-// ═══════════════════════════════════════════════════
-// AUTH GATE OVERLAY
-// ═══════════════════════════════════════════════════
 
 interface AuthGateProps {
   loading: boolean;
@@ -398,9 +388,6 @@ function AuthRedirect() {
   return <VaultaLoader />;
 }
 
-// ═══════════════════════════════════════════════════
-// NAV ACTIONS (enhanced with notifications + profile)
-// ═══════════════════════════════════════════════════
 
 interface NavActionsProps {
   theme: string;
@@ -487,7 +474,6 @@ export function NavActions({
       )}
       {user && (
         <>
-          {/* Notification Bell */}
           <div ref={notifRef} className="desktop-only" style={{ position: 'relative' }}>
             <button className="nav-search-btn" onClick={() => { setNotifOpen(!notifOpen); if (!notifOpen) loadNotifications(); }} title="Notifications" aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`} style={{ position: 'relative' }}>
               <i className="fa-solid fa-bell" />
@@ -517,7 +503,6 @@ export function NavActions({
               </div>
             )}
           </div>
-          {/* User Avatar */}
           <button className="nav-user-btn desktop-only" onClick={() => setDashboardOpen(true)}>
             <span className="nav-user-avatar">
               {user.avatar
@@ -552,9 +537,6 @@ export function NavActions({
   );
 }
 
-// ═══════════════════════════════════════════════════
-// PROFILE MODAL (shared across all sub-pages)
-// ═══════════════════════════════════════════════════
 
 interface ProfileModalProps {
   open: boolean;
@@ -669,7 +651,6 @@ export function ProfileModal({
             <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, marginBottom: 4, color: 'var(--text-light)' }}>My Profile</h3>
             <p style={{ color: 'var(--text-dim)', marginBottom: 28, fontSize: 14 }}>Manage your account details and profile picture</p>
 
-            {/* Avatar */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 28 }}>
               <div style={{ position: 'relative' }}>
                 <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '2px solid color-mix(in srgb, var(--accent) 30%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', fontSize: 24, fontWeight: 900, overflow: 'hidden' }}>
@@ -690,7 +671,6 @@ export function ProfileModal({
               </div>
             </div>
 
-            {/* Profile Form */}
             <form onSubmit={onProfileSave}>
               <WaveInput label="Full Name" type="text" value={profileName} onChange={(e) => setProfileName(e.target.value)} />
               <WaveInput label="Username" type="text" value={profileUsername} onChange={(e) => setProfileUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))} />
@@ -789,9 +769,6 @@ export function ProfileModal({
   );
 }
 
-// ═══════════════════════════════════════════════════
-// HERO EFFECTS (shared)
-// ═══════════════════════════════════════════════════
 
 export function HeroEffects() {
   return (

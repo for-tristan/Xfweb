@@ -4,9 +4,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
-// ═══════════════════════════════════════════════════
-// TYPES
-// ═══════════════════════════════════════════════════
 
 export interface User {
   id: string;
@@ -39,9 +36,6 @@ interface SearchItem {
   link: string;
 }
 
-// ═══════════════════════════════════════════════════
-// SEARCH DATA
-// ═══════════════════════════════════════════════════
 
 const searchData: SearchItem[] = [
   { title: 'AI & Machine Learning', category: 'Service', desc: 'Intelligent systems with ML algorithms', link: '/services/ai-ml' },
@@ -52,15 +46,11 @@ const searchData: SearchItem[] = [
   { title: 'Contact Us', category: 'Page', desc: 'Get in touch with our team', link: '/#contact' },
 ];
 
-// ═══════════════════════════════════════════════════
-// HOOK
-// ═══════════════════════════════════════════════════
 
 export function usePageFeatures() {
   const { toast } = useToast();
   const router = useRouter();
 
-  // ── Auth ──
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [minLoading, setMinLoading] = useState(true);
@@ -71,17 +61,14 @@ export function usePageFeatures() {
     return () => clearTimeout(timer);
   }, []);
 
-  // ── Auth Modal ──
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authTab, setAuthTab] = useState<'signin' | 'signup'>('signin');
   const [authMessage, setAuthMessage] = useState('');
 
-  // ── Login Form ──
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
 
-  // ── Signup Form ──
   const [signupName, setSignupName] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
@@ -91,25 +78,20 @@ export function usePageFeatures() {
   const [signupRole, setSignupRole] = useState('student');
   const [signupLoading, setSignupLoading] = useState(false);
 
-  // ── Search ──
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // ── Theme ──
   // Multi-theme: crimson, midnight, oled, phantom, synthwave, frost, light, sand
   const [theme, setTheme] = useState<string>(() => {
     if (typeof window === 'undefined') return 'light';
     return localStorage.getItem('x-foundry-theme') || 'oled';
   });
 
-  // ── UI ──
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // ── Dashboard / Profile Modal ──
   const [dashboardOpen, setDashboardOpen] = useState(false);
 
-  // ── Scroll to section (for navbar hash links) ──
   const scrollToSection = useCallback((sectionId: string) => {
     setMobileMenuOpen(false);
     const doScroll = () => {
@@ -139,12 +121,10 @@ export function usePageFeatures() {
     }
   }, [router]);
 
-  // ── Notifications ──
   const [notifications, setNotifications] = useState<{ id: string; title: string; message: string; read: boolean; createdAt: string; type?: string }[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifOpen, setNotifOpen] = useState(false);
 
-  // ── Forgot Password ──
   const [forgotStep, setForgotStep] = useState<'idle' | 'email' | 'code'>('idle');
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotLoading, setForgotLoading] = useState(false);
@@ -152,14 +132,12 @@ export function usePageFeatures() {
   const [newPassword, setNewPassword] = useState('');
   const [resetLoading, setResetLoading] = useState(false);
 
-  // ── Email Verification ──
   const [verificationStep, setVerificationStep] = useState<'idle' | 'pending'>('idle');
   const [verificationEmail, setVerificationEmail] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [verificationLoading, setVerificationLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
 
-  // ── Profile Editing ──
   const [profileName, setProfileName] = useState('');
   const [profileUsername, setProfileUsername] = useState('');
   const [profilePhone, setProfilePhone] = useState('');
@@ -167,9 +145,6 @@ export function usePageFeatures() {
   const [profileSaving, setProfileSaving] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
 
-  // ═══════════════════════════════════════════════════
-  // EFFECTS
-  // ═══════════════════════════════════════════════════
 
   // Auth check
   useEffect(() => {
@@ -233,9 +208,6 @@ export function usePageFeatures() {
     return () => document.removeEventListener('keydown', onKey);
   }, []);
 
-  // ═══════════════════════════════════════════════════
-  // HANDLERS
-  // ═══════════════════════════════════════════════════
 
   const toggleTheme = useCallback(() => {
     // Legacy toggle: switch between crimson (dark) and light
@@ -325,7 +297,6 @@ export function usePageFeatures() {
     router.push('/auth');
   }, [toast, router]);
 
-  // ── Forgot Password ──
   const handleForgotSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!forgotEmail) { toast({ title: 'Error', description: 'Please enter your email', variant: 'destructive' }); return; }
@@ -358,7 +329,6 @@ export function usePageFeatures() {
     setResetLoading(false);
   }, [forgotEmail, resetCode, newPassword, toast]);
 
-  // ── Notifications ──
   const loadNotifications = useCallback(async () => {
     try {
       const res = await fetch('/api/notifications');
@@ -370,7 +340,6 @@ export function usePageFeatures() {
     } catch { /* ignore */ }
   }, []);
 
-  // ── Profile ──
   const handleAvatarUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
@@ -413,9 +382,6 @@ export function usePageFeatures() {
     setProfileSaving(false);
   }, [user, profileName, profilePhone, profileCompany, toast]);
 
-  // ═══════════════════════════════════════════════════
-  // COMPUTED
-  // ═══════════════════════════════════════════════════
 
   const filteredSearch = searchQuery.length >= 2
     ? searchData.filter((i) => i.title.toLowerCase().includes(searchQuery.toLowerCase()) || i.desc.toLowerCase().includes(searchQuery.toLowerCase()))

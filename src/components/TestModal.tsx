@@ -167,7 +167,6 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
   const answeredCount = Object.keys(answers).length;
   const isTimeLow = timeLeft <= 60 && timeLeft > 0;
 
-  // ── Already completed view ──
   if (test.hasCompleted && test.attempt && !results) {
     const pct = test.attempt.totalPoints > 0
       ? Math.round((test.attempt.score / test.attempt.totalPoints) * 100)
@@ -226,7 +225,6 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
     );
   }
 
-  // ── Results view (just submitted) ──
   if (results) {
     return (
       <div style={{
@@ -272,7 +270,6 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
             </div>
           </div>
 
-          {/* Question breakdown */}
           <div style={{ maxHeight: 200, overflowY: 'auto', marginBottom: 20, borderTop: '1px solid color-mix(in srgb, var(--border-color) 50%, transparent)', paddingTop: 16 }}>
             {questions.map((q, idx) => {
               const isCorrect = results.correctQuestionIds.includes(q.id);
@@ -298,7 +295,6 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
     );
   }
 
-  // ── Test-taking view ──
   const q = questions[currentQ];
 
   return (
@@ -316,7 +312,6 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
         boxShadow: '0 0 0 1px color-mix(in srgb, var(--accent) 8%, transparent), 0 24px 80px rgba(0,0,0,0.5), 0 0 120px color-mix(in srgb, var(--accent) 6%, transparent)',
       }} onClick={(e) => e.stopPropagation()}>
 
-        {/* Header */}
         <div style={{
           padding: '16px 24px', borderBottom: '1px solid color-mix(in srgb, var(--border-color) 50%, transparent)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0,
@@ -336,7 +331,7 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
               padding: '6px 14px', borderRadius: 8, fontSize: 16, fontWeight: 700, fontFamily: 'monospace',
               background: isTimeLow ? 'color-mix(in srgb, var(--error-color) 15%, transparent)' : 'color-mix(in srgb, var(--text-light) 5%, transparent)',
               color: isTimeLow ? 'var(--error-color)' : timeLeft <= 300 ? '#eab308' : 'var(--text-light)',
-              border: `1px solid ${isTimeLow ? 'color-mix(in srgb, var(--error-color) 30%, transparent)' : 'color-mix(in srgb, var(--border-color) 60%, transparent)'}`, 
+              border: `1px solid ${isTimeLow ? 'color-mix(in srgb, var(--error-color) 30%, transparent)' : 'color-mix(in srgb, var(--border-color) 60%, transparent)'}`,
               animation: isTimeLow ? 'pulse 1s infinite' : 'none',
             }}>
               <i className="fa-solid fa-clock" style={{ marginRight: 6, fontSize: 13 }} />
@@ -348,7 +343,6 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
           </div>
         </div>
 
-        {/* Question navigation dots */}
         <div style={{
           padding: '12px 24px', borderBottom: '1px solid color-mix(in srgb, var(--border-color) 50%, transparent)',
           display: 'flex', gap: 6, flexWrap: 'wrap', flexShrink: 0,
@@ -370,7 +364,6 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
           ))}
         </div>
 
-        {/* Question content */}
         <div style={{ padding: '24px', overflowY: 'auto', flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
             <span style={{
@@ -417,7 +410,6 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
           </div>
         </div>
 
-        {/* Footer */}
         <div style={{
           padding: '16px 24px', borderTop: '1px solid color-mix(in srgb, var(--border-color) 50%, transparent)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0,

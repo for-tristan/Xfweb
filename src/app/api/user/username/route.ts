@@ -5,7 +5,6 @@ import { getCurrentUser } from '@/lib/auth';
 // GET: Check if username is available
 export async function GET(request: NextRequest) {
   try {
-    // SECURITY: Require auth to prevent username enumeration by attackers
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });

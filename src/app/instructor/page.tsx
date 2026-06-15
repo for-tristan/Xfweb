@@ -11,7 +11,6 @@ import ReactMarkdown from 'react-markdown';
 import { WaveInput } from '@/components/WaveInput';
 import { WaveTextarea } from '@/components/WaveTextarea';
 
-// ── TYPES ──
 
 interface InstructorCourse {
   id: string;
@@ -125,7 +124,6 @@ interface ModuleStudy {
   testScores: { testId: string; testTitle: string; score: number; totalPoints: number; passed: boolean; submittedAt: string | null }[];
 }
 
-// ── HELPERS ──
 
 const fmt = (d: string) => {
   try { return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); } catch { return d; }
@@ -157,7 +155,6 @@ const formatDuration = (mins: number) => {
   return m > 0 ? `${h}h ${m}m` : `${h}h`;
 };
 
-// ── MAIN COMPONENT ──
 
 export default function InstructorPage() {
   const router = useRouter();
@@ -184,7 +181,6 @@ export default function InstructorPage() {
     scrolled, openAuthModal, dashboardOpen, setDashboardOpen, router: featureRouter,
   } = usePageFeatures();
 
-  // ── Auth check ──
   const authCheckedRef = useRef(false);
   useEffect(() => {
     if (loading || authCheckedRef.current) return;
@@ -195,10 +191,8 @@ export default function InstructorPage() {
     }
   }, [loading, user]);
 
-  // ── Tab state ──
   const [tab, setTab] = useState<'overview' | 'courses' | 'modules' | 'enrollments' | 'tests' | 'students'>('overview');
 
-  // ── Analytics ──
   const [analytics, setAnalytics] = useState<InstructorAnalytics | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const fetchAnalytics = useCallback(async () => {
@@ -210,7 +204,6 @@ export default function InstructorPage() {
     setAnalyticsLoading(false);
   }, []);
 
-  // ── Courses ──
   const [courses, setCourses] = useState<InstructorCourse[]>([]);
   const [coursesLoading, setCoursesLoading] = useState(false);
   const [showCourseForm, setShowCourseForm] = useState(false);
@@ -265,7 +258,6 @@ export default function InstructorPage() {
     setCourseForm(f => ({ ...f, title, slug: title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') }));
   };
 
-  // ── Modules ──
   const [modules, setModules] = useState<InstructorModule[]>([]);
   const [modulesLoading, setModulesLoading] = useState(false);
   const [modulesCourseFilter, setModulesCourseFilter] = useState('all');
@@ -354,7 +346,6 @@ export default function InstructorPage() {
     setUnlockLoading(null);
   };
 
-  // ── Enrollments ──
   const [enrollments, setEnrollments] = useState<InstructorEnrollment[]>([]);
   const [enrollmentsLoading, setEnrollmentsLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -392,7 +383,6 @@ export default function InstructorPage() {
     }, { confirmLabel: 'Remove', danger: true, icon: 'fa-solid fa-trash-alt' });
   };
 
-  // ── Tests ──
   const [tests, setTests] = useState<InstructorTest[]>([]);
   const [testsLoading, setTestsLoading] = useState(false);
   const [selectedTestId, setSelectedTestId] = useState<string | null>(null);
@@ -524,7 +514,6 @@ export default function InstructorPage() {
     }, { confirmLabel: 'Reset All', danger: true, icon: 'fa-solid fa-undo' });
   };
 
-  // ── Students / Progress ──
   const [studentProgress, setStudentProgress] = useState<InstructorProgress[]>([]);
   const [progressLoading, setProgressLoading] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<InstructorProgress | null>(null);
@@ -553,7 +542,6 @@ export default function InstructorPage() {
     setStudyLoading(false);
   };
 
-  // ── Data loading on tab change ──
   useEffect(() => {
     if (tab === 'overview') fetchAnalytics();
     else if (tab === 'courses') fetchCourses();
@@ -563,7 +551,6 @@ export default function InstructorPage() {
     else if (tab === 'students') fetchProgress();
   }, [tab]);
 
-  // ── Scroll reveal observer ──
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
@@ -572,24 +559,20 @@ export default function InstructorPage() {
     return () => observer.disconnect();
   }, [loading, tab]);
 
-  // ── Logout handler ──
   const handleLogout = async () => {
     try { await fetch('/api/auth/logout', { method: 'POST' }); } catch {}
     router.push('/');
   };
 
-  // ── Computed values ──
   const pendingCount = enrollments.filter(e => e.status === 'pending').length;
   const activeCourseCount = courses.filter(c => c.status === 'active').length;
 
-  // ── Loading guard ──
   if (loading || minLoading) return (
     <>
       <div className="xf-loader"><div className="xf-loader-dot" /><div className="xf-loader-dot" /><div className="xf-loader-dot" /></div>
     </>
   );
   if (!user || (user.role !== 'instructor' && user.role !== 'admin')) return null;
-
 
 
   return (
@@ -599,11 +582,7 @@ export default function InstructorPage() {
     `}</style>
 
       <div style={{ minHeight: '100vh', background: 'var(--black)', color: 'var(--text-light)', fontFamily: "var(--font-body)", fontWeight: 400 }}>
-
-        {/* ═══ NAV ═══ */}
         <Navbar activePage="instructor" scrolled={true} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} user={user} scrollToSection={scrollToSection} theme={theme} onToggleTheme={toggleTheme} onChangeTheme={changeTheme} onSearchOpen={() => setSearchOpen(true)} onOpenAuth={openAuthModal} onLogout={handleLogout} notifOpen={notifOpen} setNotifOpen={setNotifOpen} notifications={notifications} unreadCount={unreadCount} loadNotifications={loadNotifications} setNotifications={setNotifications} setUnreadCount={setUnreadCount} dashboardOpen={dashboardOpen} setDashboardOpen={setDashboardOpen} />
-
-        {/* ═══ STATS OVERVIEW ═══ */}
         <section className="section" style={{ paddingTop: 100, paddingBottom: 40 }}>
           <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20 }}>
             {[
@@ -621,8 +600,6 @@ export default function InstructorPage() {
             ))}
           </div>
         </section>
-
-        {/* ═══ TABS ═══ */}
         <section className="section" style={{ paddingTop: 0, paddingBottom: 60 }}>
           <div className="projects-filter reveal" style={{ display: 'flex', justifyContent: 'center', gap: 0, marginBottom: 56, flexWrap: 'wrap' }}>
             <button className={`filter-btn${tab === 'overview' ? ' active' : ''}`} onClick={() => setTab('overview')}>
@@ -644,13 +621,8 @@ export default function InstructorPage() {
               <i className="fa-solid fa-users" style={{ marginRight: 8 }}></i>Students
             </button>
           </div>
-
-          {/* ═══════════════════════════════════════════════════
-              OVERVIEW TAB
-              ═══════════════════════════════════════════════════ */}
           {tab === 'overview' && (
             <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-              {/* Analytics Cards */}
               <div className="reveal" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20, marginBottom: 40 }}>
                 <div style={{ background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)', backdropFilter: 'blur(20px) saturate(1.6)', WebkitBackdropFilter: 'blur(20px) saturate(1.6)', border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', borderRadius: 12, padding: 24 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
@@ -693,7 +665,6 @@ export default function InstructorPage() {
                 </div>
               </div>
 
-              {/* Course Popularity */}
               {analytics?.coursePopularity && analytics.coursePopularity.length > 0 && (
                 <div className="reveal" style={{ marginBottom: 40 }}>
                   <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: 18, color: 'var(--text-light)', marginBottom: 20 }}>
@@ -719,7 +690,6 @@ export default function InstructorPage() {
                 </div>
               )}
 
-              {/* Test Pass Rates */}
               {analytics?.testPassRates && analytics.testPassRates.length > 0 && (
                 <div className="reveal" style={{ marginBottom: 40 }}>
                   <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: 18, color: 'var(--text-light)', marginBottom: 20 }}>
@@ -770,10 +740,6 @@ export default function InstructorPage() {
               )}
             </div>
           )}
-
-          {/* ═══════════════════════════════════════════════════
-              COURSES TAB
-              ═══════════════════════════════════════════════════ */}
           {tab === 'courses' && (
             <div style={{ maxWidth: 1100, margin: '0 auto' }}>
               <div className="reveal" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
@@ -820,7 +786,6 @@ export default function InstructorPage() {
                   </div>
                   <WaveTextarea label="Description" value={courseForm.description} onChange={e => setCourseForm(f => ({ ...f, description: e.target.value }))} rows={3} style={{ marginBottom: 16 }} />
                   <WaveTextarea label="Prerequisites" value={courseForm.prerequisites} onChange={e => setCourseForm(f => ({ ...f, prerequisites: e.target.value }))} rows={2} style={{ marginBottom: 16 }} />
-                  {/* Features */}
                   <div style={{ marginBottom: 16 }}>
                     <label style={{ fontSize: 10, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
                       <i className="fa-solid fa-list" style={{ color: 'var(--accent)' }}></i>Features ({courseForm.features.length})
@@ -898,10 +863,6 @@ export default function InstructorPage() {
               )}
             </div>
           )}
-
-          {/* ═══════════════════════════════════════════════════
-              MODULES TAB
-              ═══════════════════════════════════════════════════ */}
           {tab === 'modules' && (
             <div style={{ maxWidth: 1100, margin: '0 auto' }}>
               <div className="reveal" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 12 }}>
@@ -1018,7 +979,6 @@ export default function InstructorPage() {
                           </div>
                         </div>
 
-                        {/* Unlock panel */}
                         {showModuleUnlock === m.id && (
                           <div style={{ marginTop: 16, paddingTop: 16, borderTop: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)' }}>
                             <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 12 }}>
@@ -1047,10 +1007,6 @@ export default function InstructorPage() {
               )}
             </div>
           )}
-
-          {/* ═══════════════════════════════════════════════════
-              ENROLLMENTS TAB
-              ═══════════════════════════════════════════════════ */}
           {tab === 'enrollments' && (
             <>
               <div className="projects-filter reveal" style={{ justifyContent: 'center', marginBottom: 48 }}>
@@ -1132,10 +1088,6 @@ export default function InstructorPage() {
               </div>
             </>
           )}
-
-          {/* ═══════════════════════════════════════════════════
-              TESTS TAB
-              ═══════════════════════════════════════════════════ */}
           {tab === 'tests' && (
             <div style={{ maxWidth: 1100, margin: '0 auto' }}>
               <div className="reveal" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 12 }}>
@@ -1219,7 +1171,6 @@ export default function InstructorPage() {
                 </div>
               )}
 
-              {/* Test Detail Panel */}
               {selectedTest && (
                 <div className="reveal" style={{ marginTop: 32, background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)', backdropFilter: 'blur(20px) saturate(1.6)', WebkitBackdropFilter: 'blur(20px) saturate(1.6)', border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', borderRadius: 12, padding: 28 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
@@ -1240,7 +1191,6 @@ export default function InstructorPage() {
                     </div>
                   </div>
 
-                  {/* Questions */}
                   <div style={{ marginBottom: 28 }}>
                     <h4 style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: 14, color: 'var(--text-light)', marginBottom: 14 }}>
                       <i className="fa-solid fa-list-ol" style={{ color: 'var(--accent)', marginRight: 8 }}></i>Questions
@@ -1305,7 +1255,6 @@ export default function InstructorPage() {
                     )}
                   </div>
 
-                  {/* Test Unlocks */}
                   <div style={{ marginBottom: 28 }}>
                     <h4 style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: 14, color: 'var(--text-light)', marginBottom: 14 }}>
                       <i className="fa-solid fa-key" style={{ color: 'var(--accent)', marginRight: 8 }}></i>Test Access
@@ -1367,10 +1316,6 @@ export default function InstructorPage() {
               )}
             </div>
           )}
-
-          {/* ═══════════════════════════════════════════════════
-              STUDENTS TAB
-              ═══════════════════════════════════════════════════ */}
           {tab === 'students' && (
             <div style={{ maxWidth: 1100, margin: '0 auto' }}>
               <div className="reveal" style={{ marginBottom: 32 }}>
@@ -1411,7 +1356,6 @@ export default function InstructorPage() {
                           </div>
                         </div>
 
-                        {/* Progress bar */}
                         <div style={{ marginTop: 16, paddingLeft: 58 }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
                             <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>{p.completedModules.length}/{p.totalModules} modules completed</span>
@@ -1423,7 +1367,6 @@ export default function InstructorPage() {
                           <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 8 }}>Last accessed: {fmt(p.lastAccessed)}</div>
                         </div>
 
-                        {/* Student Detail Panel */}
                         {selectedStudent?.id === p.id && (
                           <div style={{ marginTop: 20, paddingTop: 20, borderTop: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', paddingLeft: 58 }}>
                             <h4 style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: 14, color: 'var(--text-light)', marginBottom: 14 }}>
@@ -1476,12 +1419,6 @@ export default function InstructorPage() {
           )}
         </section>
       </div>
-
-      {/* ═══════════════════════════════════════════════════
-          MODALS
-          ═══════════════════════════════════════════════════ */}
-
-      {/* Confirm Modal */}
       <ConfirmModal
         open={confirmModal.open}
         onClose={() => setConfirmModal(prev => ({ ...prev, open: false }))}
@@ -1492,8 +1429,6 @@ export default function InstructorPage() {
         danger={confirmModal.danger}
         icon={confirmModal.icon}
       />
-
-      {/* ═══ GLOBAL MODALS ═══ */}
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} query={searchQuery} setQuery={setSearchQuery} results={filteredSearch} onSelect={(link) => { router.push(link); setSearchOpen(false); }} />
     </>
   );

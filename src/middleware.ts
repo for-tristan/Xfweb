@@ -19,7 +19,6 @@ const RATE_LIMITS: Record<string, RateLimitConfig> = {
   // General API — moderate limits
   '/api/chat': { windowMs: 60 * 1000, maxRequests: 30 },                   // 30 messages per minute
   '/api/quotes': { windowMs: 60 * 60 * 1000, maxRequests: 10 },            // 10 quotes per hour
-  // AI endpoints — strict limits (costs money per token)
   '/api/ai/chat': { windowMs: 60 * 1000, maxRequests: 15 },                // 15 AI messages per minute
   '/api/ai/upload': { windowMs: 60 * 1000, maxRequests: 10 },              // 10 uploads per minute
   // Game & friend spam prevention

@@ -3,7 +3,6 @@ import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
-// SECURITY: No fallback — throw if SESSION_SECRET is not set
 const SESSION_SECRET = process.env.SESSION_SECRET;
 if (!SESSION_SECRET) {
   console.error('[AUTH] FATAL: SESSION_SECRET environment variable is not set. Session tokens cannot be validated.');
@@ -77,7 +76,6 @@ export async function verifySessionToken(userId: string, token: string): Promise
     return false;
   }
 
-  // ── Rolling expiry: extend session by 3 days on each valid request ──
   // If the user is active, their session keeps getting renewed.
   // If they don't visit for 3 days, the session naturally expires.
   const newExpiresAt = new Date(Date.now() + SESSION_MAX_AGE_MS);
@@ -106,7 +104,6 @@ export async function getCurrentUser(): Promise<{
 
   if (!userId || !sessionToken) return null;
 
-  // SECURITY: Validate the session token against the database
   const isValidSession = await verifySessionToken(userId, sessionToken);
   if (!isValidSession) return null;
 
@@ -175,9 +172,6 @@ export async function deleteAllUserSessions(userId: string): Promise<void> {
   }
 }
 
-// ═══════════════════════════════════════════════════
-// ROLE-BASED ACCESS HELPERS
-// ═══════════════════════════════════════════════════
 
 type AuthUser = NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>;
 

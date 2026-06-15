@@ -4,9 +4,6 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { User } from '@/lib/usePageFeatures';
 import { WaveInput } from '@/components/WaveInput';
 
-// ═══════════════════════════════════════════════════
-// TYPES
-// ═══════════════════════════════════════════════════
 
 interface Friend {
   id: string;
@@ -32,9 +29,6 @@ interface ConversationPreview {
   unreadCount: number;
 }
 
-// ═══════════════════════════════════════════════════
-// CHAT MODAL
-// ═══════════════════════════════════════════════════
 
 interface ChatModalProps {
   open: boolean;
@@ -396,13 +390,11 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
           </button>
         </div>
 
-        {/* Body */}
         <div style={{
           flex: 1, display: 'flex', overflow: 'hidden', position: 'relative',
           // Clip overflow on mobile so sliding panels don't leak
           ...(isMobile ? { overflow: 'hidden' } : {}),
         }}>
-          {/* Sidebar: Friend List */}
           <div style={{
             width: isMobile ? '100%' : 260,
             flexShrink: 0,
@@ -497,7 +489,6 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
             </div>
           </div>
 
-          {/* Chat Area */}
           <div style={{
             flex: 1,
             display: 'flex',
@@ -548,7 +539,6 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
                   </div>
                 )}
 
-                {/* Messages */}
                 <div style={{
                   flex: 1, overflowY: 'auto', padding: isMobile ? 10 : 16,
                   display: 'flex', flexDirection: 'column', gap: 6,

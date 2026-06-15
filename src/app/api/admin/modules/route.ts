@@ -21,7 +21,6 @@ export async function DELETE(request: NextRequest) {
     const body = await request.json();
     const { userId, moduleId } = body;
 
-    // ── DELETE MODULE ENTIRELY (from Courses tab) ──
     if (moduleId && !userId) {
       await db.moduleStudy.deleteMany({ where: { moduleId } });
       await db.moduleUnlock.deleteMany({ where: { moduleId } });
@@ -29,7 +28,6 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ message: 'Module deleted' });
     }
 
-    // ── REMOVE MODULE UNLOCK (from Modules tab) ──
     if (!userId || !moduleId) {
       return NextResponse.json(
         { error: 'moduleId is required' },
@@ -177,7 +175,6 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json();
 
-    // ── UNLOCK MODULE (single) ──
     if (body.userId && body.moduleId) {
       const existing = await db.moduleUnlock.findUnique({
         where: { userId_moduleId: { userId: body.userId, moduleId: body.moduleId } },
@@ -197,7 +194,6 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ message: 'Module unlocked' });
     }
 
-    // ── UNLOCK ALL MODULES (bulk) ──
     if (body.userId && body.courseId && body.unlockAll) {
       const courseModules = await db.courseModule.findMany({ where: { courseId: body.courseId } });
       let created = 0;
@@ -215,7 +211,6 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ created });
     }
 
-    // ── UPDATE MODULE CONTENT ──
     const { id, title, description, content, moduleOrder } = body;
     if (!id) {
       return NextResponse.json({ error: 'id is required' }, { status: 400 });

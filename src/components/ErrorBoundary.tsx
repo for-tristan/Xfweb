@@ -42,7 +42,6 @@ export class ErrorBoundary extends React.Component<Props, State> {
           <p style={{ fontSize: 14, maxWidth: 400, marginBottom: 8 }}>
             An unexpected error occurred. Please try refreshing the page.
           </p>
-          {/* Show actual error message for debugging */}
           {this.state.error && (
             <details style={{ fontSize: 12, maxWidth: 500, marginBottom: 24, color: 'var(--text-dim)', textAlign: 'left', width: '100%' }}>
               <summary style={{ cursor: 'pointer', marginBottom: 8, color: 'var(--accent)' }}>

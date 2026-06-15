@@ -19,10 +19,8 @@ export const db = globalForPrisma.prisma ?? createPrismaClient();
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;
 
-// ═══════════════════════════════════════════════════════
 // AUTO-MIGRATION: Run once on cold start to sync schema
 // with Turso. Safe to run multiple times (idempotent).
-// ═══════════════════════════════════════════════════════
 
 let migrationRan = false;
 
@@ -34,7 +32,6 @@ export async function ensureMigrations() {
   if (!url) return;
 
   try {
-    // SECURITY: Include auth token for Turso remote databases
     const client = createClient({
       url,
       authToken: process.env.DATABASE_AUTH_TOKEN,
@@ -64,25 +61,19 @@ export async function ensureMigrations() {
       }
     };
 
-    // ── User table columns ──────────────────────────────────────────────
     await addColumn('User', 'username', 'TEXT');
     await addColumn('User', 'avatar', 'TEXT');
     await addColumn('User', 'bio', 'TEXT');
     await addColumn('User', 'emailVerified', 'DATETIME');
 
-    // ── Course table columns ────────────────────────────────────────────
     await addColumn('Course', 'instructorId', 'TEXT');
 
-    // ── ModuleTest table columns ────────────────────────────────────────
     await addColumn('ModuleTest', 'status', "TEXT NOT NULL DEFAULT 'active'");
 
-    // ── TestAttempt table columns ───────────────────────────────────────
     await addColumn('TestAttempt', 'startedat', "TEXT NOT NULL DEFAULT '{}'");
 
-    // ── CourseModule table columns ──────────────────────────────────────
     await addColumn('CourseModule', 'content', "TEXT NOT NULL DEFAULT ''");
 
-    // ── Create missing tables ───────────────────────────────────────────
     // These use CREATE TABLE IF NOT EXISTS so they're safe if the table exists
 
     await createTable('Project', `
@@ -237,7 +228,6 @@ export async function ensureMigrations() {
       "issuedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     `);
 
-    // ── Create missing indexes (idempotent) ─────────────────────────────
     const createIndex = async (name: string, sql: string) => {
       try {
         await client.execute(`CREATE INDEX IF NOT EXISTS "${name}" ON ${sql}`);
@@ -276,7 +266,6 @@ export async function ensureMigrations() {
     await createIndex('TestAttempt_testId_userId_key', '"TestAttempt"("testid", "userid")');
     await createIndex('TestUnlock_testId_userId_key', '"TestUnlock"("testid", "userid")');
 
-    // ── Create missing test tables (with lowercase columns for libSQL) ──
     await createTable('ModuleTest', `
       "id" TEXT PRIMARY KEY NOT NULL,
       "moduleid" TEXT NOT NULL,

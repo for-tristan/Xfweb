@@ -33,7 +33,6 @@ export function Scene2() {
       exit={{ x: "-100%" }}
       transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
     >
-      {/* Line draw */}
       <motion.div
         className="mb-10"
         style={{ height: 2, background: 'var(--primary-red)', opacity: 0.5 }}
@@ -42,7 +41,6 @@ export function Scene2() {
         transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
       />
 
-      {/* Sub-label */}
       <motion.div
         className="mb-8"
         style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 13, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--text-dim)' }}

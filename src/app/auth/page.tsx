@@ -210,8 +210,6 @@ function AuthContent() {
   return (
     <>
       <title>Sign In | XFoundry</title>
-
-      {/* ═══ Split Layout: Video Left | Auth Right ═══ */}
       <div style={{
         minHeight: '100vh',
         display: 'flex',
@@ -219,7 +217,6 @@ function AuthContent() {
         position: 'relative',
         overflow: 'hidden',
       }}>
-        {/* ── Left Panel: Video Animation ── */}
         <div className="auth-left-panel" style={{
           flex: 1,
           display: 'flex',
@@ -230,7 +227,6 @@ function AuthContent() {
           overflow: 'hidden',
           background: 'var(--black)',
         }}>
-          {/* Gradient overlay for visual depth */}
           <div style={{
             position: 'absolute',
             inset: 0,
@@ -239,12 +235,10 @@ function AuthContent() {
             zIndex: 1,
           }} />
 
-          {/* Video Template */}
           <div style={{ position: 'relative', width: '100%', maxWidth: 680, aspectRatio: '4/3', zIndex: 2 }}>
             <VideoTemplate />
           </div>
 
-          {/* Left panel bottom text */}
           <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', marginTop: 32, padding: '0 40px' }}>
             <h2 style={{
               fontFamily: "'Inter Tight', sans-serif",
@@ -275,12 +269,9 @@ function AuthContent() {
             </p>
           </div>
 
-          {/* Decorative floating orbs */}
           <div className="orb orb-1" style={{ opacity: 0.5 }} />
           <div className="orb orb-2" style={{ opacity: 0.4 }} />
         </div>
-
-        {/* ── Right Panel: Auth Form ── */}
         <div className="auth-right-panel" style={{
           width: 520,
           minWidth: 360,
@@ -294,7 +285,6 @@ function AuthContent() {
           borderLeft: '1px solid color-mix(in srgb, var(--accent) 8%, var(--border-color))',
           overflowY: 'auto',
         }}>
-          {/* Right panel gradient accent */}
           <div style={{
             position: 'absolute',
             top: 0,
@@ -305,7 +295,6 @@ function AuthContent() {
             pointerEvents: 'none',
           }} />
 
-          {/* Logo */}
           <div style={{ textAlign: 'center', marginBottom: 32, position: 'relative', zIndex: 2 }}>
             <a href="/" style={{ textDecoration: 'none', display: 'inline-block' }}>
               <Logo style={{ height: 44, width: 'auto', filter: 'drop-shadow(0 0 12px color-mix(in srgb, var(--accent) 50%, transparent))' }} />
@@ -332,8 +321,6 @@ function AuthContent() {
               </p>
             )}
           </div>
-
-          {/* ═══ Glassmorphic Auth Card ═══ */}
           <div className="v-auth-card" style={{
             width: '100%',
             maxWidth: 420,
@@ -352,7 +339,6 @@ function AuthContent() {
             zIndex: 2,
           }}>
             {verificationStep === 'pending' ? (
-              /* ═══ Verification ═══ */
               <div style={{ padding: '36px 28px' }}>
                 <div style={{ textAlign: 'center', marginBottom: 24 }}>
                   <div style={{
@@ -385,7 +371,6 @@ function AuthContent() {
                 </div>
               </div>
             ) : forgotStep === 'email' ? (
-              /* ═══ Forgot Password — Email ═══ */
               <div style={{ padding: '36px 28px' }}>
                 <div style={{ textAlign: 'center', marginBottom: 24 }}>
                   <div style={{
@@ -419,7 +404,6 @@ function AuthContent() {
                 </div>
               </div>
             ) : forgotStep === 'code' ? (
-              /* ═══ Forgot Password — Code ═══ */
               <div style={{ padding: '36px 28px' }}>
                 <h2 style={{ fontFamily: "'Inter Tight', sans-serif", fontSize: 20, fontWeight: 600, color: 'var(--text-light)', marginBottom: 8, textAlign: 'center' }}>Verify Code</h2>
                 <p style={{ color: 'var(--text-dim)', fontSize: 14, marginBottom: 20, lineHeight: 1.6, textAlign: 'center' }}>
@@ -439,9 +423,7 @@ function AuthContent() {
                 </div>
               </div>
             ) : (
-              /* ═══ Main Sign In / Sign Up ═══ */
               <>
-                {/* Tabs */}
                 <div style={{
                   display: 'flex',
                   borderBottom: '1px solid color-mix(in srgb, var(--accent) 10%, var(--border-color))',
@@ -523,14 +505,12 @@ function AuthContent() {
                     </form>
                   )}
 
-                  {/* Divider */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '20px 0' }}>
                     <div style={{ flex: 1, height: 1, background: 'var(--border-color)' }} />
                     <span style={{ color: 'var(--text-dim)', fontSize: 12, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 500 }}>or</span>
                     <div style={{ flex: 1, height: 1, background: 'var(--border-color)' }} />
                   </div>
 
-                  {/* Switch tab link */}
                   <div style={{ textAlign: 'center' }}>
                     <span style={{ color: 'var(--text-dim)', fontSize: 13, fontFamily: "'Space Grotesk', sans-serif" }}>
                       {tab === 'signin' ? "Don't have an account? " : 'Already have an account? '}
@@ -556,7 +536,6 @@ function AuthContent() {
             )}
           </div>
 
-          {/* Back to home */}
           <a href="/" style={{
             display: 'inline-flex',
             alignItems: 'center',

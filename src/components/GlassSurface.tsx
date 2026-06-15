@@ -45,7 +45,6 @@ export interface GlassSurfaceProps {
   isDark?: boolean;
 }
 
-/* ── Detect dark vs light theme from [data-theme] attribute ── */
 const DARK_THEMES = new Set([
   'midnight', 'oled', 'phantom', 'synthwave', 'frost',
   'cyberpunk', 'crimson-night', 'aurora', 'volcano', 'slate',

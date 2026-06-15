@@ -64,7 +64,6 @@ export async function GET(request: NextRequest) {
     const testId = searchParams.get('testId');
     const viewGrades = searchParams.get('viewGrades');
 
-    // ── Return single test with full details ──
     if (testId) {
       const { test, error: accessError } = await verifyTestAccess(testId, user?.id, isInstructor, isAdmin);
       if (accessError) return accessError;
@@ -113,7 +112,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ test: fullTest, enrolledStudents });
     }
 
-    // ── Get instructor's course IDs for filtering ──
     const instructorCourseIds = isInstructor && user
       ? (await db.course.findMany({ where: { instructorId: user.id }, select: { id: true } })).map(c => c.id)
       : [];
@@ -122,7 +120,6 @@ export async function GET(request: NextRequest) {
       ? { courseId: { in: instructorCourseIds } }
       : {};
 
-    // ── Return all tests with attempts and user info (for viewing grades) ──
     if (viewGrades === '1') {
       const tests = await db.moduleTest.findMany({
         orderBy: { createdAt: 'desc' },
@@ -144,7 +141,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ tests });
     }
 
-    // ── Default: return all tests with summary counts ──
     const tests = await db.moduleTest.findMany({
       orderBy: { createdAt: 'desc' },
       where: isInstructor
@@ -220,7 +216,6 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const { action } = body;
 
-    // ── ADD QUESTION ──
     if (action === 'addQuestion') {
       const { testId, questionText, options, correctAnswer, points } = body;
 
@@ -248,7 +243,6 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ question });
     }
 
-    // ── DELETE QUESTION ──
     if (action === 'deleteQuestion') {
       const { testId, questionId } = body;
 
@@ -264,7 +258,6 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ message: 'Question deleted' });
     }
 
-    // ── UNLOCK TEST FOR USER ──
     if (action === 'unlock') {
       const { testId, userId } = body;
 
@@ -308,7 +301,6 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ message: 'Test unlocked for user' });
     }
 
-    // ── LOCK TEST FOR USER ──
     if (action === 'lock') {
       const { testId, userId } = body;
 
@@ -355,7 +347,6 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ message: 'Test locked for user' });
     }
 
-    // ── RESET SINGLE ATTEMPT ──
     if (action === 'resetAttempt') {
       const { testId, userId } = body;
 
@@ -371,7 +362,6 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ message: 'Attempt reset for user' });
     }
 
-    // ── RESET ALL ATTEMPTS ──
     if (action === 'resetAllAttempts') {
       const { testId } = body;
 
@@ -387,7 +377,6 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ message: `All attempts reset (${result.count} deleted)` });
     }
 
-    // ── UPDATE TEST ──
     const { id, title, description, timeLimit, passingScore } = body;
 
     if (!id) {

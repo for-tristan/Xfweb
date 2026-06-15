@@ -54,7 +54,6 @@ export async function DELETE(request: NextRequest) {
       data: { deletedAt: new Date() },
     });
 
-    // ── Clean up all related data so it doesn't linger in admin panel ──
 
     // 1. Delete student's progress for this course
     await db.courseProgress.deleteMany({

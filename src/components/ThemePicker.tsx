@@ -79,7 +79,6 @@ function ThemeButton({ theme, currentTheme, onThemeChange, onClose }: {
         if (!isActive) e.currentTarget.style.background = 'transparent';
       }}
     >
-      {/* Theme preview swatch */}
       <div style={{
         width: 36,
         height: 24,
@@ -260,7 +259,6 @@ export function ThemePicker({ currentTheme, onThemeChange }: ThemePickerProps) {
                 Choose Theme
               </span>
             </div>
-            {/* Dark themes section */}
             <div style={{ padding: '8px 12px 4px', marginTop: 4 }}>
               <span style={{
                 fontSize: 9,
@@ -277,7 +275,6 @@ export function ThemePicker({ currentTheme, onThemeChange }: ThemePickerProps) {
             {darkThemes.map((theme) => (
               <ThemeButton key={theme.id} theme={theme} currentTheme={currentTheme} onThemeChange={handleThemeChange} onClose={() => setOpen(false)} />
             ))}
-            {/* Light themes section */}
             <div style={{ padding: '8px 12px 4px', marginTop: 6, borderTop: '1px solid var(--border-color)' }}>
               <span style={{
                 fontSize: 9,

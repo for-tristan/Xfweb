@@ -9,7 +9,6 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    // SECURITY: Require password confirmation for account deletion
     const body = await request.json().catch(() => ({}));
     const { password } = body;
 

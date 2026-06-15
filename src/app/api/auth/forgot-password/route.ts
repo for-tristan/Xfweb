@@ -27,7 +27,6 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // SECURITY: Use crypto.randomInt instead of Math.random for secure code generation
     const code = randomInt(100000, 1000000).toString();
 
     // Invalidate any previous reset codes for this email

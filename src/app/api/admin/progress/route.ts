@@ -48,7 +48,6 @@ export async function GET(request: NextRequest) {
         orderBy: { moduleOrder: 'asc' },
       });
 
-      // FIX: ModuleStudy doesn't have moduleOrder, join through module relation
       const studies = await db.moduleStudy.findMany({
         where: { userId, moduleId: { in: modules.map(m => m.id) } },
       });
@@ -103,7 +102,6 @@ export async function GET(request: NextRequest) {
     const allCourses = await db.course.findMany({ select: { id: true, slug: true } });
     const courseMap = new Map(allCourses.map(c => [c.slug, c.id]));
 
-    // FIX: Batch-fetch module counts using groupBy instead of N+1
     const resolvedIds = [...new Set(filteredRecords.map(r => {
       const cuid = courseMap.get(r.courseId);
       return cuid || r.courseId;

@@ -20,28 +20,24 @@ export async function GET() {
       courseCUIDs = courses.map(c => c.id);
     }
 
-    // ── Total students in instructor's courses ──
     const totalStudents = isAdmin
       ? await db.enrollment.count({ where: { deletedAt: null, status: 'approved' } })
       : await db.enrollment.count({
           where: { deletedAt: null, status: 'approved', courseId: { in: courseSlugs } },
         });
 
-    // ── Pending enrollments ──
     const pendingEnrollments = isAdmin
       ? await db.enrollment.count({ where: { deletedAt: null, status: 'pending' } })
       : await db.enrollment.count({
           where: { deletedAt: null, status: 'pending', courseId: { in: courseSlugs } },
         });
 
-    // ── Approved enrollments ──
     const approvedEnrollments = isAdmin
       ? await db.enrollment.count({ where: { deletedAt: null, status: 'approved' } })
       : await db.enrollment.count({
           where: { deletedAt: null, status: 'approved', courseId: { in: courseSlugs } },
         });
 
-    // ── Course popularity ──
     const coursePopularity = isAdmin
       ? await db.enrollment.groupBy({
           by: ['courseId', 'courseName'],
@@ -56,7 +52,6 @@ export async function GET() {
           orderBy: { _count: { id: 'desc' } },
         });
 
-    // ── Daily enrollment trends (last 7 days) ──
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
@@ -84,7 +79,6 @@ export async function GET() {
       if (dailyTrends[key] !== undefined) dailyTrends[key]++;
     });
 
-    // ── Test pass rates ──
     // Get all test attempts for instructor's courses
     const testModules = isAdmin
       ? await db.moduleTest.findMany({
@@ -118,7 +112,6 @@ export async function GET() {
       };
     });
 
-    // ── Summary ──
     const totalTestAttempts = testPassRates.reduce((sum, t) => sum + t.totalAttempts, 0);
     const totalPassed = testPassRates.reduce((sum, t) => sum + t.passedAttempts, 0);
     const overallPassRate = totalTestAttempts > 0 ? Math.round((totalPassed / totalTestAttempts) * 100) : 0;

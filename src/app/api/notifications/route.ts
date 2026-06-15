@@ -36,7 +36,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Title and message are required' }, { status: 400 });
     }
 
-    // SECURITY: Only admins can send notifications to other users
     // Regular users can only create notifications for themselves
     let notificationUserId = user.id;
     if (targetUserId && targetUserId !== user.id) {

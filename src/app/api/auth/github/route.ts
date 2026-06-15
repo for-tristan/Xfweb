@@ -12,12 +12,10 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // SECURITY: Use environment variable for base URL instead of spoofable headers
   const host = request.headers.get('host');
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (host ? `https://${host}` : 'http://localhost:3000');
   const redirectUri = `${baseUrl}/api/auth/github/callback`;
 
-  // SECURITY: Generate and store state parameter to prevent CSRF
   const state = randomBytes(16).toString('hex');
 
   const params = new URLSearchParams({

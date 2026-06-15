@@ -13,7 +13,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/?error=oauth_failed', request.url));
     }
 
-    // SECURITY: Verify state parameter to prevent CSRF
     const cookieStore = request.cookies;
     const storedState = cookieStore.get('oauth_state')?.value;
     if (!state || !storedState || state !== storedState) {
@@ -67,7 +66,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/?error=no_email', request.url));
     }
 
-    // SECURITY: GitHub allows unverified emails. Require a verified email to proceed.
     if (!isEmailVerified) {
       return NextResponse.redirect(new URL('/?error=email_not_verified', request.url));
     }
@@ -93,7 +91,6 @@ export async function GET(request: NextRequest) {
       user = await db.user.findUnique({ where: { email: primaryEmail } });
 
       if (user) {
-        // SECURITY: Do NOT auto-link by email. This prevents account takeover attacks
         // where an attacker adds a victim's email to their GitHub account.
         // Users must link accounts manually via account settings (with password confirmation).
         const response = NextResponse.redirect(
@@ -123,8 +120,6 @@ export async function GET(request: NextRequest) {
           suffix++;
         }
 
-        // SECURITY: Use randomBytes for placeholder password instead of Math.random
-        // SECURITY: GitHub email is verified (checked above), so set emailVerified
         user = await db.user.create({
           data: {
             name: ghUser.name || ghUser.login || 'GitHub User',

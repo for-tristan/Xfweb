@@ -3,17 +3,9 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 
-// ═══════════════════════════════════════════════════
-// PAGE TRANSITION — Vaulta dot pulse loader
-// Shows the accent dot pulse overlay on route changes.
 //
-// Flow:
-// 1. NavigationInterceptor fires 'xf:navigation-start'
 //    → dot loader fades in (covering the page)
-// 2. Next.js route changes → pathname updates
 //    → swap content behind loader, then fade loader out
-// 3. Animation completes → idle state
-// ═══════════════════════════════════════════════════
 
 type Phase = 'idle' | 'loading' | 'fading';
 
@@ -117,7 +109,6 @@ export default function PageTransition({ children }: { children: React.ReactNode
 
   return (
     <>
-      {/* Vaulta dot pulse loader overlay */}
       {phase !== 'idle' && (
         <div className={`xf-page-loader ${phase === 'fading' ? 'xf-page-loader-fading' : ''}`}>
           <div className="xf-loader-dot" />
@@ -126,7 +117,6 @@ export default function PageTransition({ children }: { children: React.ReactNode
         </div>
       )}
 
-      {/* Page content */}
       {displayChildren}
     </>
   );

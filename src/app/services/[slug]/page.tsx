@@ -80,7 +80,6 @@ export default function DynamicServicePage() {
       .finally(() => setFetching(false));
   }, [slug]);
 
-  // ── Reveal check helper ──
   const checkReveals = useCallback(() => {
     document.querySelectorAll('.reveal, .reveal-up, .reveal-scale, .reveal-left, .reveal-right').forEach((el) => {
       const rect = el.getBoundingClientRect();
@@ -220,13 +219,10 @@ export default function DynamicServicePage() {
       <meta name="twitter:title" content={`${service.title} | XFoundry`} />
       <meta name="twitter:description" content={service.description || `${service.title} services by XFoundry.`} />
 
-      {/* AUTH GATE */}
       <AuthGate loading={loading} minLoading={minLoading} user={user} onSignIn={() => openAuthModal('signin', 'Sign in to access this page')} onSignUp={() => openAuthModal('signup')} />
 
-      {/* SEARCH MODAL */}
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} query={searchQuery} setQuery={setSearchQuery} results={filteredSearch} onSelect={(link) => router.push(link)} />
 
-      {/* AUTH MODAL */}
       <AuthModal open={authModalOpen} onClose={() => setAuthModalOpen(false)} tab={authTab} setTab={setAuthTab} message={authMessage}
         loginEmail={loginEmail} setLoginEmail={setLoginEmail} loginPassword={loginPassword} setLoginPassword={setLoginPassword} loginLoading={loginLoading} onLogin={handleLogin}
         signupName={signupName} setSignupName={setSignupName} signupEmail={signupEmail} setSignupEmail={setSignupEmail} signupPassword={signupPassword} setSignupPassword={setSignupPassword} signupConfirmPassword={signupConfirmPassword} setSignupConfirmPassword={setSignupConfirmPassword}
@@ -237,18 +233,14 @@ export default function DynamicServicePage() {
         verificationStep={verificationStep} setVerificationStep={setVerificationStep} verificationEmail={verificationEmail} verificationCode={verificationCode} setVerificationCode={setVerificationCode} verificationLoading={verificationLoading} onVerifyEmail={handleVerifyEmail} onResendVerification={handleResendVerification} resendLoading={resendLoading}
       />
 
-      {/* PROFILE MODAL */}
       <ProfileModal open={dashboardOpen} onClose={() => setDashboardOpen(false)} user={user} profileName={profileName} setProfileName={setProfileName} profileUsername={profileUsername} setProfileUsername={setProfileUsername} profilePhone={profilePhone} setProfilePhone={setProfilePhone} profileCompany={profileCompany} setProfileCompany={setProfileCompany} profileSaving={profileSaving} avatarUploading={avatarUploading} onProfileSave={handleProfileSave} onAvatarUpload={handleAvatarUpload} onAvatarUploaded={handleAvatarUploaded} />
 
-      {/* NAVBAR */}
       {!(loading || minLoading) && <Navbar activePage="services" scrolled={scrolled} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} user={user} scrollToSection={scrollToSection} theme={theme} onToggleTheme={toggleTheme} onChangeTheme={changeTheme} onSearchOpen={() => setSearchOpen(true)} onOpenAuth={openAuthModal} onLogout={handleLogout} notifOpen={notifOpen} setNotifOpen={setNotifOpen} notifications={notifications} unreadCount={unreadCount} loadNotifications={loadNotifications} setNotifications={setNotifications} setUnreadCount={setUnreadCount} dashboardOpen={dashboardOpen} setDashboardOpen={setDashboardOpen} />}
 
       {!(loading || minLoading) && <div className="page-transition-enter">
 
-      {/* MAIN CONTENT */}
       <section style={{ background: 'var(--black)', padding: '140px 60px 80px', position: 'relative', overflow: 'hidden', zIndex: 2 }}>
         <div className="container-max" style={{ paddingLeft: isMobile ? 16 : undefined, paddingRight: isMobile ? 16 : undefined }}>
-          {/* Service header */}
           <div style={{ marginBottom: 32 }}>
             <div className="breadcrumb" style={{ marginBottom: 16 }}>
               <Link href="/" style={{ color: 'var(--text-dim)' }}>Home</Link> <span>/</span> <Link href="/#services" style={{ color: 'var(--text-dim)' }}>Services</Link> <span>/</span> <span style={{ color: 'var(--text-light)' }}>{service.title}</span>
@@ -333,7 +325,6 @@ export default function DynamicServicePage() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="cta-section">
         <div className="cta-content reveal-up">
           <h2>Have a Project in Mind?</h2>
@@ -381,7 +372,6 @@ export default function DynamicServicePage() {
       </section>
       </div>}
 
-      {/* FOOTER */}
       {!(loading || minLoading) &&<footer className="v-footer" style={{ marginTop: 80 }}>
   <div className="v-footer-grid">
     <div className="v-footer-brand">

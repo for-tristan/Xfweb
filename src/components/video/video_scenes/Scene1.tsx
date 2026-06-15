@@ -16,7 +16,7 @@ export function Scene1() {
   }, []);
 
   return (
-    <motion.div 
+    <motion.div
       className="absolute inset-0 flex flex-col items-center justify-center z-10"
       initial={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -34,8 +34,8 @@ export function Scene1() {
       <div className="h-14 overflow-hidden flex justify-center items-center">
         <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-light)', fontSize: 'clamp(24px, 4vw, 48px)', fontWeight: 900, letterSpacing: '0.15em' }}>
           {'XFOUNDRY'.split('').map((char, i) => (
-            <motion.span 
-              key={i} 
+            <motion.span
+              key={i}
               style={{ display: 'inline-block' }}
               initial={{ opacity: 0 }}
               animate={phase >= 2 ? { opacity: 1 } : { opacity: 0 }}

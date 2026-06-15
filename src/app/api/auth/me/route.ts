@@ -15,7 +15,6 @@ export async function GET() {
       );
     }
 
-    // ── Email Verification Gate ──
     // If the user's email is not verified (emailVerified is null),
     // force them to verify before they can access the site.
     // This handles existing users who were created before the

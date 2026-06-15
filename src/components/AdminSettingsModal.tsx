@@ -5,9 +5,6 @@ import { useToast } from '@/hooks/use-toast';
 import { WaveInput } from '@/components/WaveInput';
 import { WaveTextarea } from '@/components/WaveTextarea';
 
-// ═══════════════════════════════════════════════════
-// TYPES
-// ═══════════════════════════════════════════════════
 
 interface SettingField {
   key: string;
@@ -29,9 +26,6 @@ interface AdminSettingsModalProps {
   onSettingsSaved?: () => void;
 }
 
-// ═══════════════════════════════════════════════════
-// SETTINGS CONFIGURATION
-// ═══════════════════════════════════════════════════
 
 const SETTINGS_SECTIONS: SettingsSection[] = [
   {
@@ -79,9 +73,6 @@ const SETTINGS_SECTIONS: SettingsSection[] = [
   },
 ];
 
-// ═══════════════════════════════════════════════════
-// COMPONENT
-// ═══════════════════════════════════════════════════
 
 export function AdminSettingsModal({ open, onClose, onSettingsSaved }: AdminSettingsModalProps) {
   const { toast } = useToast();
@@ -176,7 +167,6 @@ export function AdminSettingsModal({ open, onClose, onSettingsSaved }: AdminSett
 
   if (!open) return null;
 
-  // ─── Shared styles ───────────────────────────────
   const overlayStyle: React.CSSProperties = {
     position: 'fixed',
     inset: 0,
@@ -392,7 +382,6 @@ export function AdminSettingsModal({ open, onClose, onSettingsSaved }: AdminSett
       onClick={handleOverlayClick}
     >
       <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
-        {/* ─── Header ─────────────────────────────── */}
         <div style={headerStyle}>
           <div style={{ flex: 1 }}>
             <h2 style={{
@@ -448,8 +437,6 @@ export function AdminSettingsModal({ open, onClose, onSettingsSaved }: AdminSett
             <i className="fa-solid fa-times" />
           </button>
         </div>
-
-        {/* ─── Body ───────────────────────────────── */}
         <div style={bodyStyle}>
           {loading ? (
             <div style={{
@@ -476,17 +463,14 @@ export function AdminSettingsModal({ open, onClose, onSettingsSaved }: AdminSett
           ) : (
             SETTINGS_SECTIONS.map((section, sIdx) => (
               <div key={section.title}>
-                {/* Section header */}
                 <div style={sectionTitleStyle}>
                   <i className={section.icon} />
                   {section.title}
                 </div>
 
-                {/* Section fields */}
                 <div style={fieldGroupStyle}>
                   {section.fields.map((field) => (
                     <div key={field.key}>
-                      {/* Field label */}
                       <label
                         htmlFor={`setting-${field.key}`}
                         style={fieldLabelStyle}
@@ -497,7 +481,6 @@ export function AdminSettingsModal({ open, onClose, onSettingsSaved }: AdminSett
                         {field.label}
                       </label>
 
-                      {/* Field input */}
                       {field.multiline ? (
                         <WaveTextarea
                           label={field.label}
@@ -527,8 +510,6 @@ export function AdminSettingsModal({ open, onClose, onSettingsSaved }: AdminSett
             ))
           )}
         </div>
-
-        {/* ─── Footer ─────────────────────────────── */}
         <div style={footerStyle}>
           <button
             onClick={onClose}

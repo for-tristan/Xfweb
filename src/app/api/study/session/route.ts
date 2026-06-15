@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 
-// SECURITY: Cap maximum study session duration to 24 hours (in seconds)
 const MAX_DURATION_SECONDS = 86400;
 
 function getTodayStr(): string {
@@ -75,7 +74,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'duration (number, >= 0) is required for stop action' }, { status: 400 });
     }
 
-    // SECURITY: Cap duration to prevent leaderboard inflation
     const cappedDuration = Math.min(duration, MAX_DURATION_SECONDS);
 
     // Find existing session or create one
