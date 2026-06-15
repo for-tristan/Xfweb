@@ -4,8 +4,9 @@ import { useEffect, useRef } from 'react';
 
 /**
  * ParticlesBackground — Pure canvas implementation.
- * Theme-dynamic: watches `data-theme` attribute on <html> and
- * recalculates particle color whenever the theme changes.
+ * Theme-dynamic: watches `data-theme` AND `class` attributes on <html>
+ * and also listens for a custom 'xf-theme-change' event.
+ * Determines particle color from the theme ID directly (no CSS variable lag).
  *
  * Canvas has pointer-events: none so all clicks pass through.
  */
@@ -20,20 +21,14 @@ interface Particle {
   opacityDir: number;
 }
 
-function computeColor(): string {
-  try {
-    const bg = getComputedStyle(document.documentElement).getPropertyValue('--black').trim();
-    const hex = bg.replace('#', '');
-    if (hex.length >= 6) {
-      const r = parseInt(hex.substring(0, 2), 16);
-      const g = parseInt(hex.substring(2, 4), 2);
-      const b = parseInt(hex.substring(4, 6), 16);
-      const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-      // Light background → dark subtle particles; dark background → light subtle particles
-      return lum > 0.5 ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.25)';
-    }
-  } catch {}
-  return 'rgba(255,255,255,0.25)';
+const LIGHT_THEMES = new Set([
+  'light', 'sand', 'lavender', 'mint', 'rose-gold',
+  'honey', 'clay', 'sage', 'peach',
+]);
+
+function isLightTheme(): boolean {
+  const theme = document.documentElement.getAttribute('data-theme') || '';
+  return LIGHT_THEMES.has(theme);
 }
 
 export default function ParticlesBackground() {
@@ -50,20 +45,44 @@ export default function ParticlesBackground() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Initial color
-    colorRef.current = computeColor();
+    // Derive color from theme attribute directly — no CSS variable lag
+    const updateColor = () => {
+      colorRef.current = isLightTheme()
+        ? 'rgba(0,0,0,0.18)'
+        : 'rgba(255,255,255,0.25)';
+    };
+    updateColor();
 
-    // Watch for theme changes via MutationObserver on data-theme attribute
+    // Watch for theme changes via MutationObserver
+    // Watch both 'data-theme' attribute AND 'class' (toggles dark class)
     const observer = new MutationObserver(() => {
-      // Small delay so CSS variables have updated
-      setTimeout(() => {
-        colorRef.current = computeColor();
-      }, 50);
+      // Use requestAnimationFrame to ensure style recalculation
+      requestAnimationFrame(() => {
+        updateColor();
+      });
     });
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['data-theme'],
+      attributeFilter: ['data-theme', 'class'],
     });
+
+    // Also listen for custom event (dispatched by theme setters)
+    const onCustomThemeChange = () => {
+      requestAnimationFrame(() => {
+        updateColor();
+      });
+    };
+    window.addEventListener('xf-theme-change', onCustomThemeChange);
+
+    // Also listen for storage events (in case theme changed in another component)
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'x-foundry-theme') {
+        requestAnimationFrame(() => {
+          updateColor();
+        });
+      }
+    };
+    window.addEventListener('storage', onStorage);
 
     const resize = () => {
       canvas.width = window.innerWidth;
@@ -126,6 +145,8 @@ export default function ParticlesBackground() {
     return () => {
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener('resize', resize);
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('xf-theme-change', onCustomThemeChange);
       observer.disconnect();
     };
   }, []);

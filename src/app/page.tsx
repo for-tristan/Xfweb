@@ -532,6 +532,8 @@ export default function Home() {
     }
     const lightThemeIds = ['light', 'sand', 'lavender', 'mint', 'rose-gold', 'honey', 'clay', 'sage', 'peach'];
     document.documentElement.classList.toggle('dark', !lightThemeIds.includes(theme));
+    // Dispatch custom event so other components (e.g. ParticlesBackground) react instantly
+    window.dispatchEvent(new CustomEvent('xf-theme-change', { detail: { theme } }));
   }, [theme]);
 
   // Load profile data when dashboard opens or profile tab selected

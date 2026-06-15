@@ -210,6 +210,8 @@ export function usePageFeatures() {
     const effectiveTheme = theme === 'dark' ? 'crimson' : theme;
     document.documentElement.setAttribute('data-theme', effectiveTheme);
     document.documentElement.classList.toggle('dark', effectiveTheme !== 'light' && effectiveTheme !== 'sand');
+    // Dispatch custom event so other components (e.g. ParticlesBackground) react instantly
+    window.dispatchEvent(new CustomEvent('xf-theme-change', { detail: { theme: effectiveTheme } }));
   }, [theme]);
 
   // Scroll detection
