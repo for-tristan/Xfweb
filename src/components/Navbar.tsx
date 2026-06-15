@@ -17,7 +17,6 @@ interface NavbarProps {
   activeNav?: string;
   scrollToSection: (section: string) => void;
   onNavClick?: (e: React.MouseEvent<HTMLElement>) => void;
-  // NavActions props
   theme: string;
   onToggleTheme: () => void;
   onChangeTheme: (theme: string) => void;
@@ -33,7 +32,6 @@ interface NavbarProps {
   setUnreadCount: React.Dispatch<React.SetStateAction<number>>;
   dashboardOpen: boolean;
   setDashboardOpen: (open: boolean) => void;
-  // Friend request handlers (for mobile notification actions)
   onAcceptFriend?: (friendshipId: string) => void;
   onRejectFriend?: (friendshipId: string) => void;
 }
@@ -49,7 +47,6 @@ export function Navbar({
   const isHome = activePage === 'home';
   const staggeredMenuRef = useRef<StaggeredMenuHandle>(null);
 
-  // Close mobile menu when viewport grows past 1570px
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 1570 && staggeredMenuRef.current?.isOpen()) {
@@ -75,7 +72,6 @@ export function Navbar({
     </Link>
   );
 
-  // Build StaggeredMenu items — Games/Study/Dashboard hidden for logged-out users
   const staggeredMenuItems = [
     { label: 'Home', ariaLabel: 'Go to home page', link: '/', onClick: isHome ? () => scrollToSection('home') : undefined },
     { label: 'Services', ariaLabel: 'View our services', link: '/#services', onClick: isHome ? () => scrollToSection('services') : undefined },
@@ -97,10 +93,7 @@ export function Navbar({
       id="navbar"
       onClick={onNavClick}
     >
-      {/* Logo — outside the pill */}
       {logoLink}
-
-      {/* Center pill — GlassSurface nav bar (desktop links only) */}
       <GlassSurface
         className="nav-pill-wrapper"
         width="fit-content"
@@ -121,7 +114,6 @@ export function Navbar({
           minWidth: 'max-content',
         }}
       >
-        {/* Compact inline nav — visible between 1570px and 1140px */}
         <ul className="nav-links-compact">
           {isHome ? (
             <li><a href="#home" className={isActive('home') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('home'); }}>Home</a></li>
@@ -154,8 +146,6 @@ export function Navbar({
             <li><Link href="/instructor" style={{ color: 'var(--primary-red)' }}>Instructor</Link></li>
           )}
         </ul>
-
-        {/* Full desktop nav links — only shown on >1570px desktop */}
         <ul className="nav-links" id="navLinks">
           {isHome ? (
             <li><a href="#home" className={isActive('home') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('home'); }}>Home</a></li>
@@ -189,8 +179,6 @@ export function Navbar({
           )}
         </ul>
       </GlassSurface>
-
-      {/* Right actions — outside the pill (desktop only controls) */}
       <NavActions
         theme={theme} onToggleTheme={onToggleTheme} onChangeTheme={onChangeTheme} onSearchOpen={onSearchOpen}
         user={user} onOpenAuth={onOpenAuth} onLogout={onLogout}
@@ -200,10 +188,6 @@ export function Navbar({
         loadNotifications={loadNotifications} setNotifications={setNotifications as any} setUnreadCount={setUnreadCount as any}
         dashboardOpen={dashboardOpen} setDashboardOpen={setDashboardOpen}
       />
-
-      {/* StaggeredMenu — mobile menu for ≤1570px, logged-in only.
-          Rendered via portal to document.body (inside component) to avoid
-          CSS containment issues from the navbar. CSS hides it above 1570px. */}
       {user && (
         <StaggeredMenu
           ref={staggeredMenuRef}

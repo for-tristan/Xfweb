@@ -1,11 +1,6 @@
 'use client';
 
-/**
- * Inline SVG version of the XFoundry logo.
- * Uses `currentColor` so it inherits the theme's accent color via
- * `color: var(--primary-red)` on the wrapper — unlike an <img> tag,
- * inline SVGs can resolve CSS variables from the page context.
- */
+
 export function LogoIcon({ className, style }: { className?: string; style?: React.CSSProperties }) {
   return (
     <svg

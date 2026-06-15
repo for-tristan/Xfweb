@@ -41,7 +41,7 @@ export interface GlassSurfaceProps {
     | 'plus-lighter';
   className?: string;
   style?: React.CSSProperties;
-  /** Override dark/light detection — uses [data-theme] by default */
+
   isDark?: boolean;
 }
 
@@ -52,14 +52,13 @@ const DARK_THEMES = new Set([
 ]);
 
 const useThemeDarkMode = (): boolean => {
-  const [isDark, setIsDark] = useState(true); // default dark for no data-theme
+  const [isDark, setIsDark] = useState(true);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     const resolve = () => {
       const theme = document.documentElement.getAttribute('data-theme') || '';
-      // No data-theme = default root vars (--black: #ffffff → light)
       if (!theme) {
         setIsDark(false);
         return;
@@ -186,9 +185,6 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
   ]);
 
   useEffect(() => {
-    // SVG displacement-map filters are extremely GPU-expensive when applied
-    // via backdrop-filter. The CSS fallback (blur + saturate) looks nearly
-    // identical at a fraction of the cost, so we skip SVG filters entirely.
     setSvgSupported(false);
   }, []);
 
@@ -307,8 +303,6 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
       className={`${glassSurfaceClasses} ${focusVisibleClasses} ${className}`}
       style={getContainerStyles()}
     >
-      {/* SVG filter removed — CSS backdrop-filter fallback provides
-          the same visual quality at a fraction of the GPU cost */}
 
       <div className="w-full h-full flex items-center justify-center p-2 rounded-[inherit] relative z-10">
         {children}

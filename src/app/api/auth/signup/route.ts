@@ -4,7 +4,6 @@ import { hashPassword } from '@/lib/auth';
 import { sendEmailVerificationEmail } from '@/lib/email';
 import { randomInt } from 'crypto';
 
-// Email validation regex
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -18,7 +17,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name, email, password, phone, company, username: providedUsername } = body;
 
-    // Validate required fields
     if (!name || !email || !password) {
       return NextResponse.json(
         { error: 'Name, email, and password are required' },
@@ -61,7 +59,6 @@ export async function POST(request: NextRequest) {
 
     const normalizedEmail = email.toLowerCase().trim();
 
-    // Check if user already exists
     const existingUser = await db.user.findUnique({
       where: { email: normalizedEmail },
     });
@@ -73,7 +70,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate unique username
     let username = providedUsername?.trim().toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 20);
     if (!username) {
       username = generateUsername(name);
@@ -98,31 +94,25 @@ export async function POST(request: NextRequest) {
           username,
           phone: phone || null,
           company: company || null,
-          role: 'student', // SECURITY: Always 'student' — admin promotion is done via admin panel only
+          role: 'student',
         },
       });
 
-      // Generate a 6-digit verification code
       const code = randomInt(100000, 1000000).toString();
 
-      // Invalidate any previous verification codes for this email
       await db.emailVerification.updateMany({
         where: { email: normalizedEmail, used: false },
         data: { used: true },
       });
 
-      // Store the verification code with 24-hour expiry
       await db.emailVerification.create({
         data: {
           email: normalizedEmail,
           code,
-          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
         },
       });
 
-      // Send verification email BEFORE returning response.
-      // IMPORTANT: On Vercel serverless, after() does NOT keep the function alive —
-      // the email send gets killed before it completes. We MUST await it here.
       try {
         await sendEmailVerificationEmail({
           userEmail: user.email,
@@ -131,10 +121,8 @@ export async function POST(request: NextRequest) {
         });
       } catch (emailErr: any) {
         console.error('[Signup] Email send failed:', emailErr?.message || emailErr);
-        // Don't fail signup — user can resend verification code later
       }
 
-      // Return response WITHOUT session cookies — user must verify email first
       return NextResponse.json({
         message: 'Account created. Please check your email for a verification code.',
         requiresVerification: true,
@@ -152,7 +140,6 @@ export async function POST(request: NextRequest) {
       });
 
     } catch (createError: any) {
-      // Race condition: another request created the user between our check and insert
       if (createError?.code === 'P2002') {
         const target = createError?.meta?.target as string[] | undefined;
         if (target?.includes('email')) {

@@ -3,9 +3,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 
-//
-//    → dot loader fades in (covering the page)
-//    → swap content behind loader, then fade loader out
 
 type Phase = 'idle' | 'loading' | 'fading';
 
@@ -34,7 +31,6 @@ export default function PageTransition({ children }: { children: React.ReactNode
     setPhase(p);
   }, []);
 
-  // Listen for navigation start event
   useEffect(() => {
     const onNavStart = () => {
       if (phaseRef.current === 'idle') {
@@ -46,7 +42,6 @@ export default function PageTransition({ children }: { children: React.ReactNode
     return () => window.removeEventListener('xf:navigation-start', onNavStart);
   }, [updatePhase]);
 
-  // Detect pathname change
   useEffect(() => {
     const pathChanged = pathname !== prevPathRef.current;
     if (!pathChanged) return;
@@ -55,7 +50,6 @@ export default function PageTransition({ children }: { children: React.ReactNode
     const currentPhase = phaseRef.current;
 
     if (currentPhase === 'loading') {
-      // Loader already visible — swap content and fade out
       if (!swappedRef.current) {
         swappedRef.current = true;
         clearAllTimeouts();
@@ -66,11 +60,10 @@ export default function PageTransition({ children }: { children: React.ReactNode
           addTimeout(() => {
             updatePhase('idle');
             swappedRef.current = false;
-          }, 500); // fade-out duration
-        }, 150); // small buffer so loader is visible
+          }, 500);
+        }, 150);
       }
     } else if (currentPhase === 'idle') {
-      // Browser nav (back/forward) or missed event
       updatePhase('loading');
       swappedRef.current = false;
       addTimeout(() => {
@@ -81,7 +74,7 @@ export default function PageTransition({ children }: { children: React.ReactNode
           updatePhase('idle');
           swappedRef.current = false;
         }, 500);
-      }, 400); // show loader briefly
+      }, 400);
     } else if (currentPhase === 'fading') {
       setDisplayChildren(children);
     }
@@ -90,12 +83,10 @@ export default function PageTransition({ children }: { children: React.ReactNode
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
-  // Keep children in sync when idle
   useEffect(() => {
     if (phaseRef.current === 'idle') setDisplayChildren(children);
   }, [children]);
 
-  // Safety: force idle if stuck
   useEffect(() => {
     if (phase === 'idle') return;
     const t = setTimeout(() => {

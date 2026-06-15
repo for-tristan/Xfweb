@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireInstructorOrAdmin } from '@/lib/auth';
 
-/**
- * Helper: get course IDs that belong to the instructor (or all for admin).
- * Returns an array of course CUIDs.
- */
+
 async function getInstructorCourseIds(instructorId: string | undefined, isAdmin: boolean): Promise<string[]> {
   if (isAdmin || !instructorId) {
     const all = await db.course.findMany({ select: { id: true } });
@@ -26,10 +23,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const courseId = searchParams.get('courseId');
 
-    // Get the set of course IDs this instructor can access
     const allowedCourseIds = await getInstructorCourseIds(user?.id, isAdmin);
 
-    // If a specific courseId is requested, verify access
     if (courseId && !allowedCourseIds.includes(courseId)) {
       return NextResponse.json({ error: 'Forbidden: You do not have access to this course' }, { status: 403 });
     }
@@ -38,7 +33,6 @@ export async function GET(request: NextRequest) {
     if (courseId) {
       whereClause.courseId = courseId;
     } else {
-      // Only show modules for courses the instructor can access
       whereClause.courseId = { in: allowedCourseIds };
     }
 
@@ -50,7 +44,6 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Get all unlocks grouped by moduleId (only for allowed courses)
     const unlocks = await db.moduleUnlock.findMany({
       where: { moduleId: { in: modules.map(m => m.id) } },
       include: {
@@ -92,13 +85,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'courseId and title are required' }, { status: 400 });
     }
 
-    // Verify course exists
     const course = await db.course.findUnique({ where: { id: courseId } });
     if (!course) {
       return NextResponse.json({ error: 'Course not found' }, { status: 404 });
     }
 
-    // Instructors can only add modules to their own courses
     if (isInstructor && course.instructorId !== user!.id) {
       return NextResponse.json({ error: 'Forbidden: You can only add modules to your own courses' }, { status: 403 });
     }
@@ -130,7 +121,6 @@ export async function PUT(request: NextRequest) {
     if (body.userId && body.moduleId && !body.unlockAll) {
       const { userId, moduleId } = body;
 
-      // Verify the module belongs to an instructor-accessible course
       const mod = await db.courseModule.findUnique({ where: { id: moduleId } });
       if (!mod) {
         return NextResponse.json({ error: 'Module not found' }, { status: 404 });
@@ -169,7 +159,6 @@ export async function PUT(request: NextRequest) {
     if (body.userId && body.courseId && body.unlockAll) {
       const { userId, courseId } = body;
 
-      // Verify course access
       const course = await db.course.findUnique({ where: { id: courseId } });
       if (!course) {
         return NextResponse.json({ error: 'Course not found' }, { status: 404 });
@@ -205,7 +194,6 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Module not found' }, { status: 404 });
     }
 
-    // Instructors can only update modules in their own courses
     if (isInstructor) {
       const course = await db.course.findUnique({ where: { id: existing.courseId } });
       if (!course || course.instructorId !== user!.id) {
@@ -244,7 +232,6 @@ export async function DELETE(request: NextRequest) {
         return NextResponse.json({ error: 'Module not found' }, { status: 404 });
       }
 
-      // Instructors can only lock modules in their own courses
       if (isInstructor) {
         const course = await db.course.findUnique({ where: { id: mod.courseId } });
         if (!course || course.instructorId !== user!.id) {
@@ -281,7 +268,6 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Module not found' }, { status: 404 });
     }
 
-    // Instructors can only delete modules in their own courses
     if (isInstructor) {
       const course = await db.course.findUnique({ where: { id: mod.courseId } });
       if (!course || course.instructorId !== user!.id) {
@@ -289,11 +275,9 @@ export async function DELETE(request: NextRequest) {
       }
     }
 
-    // Clean up related data before deleting
     await db.moduleStudy.deleteMany({ where: { moduleId } });
     await db.moduleUnlock.deleteMany({ where: { moduleId } });
 
-    // Clean up tests within this module
     const testIds = (await db.moduleTest.findMany({
       where: { moduleId },
       select: { id: true },

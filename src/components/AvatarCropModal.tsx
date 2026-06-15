@@ -38,7 +38,6 @@ export function AvatarCropModal({ open, imageFile, onClose, onCropComplete }: Av
   const imgRef = useRef<HTMLImageElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // Load image when file changes
   useEffect(() => {
     if (!imageFile) {
       setImgSrc('');
@@ -50,7 +49,6 @@ export function AvatarCropModal({ open, imageFile, onClose, onCropComplete }: Av
     return () => reader.abort();
   }, [imageFile]);
 
-  // Reset state when modal opens/closes
   useEffect(() => {
     if (!open) {
       setCrop(undefined);
@@ -86,7 +84,6 @@ export function AvatarCropModal({ open, imageFile, onClose, onCropComplete }: Av
       const ctx = canvas.getContext('2d');
       if (!ctx) throw new Error('No canvas context');
 
-      // Convert crop to pixel values if it's in percent
       const pixelCrop = completedCrop.unit === '%'
         ? convertToPixelCrop(completedCrop, image.width, image.height)
         : completedCrop;
@@ -94,11 +91,9 @@ export function AvatarCropModal({ open, imageFile, onClose, onCropComplete }: Av
       const scaleX = image.naturalWidth / image.width;
       const scaleY = image.naturalHeight / image.height;
 
-      // Crop size in actual pixels
       const cropWidth = pixelCrop.width * scaleX;
       const cropHeight = pixelCrop.height * scaleY;
 
-      // Output size: max 400px on the longest side for quality
       const maxSize = 400;
       const outputScale = Math.min(maxSize / cropWidth, maxSize / cropHeight, 1);
       canvas.width = Math.round(cropWidth * outputScale);
@@ -122,7 +117,6 @@ export function AvatarCropModal({ open, imageFile, onClose, onCropComplete }: Av
         canvas.height,
       );
 
-      // Convert canvas to blob
       const blob = await new Promise<Blob>((resolve, reject) => {
         canvas.toBlob(
           (b) => {

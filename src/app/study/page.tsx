@@ -78,7 +78,7 @@ export default function StudyFocusPage() {
         const data = await res.json();
         setLeaderboard(data.leaderboard);
       }
-    } catch { /* err */ }
+    } catch {  }
     setLeaderboardLoading(false);
   }, []);
 
@@ -92,7 +92,7 @@ export default function StudyFocusPage() {
         setTodaySeconds(data.stats.todaySeconds);
         setWeekSeconds(data.stats.weekSeconds);
       }
-    } catch { /* err */ }
+    } catch {  }
     setStatsLoading(false);
   }, [user]);
 
@@ -104,7 +104,7 @@ export default function StudyFocusPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'start' }),
       });
-    } catch { /* err */ }
+    } catch {  }
     timerStartRef.current = Date.now();
     setTimerRunning(true);
     setTimerSeconds(0);
@@ -128,7 +128,7 @@ export default function StudyFocusPage() {
         loadStats();
         loadLeaderboard();
         toast({ title: 'Session Saved!', description: `${formatHours(elapsed)} of study time recorded` });
-      } catch { /* err */ }
+      } catch {  }
     }
   };
 
@@ -169,7 +169,6 @@ export default function StudyFocusPage() {
     };
   }, [checkReveals]);
 
-  // Re-check reveals when loading finishes (content mounts after loading)
   useEffect(() => {
     if (!loading && !minLoading) {
       const t = setTimeout(checkReveals, 50);
@@ -177,7 +176,6 @@ export default function StudyFocusPage() {
     }
   }, [loading, minLoading, checkReveals]);
 
-  // Load leaderboard once on mount
   useEffect(() => {
     if (!leaderboardLoadedRef.current) {
       leaderboardLoadedRef.current = true;
@@ -189,13 +187,12 @@ export default function StudyFocusPage() {
             const data = await res.json();
             setLeaderboard(data.leaderboard);
           }
-        } catch { /* err */ }
+        } catch {  }
         setLeaderboardLoading(false);
       })();
     }
   }, []);
 
-  // Load stats once when user becomes available
   useEffect(() => {
     if (user && !statsLoadedRef.current) {
       statsLoadedRef.current = true;
@@ -208,18 +205,16 @@ export default function StudyFocusPage() {
             setTodaySeconds(data.stats.todaySeconds);
             setWeekSeconds(data.stats.weekSeconds);
           }
-        } catch { /* err */ }
+        } catch {  }
         setStatsLoading(false);
       })();
     }
   }, [user]);
 
-  // Cleanup timer on unmount
   useEffect(() => {
     return () => { if (timerIntervalRef.current) clearInterval(timerIntervalRef.current); };
   }, []);
 
-  // Fix timer drift when tab is backgrounded
   useEffect(() => {
     if (!timerRunning) return;
     const handleVisibility = () => {
@@ -284,8 +279,6 @@ export default function StudyFocusPage() {
                     {' '}to start tracking your study time
                   </div>
                 )}
-
-                {/* Timer Display — takes remaining space */}
                 <div className="study-timer-padding" style={{
                   textAlign: 'center', padding: '20px 0',
                   position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
@@ -320,8 +313,6 @@ export default function StudyFocusPage() {
                     </div>
                   )}
                 </div>
-
-                {/* Bottom section — controls + stats pinned to bottom */}
                 <div style={{ marginTop: 'auto', paddingTop: 16, borderTop: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)' }}>
                   <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
                     {!timerRunning ? (

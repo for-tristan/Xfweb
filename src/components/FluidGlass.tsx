@@ -5,7 +5,7 @@ import { useRef, useEffect, useCallback, type ReactNode } from 'react';
 interface FluidGlassProps {
   children: ReactNode;
   className?: string;
-  /** Whether the glass is in "scrolled" compact state */
+
   compact?: boolean;
 }
 
@@ -57,5 +57,4 @@ export function FluidGlassNav({ children, className = '', compact = false }: Flu
   );
 }
 
-// Re-export default for compatibility
 export default FluidGlassNav;

@@ -40,8 +40,6 @@ export function ScenePrograms() {
       >
         TECH EDUCATION
       </motion.div>
-
-      {/* Heading 1 */}
       <div className="overflow-hidden">
         <motion.h2
           style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-light)', fontSize: 'clamp(40px, 6vw, 72px)', fontWeight: 900, lineHeight: 1.1, letterSpacing: '-0.02em', paddingTop: 8, paddingBottom: 8 }}
@@ -52,8 +50,6 @@ export function ScenePrograms() {
           Learn. Grow.
         </motion.h2>
       </div>
-
-      {/* Heading 2 */}
       <div className="overflow-hidden">
         <motion.h2
           style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-dim)', fontSize: 'clamp(40px, 6vw, 72px)', fontWeight: 300, fontStyle: 'italic', lineHeight: 1.1, paddingTop: 8, paddingBottom: 8 }}
@@ -64,8 +60,6 @@ export function ScenePrograms() {
           Lead the industry.
         </motion.h2>
       </div>
-
-      {/* Program list — big gap from heading */}
       <div className="flex flex-col gap-8 max-w-lg w-full mt-12">
         {PROGRAMS.map((program, i) => (
           <motion.div

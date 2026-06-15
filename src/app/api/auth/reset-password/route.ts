@@ -42,7 +42,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find the reset code
     const resetRecord = await db.passwordReset.findFirst({
       where: {
         email: email.toLowerCase().trim(),
@@ -60,7 +59,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find the user
     const user = await db.user.findUnique({
       where: { email: email.toLowerCase().trim() },
     });
@@ -72,7 +70,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Hash the new password and update the user, and mark code as used in a transaction
     const hashedPassword = hashPassword(newPassword);
 
     await db.$transaction([

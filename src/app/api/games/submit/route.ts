@@ -28,7 +28,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid difficulty' }, { status: 400 });
     }
 
-    // Validate numeric ranges
     const numScore = parseInt(score);
     const numCorrect = parseInt(correct);
     const numTotal = parseInt(total);

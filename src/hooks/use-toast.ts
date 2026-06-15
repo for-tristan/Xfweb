@@ -13,7 +13,7 @@ export interface ToastData {
 }
 
 const TOAST_LIMIT = 3
-const DEFAULT_DURATION = 4000 // 4 seconds — iPhone-like auto-dismiss
+const DEFAULT_DURATION = 4000
 
 type Action =
   | { type: "ADD_TOAST"; toast: ToastData }
@@ -50,11 +50,11 @@ function reducer(state: State, action: Action): State {
     case "DISMISS_TOAST": {
       const { toastId } = action
       if (toastId) {
-        addToRemoveQueue(toastId, 400) // quick fade-out then remove
+        addToRemoveQueue(toastId, 400)
       } else {
         state.toasts.forEach((t) => addToRemoveQueue(t.id, 400))
       }
-      return state // removal handled by REMOVE_TOAST after animation
+      return state
     }
     case "REMOVE_TOAST": {
       if (action.toastId === undefined) return { ...state, toasts: [] }

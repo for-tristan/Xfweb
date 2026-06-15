@@ -7,7 +7,6 @@ export async function GET() {
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
 
-    // Use groupBy at DB level instead of fetching all sessions
     const aggregated = await db.studySession.groupBy({
       by: ['userId'],
       where: {
@@ -20,7 +19,6 @@ export async function GET() {
       take: 10,
     });
 
-    // Fetch user details for top 10 only (1 query instead of N+1)
     const topUserIds = aggregated.map(a => a.userId);
     const users = await db.user.findMany({
       where: { id: { in: topUserIds } },

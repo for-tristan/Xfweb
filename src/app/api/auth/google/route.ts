@@ -30,12 +30,11 @@ export async function GET(request: NextRequest) {
 
   const response = NextResponse.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`);
 
-  // Store state in a short-lived cookie for verification in the callback
   response.cookies.set('oauth_state', state, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: 60 * 10, // 10 minutes
+    maxAge: 60 * 10,
     path: '/',
   });
 

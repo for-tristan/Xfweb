@@ -55,7 +55,6 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
   const initialFriendAppliedRef = useRef(false);
   const lastVHRef = useRef(0);
 
-  // Detect mobile viewport
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)');
     const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
@@ -64,7 +63,6 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  // Track visualViewport height for keyboard handling on mobile
   useEffect(() => {
     if (!isMobile) {
       setMobileVH(0);
@@ -74,7 +72,6 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
     if (!vv) return;
     const update = () => {
       setMobileVH(vv.height);
-      // If viewport shrank significantly (keyboard opened), scroll messages to bottom
       const prev = lastVHRef.current;
       if (prev > 0 && vv.height < prev - 100) {
         requestAnimationFrame(() => {
@@ -92,7 +89,6 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
     };
   }, [isMobile]);
 
-  // Load conversation previews
   const loadConversations = useCallback(async () => {
     if (!user || !open) return;
     try {
@@ -101,7 +97,6 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
         const data = await res.json();
         setTotalUnread(data.totalUnread || 0);
 
-        // Build conversation list from friends + unread data
         const convos: ConversationPreview[] = friends.map((f) => {
           const unread = data.conversations?.find((c: { userId: string }) => c.userId === f.friendId);
           return {
@@ -112,10 +107,9 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
 
         setConversations(convos);
       }
-    } catch { /* ignore */ }
+    } catch {  }
   }, [user, friends, open]);
 
-  // Load messages for selected friend
   const loadMessages = useCallback(async (friend: Friend) => {
     if (!user) return;
     setLoadingMessages(true);
@@ -125,12 +119,10 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
         const data = await res.json();
         setMessages(data.messages || []);
       }
-    } catch { /* ignore */ }
+    } catch {  }
     setLoadingMessages(false);
   }, [user]);
 
-  // Poll for new messages — only when modal is open and a friend is selected
-  // Uses a longer interval (10s) to avoid constant refreshing
   useEffect(() => {
     if (!open || !selectedFriend || !user) return;
     const tick = () => {
@@ -144,16 +136,13 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
     };
   }, [open, selectedFriend, user, loadConversations, loadMessages]);
 
-  // Auto-select initial friend when modal opens
   useEffect(() => {
     if (open && initialFriend && !initialFriendAppliedRef.current) {
       initialFriendAppliedRef.current = true;
-      // Schedule to avoid cascading render warning
       const id = setTimeout(() => {
         setSelectedFriend(initialFriend);
         setMessages([]);
         loadMessages(initialFriend);
-        // On mobile, auto-switch to chat view when initialFriend is provided
         if (isMobile) {
           setMobileView('chat');
         }
@@ -162,23 +151,19 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
     }
     if (!open) {
       initialFriendAppliedRef.current = false;
-      // Reset mobile view when modal closes
       setMobileView('list');
     }
     return undefined;
   }, [open, initialFriend, loadMessages, isMobile]);
 
-  // Auto scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Focus input when friend selected
   useEffect(() => {
     if (selectedFriend && (!isMobile || mobileView === 'chat')) inputRef.current?.focus();
   }, [selectedFriend, isMobile, mobileView]);
 
-  // Handle send message
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !selectedFriend || !newMessage.trim() || sending) return;
@@ -198,27 +183,23 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
         loadMessages(selectedFriend);
         loadConversations();
       }
-    } catch { /* ignore */ }
+    } catch {  }
     setSending(false);
   };
 
-  // Select friend
   const handleSelectFriend = (friend: Friend) => {
     setSelectedFriend(friend);
     setMessages([]);
     loadMessages(friend);
-    // On mobile, switch to chat view
     if (isMobile) {
       setMobileView('chat');
     }
   };
 
-  // Go back to friend list on mobile
   const handleBackToList = () => {
     setMobileView('list');
   };
 
-  // Format time
   const formatTime = (dateStr: string) => {
     const date = new Date(dateStr);
     const now = new Date();
@@ -231,14 +212,10 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
 
   if (!open || !user) return null;
 
-  // Responsive modal styles
-  // On mobile: use visualViewport height when keyboard is open, otherwise 100dvh (with 100vh fallback)
-  // On desktop: centered card
   const modalContainerStyle: React.CSSProperties = isMobile
     ? {
         width: '100%',
         height: mobileVH > 0 ? mobileVH : '100dvh',
-        // Fallback for browsers that don't support dvh
         ...((typeof window !== 'undefined' && !CSS.supports('height', '100dvh') && mobileVH === 0)
           ? { height: '100vh' }
           : {}),
@@ -250,11 +227,8 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
-        // Safe-area: respect notch / status bar area
         paddingTop: 'env(safe-area-inset-top, 0px)',
         boxSizing: 'border-box',
-        // Use fixed positioning so the modal stays pinned to viewport
-        // and resizes correctly with visualViewport
         position: 'fixed',
         top: 0,
         left: 0,
@@ -276,7 +250,6 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
         boxShadow: '0 0 0 1px color-mix(in srgb, var(--accent) 8%, transparent), 0 24px 80px rgba(0,0,0,0.5), 0 0 120px color-mix(in srgb, var(--accent) 6%, transparent)',
       };
 
-  // Compute slide transforms for mobile transition
   const listTransform = isMobile
     ? (mobileView === 'list' ? 'translateX(0)' : 'translateX(-100%)')
     : 'none';
@@ -292,7 +265,6 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
       data-lenis-prevent
       style={{
         position: 'fixed', inset: 0, zIndex: 10002,
-        // Lighter overlay on mobile so it doesn't feel as oppressive on small screens
         background: isMobile ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.75)',
         backdropFilter: 'blur(16px) saturate(1.4)',
         WebkitBackdropFilter: 'blur(16px) saturate(1.4)',
@@ -304,7 +276,6 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
         onClick={(e) => e.stopPropagation()}
         style={modalContainerStyle}
       >
-        {/* Header — compact on mobile */}
         <div style={{
           padding: isMobile ? '8px 12px' : '16px 20px',
           borderBottom: '1px solid color-mix(in srgb, var(--border-color) 50%, transparent)',
@@ -319,7 +290,6 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
           }}>
             {isMobile && mobileView === 'chat' && selectedFriend ? (
               <>
-                {/* Back arrow button on mobile — 44px touch target */}
                 <button
                   onClick={handleBackToList}
                   aria-label="Back to friends"
@@ -327,7 +297,6 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
                     background: 'transparent', border: 'none',
                     color: 'var(--text-light, #fff)', cursor: 'pointer',
                     fontSize: 16,
-                    // 44px touch target
                     minWidth: 44, minHeight: 44,
                     width: 44, height: 44,
                     padding: 0,
@@ -377,7 +346,6 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
               border: '1px solid color-mix(in srgb, var(--border-color) 40%, transparent)',
               color: 'var(--text-dim, #666)', cursor: 'pointer', fontSize: 18,
               padding: 0,
-              // 44px touch target on mobile
               minWidth: isMobile ? 44 : 'auto',
               minHeight: isMobile ? 44 : 'auto',
               width: isMobile ? 44 : 'auto',
@@ -392,7 +360,6 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
 
         <div style={{
           flex: 1, display: 'flex', overflow: 'hidden', position: 'relative',
-          // Clip overflow on mobile so sliding panels don't leak
           ...(isMobile ? { overflow: 'hidden' } : {}),
         }}>
           <div style={{
@@ -404,7 +371,6 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
             position: isMobile ? 'absolute' : 'relative',
             inset: isMobile ? 0 : 'auto',
             zIndex: isMobile ? 1 : 'auto',
-            // Slide transition on mobile
             ...(isMobile ? {
               transform: listTransform,
               transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -430,7 +396,6 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
                       display: 'flex', alignItems: 'center', gap: 10,
                       width: '100%',
                       padding: isMobile ? '10px 12px' : '10px 16px',
-                      // Larger tap target on mobile
                       ...(isMobile ? { minHeight: 56 } : {}),
                       background: selectedFriend?.friendId === convo.friend.friendId
                         ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
@@ -497,18 +462,14 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
             inset: isMobile ? 0 : 'auto',
             zIndex: isMobile ? 2 : 'auto',
             background: 'color-mix(in srgb, var(--card-bg) 80%, transparent)',
-            // Slide transition on mobile
             ...(isMobile ? {
               transform: chatTransform,
               transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               willChange: 'transform',
             } : {}),
           }}>
-            {/* On desktop, show chat header only when friend is selected */}
-            {/* On mobile, header shows friend info in the main header already */}
             {selectedFriend ? (
               <>
-                {/* Chat Header - only on desktop (mobile shows friend info in main header) */}
                 {!isMobile && (
                   <div style={{
                     padding: '12px 20px',
@@ -542,7 +503,6 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
                 <div style={{
                   flex: 1, overflowY: 'auto', padding: isMobile ? 10 : 16,
                   display: 'flex', flexDirection: 'column', gap: 6,
-                  // Subtle inset shadow at top to visually separate from header
                   boxShadow: isMobile ? 'inset 0 8px 12px -8px rgba(0,0,0,0.3)' : 'none',
                 }}>
                   {loadingMessages ? (
@@ -589,13 +549,10 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
                   )}
                   <div ref={messagesEndRef} />
                 </div>
-
-                {/* Message Input — with safe-area-inset-bottom for gesture bar */}
                 <form
                   onSubmit={handleSend}
                   style={{
                     padding: isMobile ? '8px 10px' : '12px 16px',
-                    // Bottom safe area so input isn't hidden behind gesture bar
                     ...(isMobile ? { paddingBottom: 'calc(8px + env(safe-area-inset-bottom, 0px))' } : {}),
                     borderTop: '1px solid color-mix(in srgb, var(--border-color) 50%, transparent)',
                     display: 'flex', gap: isMobile ? 8 : 10, alignItems: 'center',
@@ -616,7 +573,6 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
                     type="submit"
                     disabled={!newMessage.trim() || sending}
                     style={{
-                      // 44px touch target on mobile
                       minWidth: isMobile ? 44 : 'auto',
                       minHeight: isMobile ? 44 : 'auto',
                       height: isMobile ? 44 : 'auto',

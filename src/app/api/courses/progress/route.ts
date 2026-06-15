@@ -12,7 +12,6 @@ export async function GET() {
       orderBy: { lastAccessed: 'desc' },
     });
 
-    // Fetch all courses to build slug→CUID mapping
     const allCourses = await db.course.findMany({ select: { id: true, slug: true } });
     const courseMap = new Map(allCourses.map(c => [c.slug, c.id]));
 

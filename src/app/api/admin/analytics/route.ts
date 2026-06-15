@@ -19,7 +19,6 @@ export async function GET() {
     const pendingEnrollments = await db.enrollment.count({ where: { deletedAt: null, status: 'pending' } });
     const approvedEnrollments = await db.enrollment.count({ where: { deletedAt: null, status: 'approved' } });
 
-    // Course popularity
     const coursePopularity = await db.enrollment.groupBy({
       by: ['courseId', 'courseName'],
       where: { deletedAt: null },
@@ -27,7 +26,6 @@ export async function GET() {
       orderBy: { _count: { id: 'desc' } },
     });
 
-    // Daily enrollment trends (last 7 days)
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
@@ -49,7 +47,6 @@ export async function GET() {
       if (dailyTrends[key] !== undefined) dailyTrends[key]++;
     });
 
-    // Recent activity (last 10)
     const recentActivity = await db.enrollment.findMany({
       where: { deletedAt: null },
       include: { user: { select: { id: true, name: true, email: true } } },
@@ -57,7 +54,6 @@ export async function GET() {
       take: 10,
     });
 
-    // Users this week vs last week
     const thisWeekStart = new Date();
     thisWeekStart.setDate(thisWeekStart.getDate() - 7);
     const lastWeekStart = new Date();

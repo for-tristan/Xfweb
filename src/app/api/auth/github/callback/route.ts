@@ -26,7 +26,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/?error=oauth_not_configured', request.url));
     }
 
-    // Exchange code for access token
     const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
       headers: {
@@ -47,13 +46,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/?error=oauth_failed', request.url));
     }
 
-    // Fetch GitHub user profile
     const userRes = await fetch('https://api.github.com/user', {
       headers: { Authorization: `Bearer ${tokenData.access_token}` },
     });
     const ghUser = await userRes.json();
 
-    // Fetch GitHub emails
     const emailRes = await fetch('https://api.github.com/user/emails', {
       headers: { Authorization: `Bearer ${tokenData.access_token}` },
     });
@@ -70,7 +67,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/?error=email_not_verified', request.url));
     }
 
-    // Check for existing account link
     const existingLink = await db.accountLink.findUnique({
       where: {
         provider_providerAccountId: {
@@ -84,19 +80,14 @@ export async function GET(request: NextRequest) {
     let user;
 
     if (existingLink) {
-      // Link exists, log in the linked user
       user = existingLink.user;
     } else {
-      // Check if user exists with this email — link if found
       user = await db.user.findUnique({ where: { email: primaryEmail } });
 
       if (user) {
-        // where an attacker adds a victim's email to their GitHub account.
-        // Users must link accounts manually via account settings (with password confirmation).
         const response = NextResponse.redirect(
           new URL('/?error=account_link_required&provider=github', request.url)
         );
-        // Clear the OAuth state cookie
         response.cookies.set('oauth_state', '', {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
@@ -106,7 +97,6 @@ export async function GET(request: NextRequest) {
         });
         return response;
       } else {
-        // Create new user
         const baseUsername = ghUser.login
           ? `gh_${ghUser.login.replace(/[^a-zA-Z0-9_]/g, '').toLowerCase().slice(0, 15)}`
           : `gh_${String(ghUser.id)}`;
@@ -128,7 +118,7 @@ export async function GET(request: NextRequest) {
             username,
             avatar: ghUser.avatar_url || null,
             role: 'student',
-            emailVerified: new Date(), // GitHub email is verified (checked above)
+            emailVerified: new Date(),
           },
         });
 
@@ -146,7 +136,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/?error=oauth_failed', request.url));
     }
 
-    // Set session cookies using the new createSession helper
     const token = await createSession(user.id);
     const response = NextResponse.redirect(new URL('/', request.url));
 
@@ -168,7 +157,6 @@ export async function GET(request: NextRequest) {
       path: '/',
     });
 
-    // Clear the OAuth state cookie
     response.cookies.set('oauth_state', '', {
       httpOnly: true,
       secure,

@@ -55,16 +55,13 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
   } | null>(null);
   const [error, setError] = useState('');
 
-  // Initialize timer when test opens
   useEffect(() => {
     if (test && !test.hasCompleted) {
       setTimeLeft(test.timeLimit * 60);
-      // Capture the exact moment the student started the test
       setTestStartedAt(new Date().toISOString());
     }
   }, [test]);
 
-  // Timer countdown
   useEffect(() => {
     if (!test || test.hasCompleted || timeLeft <= 0 || results) return;
 
@@ -81,7 +78,6 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
     return () => clearInterval(timer);
   }, [test, timeLeft, results, test?.hasCompleted]);
 
-  // Auto-submit when time runs out
   useEffect(() => {
     if (timeLeft === 0 && test && !test.hasCompleted && !results && !submitting) {
       handleSubmit();
@@ -92,7 +88,6 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
   const handleSubmit = useCallback(async () => {
     if (!test || submitting || results) return;
 
-    // Check if at least one answer
     const answeredCount = Object.keys(answers).length;
     if (answeredCount === 0) {
       setError('Please answer at least one question');

@@ -26,7 +26,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { action, duration } = body;
 
-    // Default courseId to 'general' if not provided
     const courseId = body.courseId || 'general';
 
     if (!action) {
@@ -40,7 +39,6 @@ export async function POST(request: NextRequest) {
     const today = getTodayStr();
 
     if (action === 'start') {
-      // Create or get today's session for this course
       const session = await db.studySession.upsert({
         where: {
           userId_courseId_date: {
@@ -69,14 +67,12 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // action === 'stop'
     if (typeof duration !== 'number' || duration < 0) {
       return NextResponse.json({ error: 'duration (number, >= 0) is required for stop action' }, { status: 400 });
     }
 
     const cappedDuration = Math.min(duration, MAX_DURATION_SECONDS);
 
-    // Find existing session or create one
     const session = await db.studySession.upsert({
       where: {
         userId_courseId_date: {
@@ -118,7 +114,6 @@ export async function GET() {
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 
-    // Get all 'general' sessions for this user
     const sessions = await db.studySession.findMany({
       where: { userId: user.id, courseId: 'general' },
       orderBy: { date: 'desc' },

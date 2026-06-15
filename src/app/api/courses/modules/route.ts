@@ -19,8 +19,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // The frontend passes the course slug as courseId, but modules store
-    // the Course's CUID id. Look up the course by slug first.
     const course = await db.course.findUnique({
       where: { slug: courseIdParam },
     });
@@ -31,7 +29,6 @@ export async function GET(request: NextRequest) {
       orderBy: { moduleOrder: 'asc' },
     });
 
-    // Get unlocks for this user
     const unlocks = await db.moduleUnlock.findMany({
       where: { userId: user.id },
       select: { moduleId: true },
@@ -39,8 +36,6 @@ export async function GET(request: NextRequest) {
 
     const unlockedModuleIds = new Set(unlocks.map(u => u.moduleId));
 
-    // Check if user has an approved enrollment for this course
-    // Enrollments store the slug as courseId, so use courseIdParam
     const enrollment = await db.enrollment.findFirst({
       where: {
         userId: user.id,

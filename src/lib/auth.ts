@@ -15,7 +15,6 @@ export function hashPassword(password: string): string {
 }
 
 export function verifyPassword(password: string, stored: string): boolean {
-  // Legacy format: plain sha256 hex (64 chars, no colon)
   if (!stored.includes(':')) {
     const legacyMatch = createHash('sha256').update(password + 'x-foundry-salt').digest('hex') === stored;
     if (legacyMatch) {
@@ -23,7 +22,6 @@ export function verifyPassword(password: string, stored: string): boolean {
     }
     return legacyMatch;
   }
-  // New format: salt:hash
   const [salt, hash] = stored.split(':');
   if (!salt || !hash) return false;
   const computed = scryptSync(password, salt, 64).toString('hex');
@@ -38,32 +36,13 @@ export function createSessionToken(userId: string): string {
   return createHash('sha256').update(userId + SESSION_SECRET + randomPart).digest('hex');
 }
 
-/**
- * Validates a session token against a user ID.
- * The token is: sha256(userId + SESSION_SECRET + randomPart)
- * We store the token in the xfoundry_session cookie and the userId in xfoundry_user_id.
- * To validate, we check that the token could have been generated for this userId.
- * Since the random part is embedded in the hash, we need a different approach:
- * We store a hash of (userId + token) in the database or validate it differently.
- *
- * Approach: Store session tokens in the database for proper validation.
- * For now, we use a simpler verification: the token must equal sha256(userId + SESSION_SECRET + randomPart)
- * Since we can't recover randomPart from the hash, we store the token alongside the user.
- *
- * Simple secure approach: store the session token in the database (Session table).
- * But for minimal disruption, we use a HMAC-like approach:
- * Token = sha256(userId + SESSION_SECRET + randomPart)
- * We store the token. To validate: we check if the stored token matches for this userId.
- *
- * Best minimal fix: Store session tokens in a Session model and validate against it.
- */
+
 export const SESSION_INACTIVITY_DAYS = 3;
 export const SESSION_MAX_AGE_MS = SESSION_INACTIVITY_DAYS * 24 * 60 * 60 * 1000;
 
 export async function verifySessionToken(userId: string, token: string): Promise<boolean> {
   if (!SESSION_SECRET) return false;
 
-  // Look up active sessions for this user
   const session = await db.session.findUnique({
     where: { token },
   });
@@ -71,13 +50,10 @@ export async function verifySessionToken(userId: string, token: string): Promise
   if (!session) return false;
   if (session.userId !== userId) return false;
   if (session.expiresAt < new Date()) {
-    // Clean up expired session
     await db.session.delete({ where: { token } }).catch(() => {});
     return false;
   }
 
-  // If the user is active, their session keeps getting renewed.
-  // If they don't visit for 3 days, the session naturally expires.
   const newExpiresAt = new Date(Date.now() + SESSION_MAX_AGE_MS);
   await db.session.update({
     where: { token },
@@ -129,13 +105,10 @@ export async function getCurrentUser(): Promise<{
   }
 }
 
-/**
- * Create a session record in the database and return the token.
- * Call this after successful login/signup/OAuth.
- */
+
 export async function createSession(userId: string): Promise<string> {
   const token = createSessionToken(userId);
-  const expiresAt = new Date(Date.now() + SESSION_MAX_AGE_MS); // 3 days (rolling)
+  const expiresAt = new Date(Date.now() + SESSION_MAX_AGE_MS);
 
   await db.session.upsert({
     where: { token },
@@ -150,35 +123,26 @@ export async function createSession(userId: string): Promise<string> {
   return token;
 }
 
-/**
- * Delete a session (for logout).
- */
+
 export async function deleteSession(token: string): Promise<void> {
   try {
     await db.session.delete({ where: { token } });
   } catch {
-    // Session may already be deleted
   }
 }
 
-/**
- * Delete all sessions for a user (for password reset, role change, etc.)
- */
+
 export async function deleteAllUserSessions(userId: string): Promise<void> {
   try {
     await db.session.deleteMany({ where: { userId } });
   } catch {
-    // Ignore errors
   }
 }
 
 
 type AuthUser = NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>;
 
-/**
- * Require the current user to be an admin.
- * Returns { error: NextResponse, user: null } on failure.
- */
+
 export async function requireAdmin(): Promise<{ error: NextResponse | null; user: AuthUser | null }> {
   const user = await getCurrentUser();
   if (!user) return { error: NextResponse.json({ error: 'Not authenticated' }, { status: 401 }), user: null };
@@ -186,10 +150,7 @@ export async function requireAdmin(): Promise<{ error: NextResponse | null; user
   return { error: null, user };
 }
 
-/**
- * Require the current user to be an instructor.
- * Returns { error: NextResponse, user: null } on failure.
- */
+
 export async function requireInstructor(): Promise<{ error: NextResponse | null; user: AuthUser | null }> {
   const user = await getCurrentUser();
   if (!user) return { error: NextResponse.json({ error: 'Not authenticated' }, { status: 401 }), user: null };
@@ -197,11 +158,7 @@ export async function requireInstructor(): Promise<{ error: NextResponse | null;
   return { error: null, user };
 }
 
-/**
- * Require the current user to be either an instructor or an admin.
- * Admins get full access; instructors get course-scoped access.
- * Returns { error: NextResponse | null, user: AuthUser | null, isInstructor: boolean, isAdmin: boolean }
- */
+
 export async function requireInstructorOrAdmin(): Promise<{
   error: NextResponse | null;
   user: AuthUser | null;

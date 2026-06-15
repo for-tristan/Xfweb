@@ -72,7 +72,6 @@ interface Course {
   enrollmentCount?: number;
 }
 
-// DATA (dynamic fallback)
 
 const fallbackCourses: Course[] = [];
 
@@ -92,10 +91,6 @@ const staticSearchData = [
 ];
 
 
-//
-
-// Character-by-character reveal component (Vaulta SplitText style)
-// Reveals once on scroll into view — does NOT re-hide on scroll away to prevent lag spikes
 function BlurText({ text, tag = 'span', className = '', stagger = 0.02 }: { text: string; tag?: string; className?: string; stagger?: number }) {
   const ref = useRef<HTMLElement>(null);
   const [revealed, setRevealed] = useState(false);
@@ -106,7 +101,6 @@ function BlurText({ text, tag = 'span', className = '', stagger = 0.02 }: { text
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
         setRevealed(true);
-        // Disconnect after first reveal — no need to re-trigger
         observer.disconnect();
       }
     }, { threshold: 0.1 });
@@ -231,7 +225,7 @@ export default function Home() {
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [cropImageFile, setCropImageFile] = useState<File | null>(null);
   const [profileSaving, setProfileSaving] = useState(false);
-  const [enrollmentStatus, setEnrollmentStatus] = useState<Record<string, string>>({}); // courseId -> status
+  const [enrollmentStatus, setEnrollmentStatus] = useState<Record<string, string>>({});
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [enrollmentsLoading, setEnrollmentsLoading] = useState(false);
   const [quotes, setQuotes] = useState<QuoteRequest[]>([]);
@@ -270,7 +264,6 @@ export default function Home() {
 
   const [cancelLoading, setCancelLoading] = useState<string | null>(null);
 
-  // Confirm modals
   const [confirmModal, setConfirmModal] = useState<{ open: boolean; title: string; message: string; confirmLabel: string; danger: boolean; icon: string; onConfirm: () => void }>({ open: false, title: '', message: '', confirmLabel: 'Confirm', danger: false, icon: 'fa-solid fa-exclamation-triangle', onConfirm: () => {} });
   const [deletePassword, setDeletePassword] = useState('');
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -306,12 +299,10 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
 
 
-  // Minimum 3-second loader display
   useEffect(() => {
     const timer = setTimeout(() => setMinLoading(false), 3000);
     return () => clearTimeout(timer);
   }, []);
-  // Auth check — logged-out users can still view the homepage
   useEffect(() => {
     (async () => {
       try {
@@ -320,8 +311,6 @@ export default function Home() {
           const data = await res.json();
           setUser(data.user);
         } else if (res.status === 403) {
-          // Existing user whose email is not yet verified —
-          // redirect to auth page for verification flow
           const data = await res.json();
           if (data.needsVerification) {
             setUser(null);
@@ -329,18 +318,15 @@ export default function Home() {
             return;
           }
         } else {
-          // Not authenticated — allow browsing but no user
           setUser(null);
         }
       } catch {
-        // Not authenticated — allow browsing but no user
         setUser(null);
       }
       setAuthLoading(false);
     })();
   }, [router, toast]);
 
-  // Load enrollments & quotes when user logs in
   const loadEnrollments = useCallback(async () => {
     setEnrollmentsLoading(true);
     try {
@@ -350,7 +336,7 @@ export default function Home() {
         setEnrollments(data.enrollments);
         setEnrollmentStatus(Object.fromEntries(data.enrollments.map((e: Enrollment) => [e.courseId, e.status])));
       }
-    } catch { /* err */ }
+    } catch {  }
     setEnrollmentsLoading(false);
   }, []);
 
@@ -363,7 +349,7 @@ export default function Home() {
         setNotifications(data.notifications);
         setUnreadCount(data.unreadCount);
       }
-    } catch { /* err */ }
+    } catch {  }
   }, []);
 
   const loadFriends = useCallback(async () => {
@@ -376,7 +362,7 @@ export default function Home() {
         setPendingRequests(data.pendingRequests || []);
         setSentRequests(data.sentRequests || []);
       }
-    } catch { /* err */ }
+    } catch {  }
     setFriendsLoading(false);
   }, []);
 
@@ -397,21 +383,21 @@ export default function Home() {
     try {
       const res = await fetch('/api/friends', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ friendshipId, action: 'accept' }) });
       if (res.ok) { toast({ title: 'Friend Added!' }); loadFriends(); loadNotifications(); }
-    } catch { /* err */ }
+    } catch {  }
   };
 
   const handleRejectFriend = async (friendshipId: string) => {
     try {
       const res = await fetch('/api/friends', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ friendshipId, action: 'reject' }) });
       if (res.ok) { toast({ title: 'Request Declined' }); loadFriends(); }
-    } catch { /* err */ }
+    } catch {  }
   };
 
   const handleRemoveFriend = async (friendshipId: string) => {
     try {
       const res = await fetch(`/api/friends?friendshipId=${friendshipId}`, { method: 'DELETE' });
       if (res.ok) { toast({ title: 'Friend Removed' }); loadFriends(); }
-    } catch { /* err */ }
+    } catch {  }
   };
 
   const handleCancelSentRequest = (friendshipId: string) => {
@@ -422,7 +408,7 @@ export default function Home() {
         try {
           const res = await fetch(`/api/friends?friendshipId=${friendshipId}`, { method: 'DELETE' });
           if (res.ok) { toast({ title: 'Request Cancelled' }); loadFriends(); }
-        } catch { /* err */ }
+        } catch {  }
       },
       { confirmLabel: 'Cancel Request', danger: false, icon: 'fa-solid fa-paper-plane' }
     );
@@ -436,7 +422,7 @@ export default function Home() {
         const data = await res.json();
         setQuotes(data.quotes);
       }
-    } catch { /* err */ }
+    } catch {  }
     setQuotesLoading(false);
   }, []);
 
@@ -446,21 +432,17 @@ export default function Home() {
     init();
   }, [user, loadEnrollments, loadQuotes, loadNotifications, loadFriends]);
 
-  // Poll notifications every 30s so friend requests show up in real-time
   useEffect(() => {
     if (!user) return;
     const interval = setInterval(() => { loadNotifications(); loadFriends(); }, 30000);
     return () => clearInterval(interval);
   }, [user, loadNotifications, loadFriends]);
 
-  // Scroll detection
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 80);
-      // Detect bottom of page
       const distFromBottom = document.documentElement.scrollHeight - window.innerHeight - window.scrollY;
       setAtBottom(distFromBottom < 80);
-      // Active nav highlighting
       const scrollPos = window.scrollY + 150;
       const ids = ['home', 'services', 'courses', 'contact'];
       for (const id of ids) {
@@ -475,11 +457,9 @@ export default function Home() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Theme: initialize from localStorage
   const [theme, setTheme] = useState<string>(() => {
     if (typeof window === 'undefined') return 'light';
     const saved = localStorage.getItem('x-foundry-theme') || 'oled';
-    // Backwards compat: map old 'dark' or 'vaulta' to light
     if (saved === 'dark' || saved === 'vaulta') return 'light';
     return saved;
   });
@@ -491,11 +471,9 @@ export default function Home() {
     }
     const lightThemeIds = ['light', 'sand', 'lavender', 'mint', 'rose-gold', 'honey', 'clay', 'sage', 'peach'];
     document.documentElement.classList.toggle('dark', !lightThemeIds.includes(theme));
-    // Dispatch custom event so other components (e.g. ParticlesBackground) react instantly
     window.dispatchEvent(new CustomEvent('xf-theme-change', { detail: { theme } }));
   }, [theme]);
 
-  // Load profile data when dashboard opens or profile tab selected
   useEffect(() => {
     if (dashboardOpen && user) {
       setProfileName(user.name || '');
@@ -505,7 +483,6 @@ export default function Home() {
     }
   }, [dashboardOpen, user]);
 
-  // Scroll reveal
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
@@ -522,7 +499,6 @@ export default function Home() {
     return () => { observer.disconnect(); };
   }, [authModalOpen, dashboardOpen, serviceModal]);
 
-  // Keyboard shortcuts
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); setSearchOpen(true); }
@@ -547,7 +523,6 @@ export default function Home() {
   };
 
   const openAuthModal = (tab: 'signin' | 'signup', msg?: string) => {
-    // Navigate to the /auth page instead of opening a modal
     router.push(`/auth?tab=${tab}${msg ? `&msg=${encodeURIComponent(msg)}` : ''}`);
   };
 
@@ -590,7 +565,7 @@ export default function Home() {
   };
 
   const handleLogout = async () => {
-    try { await fetch('/api/auth/logout', { method: 'POST' }); } catch { /* ignore */ }
+    try { await fetch('/api/auth/logout', { method: 'POST' }); } catch {  }
     setUser(null); setEnrollments([]); setEnrollmentStatus({}); setQuotes([]);
     setDashboardOpen(false);
     setVerificationStep('idle');
@@ -635,7 +610,7 @@ export default function Home() {
     const status = enrollmentStatus[course.id];
     if (status === 'approved') { toast({ title: 'Already Enrolled', description: `You're already enrolled in ${course.name}` }); return; }
     if (status === 'pending') { toast({ title: 'Enrollment Pending', description: `Your enrollment request for ${course.name} is pending review` }); return; }
-    if (status === 'declined') { /* allow re-enrollment after decline */ }
+    if (status === 'declined') {  }
     setEnrollCourse(course);
     setErExperience('');
     setErMotivation('');
@@ -794,16 +769,10 @@ export default function Home() {
   const formatDate = (d: string) => new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
   const scrollToSection = (id: string) => {
-    // Close the menu first so the body scroll-lock cleanup runs
-    // (which restores window.scrollTo to the pre-menu position).
-    // Then, after the cleanup has completed, scroll to the target section.
     setMobileMenuOpen(false);
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         const lenis = (window as any).__lenis;
-        // 'home' = scroll to very top (the hero section is pinned
-        // and becomes position:fixed/visibility:hidden when scrolled,
-        // so scrollIntoView/scrollTo(element) fails silently).
         if (id === 'home') {
           if (lenis) {
             lenis.scrollTo(0, { duration: 1.2 });
@@ -823,11 +792,9 @@ export default function Home() {
     });
   };
 
-  // Handle incoming hash fragments (e.g. /#services from other pages)
   useEffect(() => {
     if (window.location.hash) {
       const id = window.location.hash.replace('#', '');
-      // Poll for element since dynamic sections may not be rendered yet
       let attempts = 0;
       const poll = setInterval(() => {
         const el = document.getElementById(id);
@@ -838,12 +805,11 @@ export default function Home() {
           } else {
             el.scrollIntoView({ behavior: 'smooth' });
           }
-          // Clean up hash without re-triggering
           history.replaceState(null, '', window.location.pathname);
           clearInterval(poll);
         }
         attempts++;
-        if (attempts > 40) clearInterval(poll); // give up after ~2s
+        if (attempts > 40) clearInterval(poll);
       }, 50);
       return () => clearInterval(poll);
     }
@@ -854,7 +820,6 @@ export default function Home() {
   const [dynamicTeam, setDynamicTeam] = useState<Array<{id:string;name:string;role:string;bio:string;avatar:string;icon:string;linkedinUrl:string;githubUrl:string;displayOrder:number}>>([]);
   const [dynamicProjects, setDynamicProjects] = useState<Array<{id:string;title:string;slug:string;description:string;category:string;tags:string[];icon:string;imageUrl:string;projectUrl:string;status:string;displayOrder:number}>>([]);
 
-  // Fetch services, courses, and team from API
   useEffect(() => {
     const fetchDynamicData = async () => {
       try {
@@ -896,7 +861,6 @@ export default function Home() {
     fetchDynamicData();
   }, []);
 
-  // Site content
   const siteName = 'X-Foundry';
   const contactEmail = 'xfoundationcom@gmail.com';
   const contactPhone = '+201234567890';
@@ -910,7 +874,6 @@ export default function Home() {
   const servicesDataMap: Record<string, DynamicService> = {};
   servicesDataArr.forEach(s => { servicesDataMap[s.slug] = s; });
 
-  // Dynamic search data
   const dynamicSearchData = [
     ...servicesDataArr.map(s => ({ title: s.title, category: 'Service', desc: s.description.substring(0, 60) + '...', link: `/services/${s.slug}` })),
     ...dynamicCourses.map(c => ({ title: c.name, category: 'Course', desc: c.description.substring(0, 60) + '...', link: `/courses/${c.id}` })),

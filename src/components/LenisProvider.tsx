@@ -14,11 +14,8 @@ export default function LenisProvider({ children }: { children: React.ReactNode 
       gestureOrientation: 'vertical',
       smoothWheel: true,
       touchMultiplier: 2,
-      // Prevent Lenis from hijacking scroll inside these elements
       prevent: (node: EventTarget | null) => {
         if (!(node instanceof HTMLElement)) return false;
-        // Don't intercept scroll if the target is inside an element
-        // that should handle its own scrolling
         return !!(
           node.closest('[data-lenis-prevent]') ||
           node.closest('.zai-chat-page') ||
@@ -41,9 +38,6 @@ export default function LenisProvider({ children }: { children: React.ReactNode 
 
     lenisRef.current = lenis;
 
-    // Fire a custom event on each Lenis scroll frame so that
-    // ScrollFadeSection and other scroll-linked components can
-    // update their positions in sync with Lenis' smooth scroll.
     lenis.on('scroll', () => {
       window.dispatchEvent(new CustomEvent('xf:lenis-scroll'));
     });
@@ -55,7 +49,6 @@ export default function LenisProvider({ children }: { children: React.ReactNode 
 
     requestAnimationFrame(raf);
 
-    // Expose lenis instance globally so other components can use it
     (window as unknown as Record<string, unknown>).__lenis = lenis;
 
     return () => {

@@ -12,13 +12,12 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const courseId = searchParams.get('courseId');
-    const format = searchParams.get('format'); // 'pdf' for direct download
+    const format = searchParams.get('format');
 
     if (!courseId) {
       return NextResponse.json({ error: 'Course ID is required' }, { status: 400 });
     }
 
-    // Check if a certificate has been issued for this user/course
     const certificate = await db.certificate.findUnique({
       where: { userId_courseId: { userId: user.id, courseId } },
     });
@@ -27,7 +26,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ hasCertificate: false }, { status: 404 });
     }
 
-    // If format=pdf, generate and serve the PDF
     if (format === 'pdf') {
       try {
         const pdfBuffer = await generateCertificatePDF({
@@ -49,7 +47,6 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Otherwise return certificate metadata
     return NextResponse.json({
       hasCertificate: true,
       userName: user.name,

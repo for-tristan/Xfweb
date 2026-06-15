@@ -431,7 +431,6 @@ export async function POST() {
     const { error, user } = await requireAdmin();
     if (error) return error;
 
-    // Resolve course slugs to actual CUIDs
     const courses = await db.course.findMany({ select: { id: true, slug: true } });
     const slugToId = new Map(courses.map(c => [c.slug, c.id]));
 
@@ -443,7 +442,6 @@ export async function POST() {
     let notFound = 0;
 
     for (const mod of allModules) {
-      // Resolve slug to real CUID
       const realCourseId = slugToId.get(mod.courseId);
       if (!realCourseId) {
         console.warn(`[Seed] Course slug "${mod.courseId}" not found in DB — skipping module "${mod.title}"`);
@@ -459,7 +457,6 @@ export async function POST() {
       });
 
       if (existing) {
-        // Update content if module exists but has no content
         if (!existing.content || existing.content.trim() === '') {
           await db.courseModule.update({
             where: { id: existing.id },

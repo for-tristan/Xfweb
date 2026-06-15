@@ -74,7 +74,6 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Check if this would remove the last admin
     if (targetUser.role === 'admin' && role === 'student') {
       const adminCount = await db.user.count({ where: { role: 'admin' } });
       if (adminCount <= 1) {
@@ -91,7 +90,6 @@ export async function PUT(request: NextRequest) {
       select: { id: true, name: true, email: true, role: true, avatar: true, createdAt: true },
     });
 
-    // so they need to re-login with their new permissions
     await deleteAllUserSessions(userId);
 
     return NextResponse.json({
@@ -141,7 +139,6 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Check if this would delete the last admin
     if (targetUser.role === 'admin') {
       const adminCount = await db.user.count({ where: { role: 'admin' } });
       if (adminCount <= 1) {

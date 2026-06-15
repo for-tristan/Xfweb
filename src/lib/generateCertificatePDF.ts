@@ -16,14 +16,10 @@ export function generateCertificatePDF(
     format: 'a4',
   });
 
-  // =========================
-  // =========================
 
   const W = 297;
   const H = 210;
 
-  // =========================
-  // =========================
 
   const BG: [number, number, number] = [250, 247, 242];
 
@@ -39,14 +35,10 @@ export function generateCertificatePDF(
 
   const LIGHT: [number, number, number] = [165, 165, 165];
 
-  // =========================
-  // =========================
 
   doc.setFillColor(...BG);
   doc.rect(0, 0, W, H, 'F');
 
-  // =========================
-  // =========================
 
   doc.setDrawColor(...GOLD);
   doc.setLineWidth(1.2);
@@ -57,8 +49,6 @@ export function generateCertificatePDF(
 
   doc.rect(14, 14, W - 28, H - 28);
 
-  // =========================
-  // =========================
 
   doc.setTextColor(240, 236, 228);
 
@@ -70,8 +60,6 @@ export function generateCertificatePDF(
     angle: 0,
   });
 
-  // =========================
-  // =========================
 
   doc.setTextColor(...RED);
 
@@ -82,15 +70,12 @@ export function generateCertificatePDF(
     align: 'center',
   });
 
-  // gold line
 
   doc.setDrawColor(...GOLD_LIGHT);
   doc.setLineWidth(0.8);
 
   doc.line(W / 2 - 20, 39, W / 2 + 20, 39);
 
-  // =========================
-  // =========================
 
   doc.setTextColor(...DARK);
 
@@ -108,8 +93,6 @@ export function generateCertificatePDF(
     align: 'center',
   });
 
-  // =========================
-  // =========================
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
@@ -125,8 +108,6 @@ export function generateCertificatePDF(
     }
   );
 
-  // =========================
-  // =========================
 
   doc.setFont('times', 'bold');
   doc.setFontSize(34);
@@ -137,7 +118,6 @@ export function generateCertificatePDF(
     align: 'center',
   });
 
-  // underline
 
   const nameWidth = doc.getTextWidth(data.userName);
 
@@ -151,8 +131,6 @@ export function generateCertificatePDF(
     108
   );
 
-  // =========================
-  // =========================
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(11);
@@ -168,8 +146,6 @@ export function generateCertificatePDF(
     }
   );
 
-  // =========================
-  // =========================
 
   doc.setFont('times', 'bolditalic');
   doc.setFontSize(24);
@@ -181,20 +157,14 @@ export function generateCertificatePDF(
   });
 
 
-   // =========================
-  // =========================
-
   const sigY = 165;
 
   doc.setDrawColor(...LIGHT);
   doc.setLineWidth(0.4);
 
-  // =========================
-  // =========================
 
   doc.line(92, sigY, 132, sigY);
 
-  // handwritten style signature
   doc.setFont('times', 'italic');
   doc.setFontSize(16);
 
@@ -204,7 +174,6 @@ export function generateCertificatePDF(
     align: 'center',
   });
 
-  // title
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
 
@@ -214,12 +183,9 @@ export function generateCertificatePDF(
     align: 'center',
   });
 
-  // =========================
-  // =========================
 
   doc.line(165, sigY, 205, sigY);
 
-  // handwritten style signature
   doc.setFont('times', 'italic');
   doc.setFontSize(16);
 
@@ -229,7 +195,6 @@ export function generateCertificatePDF(
     align: 'center',
   });
 
-  // title
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
 
@@ -239,8 +204,6 @@ export function generateCertificatePDF(
     align: 'center',
   });
 
-  // =========================
-  // =========================
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
@@ -262,8 +225,6 @@ export function generateCertificatePDF(
     }
   );
 
-  // =========================
-  // =========================
 
   doc.setDrawColor(...GOLD_LIGHT);
   doc.setLineWidth(0.8);

@@ -1,10 +1,6 @@
 'use client';
 import { useEffect, useRef, useCallback, ReactNode } from 'react';
 
-// =============================================
-// Uses IntersectionObserver + CSS transitions
-// Animations replay when scrolling back and forth
-// =============================================
 
 function useRevealOnScroll(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null);
@@ -27,8 +23,6 @@ function useRevealOnScroll(threshold = 0.1) {
   return ref;
 }
 
-// =============================================
-// =============================================
 export function SectionReveal({ children, direction = 'up', delay = 0, className = '' }: {
   children: React.ReactNode;
   direction?: 'up' | 'down' | 'left' | 'right' | 'scale';
@@ -39,7 +33,6 @@ export function SectionReveal({ children, direction = 'up', delay = 0, className
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    // Map direction to CSS class
     const dirClass = direction === 'down' ? 'reveal-up' : `reveal-${direction}`;
     el.classList.add(dirClass);
     if (delay > 0) {
@@ -49,7 +42,7 @@ export function SectionReveal({ children, direction = 'up', delay = 0, className
       ([entry]) => {
         if (entry.isIntersecting) {
           el.classList.add('visible');
-          obs.disconnect(); // Only reveal once — prevents lag from constant re-triggering
+          obs.disconnect();
         }
       },
       { threshold: 0.1 }
@@ -60,8 +53,6 @@ export function SectionReveal({ children, direction = 'up', delay = 0, className
   return <div ref={ref} className={className}>{children}</div>;
 }
 
-// =============================================
-// =============================================
 export function StaggerReveal({ children, className = '', staggerDelay = 80, direction = 'up' }: {
   children: React.ReactNode;
   className?: string;
@@ -85,7 +76,7 @@ export function StaggerReveal({ children, className = '', staggerDelay = 80, dir
           for (let i = 0; i < children.length; i++) {
             (children[i] as HTMLElement).classList.add('visible');
           }
-          obs.disconnect(); // Only reveal once
+          obs.disconnect();
         }
       },
       { threshold: 0.1 }
@@ -96,8 +87,6 @@ export function StaggerReveal({ children, className = '', staggerDelay = 80, dir
   return <div ref={ref} className={className}>{children}</div>;
 }
 
-// =============================================
-// =============================================
 export function ScrollProgressBar() {
   const barRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -117,8 +106,6 @@ export function ScrollProgressBar() {
   );
 }
 
-// =============================================
-// =============================================
 export function ParallaxLayer({ children, speed = 0.3, className = '' }: {
   children: React.ReactNode;
   speed?: number;
@@ -149,8 +136,6 @@ export function ParallaxLayer({ children, speed = 0.3, className = '' }: {
   return <div ref={ref} className={className} style={{ willChange: 'transform' }}>{children}</div>;
 }
 
-// =============================================
-// =============================================
 export function TextSplitReveal({ text, className = '', tag = 'h2', delay = 0 }: {
   text: string;
   className?: string;
@@ -175,7 +160,7 @@ export function TextSplitReveal({ text, className = '', tag = 'h2', delay = 0 }:
             (s as HTMLElement).style.opacity = '1';
             (s as HTMLElement).style.transform = 'translate3d(0,0,0)';
           });
-          obs.disconnect(); // Only reveal once
+          obs.disconnect();
         }
       },
       { threshold: 0.3 }
@@ -187,8 +172,6 @@ export function TextSplitReveal({ text, className = '', tag = 'h2', delay = 0 }:
   return <Tag ref={ref} className={className} />;
 }
 
-// =============================================
-// =============================================
 export function CounterAnimation({ target, suffix = '', className = '' }: {
   target: number;
   suffix?: string;
@@ -208,7 +191,6 @@ export function CounterAnimation({ target, suffix = '', className = '' }: {
           const animate = (now: number) => {
             const elapsed = now - start;
             const progress = Math.min(elapsed / duration, 1);
-            // Ease out expo
             const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
             if (el) el.textContent = Math.round(eased * target) + suffix;
             if (progress < 1) requestAnimationFrame(animate);
@@ -224,8 +206,6 @@ export function CounterAnimation({ target, suffix = '', className = '' }: {
   return <span ref={ref} className={className}>0{suffix}</span>;
 }
 
-// =============================================
-// =============================================
 export function MagneticButton({ children, className = '', strength = 0.3, onClick }: {
   children: React.ReactNode;
   className?: string;
@@ -255,8 +235,6 @@ export function MagneticButton({ children, className = '', strength = 0.3, onCli
   );
 }
 
-// =============================================
-// =============================================
 export function TiltCard({ children, className = '', glare = true }: {
   children: React.ReactNode;
   className?: string;
@@ -296,8 +274,6 @@ export function TiltCard({ children, className = '', glare = true }: {
   );
 }
 
-// =============================================
-// =============================================
 export function GlowButton({ children, className = '', onClick }: {
   children: React.ReactNode;
   className?: string;
@@ -310,8 +286,6 @@ export function GlowButton({ children, className = '', onClick }: {
   );
 }
 
-// =============================================
-// =============================================
 export function FloatingParticles({ count = 20, className = '' }: {
   count?: number;
   className?: string;
@@ -344,8 +318,6 @@ export function FloatingParticles({ count = 20, className = '' }: {
   return <div ref={ref} className={className} style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }} />;
 }
 
-// =============================================
-// =============================================
 export function MorphingShape({ className = '' }: { className?: string }) {
   return (
     <div className={`morphing-shape ${className}`} style={{ opacity: 0.06 }}>

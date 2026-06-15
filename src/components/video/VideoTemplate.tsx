@@ -38,7 +38,6 @@ export default function VideoTemplate({
   const isFirst = useRef(true);
 
 
-  // Fire transition hit + notify parent on scene change
   useEffect(() => {
     if (isFirst.current) {
       isFirst.current = false;

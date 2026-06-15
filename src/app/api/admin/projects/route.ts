@@ -13,7 +13,6 @@ async function requireAdmin() {
   return { error: null, user };
 }
 
-// GET /api/admin/projects — list all projects
 export async function GET() {
   try {
     const { error } = await requireAdmin();
@@ -30,7 +29,6 @@ export async function GET() {
   }
 }
 
-// POST /api/admin/projects — create a project
 export async function POST(request: NextRequest) {
   try {
     const { error } = await requireAdmin();
@@ -68,7 +66,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PUT /api/admin/projects — update a project
 export async function PUT(request: NextRequest) {
   try {
     const { error } = await requireAdmin();
@@ -112,7 +109,6 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// DELETE /api/admin/projects — delete a project
 export async function DELETE(request: NextRequest) {
   try {
     const { error } = await requireAdmin();

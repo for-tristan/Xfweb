@@ -2,34 +2,16 @@ import { Resend } from 'resend';
 import nodemailer from 'nodemailer';
 import type SMTPTransport from 'nodemailer/lib/smtp-transport';
 
-// Primary: Gmail SMTP (with App Password — fast + reliable)
-// Fallback: Resend (if Gmail fails)
-//
-// 1. Port 587 + STARTTLS = extra handshake round-trip (~3-5s wasted)
-// 2. Old timeouts were too long = hung connections blocked everything
-// 3. Old code used regular Gmail password = auth failures
-
-// Setup: https://myaccount.google.com/apppasswords
-// 1. Enable 2FA on your Google account
-// 2. Generate an App Password (name it "XFoundry")
-// 3. Use the 16-char code as SMTP_PASS
-// Free: 500 emails/day
 
 const SMTP_HOST = process.env.SMTP_HOST || '';
-const SMTP_PORT = parseInt(process.env.SMTP_PORT || '465'); // 465 = implicit TLS (FASTER than 587)
+const SMTP_PORT = parseInt(process.env.SMTP_PORT || '465');
 const SMTP_USER = process.env.SMTP_USER || '';
 const SMTP_PASS = process.env.SMTP_PASS || '';
 
-// Free tier: 100 emails/day. Just needs RESEND_API_KEY.
-// Only used if Gmail fails. Sign up at https://resend.com
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
 const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
 
-// Key optimizations for Vercel serverless:
-// - Port 465 + secure:true = implicit TLS (saves STARTTLS round-trip)
-// - Tight timeouts = fail fast, retry quickly with fresh connection
-// - Close connection after each send = no stale connection issues
 
 function createSmtpTransporter(): nodemailer.Transporter<SMTPTransport.SentMessageInfo> | null {
   if (!SMTP_PASS) {
@@ -38,10 +20,10 @@ function createSmtpTransporter(): nodemailer.Transporter<SMTPTransport.SentMessa
   const options: SMTPTransport.Options = {
     host: SMTP_HOST,
     port: SMTP_PORT,
-    secure: SMTP_PORT === 465, // true = immediate TLS (faster!)
-    connectionTimeout: 5_000,  // 5s to connect (was 8s — too slow to fail)
-    greetingTimeout: 3_000,    // 3s for greeting (was 5s)
-    socketTimeout: 8_000,      // 8s for data transfer (was 10s)
+    secure: SMTP_PORT === 465,
+    connectionTimeout: 5_000,
+    greetingTimeout: 3_000,
+    socketTimeout: 8_000,
     auth: {
       user: SMTP_USER,
       pass: SMTP_PASS,
@@ -81,24 +63,11 @@ interface EmailPayload {
   }>;
 }
 
-/**
- * Send email via Gmail SMTP (primary) → Resend (fallback).
- *
- * Speed improvements over old code:
- * - Port 465 + implicit TLS = skips STARTTLS handshake (~2-3s faster)
- * - pool: false = no stale connections in serverless
- * - Tighter timeouts = fail fast, retry with fresh connection
- * - Fresh transporter per attempt = never stuck on dead connection
- *
- * IMPORTANT: This function is BLOCKING — callers MUST await it.
- * On Vercel serverless, non-blocking sends get killed when the function exits.
- */
+
 async function sendEmail(payload: EmailPayload): Promise<boolean> {
   const toStr = Array.isArray(payload.to) ? payload.to.join(', ') : payload.to;
 
   if (isGmailConfigured()) {
-    // Fresh transporter for each attempt — avoids stale connections
-    // in Vercel serverless where functions freeze between invocations
     for (let attempt = 1; attempt <= 3; attempt++) {
       const transport = createSmtpTransporter();
       if (!transport) break;
@@ -111,16 +80,13 @@ async function sendEmail(payload: EmailPayload): Promise<boolean> {
           html: payload.html,
           attachments: payload.attachments,
         });
-        // Close connection immediately — don't let it linger
         transport.close();
         console.log(`[Email] Sent via Gmail${attempt > 1 ? ` (attempt ${attempt})` : ''}`);
         return true;
       } catch (error: any) {
-        // Always close on error too
         try { transport.close(); } catch {}
         const code = error?.code || '';
 
-        // Auth error = wrong password, don't retry
         if (code === 'EAUTH') {
           console.error('[Email] Gmail auth failed — check SMTP_PASS is an App Password (not your Gmail password)');
           break;
@@ -128,7 +94,6 @@ async function sendEmail(payload: EmailPayload): Promise<boolean> {
 
         console.error(`[Email] Gmail attempt ${attempt}/3 failed: ${error?.message || error}`);
 
-        // Rate limit or connection error — wait and retry with fresh connection
         if (attempt < 3) {
           const delay = code === 'ECONNREFUSED' || code === 'ETIMEDOUT' ? 1500 : 1000;
           await new Promise(resolve => setTimeout(resolve, delay));
@@ -183,7 +148,6 @@ function sanitizeHtml(text: string): string {
     .replace(/'/g, '&#x27;');
 }
 
-// Clean, minimalist design. Inspired by Stripe/Vercel email style.
 
 const EMAIL_FONT = `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif`;
 const COLOR_ACCENT = '#dc143c';

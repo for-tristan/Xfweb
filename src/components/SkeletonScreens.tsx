@@ -2,7 +2,6 @@
 
 import React from 'react';
 
-// Pulsing animation skeleton placeholders for loading states
 
 const skeletonBase: React.CSSProperties = {
   background: 'var(--border-color, rgba(255,255,255,0.08))',
@@ -103,7 +102,6 @@ export function SkeletonButton({ width = 120, height = 40, style }: SkeletonButt
 }
 
 
-/** Hero section skeleton (title + subtitle + buttons) */
 export function SkeletonHero() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, padding: '60px 20px' }}>
@@ -118,7 +116,7 @@ export function SkeletonHero() {
   );
 }
 
-/** Service card skeleton with icon + title + description */
+
 export function SkeletonServiceCard() {
   return (
     <div style={{
@@ -138,7 +136,7 @@ export function SkeletonServiceCard() {
   );
 }
 
-/** Course card skeleton with image area + title + meta */
+
 export function SkeletonCourseCard() {
   return (
     <div style={{
@@ -179,7 +177,7 @@ export function SkeletonCourseCard() {
   );
 }
 
-/** Auth gate loading skeleton - shows XFoundry branding */
+
 export function SkeletonAuthGate() {
   return (
     <div style={{
@@ -228,7 +226,7 @@ export function SkeletonAuthGate() {
   );
 }
 
-/** Section header skeleton */
+
 export function SkeletonSectionHeader() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, marginBottom: 48 }}>

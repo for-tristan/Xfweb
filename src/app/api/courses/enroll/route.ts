@@ -30,7 +30,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check for duplicate enrollment (ignore soft-deleted records)
     const existingEnrollment = await db.enrollment.findFirst({
       where: {
         userId: user.id,
@@ -58,7 +57,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Create notification for the user
     await db.notification.create({
       data: {
         userId: user.id,

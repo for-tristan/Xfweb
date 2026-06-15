@@ -5,18 +5,11 @@ import { useRef, useEffect, useCallback, useState } from 'react';
 interface DraggableScrollProps {
   children: React.ReactNode;
   className?: string;
-  /** Auto-scroll speed in px/frame. 0 = no auto-scroll. */
+
   autoSpeed?: number;
 }
 
-/**
- * Horizontal draggable scroll container with optional infinite auto-scroll.
- * - Click + drag to scroll horizontally (Lenis-style lerp smoothness)
- * - Momentum/inertia after release (clamped)
- * - Auto-scrolls continuously right-to-left when autoSpeed > 0
- * - Dragging pauses auto-scroll; resumes after a delay
- * - Infinite loop: seamless position reset
- */
+
 export default function DraggableScroll({ children, className = '', autoSpeed = 0 }: DraggableScrollProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -27,7 +20,6 @@ export default function DraggableScroll({ children, className = '', autoSpeed = 
   const lastX = useRef(0);
   const lastTime = useRef(0);
 
-  // Position via translateX
   const currentPos = useRef(0);
   const targetPos = useRef(0);
   const velocity = useRef(0);
@@ -35,22 +27,19 @@ export default function DraggableScroll({ children, className = '', autoSpeed = 
   const animFrame = useRef<number | null>(null);
   const [grabbing, setGrabbing] = useState(false);
 
-  // Auto-scroll pause
   const resumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoPaused = useRef(false);
 
   const LERP = 0.1;
-  const MAX_MOMENTUM = 600; // cap momentum so cards don't fly off
+  const MAX_MOMENTUM = 600;
   const halfWidth = useRef(0);
 
-  // Measure the half-width for infinite loop
   const measureHalfWidth = useCallback(() => {
     const track = trackRef.current;
     if (!track) return;
     halfWidth.current = track.scrollWidth / 2;
   }, []);
 
-  // This keeps targetPos and currentPos always within one loop cycle
   const normalizePosition = useCallback((pos: number) => {
     if (halfWidth.current <= 0) return pos;
     while (pos <= -halfWidth.current) pos += halfWidth.current;
@@ -59,19 +48,13 @@ export default function DraggableScroll({ children, className = '', autoSpeed = 
   }, []);
 
   const animate = useCallback(() => {
-    // Auto-scroll: move target leftward when not dragging and not paused
     if (autoSpeed > 0 && !isDragging.current && !autoPaused.current) {
       targetPos.current -= autoSpeed;
     }
 
-    // Normalize target into loop range
     targetPos.current = normalizePosition(targetPos.current);
 
-    // Lerp current toward target — but also normalize the delta
-    // so currentPos doesn't drift outside the range
     let delta = targetPos.current - currentPos.current;
-    // If the delta is more than half, we're crossing the loop boundary —
-    // snap currentPos closer instead of lerping across the whole width
     if (halfWidth.current > 0 && Math.abs(delta) > halfWidth.current / 2) {
       if (delta > 0) delta -= halfWidth.current;
       else delta += halfWidth.current;
@@ -81,13 +64,11 @@ export default function DraggableScroll({ children, className = '', autoSpeed = 
 
     velocity.current = delta * LERP;
 
-    // Apply transform
     const track = trackRef.current;
     if (track) {
       track.style.transform = `translate3d(${currentPos.current}px, 0, 0)`;
     }
 
-    // Keep running
     animFrame.current = requestAnimationFrame(animate);
   }, [autoSpeed, normalizePosition]);
 
@@ -143,7 +124,6 @@ export default function DraggableScroll({ children, className = '', autoSpeed = 
     dragDistance.current = Math.abs(walk);
     targetPos.current = scrollStart.current + walk;
 
-    // Track velocity for momentum
     const now = Date.now();
     const dt = now - lastTime.current;
     if (dt > 0) {
@@ -222,7 +202,6 @@ export default function DraggableScroll({ children, className = '', autoSpeed = 
     const onResize = () => measureHalfWidth();
     window.addEventListener('resize', onResize);
 
-    // Global mouseup: if user drags outside the container and releases
     const onGlobalMouseUp = () => {
       endDrag();
     };

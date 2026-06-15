@@ -36,12 +36,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if email is verified
     if (!user.emailVerified) {
-      // Auto-resend verification email AFTER response using after()
       const code = randomInt(100000, 1000000).toString();
 
-      // Invalidate previous codes
       await db.emailVerification.updateMany({
         where: { email: user.email, used: false },
         data: { used: true },
@@ -54,9 +51,6 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      // Send email BEFORE returning response.
-      // IMPORTANT: On Vercel serverless, after() does NOT keep the function alive —
-      // the email send gets killed before it completes. We MUST await it here.
       try {
         await sendEmailVerificationEmail({
           userEmail: user.email,
@@ -77,7 +71,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Use the new createSession helper which stores session in DB
     const token = await createSession(user.id);
 
     const response = NextResponse.json({

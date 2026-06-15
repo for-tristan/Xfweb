@@ -13,8 +13,6 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Get enrollment counts for all active courses in one query
-    // courseId in Enrollment stores the course slug
     const enrollmentCounts = await db.enrollment.groupBy({
       by: ['courseId'],
       where: {
@@ -24,12 +22,10 @@ export async function GET(request: NextRequest) {
       _count: { id: true },
     });
 
-    // Create a lookup map: slug -> enrollment count
     const countMap = new Map(
       enrollmentCounts.map(e => [e.courseId, e._count.id])
     );
 
-    // Parse JSON string fields to proper types
     const parsed = courses.map(c => ({
       ...c,
       features: JSON.parse(c.features || '[]'),

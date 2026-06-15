@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireInstructorOrAdmin } from '@/lib/auth';
 
-/**
- * Helper: verify that a test belongs to a course owned by the instructor.
- * Returns the test with module info, or a NextResponse error, or null if not found.
- */
+
 async function verifyTestAccess(
   testId: string,
   instructorId: string | undefined,
@@ -31,9 +28,7 @@ async function verifyTestAccess(
   return { test, error: null };
 }
 
-/**
- * Helper: verify that a module belongs to a course owned by the instructor.
- */
+
 async function verifyModuleCourseAccess(
   moduleId: string,
   instructorId: string | undefined,
@@ -88,7 +83,6 @@ export async function GET(request: NextRequest) {
         },
       });
 
-      // Fetch approved enrollments for this course
       const course = await db.course.findUnique({
         where: { id: fullTest!.module.courseId },
         select: { slug: true },
@@ -187,7 +181,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'moduleId and title are required' }, { status: 400 });
     }
 
-    // Verify module exists and instructor has access
     const { module: mod, error: accessError } = await verifyModuleCourseAccess(moduleId, user?.id, isInstructor, isAdmin);
     if (accessError) return accessError;
 
@@ -269,19 +262,16 @@ export async function PUT(request: NextRequest) {
       if (accessError) return accessError;
 
       try {
-        // Delete any existing completed attempts so student can retake from scratch
         await db.testAttempt.deleteMany({
           where: { testId, userId, submittedAt: { not: null } },
         }).catch(() => {});
 
-        // Use upsert with compound unique key for reliability
         await db.testUnlock.upsert({
           where: { testId_userId: { testId, userId } },
           create: { testId, userId, unlockedBy: user!.id },
           update: {},
         });
 
-        // Notify user
         const testInfo = await db.moduleTest.findUnique({ where: { id: testId } });
         if (testInfo) {
           await db.notification.create({
@@ -322,12 +312,10 @@ export async function PUT(request: NextRequest) {
 
         await db.testUnlock.delete({ where: { id: existing.id } });
 
-        // Also delete any in-progress attempts
         await db.testAttempt.deleteMany({
           where: { testId, userId, submittedAt: null },
         }).catch(() => {});
 
-        // Notify user
         const testInfo = await db.moduleTest.findUnique({ where: { id: testId } });
         if (testInfo) {
           await db.notification.create({
@@ -418,7 +406,6 @@ export async function DELETE(request: NextRequest) {
     const { error: accessError } = await verifyTestAccess(id, user?.id, isInstructor, isAdmin);
     if (accessError) return accessError;
 
-    // Clean up related data before deleting
     await db.testAttempt.deleteMany({ where: { testId: id } });
     await db.testUnlock.deleteMany({ where: { testId: id } });
     await db.testQuestion.deleteMany({ where: { testId: id } });

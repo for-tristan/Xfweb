@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 
-// GET: Get unread message count per conversation
 export async function GET() {
   try {
     const user = await getCurrentUser();
@@ -10,7 +9,6 @@ export async function GET() {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    // Get all unread messages with sender info in a single query
     const unreadMessages = await db.chatMessage.findMany({
       where: {
         receiverId: user.id,
@@ -24,7 +22,6 @@ export async function GET() {
       orderBy: { createdAt: 'desc' },
     });
 
-    // Aggregate by sender in JS (already loaded sender data — no N+1)
     const senderMap = new Map<string, {
       userId: string;
       name: string;

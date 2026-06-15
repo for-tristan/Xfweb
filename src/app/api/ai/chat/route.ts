@@ -7,7 +7,6 @@ const SYSTEM_PROMPT = `You are XF AI, a helpful and knowledgeable assistant buil
 const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
 const GROQ_BASE_URL = 'https://api.groq.com/openai/v1';
 
-// Models to try in order if one gets rate-limited
 const MODEL_FALLBACKS = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'llama3-8b-8192', 'mixtral-8x7b-32768'];
 
 export async function POST(request: NextRequest) {
@@ -38,13 +37,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message too long (max 4000 chars)' }, { status: 400 });
     }
 
-    // Build the full user message — include file content if present
     let fullMessage = message.trim();
     if (fileContent && fileName) {
       fullMessage = `[User uploaded file: "${fileName}"]\n\n--- FILE CONTENT START ---\n${fileContent}\n--- FILE CONTENT END ---\n\n${message.trim()}`;
     }
 
-    // Verify conversation belongs to user
     let conversation;
     if (conversationId) {
       conversation = await db.aiConversation.findFirst({
@@ -60,7 +57,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
       }
     } else {
-      // Create new conversation
       const title = fileName
         ? `📄 ${fileName}`
         : message.slice(0, 60) + (message.length > 60 ? '...' : '');
@@ -81,7 +77,6 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Save user message (store just the display message, not the full file content)
     const displayMessage = fileName ? `📄 ${fileName}\n${message.trim()}` : message.trim();
     await db.aiMessage.create({
       data: {
@@ -91,21 +86,17 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Build messages for the AI (last 20 messages max for context window)
     const allMessages = conversation.messages;
     const userMsgIndex = allMessages.findIndex((m: { role: string }) => m.role === 'user');
     const contextStart = Math.max(userMsgIndex, allMessages.length - 20);
     const contextMessages = allMessages.slice(Math.max(0, contextStart));
-    // Add the new user message (with file content for AI context)
     contextMessages.push({ role: 'user', content: fullMessage });
 
-    // Build OpenAI-compatible messages array
     const apiMessages = contextMessages.map((m: { role: string; content: string }) => ({
       role: m.role as 'system' | 'user' | 'assistant',
       content: m.content,
     }));
 
-    // Call Groq API — try models in order until one works
     let reply: string | null = null;
     let lastError: string | null = null;
 
@@ -140,7 +131,7 @@ export async function POST(request: NextRequest) {
 
         const completion = await apiResponse.json();
         reply = completion.choices?.[0]?.message?.content || null;
-        if (reply) break; // Success!
+        if (reply) break;
       } catch (err: any) {
         console.error(`Groq fetch error with model ${model}:`, err.message);
         lastError = err.message;
@@ -153,7 +144,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to generate response — all models rate-limited or unavailable' }, { status: 502 });
     }
 
-    // Save assistant message
     await db.aiMessage.create({
       data: {
         conversationId: conversation.id,
@@ -162,7 +152,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Update conversation timestamp
     await db.aiConversation.update({
       where: { id: conversation.id },
       data: { updatedAt: new Date() },

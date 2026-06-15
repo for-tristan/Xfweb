@@ -1,4 +1,3 @@
-// Audio disabled — all functions are no-ops
 
 export function startAmbient() {}
 export function stopAmbient() {}

@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 
-// GET: List user's conversations
 export async function GET() {
   try {
     const user = await getCurrentUser();
@@ -29,7 +28,6 @@ export async function GET() {
   }
 }
 
-// DELETE: Delete a conversation
 export async function DELETE(request: NextRequest) {
   try {
     const user = await getCurrentUser();
@@ -61,7 +59,6 @@ export async function DELETE(request: NextRequest) {
   }
 }
 
-// GET messages for a specific conversation
 export async function PATCH(request: NextRequest) {
   try {
     const user = await getCurrentUser();

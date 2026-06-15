@@ -4,14 +4,12 @@ import React, { useRef, useEffect } from 'react';
 
 interface WaveInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  children?: React.ReactNode; // For password strength bars, mismatch messages, etc.
+  children?: React.ReactNode;
 }
 
 export function WaveInput({ label, children, value, style, className, ...rest }: WaveInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Add/remove .has-value class based on whether input has content
-  // (needed for non-required inputs where :valid alone isn't enough)
   useEffect(() => {
     const el = inputRef.current;
     if (!el) return;
@@ -31,7 +29,6 @@ export function WaveInput({ label, children, value, style, className, ...rest }:
     };
   }, [value]);
 
-  // Split label into characters for wave animation
   const labelChars = label.split('').map((char, i) => (
     <span
       key={i}

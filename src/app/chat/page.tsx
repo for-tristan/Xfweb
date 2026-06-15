@@ -32,7 +32,7 @@ const SUGGESTIONS = [
   { icon: 'fa-solid fa-lightbulb', label: 'Brainstorm ideas', desc: 'Generate creative project ideas' },
 ];
 
-/* Logo component — uses var(--accent) for theme-dynamic solid fill, no gradient */
+
 function ChatLogo({ size = 28 }: { size?: number }) {
   return (
     <svg
@@ -85,7 +85,6 @@ function ChatContent() {
     scrollToSection,
   } = usePageFeatures();
 
-  // Chat state
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -98,11 +97,9 @@ function ChatContent() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
 
-  // File upload state
   const [attachedFile, setAttachedFile] = useState<{ name: string; content: string; size: number } | null>(null);
   const [uploading, setUploading] = useState(false);
 
-  // Load conversations
   const loadConversations = useCallback(async () => {
     try {
       const res = await fetch('/api/ai/conversations');
@@ -110,10 +107,9 @@ function ChatContent() {
         const data = await res.json();
         setConversations(data.conversations);
       }
-    } catch { /* ignore */ }
+    } catch {  }
   }, []);
 
-  // Load messages for a conversation
   const loadMessages = useCallback(async (convId: string) => {
     try {
       const res = await fetch('/api/ai/conversations', {
@@ -127,10 +123,9 @@ function ChatContent() {
         setActiveConvId(convId);
         setSidebarOpen(false);
       }
-    } catch { /* ignore */ }
+    } catch {  }
   }, []);
 
-  // Delete conversation
   const deleteConversation = useCallback(async (convId: string) => {
     try {
       const res = await fetch(`/api/ai/conversations?id=${convId}`, { method: 'DELETE' });
@@ -141,10 +136,9 @@ function ChatContent() {
         }
         loadConversations();
       }
-    } catch { /* ignore */ }
+    } catch {  }
   }, [activeConvId, loadConversations]);
 
-  // Handle file selection
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -173,23 +167,19 @@ function ChatContent() {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  // Remove attached file
   const removeAttachedFile = () => {
     setAttachedFile(null);
   };
 
-  // Typing animation — reveals text progressively, word by word
   const typingRef = useRef<NodeJS.Timeout | null>(null);
 
   const startTyping = useCallback((msgId: string, fullText: string) => {
-    // Clear any previous typing animation
     if (typingRef.current) clearInterval(typingRef.current);
 
     let pos = 0;
-    const words = fullText.split(/(\s+)/); // Split keeping whitespace
+    const words = fullText.split(/(\s+)/);
     let accumulated = '';
 
-    // Show the first chunk immediately for responsiveness
     const firstChunk = words.slice(0, 3).join('');
     accumulated = firstChunk;
     pos = 3;
@@ -200,7 +190,6 @@ function ChatContent() {
 
     typingRef.current = setInterval(() => {
       if (pos >= words.length) {
-        // Done — show full text and stop
         clearInterval(typingRef.current!);
         typingRef.current = null;
         setMessages(prev => prev.map(m =>
@@ -209,7 +198,6 @@ function ChatContent() {
         return;
       }
 
-      // Reveal a few words per tick
       const chunk = words.slice(pos, pos + 2).join('');
       pos += 2;
       accumulated += chunk;
@@ -218,21 +206,18 @@ function ChatContent() {
         m.id === msgId ? { ...m, content: accumulated } : m
       ));
 
-      // Scroll the messages container directly to avoid page-level scroll
       if (messagesAreaRef.current) {
         messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
       }
-    }, 25); // 25ms per tick — fast but visible typing effect
+    }, 25);
   }, []);
 
-  // Cleanup typing animation on unmount
   useEffect(() => {
     return () => {
       if (typingRef.current) clearInterval(typingRef.current);
     };
   }, []);
 
-  // Send message
   const sendMessage = useCallback(async () => {
     if ((!input.trim() && !attachedFile) || sending) return;
     const userMsg = input.trim() || (attachedFile ? 'Explain this file to me' : '');
@@ -241,13 +226,10 @@ function ChatContent() {
     setAttachedFile(null);
     setSending(true);
 
-    // Reset textarea height
     if (inputRef.current) inputRef.current.style.height = 'auto';
 
-    // Display message (with file indicator)
     const displayMsg = fileData ? `📄 ${fileData.name}\n${userMsg}` : userMsg;
 
-    // Optimistically add user message
     const tempUserMsg: ChatMessage = {
       id: `temp-${Date.now()}`,
       role: 'user',
@@ -255,7 +237,6 @@ function ChatContent() {
       createdAt: new Date().toISOString(),
     };
 
-    // Add placeholder assistant message for typing animation
     const streamMsgId = `stream-${Date.now()}`;
     const streamMsg: ChatMessage = {
       id: streamMsgId,
@@ -281,7 +262,6 @@ function ChatContent() {
 
       if (res.ok) {
         const data = await res.json();
-        // Start typing animation with the full reply
         startTyping(streamMsgId, data.reply);
 
         if (!activeConvId) {
@@ -293,7 +273,7 @@ function ChatContent() {
         try {
           const errData = await res.json();
           errorMsg = errData.error || errorMsg;
-        } catch { /* ignore */ }
+        } catch {  }
         setMessages(prev => prev.map(m =>
           m.id === streamMsgId ? { ...m, content: `⚠️ Error: ${errorMsg}`, isStreaming: false } : m
         ));
@@ -306,19 +286,16 @@ function ChatContent() {
     setSending(false);
   }, [input, sending, activeConvId, loadConversations, attachedFile, startTyping]);
 
-  // Auto-scroll — scroll the messages container directly to avoid page-level scroll
   useEffect(() => {
     if (messagesAreaRef.current) {
       messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
     }
   }, [messages]);
 
-  // Load conversations on mount
   useEffect(() => {
     if (user) loadConversations();
   }, [user, loadConversations]);
 
-  // Auto-resize textarea
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
     const ta = e.target;
@@ -326,7 +303,6 @@ function ChatContent() {
     ta.style.height = Math.min(ta.scrollHeight, 150) + 'px';
   };
 
-  // Handle Enter key
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -334,17 +310,14 @@ function ChatContent() {
     }
   };
 
-  // Markdown rendering with react-markdown + remark-gfm (client-side)
   const renderContent = (content: string) => {
     return (
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          // Fenced code blocks
           code({ className, children, ...props }) {
             const match = /language-(\w+)/.exec(className || '');
             const codeString = String(children).replace(/\n$/, '');
-            // If it has a language class or contains newlines, render as a block
             if (match || codeString.includes('\n')) {
               return (
                 <pre className="ai-code-block">
@@ -353,31 +326,22 @@ function ChatContent() {
                 </pre>
               );
             }
-            // Inline code
             return <code className="ai-inline-code" {...props}>{codeString}</code>;
           },
-          // Headings — match the chat aesthetic
           h1({ children }) { return <h1 className="md-h1">{children}</h1>; },
           h2({ children }) { return <h2 className="md-h2">{children}</h2>; },
           h3({ children }) { return <h3 className="md-h3">{children}</h3>; },
           h4({ children }) { return <h4 className="md-h4">{children}</h4>; },
-          // Paragraphs
           p({ children }) { return <p className="md-p">{children}</p>; },
-          // Links
           a({ href, children }) { return <a className="md-link" href={href} target="_blank" rel="noopener noreferrer">{children}</a>; },
-          // Lists
           ul({ children }) { return <ul className="md-ul">{children}</ul>; },
           ol({ children }) { return <ol className="md-ol">{children}</ol>; },
           li({ children }) { return <li className="md-li">{children}</li>; },
-          // Blockquote
           blockquote({ children }) { return <blockquote className="md-blockquote">{children}</blockquote>; },
-          // Horizontal rule
           hr() { return <hr className="md-hr" />; },
-          // Table
           table({ children }) { return <div className="md-table-wrap"><table className="md-table">{children}</table></div>; },
           th({ children }) { return <th className="md-th">{children}</th>; },
           td({ children }) { return <td className="md-td">{children}</td>; },
-          // Bold / Italic — just use default, styled via CSS
           strong({ children }) { return <strong className="md-strong">{children}</strong>; },
           em({ children }) { return <em className="md-em">{children}</em>; },
         }}
@@ -574,7 +538,7 @@ function ChatContent() {
           overflow: hidden;
         }
 
-        /* Lock page-level scroll on chat page */
+
         html, body {
           overflow: hidden !important;
           height: 100% !important;
@@ -758,7 +722,7 @@ function ChatContent() {
           background: color-mix(in srgb, #ef4444 10%, transparent);
         }
 
-        /* Sidebar overlay (mobile) */
+
         .zai-sidebar-overlay {
           display: none;
         }
@@ -1238,7 +1202,7 @@ function ChatContent() {
         .md-table tr:last-child .md-td {
           border-bottom: none;
         }
-        /* Checkbox list items (GFM task list) */
+
         .md-li input[type="checkbox"] {
           accent-color: var(--accent);
           margin-right: 6px;

@@ -1,10 +1,5 @@
 import { useEffect } from 'react';
 
-/**
- * Click Splash hook — Particle Burst on click only.
- * Custom cursor dot, magnetic snap, and hover detection removed.
- * Keeps the satisfying particle burst effect on click.
- */
 
 interface Particle {
   x: number;
@@ -19,7 +14,6 @@ interface Particle {
 
 export function useClickSplash() {
   useEffect(() => {
-    // Skip on touch devices
     const hasHover = window.matchMedia('(hover: hover)').matches;
     const isCoarse = window.matchMedia('(pointer: coarse)').matches;
     const isTouchDevice = !hasHover || isCoarse;
@@ -114,10 +108,8 @@ export function useClickSplash() {
   }, []);
 }
 
-// Keep old export name as alias for backward compatibility (will be cleaned up from pages)
 export function useCustomCursor(
   _dotRef: React.RefObject<HTMLDivElement | null>,
 ) {
-  // Legacy — now just activates the click splash without cursor dot
   useClickSplash();
 }

@@ -7,11 +7,9 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 function getYouTubeEmbedUrl(url: string): string | null {
-  // Standard: https://www.youtube.com/watch?v=VIDEO_ID
   let match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
   if (match) return `https://www.youtube.com/embed/${match[1]}`;
 
-  // Short: https://youtu.be/VIDEO_ID
   match = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
   if (match) return `https://www.youtube.com/embed/${match[1]}`;
 
@@ -34,7 +32,6 @@ function getEmbedUrl(url: string): string | null {
   return getVimeoEmbedUrl(url);
 }
 
-// Inline styles for markdown rendered elements — using site fonts (Inter Tight / Space Grotesk)
 const mdStyles: Record<string, React.CSSProperties> = {
   h1: { fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: 22, color: 'var(--text-light)', margin: '24px 0 12px', lineHeight: 1.3 },
   h2: { fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: 18, color: 'var(--text-light)', margin: '20px 0 10px', lineHeight: 1.3 },
@@ -69,7 +66,6 @@ export default function ModuleContent({ content }: { content: string }) {
 
   for (const line of lines) {
     if (isVideoUrl(line)) {
-      // Flush any accumulated markdown
       if (currentMarkdown.length > 0) {
         parts.push({ type: 'markdown', content: currentMarkdown.join('\n') });
         currentMarkdown = [];
@@ -79,7 +75,6 @@ export default function ModuleContent({ content }: { content: string }) {
       currentMarkdown.push(line);
     }
   }
-  // Flush remaining markdown
   if (currentMarkdown.length > 0) {
     parts.push({ type: 'markdown', content: currentMarkdown.join('\n') });
   }

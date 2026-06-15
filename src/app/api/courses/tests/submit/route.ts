@@ -14,7 +14,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'testId and answers are required' }, { status: 400 });
     }
 
-  // Verify the test is unlocked for this user
   const unlock = await db.testUnlock.findUnique({
     where: { testId_userId: { testId, userId: user.id } },
   });
@@ -23,7 +22,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Test is not unlocked for you. Contact admin.' }, { status: 403 });
   }
 
-  // Check if student already has a completed attempt
   const existingAttempt = await db.testAttempt.findUnique({
     where: { testId_userId: { testId, userId: user.id } },
   });
@@ -35,7 +33,6 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Fetch the test with all questions
   const test = await db.moduleTest.findUnique({
     where: { id: testId },
     include: {
@@ -51,14 +48,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'This test has no questions' }, { status: 400 });
   }
 
-  // Grade the test
   let score = 0;
   let totalPoints = 0;
   const correctQuestionIds: string[] = [];
 
   for (const question of test.questions) {
     totalPoints += question.points;
-    // Use Number() to handle type mismatches — Turso/libSQL may return integers as strings
     const selectedAnswer = Number(answers[question.id]);
     const correctAnswer = Number(question.correctAnswer);
     if (!isNaN(selectedAnswer) && !isNaN(correctAnswer) && selectedAnswer === correctAnswer) {
@@ -70,8 +65,6 @@ export async function POST(request: NextRequest) {
   const scorePercentage = totalPoints > 0 ? (score / totalPoints) * 100 : 0;
   const passed = scorePercentage >= test.passingScore;
 
-  // Parse the client-sent start time (when the student actually began the test)
-  // Falls back to current time if not provided (backward compat)
   let startTime = new Date();
   if (startedAt) {
     const parsed = new Date(startedAt);
@@ -81,7 +74,6 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // Create or update the attempt
   const attempt = await db.testAttempt.upsert({
     where: { testId_userId: { testId, userId: user.id } },
     create: {

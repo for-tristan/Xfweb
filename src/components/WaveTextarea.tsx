@@ -10,7 +10,6 @@ interface WaveTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaEle
 export function WaveTextarea({ label, children, value, ...rest }: WaveTextareaProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Add/remove .has-value class based on whether textarea has content
   useEffect(() => {
     const el = textareaRef.current;
     if (!el) return;
@@ -30,7 +29,6 @@ export function WaveTextarea({ label, children, value, ...rest }: WaveTextareaPr
     };
   }, [value]);
 
-  // Split label into characters for wave animation
   const labelChars = label.split('').map((char, i) => (
     <span
       key={i}

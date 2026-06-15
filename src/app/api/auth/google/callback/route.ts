@@ -31,7 +31,6 @@ export async function GET(request: NextRequest) {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (host ? `https://${host}` : 'http://localhost:3000');
     const redirectUri = `${baseUrl}/api/auth/google/callback`;
 
-    // Exchange code for tokens
     const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -51,7 +50,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/?error=oauth_failed', request.url));
     }
 
-    // Fetch Google user profile
     const userRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
       headers: { Authorization: `Bearer ${tokenData.access_token}` },
     });
@@ -61,7 +59,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/?error=no_email', request.url));
     }
 
-    // Check for existing account link
     const existingLink = await db.accountLink.findUnique({
       where: {
         provider_providerAccountId: {
@@ -77,17 +74,12 @@ export async function GET(request: NextRequest) {
     if (existingLink) {
       user = existingLink.user;
     } else {
-      // where an attacker creates an OAuth account with a victim's email.
-      // Users must link accounts manually via account settings (with password confirmation).
       user = await db.user.findUnique({ where: { email: gUser.email } });
 
       if (user) {
-        // User exists but Google account is not linked.
-        // Redirect with a clear message instead of auto-linking.
         const response = NextResponse.redirect(
           new URL('/?error=account_link_required&provider=google', request.url)
         );
-        // Clear the OAuth state cookie
         response.cookies.set('oauth_state', '', {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
@@ -97,7 +89,6 @@ export async function GET(request: NextRequest) {
         });
         return response;
       } else {
-        // Create new user
         const name = gUser.name || 'Google User';
         const baseName = name.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 15);
         const baseUsername = baseName || 'user';
@@ -118,7 +109,7 @@ export async function GET(request: NextRequest) {
             username,
             avatar: gUser.picture || null,
             role: 'student',
-            emailVerified: new Date(), // Google verifies emails — mark as verified
+            emailVerified: new Date(),
           },
         });
 
@@ -136,7 +127,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/?error=oauth_failed', request.url));
     }
 
-    // Set session cookies using the new createSession helper
     const token = await createSession(user.id);
     const response = NextResponse.redirect(new URL('/', request.url));
 
@@ -158,7 +148,6 @@ export async function GET(request: NextRequest) {
       path: '/',
     });
 
-    // Clear the OAuth state cookie
     response.cookies.set('oauth_state', '', {
       httpOnly: true,
       secure,

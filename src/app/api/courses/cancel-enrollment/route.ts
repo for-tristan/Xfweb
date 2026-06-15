@@ -23,7 +23,6 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Verify the enrollment belongs to the current user
     const enrollment = await db.enrollment.findFirst({
       where: {
         id: enrollmentId,
@@ -46,32 +45,26 @@ export async function DELETE(request: NextRequest) {
     }
 
     const userId = enrollment.userId;
-    const courseId = enrollment.courseId; // This is the slug
+    const courseId = enrollment.courseId;
 
-    // Soft delete the enrollment by setting deletedAt
     await db.enrollment.update({
       where: { id: enrollmentId },
       data: { deletedAt: new Date() },
     });
 
 
-    // 1. Delete student's progress for this course
     await db.courseProgress.deleteMany({
       where: { userId, courseId },
     });
 
-    // 2. Delete study sessions for this course
     await db.studySession.deleteMany({
       where: { userId, courseId },
     });
 
-    // 3. Delete certificates for this course
     await db.certificate.deleteMany({
       where: { userId, courseId },
     });
 
-    // 4. Resolve slug to CUID for module-based lookups
-    //    (Enrollment.courseId stores the slug, CourseModule.courseId stores the CUID)
     const course = await db.course.findUnique({ where: { slug: courseId } });
     if (course) {
       const courseModuleIds = await db.courseModule.findMany({
@@ -82,7 +75,6 @@ export async function DELETE(request: NextRequest) {
       if (courseModuleIds.length > 0) {
         const moduleIds = courseModuleIds.map(m => m.id);
 
-        // 5. Delete module unlocks for this course's modules
         await db.moduleUnlock.deleteMany({
           where: {
             userId,
@@ -90,7 +82,6 @@ export async function DELETE(request: NextRequest) {
           },
         });
 
-        // 6. Delete module study records for this course's modules
         await db.moduleStudy.deleteMany({
           where: {
             userId,
@@ -98,7 +89,6 @@ export async function DELETE(request: NextRequest) {
           },
         });
 
-        // 7. Find all tests for these modules and clean up test-related data
         const tests = await db.moduleTest.findMany({
           where: { moduleId: { in: moduleIds } },
           select: { id: true },
@@ -107,7 +97,6 @@ export async function DELETE(request: NextRequest) {
         if (tests.length > 0) {
           const testIds = tests.map(t => t.id);
 
-          // Delete test attempts
           await db.testAttempt.deleteMany({
             where: {
               userId,
@@ -115,7 +104,6 @@ export async function DELETE(request: NextRequest) {
             },
           });
 
-          // Delete test unlocks
           await db.testUnlock.deleteMany({
             where: {
               userId,
@@ -126,7 +114,6 @@ export async function DELETE(request: NextRequest) {
       }
     }
 
-    // 8. Notify the user
     await db.notification.create({
       data: {
         userId,

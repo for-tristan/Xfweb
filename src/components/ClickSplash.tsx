@@ -2,11 +2,6 @@
 
 import { useEffect } from 'react';
 
-/**
- * Global click splash effect — particle burst on click.
- * Replaces the old per-page useCustomCursor hook.
- * No cursor dot, just the splash effect.
- */
 
 interface Particle {
   x: number;
@@ -21,7 +16,6 @@ interface Particle {
 
 export default function ClickSplash() {
   useEffect(() => {
-    // Skip on touch devices
     const hasHover = window.matchMedia('(hover: hover)').matches;
     const isCoarse = window.matchMedia('(pointer: coarse)').matches;
     if (!hasHover || isCoarse) return;

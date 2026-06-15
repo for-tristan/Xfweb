@@ -19,8 +19,6 @@ export const db = globalForPrisma.prisma ?? createPrismaClient();
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;
 
-// AUTO-MIGRATION: Run once on cold start to sync schema
-// with Turso. Safe to run multiple times (idempotent).
 
 let migrationRan = false;
 
@@ -37,21 +35,18 @@ export async function ensureMigrations() {
       authToken: process.env.DATABASE_AUTH_TOKEN,
     });
 
-    // Helper: add a column if it doesn't exist (idempotent)
     const addColumn = async (table: string, column: string, definition: string) => {
       try {
         await client.execute(`ALTER TABLE "${table}" ADD COLUMN "${column}" ${definition}`);
         console.log(`[Migration] Added ${table}.${column}`);
       } catch (err: any) {
         if (err?.message?.includes('duplicate column') || err?.message?.includes('already exists')) {
-          // Column already exists — nothing to do
         } else {
           console.error(`[Migration] Failed to add ${table}.${column}:`, err?.message || err);
         }
       }
     };
 
-    // Helper: create a table if it doesn't exist (idempotent)
     const createTable = async (table: string, ddl: string) => {
       try {
         await client.execute(`CREATE TABLE IF NOT EXISTS "${table}" (${ddl})`);
@@ -74,7 +69,6 @@ export async function ensureMigrations() {
 
     await addColumn('CourseModule', 'content', "TEXT NOT NULL DEFAULT ''");
 
-    // These use CREATE TABLE IF NOT EXISTS so they're safe if the table exists
 
     await createTable('Project', `
       "id" TEXT PRIMARY KEY NOT NULL,
@@ -232,7 +226,6 @@ export async function ensureMigrations() {
       try {
         await client.execute(`CREATE INDEX IF NOT EXISTS "${name}" ON ${sql}`);
       } catch (err: any) {
-        // Index might already exist, that's fine
       }
     };
 
@@ -317,6 +310,3 @@ export async function ensureMigrations() {
   }
 }
 
-// NOTE: Migrations are now run via src/instrumentation.ts on server startup,
-// which AWAITs ensureMigrations() before any requests are served.
-// This prevents race conditions where queries fire before columns exist.

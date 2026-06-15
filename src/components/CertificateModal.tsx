@@ -201,7 +201,6 @@ export default function CertificateModal({ open, onClose, data, loading }: Certi
               </div>
             ) : data ? (
               <div ref={certRef} className="certificate-print-area" style={{ display: 'flex', justifyContent: 'center' }}>
-                {/* A4 Landscape Certificate */}
                 <div
                   style={{
                     width: '100%',
@@ -269,8 +268,6 @@ export default function CertificateModal({ open, onClose, data, loading }: Certi
                     <div style={{ width: 8, height: 8, border: '1px solid #dc143c', transform: 'rotate(45deg)' }} />
                     <div style={{ width: 60, height: 1, background: 'var(--primary-red)' }} />
                   </div>
-
-                  {/* "This certifies that" */}
                   <p style={{ fontSize: 14, color: '#666', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 10 }}>
                     This certifies that
                   </p>
@@ -290,8 +287,6 @@ export default function CertificateModal({ open, onClose, data, loading }: Certi
                   >
                     {data.userName}
                   </h2>
-
-                  {/* "has successfully completed" */}
                   <p style={{ fontSize: 14, color: '#666', letterSpacing: 2, marginBottom: 8 }}>
                     has successfully completed the course
                   </p>

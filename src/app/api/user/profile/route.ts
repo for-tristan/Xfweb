@@ -22,11 +22,9 @@ export async function PUT(request: NextRequest) {
       company: company || null,
     };
 
-    // Handle username update
     if (username !== undefined && username !== null && username.trim() !== '') {
       const normalized = username.toLowerCase().trim();
       if (normalized.length >= 3 && /^[a-z0-9_]+$/.test(normalized)) {
-        // Check uniqueness
         const existing = await db.user.findUnique({ where: { username: normalized } });
         if (existing && existing.id !== user.id) {
           return NextResponse.json({ error: 'This username is already taken' }, { status: 409 });

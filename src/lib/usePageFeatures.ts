@@ -55,7 +55,6 @@ export function usePageFeatures() {
   const [loading, setLoading] = useState(true);
   const [minLoading, setMinLoading] = useState(true);
 
-  // Minimum 3-second loader display
   useEffect(() => {
     const timer = setTimeout(() => setMinLoading(false), 3000);
     return () => clearTimeout(timer);
@@ -81,7 +80,6 @@ export function usePageFeatures() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Multi-theme: crimson, midnight, oled, phantom, synthwave, frost, light, sand
   const [theme, setTheme] = useState<string>(() => {
     if (typeof window === 'undefined') return 'light';
     return localStorage.getItem('x-foundry-theme') || 'oled';
@@ -96,7 +94,6 @@ export function usePageFeatures() {
     setMobileMenuOpen(false);
     const doScroll = () => {
       const lenis = (window as any).__lenis;
-      // 'home' = scroll to very top (pinned hero can't be scrollIntoView'd)
       if (sectionId === 'home') {
         if (lenis) {
           lenis.scrollTo(0, { duration: 1.2 });
@@ -146,7 +143,6 @@ export function usePageFeatures() {
   const [avatarUploading, setAvatarUploading] = useState(false);
 
 
-  // Auth check
   useEffect(() => {
     (async () => {
       try {
@@ -154,7 +150,6 @@ export function usePageFeatures() {
         if (res.ok) {
           const data = await res.json();
           setUser(data.user);
-          // Load profile data immediately
           if (data.user) {
             setProfileName(data.user.name || '');
             setProfileUsername(data.user.username || '');
@@ -162,8 +157,6 @@ export function usePageFeatures() {
             setProfileCompany(data.user.company || '');
           }
         } else if (res.status === 403) {
-          // Existing user whose email is not yet verified —
-          // force them into the verification flow
           const data = await res.json();
           if (data.needsVerification) {
             setUser(null);
@@ -174,22 +167,18 @@ export function usePageFeatures() {
             toast({ title: 'Verification Required', description: data.error });
           }
         }
-      } catch { /* not authed */ }
+      } catch {  }
       setLoading(false);
     })();
   }, []);
 
-  // Theme init
   useEffect(() => {
-    // Map old 'dark' to 'crimson' for backwards compat
     const effectiveTheme = theme === 'dark' ? 'crimson' : theme;
     document.documentElement.setAttribute('data-theme', effectiveTheme);
     document.documentElement.classList.toggle('dark', effectiveTheme !== 'light' && effectiveTheme !== 'sand');
-    // Dispatch custom event so other components (e.g. ParticlesBackground) react instantly
     window.dispatchEvent(new CustomEvent('xf-theme-change', { detail: { theme: effectiveTheme } }));
   }, [theme]);
 
-  // Scroll detection
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 80);
@@ -198,7 +187,6 @@ export function usePageFeatures() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Keyboard shortcuts
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); setSearchOpen(true); }
@@ -210,7 +198,6 @@ export function usePageFeatures() {
 
 
   const toggleTheme = useCallback(() => {
-    // Legacy toggle: switch between crimson (dark) and light
     const isDark = theme !== 'light' && theme !== 'sand';
     const next = isDark ? 'light' : 'crimson';
     setTheme(next);
@@ -246,7 +233,6 @@ export function usePageFeatures() {
         toast({ title: 'Welcome back!', description: `Signed in as ${data.user.name}` });
         setLoginEmail(''); setLoginPassword('');
       } else if (res.status === 403 && data.needsVerification) {
-        // Email not verified — switch to verification screen
         setVerificationEmail(data.email);
         setVerificationCode('');
         setVerificationStep('pending');
@@ -267,7 +253,6 @@ export function usePageFeatures() {
       const data = await res.json();
       if (res.ok) {
         if (data.requiresVerification) {
-          // Show verification screen instead of auto-login
           setVerificationEmail(data.email);
           setVerificationCode('');
           setVerificationStep('pending');
@@ -288,7 +273,7 @@ export function usePageFeatures() {
   }, [signupName, signupEmail, signupPassword, signupConfirmPassword, signupPhone, signupCompany, signupRole, toast]);
 
   const handleLogout = useCallback(async () => {
-    try { await fetch('/api/auth/logout', { method: 'POST' }); } catch { /* ignore */ }
+    try { await fetch('/api/auth/logout', { method: 'POST' }); } catch {  }
     setUser(null);
     setDashboardOpen(false);
     setNotifOpen(false);
@@ -337,7 +322,7 @@ export function usePageFeatures() {
         setNotifications(data.notifications || []);
         setUnreadCount((data.notifications || []).filter((n: { read: boolean }) => !n.read).length);
       }
-    } catch { /* ignore */ }
+    } catch {  }
   }, []);
 
   const handleAvatarUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -358,7 +343,6 @@ export function usePageFeatures() {
     setAvatarUploading(false);
   }, [user, toast]);
 
-  // Callback for when avatar is uploaded (from crop modal)
   const handleAvatarUploaded = useCallback((avatarUrl: string) => {
     if (user) setUser({ ...user, avatar: avatarUrl });
   }, [user]);
@@ -410,17 +394,12 @@ export function usePageFeatures() {
     loading,
     minLoading,
     router,
-    // Dashboard
     dashboardOpen, setDashboardOpen,
-    // Notifications
     notifications, setNotifications, unreadCount, setUnreadCount, notifOpen, setNotifOpen, loadNotifications,
-    // Profile editing
     profileName, setProfileName, profileUsername, setProfileUsername, profilePhone, setProfilePhone, profileCompany, setProfileCompany,
     profileSaving, avatarUploading, handleAvatarUpload, handleAvatarUploaded, handleProfileSave,
-    // Forgot password
     forgotStep, setForgotStep, forgotEmail, setForgotEmail, forgotLoading, handleForgotSubmit,
     resetCode, setResetCode, newPassword, setNewPassword, resetLoading, handleResetSubmit,
-    // Email verification
     verificationStep, setVerificationStep, verificationEmail, setVerificationEmail,
     verificationCode, setVerificationCode, verificationLoading,
     handleVerifyEmail: async (e: React.FormEvent) => {

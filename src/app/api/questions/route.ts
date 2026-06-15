@@ -81,7 +81,6 @@ Rules:
       });
 
       const content = completion.choices?.[0]?.message?.content || '';
-      // Try to parse JSON from the response — handle markdown fences
       let jsonStr = content.trim();
       const fenceMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
       if (fenceMatch) {
@@ -102,7 +101,6 @@ Rules:
       }
     } catch (aiError) {
       console.error('AI question generation error:', aiError);
-      // Return empty — the client will fall back to static questions
     }
 
     if (!questions || questions.length === 0) {

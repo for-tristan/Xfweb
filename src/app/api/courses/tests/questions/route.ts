@@ -18,7 +18,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'testId is required' }, { status: 400 });
     }
 
-    // Verify student has the test unlocked
     const testUnlock = await db.testUnlock.findUnique({
       where: { testId_userId: { testId, userId: user.id } },
     });
@@ -27,7 +26,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Test is not unlocked' }, { status: 403 });
     }
 
-    // Fetch the test with questions (exclude correctAnswer for security)
     const test = await db.moduleTest.findUnique({
       where: { id: testId },
       include: {
@@ -49,7 +47,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Test not found or inactive' }, { status: 404 });
     }
 
-    // Parse options from JSON string
     const questions = test.questions.map(q => ({
       ...q,
       options: typeof q.options === 'string' ? JSON.parse(q.options) : q.options,

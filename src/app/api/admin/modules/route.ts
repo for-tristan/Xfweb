@@ -46,7 +46,6 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Notify user
     const courseModule = await db.courseModule.findUnique({ where: { id: moduleId } });
     if (courseModule) {
       await db.notification.create({
@@ -87,7 +86,6 @@ export async function GET(request: NextRequest) {
       orderBy: { moduleOrder: 'asc' },
     });
 
-    // Get all unlocks grouped by moduleId
     const unlocks = await db.moduleUnlock.findMany({
       include: {
         user: {
@@ -102,7 +100,6 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
     });
 
-    // Build a map: moduleId -> array of unlocks with user info
     const unlockMap: Record<string, typeof unlocks> = {};
     for (const u of unlocks) {
       if (!unlockMap[u.moduleId]) unlockMap[u.moduleId] = [];
@@ -139,7 +136,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify course exists
     const course = await db.course.findUnique({ where: { id: courseId } });
     if (!course) {
       return NextResponse.json(

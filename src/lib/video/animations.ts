@@ -1,10 +1,8 @@
 'use client';
 
-// Animation presets for consistent motion language
 
 import type { Transition, Variants } from 'framer-motion';
 
-// Spring presets
 export const springs = {
   snappy: { type: 'spring', stiffness: 400, damping: 30 } as Transition,
   bouncy: { type: 'spring', stiffness: 300, damping: 15 } as Transition,
@@ -15,7 +13,6 @@ export const springs = {
   poppy: { type: 'spring', stiffness: 500, damping: 22 } as Transition,
 } as const;
 
-// Easing presets
 export const easings = {
   easeOut: { ease: [0.16, 1, 0.3, 1] } as Transition,
   circOut: { ease: 'circOut' } as Transition,
@@ -24,7 +21,6 @@ export const easings = {
   expoOut: { ease: [0.16, 1, 0.3, 1] } as Transition,
 } as const;
 
-// Scene transitions for AnimatePresence
 export const sceneTransitions = {
   fadeBlur: {
     initial: { opacity: 0, filter: 'blur(20px)' },
@@ -124,7 +120,6 @@ export const sceneTransitions = {
   },
 } as const;
 
-// Element animations
 export const elementAnimations = {
   popIn: {
     initial: { opacity: 0, scale: 0 },
@@ -180,7 +175,6 @@ export const elementAnimations = {
   },
 } as const;
 
-// Character-level animation variants for kinetic typography
 export const charVariants: Variants = {
   hidden: { opacity: 0, y: 40, rotateX: -40, transformPerspective: 800 },
   visible: {
@@ -199,7 +193,6 @@ export const charContainerVariants: Variants = {
   },
 };
 
-// Stagger configs
 export const staggerConfigs = {
   fast: { staggerChildren: 0.05, delayChildren: 0 },
   medium: { staggerChildren: 0.1, delayChildren: 0.1 },
@@ -209,7 +202,6 @@ export const staggerConfigs = {
   charMedium: { staggerChildren: 0.04, delayChildren: 0.1 },
 } as const;
 
-// Common variants
 export const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
@@ -227,7 +219,6 @@ export const itemVariants: Variants = {
   },
 };
 
-// Utilities
 export function staggerDelay(index: number, baseDelay: number = 0.1): number {
   return index * baseDelay;
 }

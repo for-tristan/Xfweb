@@ -83,7 +83,6 @@ export default function DynamicCoursePage() {
   const [formExperience, setFormExperience] = useState('');
   const [formMotivation, setFormMotivation] = useState('');
 
-  // Student Tests state
   interface StudentTest {
     id: string;
     title: string;
@@ -107,11 +106,9 @@ export default function DynamicCoursePage() {
     } catch {}
   }, []);
 
-  // Certificate state
   const [certificate, setCertificate] = useState<{ certificateId: string; courseName: string; completionDate: string } | null>(null);
   const [certDownloading, setCertDownloading] = useState(false);
 
-  // Module unlock state
   const [courseModules, setCourseModules] = useState<CourseModule[]>([]);
   const [modulesLoading, setModulesLoading] = useState(false);
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
@@ -168,7 +165,6 @@ export default function DynamicCoursePage() {
     };
   }, [checkReveals]);
 
-  // Re-check reveals when loading finishes (content mounts after loading)
   useEffect(() => {
     if (!loading && !minLoading) {
       const t = setTimeout(checkReveals, 50);
@@ -176,7 +172,6 @@ export default function DynamicCoursePage() {
     }
   }, [loading, minLoading, checkReveals]);
 
-  // Check enrollment when user loads
   const enrollmentsCheckedRef = useRef(false);
 
   useEffect(() => {
@@ -193,7 +188,6 @@ export default function DynamicCoursePage() {
       .catch(() => {});
   }, [user, slug]);
 
-  // Fetch module unlock data
   useEffect(() => {
     if (!user || !slug) return;
     setModulesLoading(true);
@@ -209,7 +203,6 @@ export default function DynamicCoursePage() {
       .finally(() => setModulesLoading(false));
   }, [user, slug]);
 
-  // Check for issued certificate
   useEffect(() => {
     if (!user || !slug) return;
     fetch(`/api/courses/certificate?courseId=${slug}`)
@@ -253,7 +246,6 @@ export default function DynamicCoursePage() {
           if (res.ok) {
             toast({ title: 'Request Submitted!', description: 'Your enrollment request is pending review' });
             enrollmentsCheckedRef.current = false;
-            // Re-check enrollment
             fetch('/api/courses/my-enrollments')
               .then((res) => res.ok ? res.json() : null)
               .then((data) => {
@@ -341,7 +333,6 @@ export default function DynamicCoursePage() {
     );
   };
 
-  // Parse features JSON
   const courseFeatures: string[] = (() => {
     if (!course?.features) return [];
     try {
@@ -352,7 +343,6 @@ export default function DynamicCoursePage() {
     }
   })();
 
-  // Parse tech stack
   const courseTechStack: string[] = (() => {
     if (!course?.techStack) return [];
     try {
@@ -363,7 +353,6 @@ export default function DynamicCoursePage() {
     }
   })();
 
-  // Loading skeleton
   if (fetching) {
     return (
       <>
@@ -385,7 +374,6 @@ export default function DynamicCoursePage() {
     );
   }
 
-  // Not found
   if (notFound) {
     return (
       <>

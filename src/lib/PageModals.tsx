@@ -9,7 +9,7 @@ import { ThemePicker } from '@/components/ThemePicker';
 import { WaveInput } from '@/components/WaveInput';
 import type { User } from './usePageFeatures';
 
-/** Convenience wrapper: Vaulta minimal dot loader */
+
 function VaultaLoader() {
   return <div className="xf-loader"><div className="xf-loader-dot" /><div className="xf-loader-dot" /><div className="xf-loader-dot" /></div>;
 }
@@ -149,14 +149,12 @@ interface AuthModalProps {
   tab: 'signin' | 'signup';
   setTab: (t: 'signin' | 'signup') => void;
   message: string;
-  // Login
   loginEmail: string;
   setLoginEmail: (v: string) => void;
   loginPassword: string;
   setLoginPassword: (v: string) => void;
   loginLoading: boolean;
   onLogin: (e: React.FormEvent) => void;
-  // Signup
   signupName: string;
   setSignupName: (v: string) => void;
   signupEmail: string;
@@ -171,9 +169,7 @@ interface AuthModalProps {
   setSignupCompany: (v: string) => void;
   signupLoading: boolean;
   onSignup: (e: React.FormEvent) => void;
-  // Utils
   getPasswordStrength: (pw: string) => string;
-  // Forgot Password
   forgotStep: 'idle' | 'email' | 'code';
   setForgotStep: (s: 'idle' | 'email' | 'code') => void;
   forgotEmail: string;
@@ -186,7 +182,6 @@ interface AuthModalProps {
   setNewPassword: (v: string) => void;
   resetLoading: boolean;
   onResetSubmit: (e: React.FormEvent) => void;
-  // Email Verification
   verificationStep: 'idle' | 'pending';
   setVerificationStep: (s: 'idle' | 'pending') => void;
   verificationEmail: string;
@@ -370,7 +365,6 @@ export function AuthGate({ loading, minLoading, user, onSignIn, onSignUp }: Auth
 
   if (user) return null;
 
-  // Redirect to /auth page for non-authed users
   return <AuthRedirect />;
 }
 
@@ -399,7 +393,6 @@ interface NavActionsProps {
   onLogout: () => void;
   mobileMenuOpen: boolean;
   onToggleMobile: () => void;
-  // Notifications
   notifOpen: boolean;
   setNotifOpen: (v: boolean) => void;
   notifications: { id: string; title: string; message: string; read: boolean; createdAt: string }[];
@@ -407,7 +400,6 @@ interface NavActionsProps {
   loadNotifications: () => void;
   setNotifications: React.Dispatch<React.SetStateAction<{ id: string; title: string; message: string; read: boolean; createdAt: string }[]>>;
   setUnreadCount: React.Dispatch<React.SetStateAction<number>>;
-  // Profile
   dashboardOpen: boolean;
   setDashboardOpen: (v: boolean) => void;
 }
@@ -429,7 +421,6 @@ export function NavActions({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [notifOpen, setNotifOpen]);
 
-  // Close mobile menu when viewport grows past 1570px
   useEffect(() => {
     if (!mobileMenuOpen) return;
     const handleResize = () => { if (window.innerWidth > 1570) onToggleMobile(); };
@@ -437,7 +428,6 @@ export function NavActions({
     return () => window.removeEventListener('resize', handleResize);
   }, [mobileMenuOpen, onToggleMobile]);
 
-  // Lock body scroll when mobile menu is open to prevent scroll chaining
   useEffect(() => {
     if (mobileMenuOpen) {
       const scrollY = window.scrollY;
@@ -459,7 +449,6 @@ export function NavActions({
 
   return (
     <div className="nav-actions">
-      {/* Theme picker (desktop) */}
       <div className="desktop-only">
         <ThemePicker currentTheme={theme} onThemeChange={onChangeTheme} />
       </div>
@@ -521,7 +510,6 @@ export function NavActions({
           <button className="nav-auth-btn-inline nav-auth-btn-inline-filled" onClick={() => onOpenAuth('signup')}>Sign Up</button>
         </div>
       )}
-      {/* Mobile Menu toggle — in the navbar grid so it aligns with logo/pill at every breakpoint */}
       {user && (
         <button
           className="nav-menu-toggle"
@@ -542,7 +530,6 @@ interface ProfileModalProps {
   open: boolean;
   onClose: () => void;
   user: User | null;
-  // Profile form
   profileName: string;
   setProfileName: (v: string) => void;
   profileUsername: string;
@@ -564,7 +551,6 @@ export function ProfileModal({
   profileSaving, avatarUploading, onProfileSave, onAvatarUpload, onAvatarUploaded,
 }: ProfileModalProps) {
 
-  // All hooks MUST be called before any conditional returns (React Rules of Hooks)
   const profileRef = useRef<HTMLDivElement>(null);
   useFocusTrap(profileRef, open);
   const [confirmModal, setConfirmModal] = useState<{ open: boolean; title: string; message: string; confirmLabel: string; danger: boolean; icon: string; onConfirm: () => void }>({ open: false, title: '', message: '', confirmLabel: 'Confirm', danger: false, icon: 'fa-solid fa-exclamation-triangle', onConfirm: () => {} });
@@ -572,13 +558,11 @@ export function ProfileModal({
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteStep, setDeleteStep] = useState<'confirm' | 'password'>('confirm');
 
-  // Avatar crop modal state
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [cropImageFile, setCropImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const toast = useToast();
 
-  // When user selects a file, open crop modal instead of uploading directly
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -588,11 +572,9 @@ export function ProfileModal({
     }
     setCropImageFile(file);
     setCropModalOpen(true);
-    // Reset the file input so the same file can be re-selected
     e.target.value = '';
   }, [toast]);
 
-  // When crop is confirmed, upload the cropped blob
   const handleCropComplete = useCallback(async (croppedBlob: Blob) => {
     setCropModalOpen(false);
     if (!user) return;
@@ -622,7 +604,6 @@ export function ProfileModal({
     });
   };
 
-  // Guard clause AFTER all hooks (React Rules of Hooks)
   if (!open || !user) return null;
 
   return (

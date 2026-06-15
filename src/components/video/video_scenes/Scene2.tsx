@@ -50,8 +50,6 @@ export function Scene2() {
       >
         CAPABILITIES
       </motion.div>
-
-      {/* Heading 1 */}
       <div className="overflow-hidden">
         <motion.h2
           style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-light)', fontSize: 'clamp(40px, 6vw, 72px)', fontWeight: 900, lineHeight: 1.1, letterSpacing: '-0.02em', paddingTop: 8, paddingBottom: 8 }}
@@ -62,8 +60,6 @@ export function Scene2() {
           We build what
         </motion.h2>
       </div>
-
-      {/* Heading 2 */}
       <div className="overflow-hidden">
         <motion.h2
           style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'var(--text-dim)', fontSize: 'clamp(40px, 6vw, 72px)', fontWeight: 300, fontStyle: 'italic', lineHeight: 1.1, paddingTop: 8, paddingBottom: 8 }}
@@ -74,8 +70,6 @@ export function Scene2() {
           You imagine.
         </motion.h2>
       </div>
-
-      {/* Pills — big gap from heading */}
       <div className="flex gap-4 flex-wrap justify-center max-w-xl mt-10">
         {pills.map((pill, i) => (
           <motion.div

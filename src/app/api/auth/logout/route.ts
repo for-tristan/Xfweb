@@ -3,7 +3,6 @@ import { deleteSession } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
-    // Delete the session from the database
     const sessionToken = request.cookies.get('xfoundry_session')?.value;
     if (sessionToken) {
       await deleteSession(sessionToken);

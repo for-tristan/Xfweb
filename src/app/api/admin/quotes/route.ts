@@ -78,7 +78,6 @@ export async function PUT(request: NextRequest) {
       data: { status },
     });
 
-    // Notify the user if marked as replied
     if (status === 'replied' && existing.status !== 'replied') {
       try {
         await db.notification.create({

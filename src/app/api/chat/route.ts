@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 
-// GET: Get messages between current user and another user
 export async function GET(request: NextRequest) {
   try {
     const user = await getCurrentUser();
@@ -17,7 +16,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
     }
 
-    // Mark unread messages from this user as read
     await db.chatMessage.updateMany({
       where: {
         senderId: otherUserId,
@@ -52,7 +50,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST: Send message
 export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser();
@@ -75,7 +72,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message too long (max 2000 chars)' }, { status: 400 });
     }
 
-    // Verify receiver exists
     const receiver = await db.user.findUnique({
       where: { id: receiverId },
       select: { id: true },

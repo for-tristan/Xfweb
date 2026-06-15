@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
-// Keys that should never be exposed to the public
 const SENSITIVE_SETTING_KEYS = [
   'smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass',
   'secret', 'api_key', 'apikey', 'token', 'password',

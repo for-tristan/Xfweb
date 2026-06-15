@@ -12,7 +12,6 @@ export async function GET(request: NextRequest) {
     const testId = searchParams.get('testId');
     const viewGrades = searchParams.get('viewGrades');
 
-    // Return single test with questions, attempts, unlocks, and enrolled students
     if (testId) {
       const test = await db.moduleTest.findUnique({
         where: { id: testId },
@@ -40,7 +39,6 @@ export async function GET(request: NextRequest) {
 
       if (!test) return NextResponse.json({ error: 'Test not found' }, { status: 404 });
 
-      // Fetch approved enrollments for this course directly on the server
       const course = await db.course.findUnique({
         where: { id: test.module.courseId },
         select: { slug: true },
@@ -51,7 +49,6 @@ export async function GET(request: NextRequest) {
           where: { courseId: course.slug, status: 'approved', deletedAt: null },
           include: { user: { select: { id: true, name: true, email: true, avatar: true } } },
         });
-        // Deduplicate by userId (student might have multiple enrollments)
         const seen = new Set<string>();
         for (const e of enrolled) {
           if (!seen.has(e.userId)) {
@@ -64,7 +61,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ test, enrolledStudents });
     }
 
-    // Return all tests with attempts and user info (for viewing grades)
     if (viewGrades === '1') {
       const tests = await db.moduleTest.findMany({
         orderBy: { createdAt: 'desc' },
@@ -85,7 +81,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ tests });
     }
 
-    // Default: return all tests with summary counts
     const tests = await db.moduleTest.findMany({
       orderBy: { createdAt: 'desc' },
       include: {
@@ -129,7 +124,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'moduleId and title are required' }, { status: 400 });
     }
 
-    // Verify module exists
     const module = await db.courseModule.findUnique({ where: { id: moduleId } });
     if (!module) return NextResponse.json({ error: 'Module not found' }, { status: 404 });
 
@@ -208,19 +202,16 @@ export async function PUT(request: NextRequest) {
     }
 
     try {
-      // Delete any existing completed attempts so student can retake from scratch
       await db.testAttempt.deleteMany({
         where: { testId, userId, submittedAt: { not: null } },
       }).catch(() => {});
 
-      // Use upsert with compound unique key for reliability
       await db.testUnlock.upsert({
         where: { testId_userId: { testId, userId } },
         create: { testId, userId, unlockedBy: user.id },
-        update: {}, // already unlocked, no-op
+        update: {},
       });
 
-      // Notify user
       const testInfo = await db.moduleTest.findUnique({ where: { id: testId } });
       if (testInfo) {
         await db.notification.create({
@@ -248,7 +239,6 @@ export async function PUT(request: NextRequest) {
     }
 
     try {
-      // Find existing unlock by compound key
       const existing = await db.testUnlock.findUnique({
         where: { testId_userId: { testId, userId } },
       });
@@ -261,12 +251,10 @@ export async function PUT(request: NextRequest) {
         where: { id: existing.id },
       });
 
-      // Also delete any in-progress attempts for this test+user
       await db.testAttempt.deleteMany({
         where: { testId, userId, submittedAt: null },
       }).catch(() => {});
 
-      // Notify user
       const testInfo = await db.moduleTest.findUnique({ where: { id: testId } });
       if (testInfo) {
         await db.notification.create({

@@ -13,15 +13,12 @@ async function requireAdmin() {
   return { error: null, user };
 }
 
-// Dynamically fetch total module count for a course from the database
 async function getTotalModules(courseId: string): Promise<number> {
   try {
-    // courseId in CourseProgress stores the slug, CourseModule stores the CUID
-    // First try to find the course by slug to get its CUID
     const course = await db.course.findUnique({ where: { slug: courseId } });
     const whereCourseId = course ? course.id : courseId;
     const count = await db.courseModule.count({ where: { courseId: whereCourseId } });
-    return count > 0 ? count : 1; // fallback to 1 to avoid division by zero
+    return count > 0 ? count : 1;
   } catch {
     return 1;
   }
@@ -37,9 +34,7 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get('userId');
     const courseId = searchParams.get('courseId');
 
-    // If includeStudy with userId+courseId, return module-level study data
     if (includeStudy && userId && courseId) {
-      // Resolve slug to CUID for module lookup
       const course = await db.course.findUnique({ where: { slug: courseId } });
       const whereCourseId = course ? course.id : courseId;
 
@@ -59,7 +54,7 @@ export async function GET(request: NextRequest) {
         return {
           moduleId: m.id,
           moduleTitle: m.title,
-          moduleOrder: m.moduleOrder, // Get from CourseModule, not ModuleStudy
+          moduleOrder: m.moduleOrder,
           timeSpent: study?.timeSpent || 0,
           studied: study?.studied || false,
           lastStudied: study?.lastStudied?.toISOString() || '',
@@ -84,7 +79,6 @@ export async function GET(request: NextRequest) {
       orderBy: { lastAccessed: 'desc' },
     });
 
-    // Fetch active (non-cancelled) enrollments to filter out orphaned progress
     const activeEnrollments = await db.enrollment.findMany({
       where: { deletedAt: null, status: 'approved' },
       select: { userId: true, courseId: true },
@@ -93,12 +87,10 @@ export async function GET(request: NextRequest) {
       activeEnrollments.map(e => `${e.userId}:${e.courseId}`)
     );
 
-    // Only keep progress records for users with an active approved enrollment
     const filteredRecords = progressRecords.filter(r =>
       activeEnrollmentSet.has(`${r.userId}:${r.courseId}`)
     );
 
-    // Fetch all courses once to build a slug→CUID mapping
     const allCourses = await db.course.findMany({ select: { id: true, slug: true } });
     const courseMap = new Map(allCourses.map(c => [c.slug, c.id]));
 
@@ -178,7 +170,6 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Upsert CourseProgress
     const progress = await db.courseProgress.upsert({
       where: { userId_courseId: { userId, courseId } },
       create: {
@@ -229,7 +220,6 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'userId and courseId are required' }, { status: 400 });
     }
 
-    // Reset progress to empty
     const progress = await db.courseProgress.upsert({
       where: { userId_courseId: { userId, courseId } },
       create: {

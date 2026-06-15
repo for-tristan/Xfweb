@@ -25,7 +25,6 @@ export async function GET() {
       orderBy: { displayOrder: 'asc' },
     });
 
-    // Get enrollment counts per course (enrollment.courseId = course slug)
     const courseSlugs = courses.map(c => c.slug);
 
     const enrollmentCounts = await db.enrollment.groupBy({
@@ -68,7 +67,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'title and slug are required' }, { status: 400 });
     }
 
-    // Instructors always get their own ID; admins can optionally specify
     const assignedInstructorId = isInstructor ? user!.id : (instructorId || null);
 
     const course = await db.course.create({
@@ -119,12 +117,10 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Course not found' }, { status: 404 });
     }
 
-    // Instructors can only update their own courses
     if (isInstructor && existing.instructorId !== user!.id) {
       return NextResponse.json({ error: 'Forbidden: You can only update your own courses' }, { status: 403 });
     }
 
-    // Only admins can reassign instructor
     const updateData: Record<string, unknown> = {
       ...(title !== undefined && { title }),
       ...(slug !== undefined && { slug }),
@@ -178,35 +174,25 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Course not found' }, { status: 404 });
     }
 
-    // Instructors can only delete their own courses
     if (isInstructor && existing.instructorId !== user!.id) {
       return NextResponse.json({ error: 'Forbidden: You can only delete your own courses' }, { status: 403 });
     }
 
     const slug = existing.slug;
 
-    // Clean up all related data before deleting the course
-    // Enrollment stores courseId as the slug (not a FK), so manual cleanup needed
     await db.enrollment.deleteMany({ where: { courseId: slug } });
-    // CourseProgress also stores courseId as slug
     await db.courseProgress.deleteMany({ where: { courseId: slug } });
-    // StudySession also stores courseId as slug
     await db.studySession.deleteMany({ where: { courseId: slug } });
-    // Certificate also stores courseId as slug
     await db.certificate.deleteMany({ where: { courseId: slug } });
 
-    // CourseModule has onDelete: Cascade, but also clean up module-related data explicitly
     const moduleIds = (await db.courseModule.findMany({
       where: { courseId: id },
       select: { id: true },
     })).map(m => m.id);
 
     if (moduleIds.length > 0) {
-      // Clean up module unlocks
       await db.moduleUnlock.deleteMany({ where: { moduleId: { in: moduleIds } } });
-      // Clean up module studies
       await db.moduleStudy.deleteMany({ where: { moduleId: { in: moduleIds } } });
-      // Clean up tests (cascade should handle questions/attempts/unlocks, but be explicit)
       const testIds = (await db.moduleTest.findMany({
         where: { moduleId: { in: moduleIds } },
         select: { id: true },

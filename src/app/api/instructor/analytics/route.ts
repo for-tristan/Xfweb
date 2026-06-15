@@ -7,7 +7,6 @@ export async function GET() {
     const { error, user, isInstructor, isAdmin } = await requireInstructorOrAdmin();
     if (error) return error;
 
-    // For instructors, scope everything to their courses
     let courseSlugs: string[] = [];
     let courseCUIDs: string[] = [];
 
@@ -79,7 +78,6 @@ export async function GET() {
       if (dailyTrends[key] !== undefined) dailyTrends[key]++;
     });
 
-    // Get all test attempts for instructor's courses
     const testModules = isAdmin
       ? await db.moduleTest.findMany({
           include: {

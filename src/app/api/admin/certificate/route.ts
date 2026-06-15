@@ -3,7 +3,6 @@ import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 import { createHash } from 'crypto';
 
-// No hardcoded course names — dynamically fetched from DB
 
 async function requireAdmin() {
   const user = await getCurrentUser();
@@ -28,13 +27,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'userId and courseId are required' }, { status: 400 });
     }
 
-    // Get the student
     const student = await db.user.findUnique({ where: { id: userId } });
     if (!student) {
       return NextResponse.json({ error: 'Student not found' }, { status: 404 });
     }
 
-    // Check if a certificate already exists for this student/course
     const existingCert = await db.certificate.findUnique({
       where: { userId_courseId: { userId, courseId } },
     });
@@ -45,7 +42,6 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Check progress is at 100%
     const progress = await db.courseProgress.findUnique({
       where: { userId_courseId: { userId, courseId } },
     });
@@ -65,7 +61,6 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Generate certificate
     const certSeed = `${userId}-${courseId}-${Date.now()}`;
     const certificateId = `XF-${createHash('sha256').update(certSeed).digest('hex').substring(0, 12).toUpperCase()}`;
     const completionDate = new Date().toLocaleDateString('en-US', {
@@ -73,11 +68,9 @@ export async function POST(request: NextRequest) {
       month: 'long',
       day: 'numeric',
     });
-    // Resolve courseId (slug) to actual course name from DB
     const course = await db.course.findUnique({ where: { slug: courseId } });
     const courseName = course ? course.title : (progress.courseName || courseId);
 
-    // Save certificate to database
     await db.certificate.create({
       data: {
         userId,
@@ -88,7 +81,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Notify student
     await db.notification.create({
       data: {
         userId,

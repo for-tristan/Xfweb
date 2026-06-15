@@ -19,7 +19,6 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Verify password
     const fullUser = await db.user.findUnique({ where: { id: user.id } });
     if (!fullUser || !verifyPassword(password, fullUser.password)) {
       return NextResponse.json(
@@ -28,15 +27,12 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Delete user and all related data (cascade should handle most)
     await db.user.delete({ where: { id: user.id } });
 
-    // Invalidate all sessions
     await deleteAllUserSessions(user.id);
 
     const response = NextResponse.json({ message: 'Account deleted successfully' });
 
-    // Clear cookies
     response.cookies.set('xfoundry_session', '', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

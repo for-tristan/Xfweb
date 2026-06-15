@@ -81,7 +81,6 @@ export function AdminSettingsModal({ open, onClose, onSettingsSaved }: AdminSett
   const [saving, setSaving] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Detect mobile viewport
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)');
     const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
@@ -90,7 +89,6 @@ export function AdminSettingsModal({ open, onClose, onSettingsSaved }: AdminSett
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  // Fetch current settings when modal opens
   const fetchSettings = useCallback(async () => {
     setLoading(true);
     try {
@@ -122,12 +120,10 @@ export function AdminSettingsModal({ open, onClose, onSettingsSaved }: AdminSett
     }
   }, [open, fetchSettings]);
 
-  // Update a single field
   const handleChange = (key: string, val: string) => {
     setValues((prev) => ({ ...prev, [key]: val }));
   };
 
-  // Save all settings
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -160,7 +156,6 @@ export function AdminSettingsModal({ open, onClose, onSettingsSaved }: AdminSett
     setSaving(false);
   };
 
-  // Handle overlay click
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) onClose();
   };
@@ -499,8 +494,6 @@ export function AdminSettingsModal({ open, onClose, onSettingsSaved }: AdminSett
                     </div>
                   ))}
                 </div>
-
-                {/* Divider between sections (except last) */}
                 {sIdx < SETTINGS_SECTIONS.length - 1 && (
                   <div style={{ marginTop: 24 }}>
                     <div style={dividerStyle} />

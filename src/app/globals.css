@@ -10,21 +10,18 @@
 }
 
 ::view-transition-old(root) {
-  /* Keep old state fully visible; new state reveals over it */
+
   opacity: 1;
 }
 
 ::view-transition-new(root) {
-  /* New state starts invisible; clip-path animation reveals it */
+
   opacity: 1;
 }
 
-/* ========================================
-   X.FOUNDRY DESIGN SYSTEM
-   ======================================== */
 
 :root {
-  /* XFoundry Colors — Vaulta Light Design System */
+
   --accent: #6640ff;
   --accent-dark: #3300ff;
   --primary-red: var(--accent);
@@ -45,10 +42,10 @@
   --warning-color: #f59e0b;
   --info-color: #6640ff;
 
-  /* Accent Colors — derived from theme accent for automatic theme adaptation */
+
   --accent-purple: color-mix(in srgb, var(--accent) 55%, white);
 
-  /* Vaulta-specific — all derived from theme accent for dynamic switching */
+
   --v-badge-border: color-mix(in srgb, var(--accent) 10%, transparent);
   --v-badge-text: var(--accent);
   --v-card-line: color-mix(in srgb, var(--accent) 8%, transparent);
@@ -66,9 +63,6 @@
   --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
 }
 
-/* ========================================
-   BASE RESET & BODY
-   ======================================== */
 
 * {
   margin: 0;
@@ -79,7 +73,7 @@
   text-rendering: optimizeLegibility;
 }
 
-/* Global keyboard focus indicator — WCAG 2.1 Level A (2.4.7 Focus Visible) */
+
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
@@ -104,24 +98,20 @@ body.xf-body {
     text-rendering: optimizeLegibility;
 }
 
-/* ========================================
-   HIDDEN SCROLLBAR
-   ======================================== */
+
 html.scrollbar-hidden,
 html.scrollbar-hidden body {
-  scrollbar-width: none !important;         /* Firefox */
-  -ms-overflow-style: none !important;      /* IE/Edge */
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
 html.scrollbar-hidden::-webkit-scrollbar,
 html.scrollbar-hidden body::-webkit-scrollbar {
-  display: none !important;                 /* Chrome/Safari/Opera */
+  display: none !important;
   width: 0 !important;
   height: 0 !important;
 }
 
-/* ========================================
-   SCROLL LOCK — body locked during preloader
-   ======================================== */
+
 html.scroll-locked,
 html.scroll-locked body {
   overflow: hidden !important;
@@ -132,25 +122,6 @@ html.scroll-locked body {
   height: 100vh;
 }
 
-/* Noise Overlay - disabled (was causing heavy grain filter) */
-/* body.xf-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.4;
-  pointer-events: none;
-  z-index: 9998;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 256px 256px;
-} */
-
-/* ========================================
-   FONT AWESOME — THEME ADAPTATION
-   ======================================== */
 
 .fa-solid,
 .fa-brands,
@@ -161,9 +132,6 @@ html.scroll-locked body {
   color: inherit;
 }
 
-/* ========================================
-   CHECKBOX
-   ======================================== */
 
 .xf-checkbox-group input[type="checkbox"] {
     width: 20px;
@@ -174,9 +142,6 @@ html.scroll-locked body {
     cursor: pointer;
 }
 
-/* ========================================
-   PASSWORD STRENGTH
-   ======================================== */
 
 .xf-password-strength {
   height: 3px;
@@ -207,19 +172,13 @@ html.scroll-locked body {
   background: var(--success-color);
 }
 
-/* ========================================
-   SCROLLBAR STYLES — theme-dynamic
-   CSS variables don't resolve in ::-webkit-scrollbar
-   so we use explicit [data-theme] selectors
-   ======================================== */
 
-/* Firefox — supports CSS vars in scrollbar-color */
 html {
     scrollbar-width: thin;
     scrollbar-color: var(--border-color) var(--black);
 }
 
-/* WebKit — needs per-theme hardcoded values */
+
 ::-webkit-scrollbar { width: 6px; }
 
 :root {
@@ -359,11 +318,6 @@ html {
   background: var(--sb-hover);
 }
 
-/* ========================================
-   ORIGINAL WEBSITE STYLES (from index.html)
-   These class names are used in the main
-   website sections (Hero, Services, etc.)
-   ======================================== */
 
 [data-theme="light"] {
     --accent: #b91c1c;
@@ -381,7 +335,7 @@ html {
     --input-bg: rgba(0,0,0,0.04);
     --border-color: #e0e0e0;
 
-    /* Status colors — same values work in light mode */
+
     --success-color: #22c55e;
     --error-color: #ef4444;
     --warning-color: #f59e0b;
@@ -899,7 +853,7 @@ select {
     outline: none;
     cursor: pointer;
     transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-    /* iOS-style chevron — thin, elegant */
+
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23999' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 4.5l3 3 3-3'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
@@ -938,7 +892,7 @@ select optgroup {
     font-style: normal;
 }
 
-/* Dark-theme: lighter chevron arrow */
+
 .dark select,
 [data-theme="midnight"] select,
 [data-theme="oled"] select,
@@ -959,7 +913,7 @@ select optgroup {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23777' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 4.5l3 3 3-3'/%3E%3C/svg%3E");
 }
 
-/* Light-mode dropdowns & panels (notification, search, etc.) need solid backgrounds */
+
 .search-modal-overlay {
     background: color-mix(in srgb, var(--black) 97%, transparent) !important;
 }
@@ -994,8 +948,7 @@ select optgroup {
 .notif-panel .notif-unread {
     background: color-mix(in srgb, var(--accent) 4%, transparent) !important;
 }
-/* Particles background canvas: pointer-events: none so clicks pass
-   through to all content underneath (footer, links, buttons, etc.). */
+
 
 .click-splash-container {
     pointer-events: none;
@@ -1071,7 +1024,6 @@ select optgroup {
 }
 
 
-/* Outer wrapper: grid centering + scroll scale */
 .nav-pill-wrapper {
     position: relative;
     isolation: isolate;
@@ -1085,7 +1037,7 @@ select optgroup {
     box-shadow: none !important;
 }
 
-/* Scrolled/compact state */
+
 .navbar.scrolled .nav-pill-wrapper {
     border-color: rgba(255, 255, 255, 0.15);
 }
@@ -1135,7 +1087,7 @@ select optgroup {
     gap: 28px; align-items: center;
     padding: 0; margin: 0;
 }
-/* Nav links inside GlassSurface — override inner padding */
+
 .nav-pill-wrapper > div {
     padding: 0 !important;
 }
@@ -1166,7 +1118,7 @@ select optgroup {
     width: 100%;
 }
 
-/* AI nav link — highlighted with theme accent */
+
 .nav-ai-link {
     color: var(--accent) !important;
     font-weight: 700 !important;
@@ -1187,7 +1139,7 @@ select optgroup {
     justify-self: end;
 }
 
-/* Mobile Menu toggle button — lives in the navbar grid for perfect alignment */
+
 .nav-menu-toggle {
     display: none;
     background: transparent;
@@ -1206,7 +1158,7 @@ select optgroup {
     color: var(--accent);
 }
 
-/* Compact inline nav — visible between 1570px and 1140px only */
+
 .nav-links-compact {
     display: none;
     list-style: none;
@@ -1306,7 +1258,7 @@ select optgroup {
     animation: gridMove 25s linear infinite;
     pointer-events: none;
 }
-/* Fixed full-page grid overlay for sub-pages (study, dashboard, course/service slug) */
+
 .page-grid-bg {
     position: fixed;
     top: 0; left: 0;
@@ -1514,7 +1466,7 @@ select optgroup {
     transition: filter 0.4s ease, scale 0.4s ease, opacity 0.4s ease;
 }
 
-/* Game Select Cards — Vaulta */
+
 .game-card {
     background: color-mix(in srgb, var(--card-bg) 60%, transparent);
     backdrop-filter: blur(12px) saturate(1.3);
@@ -1585,7 +1537,7 @@ select optgroup {
     animation: slideInLeft 0.3s ease both;
 }
 
-/* Game Picker Buttons (language / difficulty) — Vaulta */
+
 .game-picker-btn {
     padding: 8px 16px; border-radius: 8px;
     background: color-mix(in srgb, var(--card-bg) 50%, transparent);
@@ -1618,7 +1570,7 @@ select optgroup {
     box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 25%, transparent);
 }
 
-/* Game Primary Button — Vaulta */
+
 .game-btn-primary {
     width: 100%; padding: 14px 24px; border-radius: 10px;
     background: var(--accent);
@@ -1649,7 +1601,7 @@ select optgroup {
     cursor: default;
 }
 
-/* Game Secondary Button — Vaulta */
+
 .game-btn-secondary {
     width: 100%; padding: 10px; border-radius: 10px;
     background: color-mix(in srgb, var(--card-bg) 40%, transparent);
@@ -1678,7 +1630,7 @@ select optgroup {
 .game-btn-secondary.quit:hover { border-color: color-mix(in srgb, var(--error-color) 40%, transparent); color: var(--error-color); }
 .game-btn-secondary.trophy:hover { border-color: color-mix(in srgb, var(--warning-color) 40%, transparent); color: var(--warning-color); box-shadow: 0 4px 16px color-mix(in srgb, var(--warning-color) 15%, transparent); }
 
-/* Game Option Buttons (answer choices) — Vaulta */
+
 .game-option {
     display: flex; align-items: center; gap: 12px;
     padding: 14px 18px;
@@ -1731,7 +1683,7 @@ select optgroup {
 .game-option.correct .option-circle { background: rgba(34,197,94,0.2); border-color: rgba(34,197,94,0.4); color: var(--success-color); }
 .game-option.wrong .option-circle { background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.4); color: var(--error-color); }
 
-/* Game Config Panel — Vaulta */
+
 .game-config-panel {
     background: color-mix(in srgb, var(--card-bg) 60%, transparent);
     backdrop-filter: blur(12px) saturate(1.3);
@@ -1741,7 +1693,7 @@ select optgroup {
     animation: slideInUp 0.4s ease both;
 }
 
-/* Game Score Circle — Vaulta */
+
 .game-score-circle {
     width: 150px; height: 150px;
     border-radius: 50%;
@@ -1756,7 +1708,7 @@ select optgroup {
 }
 .game-score-circle.animated { animation: scoreCountUp 0.6s cubic-bezier(0.22,1,0.36,1) both; }
 
-/* Game Stats Grid Item — Vaulta */
+
 .game-stat-card {
     background: color-mix(in srgb, var(--card-bg) 60%, transparent);
     backdrop-filter: blur(16px) saturate(1.5);
@@ -2452,7 +2404,7 @@ select optgroup {
 .wave-group .input:focus ~ .bar:after {
     width: 50%;
 }
-/* Password strength inside wave-group */
+
 .wave-group .xf-password-strength { margin-top: 6px; }
 .wave-group .pw-mismatch { color: var(--error-color); font-size: 11px; font-weight: 600; margin-top: 4px; display: block; }
 .wave-group-textarea .textarea {
@@ -2494,7 +2446,7 @@ select optgroup {
 .wave-group-textarea .textarea:focus ~ .bar:after {
     width: 50%;
 }
-/* Selects still use form-group */
+
 .form-group { margin-bottom: 20px; }
 .form-group label {
     display: block; font-size: 11px; font-weight: 600;
@@ -2505,7 +2457,7 @@ select optgroup {
 .form-group select,
 .form-group textarea {
     width: 100%;
-    /* Inherits iOS select styling from global rule; only override what's needed */
+
 }
 .form-group select:focus,
 .form-group textarea:focus {
@@ -2645,7 +2597,7 @@ select optgroup {
     z-index: 5;
     background: var(--black);
 }
-/* Ensure parallax wrappers don't break section layout */
+
 .parallax-section-wrapper {
     position: relative;
     z-index: 2;
@@ -2683,10 +2635,10 @@ select optgroup {
 }
 
 @media (max-width: 1570px) {
-    /* Show compact inline nav links inside nav-pill */
+
     .nav-links-compact { display: flex !important; gap: 28px !important; }
     .nav-actions { gap: 8px !important; min-width: 0; overflow: visible !important; position: relative !important; z-index: 998 !important; }
-    /* Hide old drawer — StaggeredMenu replaces it */
+
     .nav-links { display: none !important; }
     .menu-toggle { display: none !important; }
     .desktop-only { display: none !important; }
@@ -2767,9 +2719,7 @@ select optgroup {
     .study-leaderboard-scroll { max-height: 400px !important; }
 }
 
-/* ========================================
-   GENERIC MODAL (Enrollment, etc.)
-   ======================================== */
+
 .modal-overlay {
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.85);
@@ -2795,9 +2745,7 @@ select optgroup {
 }
 .modal-close:hover { color: var(--primary-red); }
 
-/* ========================================
-   VAULTA MODAL SYSTEM
-   ======================================== */
+
 .v-modal-overlay {
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.75);
@@ -2964,7 +2912,7 @@ select optgroup {
     .v-modal-tabs { margin: 0 20px; }
 }
 
-/* Auth modal — Vaulta upgrade */
+
 .auth-modal-overlay {
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.75);
@@ -3053,7 +3001,7 @@ select optgroup {
     margin-bottom: 20px;
 }
 
-/* Dashboard modal — Vaulta upgrade */
+
 .dashboard-modal-overlay {
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.75);
@@ -3150,9 +3098,9 @@ select optgroup {
     }
 }
 
-/* Inline auth buttons (visible next to hamburger at <=1570px) — Vaulta style */
+
 .nav-inline-auth {
-    display: none; /* hidden on desktop */
+    display: none;
     align-items: center;
     gap: 6px;
 }
@@ -3240,11 +3188,7 @@ select optgroup {
     border-top: 1px solid var(--border-color);
 }
 
-/* ========================================
-   SUB-PAGES — Services & Courses
-   ======================================== */
 
-/* Page Hero (service/course detail pages) */
 .page-hero, .course-hero {
     min-height: 100vh;
     display: flex; align-items: center; justify-content: center;
@@ -3404,7 +3348,7 @@ select optgroup {
 .enroll-form .form-group { margin-bottom: 16px; }
 .enroll-form label { display: block; font-size: 11px; font-weight: 700; margin-bottom: 6px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.5px; }
 .enroll-form input { width: 100%; padding: 14px 16px; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-light); font-family: 'Inter Tight', sans-serif; font-size: 14px; font-weight: 600; transition: border-color 0.2s; border-radius: 12px; }
-.enroll-form select { width: 100%; /* inherits iOS global select style */ }
+.enroll-form select { width: 100%;  }
 .enroll-form input:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 8%, transparent); }
 .enroll-form input:focus, .enroll-form select:focus { border-color: color-mix(in srgb, var(--accent) 50%, transparent); }
 .enroll-btn { width: 100%; padding: 18px; background: var(--primary-red); color: white; border: none; font-family: 'Inter Tight', sans-serif; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 8px; transition: all 0.3s ease; cursor: pointer; border-radius: 0; }
@@ -3427,7 +3371,7 @@ select optgroup {
 .cta-content h2 { font-family: 'Inter Tight', sans-serif; font-size: clamp(28px, 4vw, 42px); font-weight: 900; margin-bottom: 16px; color: var(--text-light); }
 .cta-content p { color: var(--text-dim); max-width: 500px; margin: 0 auto 32px; }
 
-/* Course Preview Grid (used in training service page) */
+
 .course-preview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 40px; }
 .course-mini-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 28px; transition: all 0.3s ease; text-decoration: none; color: inherit; display: block; }
 @media (hover: hover) {
@@ -3439,7 +3383,7 @@ select optgroup {
 .course-mini-meta span { display: flex; align-items: center; gap: 4px; }
 .course-mini-meta i { color: var(--primary-red); }
 
-/* Responsive for sub-pages */
+
 @media (max-width: 1024px) {
     .service-layout, .course-layout { grid-template-columns: 1fr; }
     .sidebar, .enroll-card { position: static; }
@@ -3455,9 +3399,6 @@ select optgroup {
     .services-grid { grid-template-columns: 1fr !important; }
 }
 
-/* ========================================
-   PAGE TRANSITION
-   ======================================== */
 
 @keyframes pageFadeIn {
   from { opacity: 0; transform: translateY(12px); }
@@ -3468,9 +3409,6 @@ body {
   animation: pageFadeIn 0.35s ease-out;
 }
 
-/* ========================================
-   SKELETON LOADING
-   ======================================== */
 
 .skeleton {
   background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
@@ -3527,9 +3465,6 @@ body {
   100% { background-position: 200% 0; }
 }
 
-/* ========================================
-   ACCESSIBILITY
-   ======================================== */
 
 *:focus-visible {
   outline: 2px solid var(--accent);
@@ -3568,10 +3503,6 @@ body {
   top: 0;
 }
 
-/* ========================================
-   IPHONE-STYLE TOAST NOTIFICATIONS
-   z-index: 99999 — appears over all modals
-   ======================================== */
 
 .xf-toast-container {
   position: fixed;
@@ -3667,9 +3598,6 @@ body {
   }
 }
 
-/* ========================================
-   SKELETON LOADING ANIMATIONS
-   ======================================== */
 
 @keyframes skeleton-pulse {
   0%, 100% { opacity: 0.4; }
@@ -3724,11 +3652,7 @@ body {
   to { opacity: 0; }
 }
 
-/* ========================================
-   PAGE CONTENT ENTER — subtle fade-in
-   ======================================== */
 
-/* Page transition - fade in from bottom */
 .page-transition-enter {
   opacity: 0;
   transform: translateY(8px);
@@ -3879,9 +3803,6 @@ body {
     }
 }
 
-/* ========================================
-   ACCESSIBILITY — REDUCED MOTION
-   ======================================== */
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -3907,14 +3828,8 @@ body {
     display: none !important;
   }
 }
-/* ========================================
-   MOBILE MENU — ENHANCED
-   ======================================== */
 
-/* StaggeredMenu: visibility now handled via .sm-mobile-only class + portal
-   (see StaggeredMenu.tsx <style> block) — this wrapper is no longer used */
 
-/* Desktop-only utility class: visible above 900px */
 .desktop-only {
     display: inline-flex;
 }
@@ -3928,7 +3843,7 @@ body {
     animation: fadeIn 0.2s ease;
 }
 
-/* Hamburger → X animation */
+
 .menu-toggle {
     position: relative;
     width: 32px;
@@ -3961,7 +3876,7 @@ body {
     transform: rotate(-45deg);
 }
 
-/* Mobile menu header (brand + close) */
+
 .mobile-menu-header {
     display: none;
     align-items: center;
@@ -4024,7 +3939,7 @@ body {
 }
 .mobile-theme-select {
     width: 100%;
-    /* inherits iOS global select style */
+
     font-size: 13px;
 }
 .mobile-theme-select:hover {
@@ -4224,7 +4139,7 @@ body {
     color: var(--primary-red);
 }
 
-/* Mobile action buttons (search) */
+
 .mobile-menu-actions {
     display: none;
     flex-direction: row;
@@ -4356,7 +4271,7 @@ body {
         display: inline-flex !important;
     }
     .nav-menu-toggle {
-        display: none !important; /* StaggeredMenu has its own toggle inside the portal */
+        display: none !important;
     }
 }
 
@@ -4411,10 +4326,6 @@ body {
     }
 }
 
-/* ========================================
-   SCROLL ANIMATION COMPONENTS
-   CSS + IntersectionObserver scroll-based design
-   ======================================== */
 
 .section-badge {
   display: inline-flex;
@@ -4587,7 +4498,7 @@ body {
   z-index: 0;
 }
 
-/* Section divider for scroll-based design (scoped — only used via .scroll-section-divider) */
+
 .scroll-section-divider {
   width: 100%;
   height: 120px;
@@ -4630,7 +4541,7 @@ body {
   letter-spacing: 2px;
 }
 
-/* Enhanced cards for scroll-based design */
+
 .service-card-scroll {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
@@ -4728,7 +4639,7 @@ body {
   animation: v-gradient-shift 4s ease infinite;
   padding: 0 0.05em;
 }
-/* Scroll-triggered blur-in for highlight text — hooks into SectionReveal's .visible class */
+
 .reveal-up:not(.visible) .v-highlight {
   filter: blur(10px);
   opacity: 0;
@@ -5061,7 +4972,7 @@ body {
   -webkit-backdrop-filter: blur(16px);
   box-shadow: 0 0 0 0 transparent;
 }
-/* All-around accent glow — border glow on hover */
+
 .v-service-card:hover {
   border-color: color-mix(in srgb, var(--accent) 40%, transparent);
   transform: translateY(-4px) scale(1.02);
@@ -5076,7 +4987,7 @@ body {
   background: color-mix(in srgb, var(--card-bg) 70%, transparent);
   animation: cardGlowPulse 2s ease-in-out infinite;
 }
-/* Other cards blur + shrink when one is hovered */
+
 .v-services-grid:hover > .v-service-card:not(:hover) {
   filter: blur(4px);
   transform: scale(0.96);
@@ -5147,7 +5058,7 @@ body {
   -webkit-backdrop-filter: blur(16px);
   box-shadow: 0 0 0 0 transparent;
 }
-/* All-around accent glow — border glow on hover */
+
 .v-course-card:hover {
   border-color: color-mix(in srgb, var(--accent) 40%, transparent);
   transform: translateY(-3px);
@@ -5185,7 +5096,7 @@ body {
   border: none;
   color: #fff;
 }
-/* Top row: category + level badge side by side */
+
 .v-course-card .v-course-top-row {
   display: flex;
   align-items: center;
@@ -5312,7 +5223,7 @@ body {
   max-width: 960px;
   margin: 0 auto;
 }
-/* Focus-blur: hovered card scales up, others blur out */
+
 .v-courses-grid:hover > .v-course-card:not(:hover) {
   filter: blur(4px);
   transform: scale(0.97);
@@ -5378,7 +5289,7 @@ body {
   border-color: rgba(255,255,255,0.2);
 }
 
-/* Vaulta theme override for .btn-secondary border */
+
 .btn-secondary {
   border-color: rgba(0,0,0,0.12);
 }
@@ -5435,7 +5346,7 @@ body {
   -webkit-backdrop-filter: blur(16px);
   box-shadow: 0 0 0 0 transparent;
 }
-/* All-around accent glow — border glow on hover */
+
 .v-team-card:hover {
   border-color: color-mix(in srgb, var(--accent) 40%, transparent);
   transform: translateY(-4px);
@@ -5526,7 +5437,7 @@ body {
   max-width: 1000px;
   margin: 0 auto;
 }
-/* Focus-blur: hovered card scales up, others blur out */
+
 .v-team-grid:hover > .v-team-card:not(:hover) {
   filter: blur(4px);
   transform: scale(0.97);
@@ -5841,7 +5752,7 @@ body {
   -webkit-backdrop-filter: blur(16px);
   box-shadow: 0 0 0 0 transparent;
 }
-/* All-around accent glow — border glow on hover */
+
 .v-project-card:hover {
   border-color: color-mix(in srgb, var(--accent) 40%, transparent);
   transform: translateY(-4px);
@@ -5920,7 +5831,7 @@ body {
   max-width: 1200px;
   margin: 0 auto;
 }
-/* Focus-blur: hovered card scales up, others blur out */
+
 .v-projects-grid:hover > .v-project-card:not(:hover) {
   filter: blur(4px);
   transform: scale(0.97);
@@ -5970,7 +5881,7 @@ body {
     0 20px 40px color-mix(in srgb, var(--accent) 10%, transparent);
   background: color-mix(in srgb, var(--card-bg) 70%, transparent);
 }
-/* Focus-blur: hovered card pops, others blur out */
+
 .v-projects-showcase:hover .v-project-showcase-card:not(:hover) {
   filter: blur(4px);
   transform: scale(0.96);
@@ -6027,7 +5938,7 @@ body {
   flex: 1;
 }
 
-/* CTA "More Coming" Card */
+
 .v-project-showcase-cta {
   background: transparent;
   border: 2px dashed color-mix(in srgb, var(--accent) 20%, transparent);

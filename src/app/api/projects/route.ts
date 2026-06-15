@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
-// GET /api/projects — public endpoint, returns active projects only
 export async function GET() {
   try {
     const projects = await db.project.findMany({
@@ -9,7 +8,6 @@ export async function GET() {
       orderBy: { displayOrder: 'asc' },
     });
 
-    // Parse tags from JSON string
     const parsed = projects.map(p => ({
       ...p,
       tags: JSON.parse(p.tags || '[]'),

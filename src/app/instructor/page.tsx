@@ -712,8 +712,6 @@ export default function InstructorPage() {
                   </div>
                 </div>
               )}
-
-              {/* Recent Activity (Daily Trends) */}
               {analytics?.dailyTrends && (
                 <div className="reveal">
                   <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: 18, color: 'var(--text-light)', marginBottom: 20 }}>
@@ -1279,8 +1277,6 @@ export default function InstructorPage() {
                       })}
                     </div>
                   </div>
-
-                  {/* Grades / Attempts */}
                   {selectedTest.attempts.length > 0 && (
                     <div>
                       <h4 style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: 14, color: 'var(--text-light)', marginBottom: 14 }}>

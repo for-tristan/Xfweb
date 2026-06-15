@@ -17,7 +17,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name, email, phone, company, serviceType, budget, description } = body;
 
-    // Phone is optional - only require name, email, serviceType, description
     if (!name || !email || !serviceType || !description) {
       return NextResponse.json(
         { error: 'Name, email, service type, and description are required' },
@@ -38,9 +37,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Send email BEFORE returning response.
-    // IMPORTANT: On Vercel serverless, after() does NOT keep the function alive —
-    // the email send gets killed before it completes. We MUST await it here.
     try {
       await sendInquiryEmail({ name, email, phone: phone || '', company, serviceType, budget, description });
     } catch (emailErr: any) {

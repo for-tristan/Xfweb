@@ -7,7 +7,6 @@ export async function GET(request: NextRequest) {
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 
-    // Fetch all test unlocks for this user with full test + module + questions data
     const unlocks = await db.testUnlock.findMany({
       where: { userId: user.id },
       include: {

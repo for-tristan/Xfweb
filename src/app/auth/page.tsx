@@ -34,25 +34,21 @@ function AuthContent() {
   const router = useRouter();
   const { toast } = useToast();
 
-  // Theme — read from localStorage only, no picker on auth page
   useEffect(() => {
     const t = localStorage.getItem('x-foundry-theme') || 'oled';
     document.documentElement.setAttribute('data-theme', t);
   }, []);
 
-  // Tab — read from URL query param (?tab=signup)
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') === 'signup' ? 'signup' : 'signin';
   const [tab, setTab] = useState<'signin' | 'signup'>(initialTab);
   const initialMsg = searchParams.get('msg') || '';
   const [authMessage, setAuthMessage] = useState(initialMsg);
 
-  // Login form
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
 
-  // Signup form
   const [signupName, setSignupName] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
@@ -61,7 +57,6 @@ function AuthContent() {
   const [signupCompany, setSignupCompany] = useState('');
   const [signupLoading, setSignupLoading] = useState(false);
 
-  // Forgot password
   const [forgotStep, setForgotStep] = useState<'idle' | 'email' | 'code'>('idle');
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotLoading, setForgotLoading] = useState(false);
@@ -69,14 +64,12 @@ function AuthContent() {
   const [newPassword, setNewPassword] = useState('');
   const [resetLoading, setResetLoading] = useState(false);
 
-  // Verification
   const [verificationStep, setVerificationStep] = useState<'idle' | 'pending'>('idle');
   const [verificationEmail, setVerificationEmail] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [verificationLoading, setVerificationLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
 
-  // Auth check — if user is already logged in, redirect to home
   useEffect(() => {
     fetch('/api/auth/me').then(r => r.json()).then(data => {
       if (data.user) router.push('/');
@@ -198,7 +191,6 @@ function AuthContent() {
     setResendLoading(false);
   }, [verificationEmail, toast]);
 
-  // Determine subtitle text
   const subtitleText = verificationStep === 'pending'
     ? 'Verify your email to get started'
     : forgotStep !== 'idle'

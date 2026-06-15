@@ -27,7 +27,6 @@ export interface StaggeredMenuProps {
   closeOnClickAway?: boolean;
   onMenuOpen?: () => void;
   onMenuClose?: () => void;
-  // Vaulta extra panel content
   user?: any;
   theme?: string;
   onChangeTheme?: (theme: string) => void;
@@ -64,7 +63,6 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
   closeOnClickAway = true,
   onMenuOpen,
   onMenuClose,
-  // Vaulta extras
   user,
   theme,
   onChangeTheme,
@@ -81,7 +79,7 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
   const [open, setOpen] = useState(false);
   const openRef = useRef(false);
   const [mounted, setMounted] = useState(false);
-  const gsapReadyRef = useRef(false); // tracks whether GSAP has initialized the portal DOM
+  const gsapReadyRef = useRef(false);
 
   const panelRef = useRef<HTMLDivElement | null>(null);
   const preLayersRef = useRef<HTMLDivElement | null>(null);
@@ -105,9 +103,6 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
 
   useEffect(() => { setMounted(true); }, []);
 
-  // Uses CSS transform (translateX) via GSAP to position panel + prelayers off-screen.
-  // CSS has clip-path:inset(0 0 0 100%) as a safety net to prevent flash before GSAP.
-  // GSAP autoAlpha:1 overrides the clip-path and sets visibility:visible.
   const resetPosition = useCallback(() => {
     const panel = panelRef.current;
     const preContainer = preLayersRef.current;
@@ -122,15 +117,11 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
 
     const offscreen = position === 'left' ? -100 : 100;
 
-    // Remove CSS clip-path (which hides the panel before GSAP init)
-    // and position off-screen using xPercent. clip-path is only needed
-    // for the brief moment before GSAP runs.
     gsap.set([panel, ...preLayers], { xPercent: offscreen, autoAlpha: 1, clipPath: 'inset(0 0 0 0)' });
     if (preContainer) {
       gsap.set(preContainer, { xPercent: 0, autoAlpha: 1, clipPath: 'inset(0 0 0 0)' });
     }
 
-    // Reset item labels
     const itemEls = Array.from(panel.querySelectorAll('.sm-panel-itemLabel')) as HTMLElement[];
     if (itemEls.length) gsap.set(itemEls, { yPercent: 140, rotate: 10 });
 
@@ -146,13 +137,8 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
     gsapReadyRef.current = true;
   }, [menuButtonColor, position]);
 
-  // CRITICAL: When isFixed=true, the first render goes to React tree (non-portal),
-  // then mounted=true triggers a re-render with createPortal to document.body.
-  // The portal creates NEW DOM nodes that refs now point to.
-  // We must initialize GSAP on the PORTAL DOM, not the initial non-portal DOM.
   useLayoutEffect(() => {
     if (isFixed) {
-      // Wait for portal to mount
       if (!mounted) return;
     }
     resetPosition();
@@ -171,20 +157,17 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
   useEffect(() => {
     if (pathname !== prevPathRef.current) {
       prevPathRef.current = pathname;
-      // Force-close & reset — kill any running animations
       if (openRef.current) {
         openRef.current = false;
         setOpen(false);
         onMenuClose?.();
       }
-      // Kill stale GSAP
       openTlRef.current?.kill();
       openTlRef.current = null;
       closeTweenRef.current?.kill();
       closeTweenRef.current = null;
       busyRef.current = false;
       if (busyTimeoutRef.current) { clearTimeout(busyTimeoutRef.current); busyTimeoutRef.current = null; }
-      // Re-init GSAP positioning after a tick (DOM may have changed)
       requestAnimationFrame(() => {
         resetPosition();
       });
@@ -192,7 +175,6 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
-  // Reset stale state on mount / remount
   useEffect(() => {
     openRef.current = false;
     setOpen(false);
@@ -260,7 +242,6 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
       }
     }
 
-    // Backdrop fade-in
     if (backdropRef.current) {
       tl.fromTo(backdropRef.current, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.5, ease: 'power2.out' }, 0);
     }
@@ -303,7 +284,6 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
 
     const offscreen = position === 'left' ? -100 : 100;
 
-    // Backdrop fade-out
     if (backdropRef.current) {
       gsap.to(backdropRef.current, { autoAlpha: 0, duration: 0.3, ease: 'power2.in', overwrite: 'auto' });
     }
@@ -416,7 +396,6 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
     }
   }, [playClose, animateColor, animateText, onMenuClose]);
 
-  // Expose imperative handle so parent can open/close/toggle from outside
   useImperativeHandle(ref, () => ({
     open: () => { if (!openRef.current) toggleMenu(); },
     close: closeMenu,
@@ -424,7 +403,6 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
     isOpen: () => openRef.current,
   }), [toggleMenu, closeMenu]);
 
-  // Click-away handler
   useEffect(() => {
     if (!closeOnClickAway || !open) return;
 
@@ -601,8 +579,6 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
                   </select>
                 </div>
               )}
-
-              {/* Notifications (logged-in only) */}
               {user && notifications.length > 0 && (
                 <div className="flex flex-col gap-3">
                   <span className="sm-extras-label" style={{ gap: 8, display: 'flex', alignItems: 'center' }}>
@@ -647,8 +623,6 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
                   </div>
                 </div>
               )}
-
-              {/* Auth / Profile */}
               {!user ? (
                 <div className="flex gap-4">
                   <button
@@ -736,8 +710,7 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
 [data-theme="sage"] .sm-scope .sm-backdrop,
 [data-theme="peach"] .sm-scope .sm-backdrop { background: rgba(255,255,255,0.4); backdrop-filter: blur(8px) saturate(1.1); -webkit-backdrop-filter: blur(8px) saturate(1.1); }
 
-/* When menu is CLOSED, prevent backdrop & panel from intercepting clicks.
-   When menu is OPEN (data-open present), allow pointer events. */
+
 .staggered-menu-wrapper:not([data-open]) .sm-backdrop,
 .staggered-menu-wrapper:not([data-open]) .staggered-menu-panel {
     pointer-events: none !important;
@@ -757,23 +730,19 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
 .sm-scope .sm-toggle-line { display: block; height: 1em; line-height: 1; }
 
 
-/* clip-path hides the panel until GSAP sets autoAlpha:1 (which overrides
-   visibility:hidden) and xPercent to slide it off-screen. This prevents
-   a flash of the panel at its default position before GSAP initializes.
-   z-index: 1100 ensures it renders ABOVE the navbar (z-index: 1000). */
 .sm-scope { z-index: 1100; }
 .sm-scope .staggered-menu-panel {
   position: absolute; top: 0; right: 0; width: clamp(340px, 46vw, 600px); height: 100%;
   background: var(--sm-panel-bg); display: flex; flex-direction: column;
   padding: 5em 2.5em 2em 2.5em; overflow-y: auto; z-index: 10;
   -webkit-overflow-scrolling: touch; touch-action: pan-y;
-  clip-path: inset(0 100% 0 0); /* hidden by default — GSAP overrides */
+  clip-path: inset(0 100% 0 0);
 }
 .sm-scope [data-position='left'] .staggered-menu-panel { right: auto; left: 0; clip-path: inset(0 0 0 100%); }
 .sm-scope .sm-prelayers {
   position: absolute; top: 0; right: 0; bottom: 0; width: clamp(340px, 46vw, 600px);
   pointer-events: none; z-index: 5;
-  clip-path: inset(0 100% 0 0); /* hidden by default */
+  clip-path: inset(0 100% 0 0);
 }
 .sm-scope [data-position='left'] .sm-prelayers { right: auto; left: 0; clip-path: inset(0 0 0 100%); }
 .sm-scope .sm-prelayer { position: absolute; top: 0; right: 0; height: 100%; width: 100%; }
@@ -831,8 +800,6 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
     </div>
   );
 
-  // When isFixed, render via portal to document.body to avoid CSS containment
-  // issues (transform/backdrop-filter on navbar ancestors breaking position:fixed)
   if (isFixed && mounted) {
     return createPortal(overlayContent, document.body);
   }

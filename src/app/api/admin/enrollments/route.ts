@@ -109,7 +109,6 @@ export async function PUT(request: NextRequest) {
       },
     });
 
-    // Create notification for the user
     if (status === 'approved') {
       await db.notification.create({
         data: {
@@ -120,9 +119,6 @@ export async function PUT(request: NextRequest) {
         },
       });
 
-      // Auto-unlock first module
-      // enrollment.courseId stores the slug, but courseModule.courseId is the Course CUID
-      // Look up the Course by slug first to get the real CUID
       const course = await db.course.findUnique({
         where: { slug: updated.courseId },
       });
@@ -139,7 +135,6 @@ export async function PUT(request: NextRequest) {
           });
         }
       }
-      // Create CourseProgress record for the student
       await db.courseProgress.upsert({
         where: { userId_courseId: { userId: updated.userId, courseId: updated.courseId } },
         create: {
@@ -162,9 +157,6 @@ export async function PUT(request: NextRequest) {
       });
     }
 
-    // Send email BEFORE returning response.
-    // IMPORTANT: On Vercel serverless, after() does NOT keep the function alive —
-    // the email send gets killed before it completes. We MUST await it here.
     try {
       await sendEnrollmentStatusEmail({
         userName: updated.user.name,
@@ -216,20 +208,16 @@ export async function DELETE(request: NextRequest) {
     }
 
     const userId = enrollment.userId;
-    const courseId = enrollment.courseId; // This is the slug
+    const courseId = enrollment.courseId;
 
-    // Delete the enrollment
     await db.enrollment.delete({
       where: { id: enrollmentId },
     });
 
-    // Remove student's progress for this course
     await db.courseProgress.deleteMany({
       where: { userId, courseId },
     });
 
-    // Lock all modules by deleting unlocks for this course's modules
-    // enrollment.courseId stores the slug, but courseModule.courseId is the Course CUID
     const course = await db.course.findUnique({ where: { slug: courseId } });
     if (course) {
       const courseModuleIds = await db.courseModule.findMany({
@@ -246,7 +234,6 @@ export async function DELETE(request: NextRequest) {
       }
     }
 
-    // Notify user
     await db.notification.create({
       data: {
         userId,

@@ -108,7 +108,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'AI returned empty response' }, { status: 500 });
     }
 
-    // Parse the AI response - handle potential markdown code fences
     let jsonStr = content.trim();
     if (jsonStr.startsWith('```')) {
       jsonStr = jsonStr.replace(/^```(?:json)?\s*\n?/, '').replace(/\n?```\s*$/, '');
@@ -118,7 +117,6 @@ export async function GET(request: NextRequest) {
     try {
       questions = JSON.parse(jsonStr);
     } catch {
-      // Try to extract JSON array from the response
       const match = jsonStr.match(/\[[\s\S]*\]/);
       if (match) {
         questions = JSON.parse(match[0]);
@@ -132,13 +130,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'No questions generated' }, { status: 500 });
     }
 
-    // Validate and clean up each question
     const validQuestions = questions
       .filter((q: any) => {
         if (!q.code || !q.options || !Array.isArray(q.options) || q.correctIndex === undefined || !q.explanation) {
           return false;
         }
-        // Reject braindead math questions
         const mathPattern = /^(print|System\.out\.println|cout\s*<<)\s*\(\s*\d+\s*[+\-*/%]\s*\d+\s*\)?\s*;?\s*$/;
         if (mathPattern.test(q.code.trim())) {
           return false;
@@ -151,7 +147,7 @@ export async function GET(request: NextRequest) {
         language,
         difficulty,
         code: q.code,
-        options: q.options.slice(0, 4), // Ensure max 4 options
+        options: q.options.slice(0, 4),
         correctIndex: Math.min(Math.max(q.correctIndex, 0), 3),
         explanation: q.explanation,
       }));

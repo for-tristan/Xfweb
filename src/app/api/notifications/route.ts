@@ -36,13 +36,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Title and message are required' }, { status: 400 });
     }
 
-    // Regular users can only create notifications for themselves
     let notificationUserId = user.id;
     if (targetUserId && targetUserId !== user.id) {
       if (user.role !== 'admin') {
         return NextResponse.json({ error: 'Only admins can send notifications to other users' }, { status: 403 });
       }
-      // Verify the target user exists
       const targetUser = await db.user.findUnique({ where: { id: targetUserId } });
       if (!targetUser) {
         return NextResponse.json({ error: 'Target user not found' }, { status: 404 });

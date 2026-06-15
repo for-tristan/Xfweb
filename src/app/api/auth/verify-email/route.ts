@@ -16,7 +16,6 @@ export async function POST(request: NextRequest) {
 
     const normalizedEmail = email.toLowerCase().trim();
 
-    // Find the verification code
     const verification = await db.emailVerification.findFirst({
       where: {
         email: normalizedEmail,
@@ -34,7 +33,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find the user
     const user = await db.user.findUnique({
       where: { email: normalizedEmail },
     });
@@ -46,7 +44,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Mark code as used and set emailVerified in a transaction
     await db.$transaction([
       db.emailVerification.update({
         where: { id: verification.id },
@@ -62,7 +59,6 @@ export async function POST(request: NextRequest) {
       }),
     ]);
 
-    // Create session and log the user in
     const token = await createSession(user.id);
 
     const response = NextResponse.json({
@@ -107,7 +103,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET endpoint for link-based verification
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -123,7 +118,6 @@ export async function GET(request: NextRequest) {
 
     const normalizedEmail = email.toLowerCase().trim();
 
-    // Find the verification code
     const verification = await db.emailVerification.findFirst({
       where: {
         email: normalizedEmail,
@@ -138,7 +132,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/?verification=failed', request.url));
     }
 
-    // Find the user
     const user = await db.user.findUnique({
       where: { email: normalizedEmail },
     });
@@ -147,7 +140,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/?verification=failed', request.url));
     }
 
-    // Mark code as used and set emailVerified
     await db.$transaction([
       db.emailVerification.update({
         where: { id: verification.id },
@@ -163,7 +155,6 @@ export async function GET(request: NextRequest) {
       }),
     ]);
 
-    // Create session and log the user in
     const token = await createSession(user.id);
 
     const response = NextResponse.redirect(new URL('/?verification=success', request.url));

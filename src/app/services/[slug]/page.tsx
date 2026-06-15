@@ -99,7 +99,6 @@ export default function DynamicServicePage() {
     };
   }, [checkReveals]);
 
-  // Re-check reveals when loading finishes (content mounts after loading)
   useEffect(() => {
     if (!loading && !minLoading) {
       const t = setTimeout(checkReveals, 50);
@@ -107,7 +106,6 @@ export default function DynamicServicePage() {
     }
   }, [loading, minLoading, checkReveals]);
 
-  // Loading skeleton
   if (fetching) {
     return (
       <>
@@ -130,7 +128,6 @@ export default function DynamicServicePage() {
     );
   }
 
-  // Not found
   if (notFound) {
     return (
       <>

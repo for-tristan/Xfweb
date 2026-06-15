@@ -4,13 +4,13 @@ import { useEffect, useRef, useCallback } from 'react';
 
 interface ScrollFadeSectionProps {
   children: React.ReactNode;
-  /** Whether this section pins at the top while fading */
+
   pin?: boolean;
-  /** Scroll distance for fade — percentage of viewport height (e.g. "100%") */
+
   fadeDistance?: string;
-  /** Stacking order — higher values appear on top of earlier sections */
+
   zIndex?: number;
-  /** Lerp smoothing factor (0–1). Lower = smoother. 0.08 ≈ GSAP scrub 0.6 */
+
   scrub?: number;
   className?: string;
 }
@@ -32,23 +32,15 @@ export default function ScrollFadeSection({
   const containerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
 
-  // Lerp-smoothed current values
   const currentRef = useRef({ opacity: 1, scale: 1, blur: 0 });
-  // Instant target values from scroll position
   const targetRef = useRef({ opacity: 1, scale: 1, blur: 0 });
-  // Current pin state
   const pinStateRef = useRef<PinState>('unpinned');
-  // The fade distance in pixels
   const fadePxRef = useRef(0);
-  // Animation frame
   const rafRef = useRef<number | null>(null);
 
   const fadeVh = parseFloat(fadeDistance) || 80;
 
-  /**
-   * Update the pin state and target fade values based on scroll.
-   * Called on scroll/resize. Does NOT apply styles — the animation loop does that.
-   */
+
   const updateTarget = () => {
     const container = containerRef.current;
     const inner = innerRef.current;
@@ -79,15 +71,12 @@ export default function ScrollFadeSection({
     let progress = 0;
 
     if (rect.top > 0) {
-      // Container hasn't reached the top yet — not pinned
       state = 'unpinned';
       progress = 0;
     } else if (rect.bottom < innerHeight) {
-      // Container has scrolled past — content should be at its final position
       state = 'past';
       progress = 1;
     } else {
-      // Container top is at/above viewport, bottom is still below — PIN
       state = 'pinned';
       const scrolledPast = -rect.top;
       progress = Math.min(1, scrolledPast / fadePx);
@@ -101,7 +90,6 @@ export default function ScrollFadeSection({
       blur: progress * 4,
     };
 
-    // Apply pin positioning immediately (no lerp — position must be exact)
     if (state === 'pinned') {
       inner.style.position = 'fixed';
       inner.style.top = '0';
@@ -109,9 +97,6 @@ export default function ScrollFadeSection({
       inner.style.width = '100%';
       inner.style.bottom = '';
     } else if (state === 'past') {
-      // Stay fixed but hidden — do NOT switch to absolute+bottom,
-      // which would reposition the hero at the bottom of the tall
-      // container and cause it to "appear twice".
       inner.style.position = 'fixed';
       inner.style.top = '0';
       inner.style.left = '0';
@@ -127,11 +112,7 @@ export default function ScrollFadeSection({
     }
   };
 
-  /**
-   * Measure the inner content height and set the container height.
-   * Container = content height + fade distance in px.
-   * This creates the scroll room needed for the pin + fade.
-   */
+
   const measureAndSetHeight = () => {
     const container = containerRef.current;
     const inner = innerRef.current;
@@ -142,7 +123,6 @@ export default function ScrollFadeSection({
       const fadePx = windowH * (fadeVh / 100);
       fadePxRef.current = fadePx;
 
-      // Temporarily switch to relative to measure true content height
       const prevPosition = inner.style.position;
       const prevTop = inner.style.top;
       const prevLeft = inner.style.left;
@@ -158,7 +138,6 @@ export default function ScrollFadeSection({
       const contentHeight = inner.offsetHeight;
       container.style.height = `${contentHeight + fadePx}px`;
 
-      // Restore
       inner.style.position = prevPosition;
       inner.style.top = prevTop;
       inner.style.left = prevLeft;
@@ -169,12 +148,9 @@ export default function ScrollFadeSection({
     }
   };
 
-  /**
-   * On-demand animation — lerps visual values toward targets.
-   * Only runs when targets differ from current values (no idle rAF loop).
-   */
+
   const startAnimation = useCallback(() => {
-    if (rafRef.current !== null) return; // already running
+    if (rafRef.current !== null) return;
 
     const animate = () => {
       const inner = innerRef.current;
@@ -187,7 +163,6 @@ export default function ScrollFadeSection({
       cur.scale = lerp(cur.scale, tgt.scale, scrub);
       cur.blur = lerp(cur.blur, tgt.blur, scrub);
 
-      // Snap values that are very close to target
       const opacityDone = Math.abs(cur.opacity - tgt.opacity) < 0.001;
       const scaleDone = Math.abs(cur.scale - tgt.scale) < 0.0001;
       const blurDone = Math.abs(cur.blur - tgt.blur) < 0.01;
@@ -206,7 +181,6 @@ export default function ScrollFadeSection({
         inner.style.filter = `blur(${cur.blur}px)`;
       }
 
-      // Stop the loop when all values have reached their targets
       if (opacityDone && scaleDone && blurDone) {
         rafRef.current = null;
       } else {
@@ -217,7 +191,6 @@ export default function ScrollFadeSection({
     rafRef.current = requestAnimationFrame(animate);
   }, [scrub]);
 
-  // Trigger animation on scroll/resize
   useEffect(() => {
     measureAndSetHeight();
     updateTarget();

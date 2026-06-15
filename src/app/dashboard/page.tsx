@@ -290,7 +290,7 @@ export default function DashboardPage() {
           sessions: data.sessions || [],
         });
       }
-    } catch { /* err */ }
+    } catch {  }
     setDataLoading(false);
   }, [user]);
 
@@ -304,7 +304,6 @@ export default function DashboardPage() {
     ? Math.round(progress.reduce((a, p) => a + p.completionPercentage, 0) / progress.length)
     : 0;
 
-  // Find best study day
   const bestDay = studyStats?.sessions?.length
     ? studyStats.sessions.reduce((best, s) => s.duration > (best?.duration || 0) ? s : best, studyStats.sessions[0])
     : null;
@@ -355,7 +354,6 @@ export default function DashboardPage() {
     };
   }, [checkReveals]);
 
-  // Re-check reveals when loading finishes (content mounts after loading)
   useEffect(() => {
     if (!loading && !minLoading) {
       const t = setTimeout(checkReveals, 50);

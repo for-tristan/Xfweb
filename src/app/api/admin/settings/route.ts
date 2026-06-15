@@ -13,7 +13,6 @@ async function requireAdmin() {
   return { error: null, user };
 }
 
-// Keys that should never be sent to the client even in admin responses
 const SENSITIVE_KEY_PATTERNS = [
   'smtp_pass', 'secret', 'api_key', 'token', 'password',
   'database_url', 'session_secret', 'private_key',
@@ -34,7 +33,6 @@ export async function GET() {
 
     const settingsMap: Record<string, string> = {};
     for (const setting of settings) {
-      // Mask sensitive values — show only last 4 chars
       if (isSensitiveKey(setting.key)) {
         const val = setting.value;
         settingsMap[setting.key] = val.length > 4 ? '••••' + val.slice(-4) : '••••';

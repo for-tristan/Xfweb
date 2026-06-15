@@ -109,7 +109,6 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Delete existing features and recreate
     if (features !== undefined) {
       await db.serviceFeature.deleteMany({ where: { serviceId: id } });
     }

@@ -66,7 +66,6 @@ function memberToForm(m: TeamMember): FormData {
 export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalProps) {
   const { toast } = useToast();
 
-  // State
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -411,8 +410,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
                   {editingId ? 'Edit Team Member' : 'New Team Member'}
                 </span>
               </div>
-
-              {/* Row 1: Name & Role */}
               <div
                 style={{
                   display: 'grid',
@@ -435,16 +432,12 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
                   required
                 />
               </div>
-
-              {/* Row 2: Bio (full width) */}
               <WaveTextarea
                 label="Bio"
                 value={form.bio}
                 onChange={(e) => updateField('bio', e.target.value)}
                 rows={3}
               />
-
-              {/* Row 3: Avatar URL & Icon */}
               <div
                 style={{
                   display: 'grid',
@@ -465,8 +458,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
                   onChange={(e) => updateField('icon', e.target.value)}
                 />
               </div>
-
-              {/* Row 4: LinkedIn & GitHub URLs */}
               <div
                 style={{
                   display: 'grid',
@@ -487,8 +478,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
                   onChange={(e) => updateField('githubUrl', e.target.value)}
                 />
               </div>
-
-              {/* Row 5: Display Order */}
               <div style={{ maxWidth: 200 }}>
                 <WaveInput
                   label="Display Order"
@@ -694,7 +683,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
                     transition: 'border-color 0.2s',
                   }}
                 >
-                  {/* Avatar / Icon */}
                   <div
                     style={{
                       width: 44,
@@ -736,7 +724,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
                       minWidth: 0,
                     }}
                   >
-                    {/* Name + Role */}
                     <div
                       style={{
                         display: 'flex',
@@ -769,8 +756,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
                         {member.role}
                       </span>
                     </div>
-
-                    {/* Bio (truncated) */}
                     {member.bio && (
                       <p
                         style={{
@@ -921,8 +906,6 @@ export function AdminTeamModal({ open, onClose, onTeamSaved }: AdminTeamModalPro
                       </div>
                     )}
                   </div>
-
-                  {/* Actions (top-right) */}
                   <div
                     style={{
                       display: 'flex',

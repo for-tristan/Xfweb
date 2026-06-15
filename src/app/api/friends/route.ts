@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 
-// GET: List friends and pending requests
 export async function GET() {
   try {
     const user = await getCurrentUser();
@@ -10,7 +9,6 @@ export async function GET() {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    // Get accepted friendships
     const accepted = await db.friendship.findMany({
       where: {
         OR: [
@@ -38,7 +36,6 @@ export async function GET() {
       };
     });
 
-    // Get pending friend requests (sent to me)
     const pendingReceived = await db.friendship.findMany({
       where: {
         receiverId: user.id,
@@ -59,7 +56,6 @@ export async function GET() {
       createdAt: f.createdAt,
     }));
 
-    // Get sent friend requests
     const pendingSent = await db.friendship.findMany({
       where: {
         senderId: user.id,
@@ -87,7 +83,6 @@ export async function GET() {
   }
 }
 
-// POST: Send friend request
 export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser();
@@ -115,7 +110,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'You cannot add yourself as a friend' }, { status: 400 });
     }
 
-    // Check if friendship already exists
     const existing = await db.friendship.findFirst({
       where: {
         OR: [
@@ -148,7 +142,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Notify the receiver that they got a friend request
     await db.notification.create({
       data: {
         userId: friendUser.id,
@@ -175,7 +168,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PUT: Accept/reject friend request
 export async function PUT(request: NextRequest) {
   try {
     const user = await getCurrentUser();
@@ -216,7 +208,6 @@ export async function PUT(request: NextRequest) {
         data: { status: 'accepted' },
       });
 
-      // Notify the sender that their request was accepted
       await db.notification.create({
         data: {
           userId: friendship.senderId,
@@ -239,7 +230,6 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// DELETE: Remove friend
 export async function DELETE(request: NextRequest) {
   try {
     const user = await getCurrentUser();

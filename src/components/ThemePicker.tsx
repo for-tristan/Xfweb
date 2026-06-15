@@ -137,7 +137,6 @@ export function ThemePicker({ currentTheme, onThemeChange }: ThemePickerProps) {
 
   const current = allThemes.find(t => t.id === currentTheme) || allThemes[0];
 
-  // Calculate the max radius needed to cover the viewport from a point (x, y)
   const getMaxRadius = useCallback((x: number, y: number) => {
     const w = window.innerWidth;
     const h = window.innerHeight;
@@ -153,14 +152,12 @@ export function ThemePicker({ currentTheme, onThemeChange }: ThemePickerProps) {
     const y = e.clientY;
     const maxRadius = getMaxRadius(x, y);
 
-    // Use View Transitions API for a true dynamic page-wide transition
     if (document.startViewTransition) {
       const transition = document.startViewTransition(() => {
         onThemeChange(newThemeId);
       });
 
       transition.ready.then(() => {
-        // Animate the new state revealing from the click point as an expanding circle
         document.documentElement.animate(
           {
             clipPath: [
@@ -176,7 +173,6 @@ export function ThemePicker({ currentTheme, onThemeChange }: ThemePickerProps) {
         );
       });
     } else {
-      // Fallback: instant swap for browsers without View Transitions
       onThemeChange(newThemeId);
     }
   }, [onThemeChange, getMaxRadius]);

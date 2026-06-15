@@ -15,12 +15,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find user by email (normalized)
     const user = await db.user.findUnique({
       where: { email: email.toLowerCase().trim() },
     });
 
-    // Always return success to prevent email enumeration
     if (!user) {
       return NextResponse.json({
         message: 'If an account with that email exists, a reset code has been sent.',
@@ -29,24 +27,19 @@ export async function POST(request: NextRequest) {
 
     const code = randomInt(100000, 1000000).toString();
 
-    // Invalidate any previous reset codes for this email
     await db.passwordReset.updateMany({
       where: { email: email.toLowerCase().trim(), used: false },
       data: { used: true },
     });
 
-    // Store the reset code with 15-minute expiry
     await db.passwordReset.create({
       data: {
         email: email.toLowerCase().trim(),
         code,
-        expiresAt: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
+        expiresAt: new Date(Date.now() + 15 * 60 * 1000),
       },
     });
 
-    // Send email BEFORE returning response.
-    // IMPORTANT: On Vercel serverless, after() does NOT keep the function alive —
-    // the email send gets killed before it completes. We MUST await it here.
     try {
       await sendPasswordResetEmail({
         userEmail: user.email,

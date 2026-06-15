@@ -135,8 +135,6 @@ function UnlockStudentPanel({ admin, modules, unlockLoading, handleUnlock, handl
   actionLoading: string | null;
   courses: AdminCourse[];
 }) {
-  // Get approved enrollments — show each student-course pair separately
-  // so admins can control modules per course, not just the first enrolled course
   const approvedEnrollments = enrollments.filter(e => e.status === 'approved');
 
   if (approvedEnrollments.length === 0) {
@@ -153,11 +151,9 @@ function UnlockStudentPanel({ admin, modules, unlockLoading, handleUnlock, handl
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxHeight: 500, overflowY: 'auto' }}>
       {approvedEnrollments.map(enr => {
         const userId = enr.user.id;
-        // enr.courseId is the slug, find the actual course to get its CUID
         const courseObj = courses.find(c => c.slug === enr.courseId);
         const courseCUID = courseObj?.id;
         const courseLabel = courseObj ? courseObj.title : enr.courseId;
-        // Filter modules using the real CUID (not the slug)
         const userModules = courseCUID ? modules.filter(m => m.courseId === courseCUID) : [];
 
         return (
@@ -260,7 +256,7 @@ export default function AdminPage() {
   const [modulesLoading, setModulesLoading] = useState(false);
   const [modulesCourseFilter, setModulesCourseFilter] = useState('all');
   const [seedLoading, setSeedLoading] = useState(false);
-  const [allModules, setAllModules] = useState<CourseModuleItem[]>([]); // all modules for unlock panel
+  const [allModules, setAllModules] = useState<CourseModuleItem[]>([]);
 
   const [adminQuotes, setAdminQuotes] = useState<AdminQuote[]>([]);
   const [quotesLoading, setQuotesLoading] = useState(false);
@@ -345,11 +341,9 @@ export default function AdminPage() {
       if (r.ok) {
         const data = (await r.json()).modules;
         setAdminModules(data);
-        // Always keep all modules for the unlock panel
         if (!courseId || courseId === 'all') {
           setAllModules(data);
         } else {
-          // If filtered, also fetch all modules in the background
           fetch('/api/admin/modules').then(ar => ar.ok ? ar.json().then(ad => setAllModules(ad.modules)) : null).catch(() => {});
         }
       }
@@ -1026,7 +1020,6 @@ export default function AdminPage() {
                     const sb = statusBadge(e.status);
                     return (
                       <div key={e.id} className="project-card reveal" style={{ padding: '32px 40px', display: 'flex', flexDirection: 'column', gap: 24 }}>
-                        {/* Top row: user + course */}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, minWidth: 250 }}>
                             <div style={{ width: 48, height: 48, borderRadius: '50%', background: e.user.avatar ? 'transparent' : 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', fontSize: 16, fontWeight: 700, flexShrink: 0, overflow: 'hidden' }}>
@@ -1040,7 +1033,6 @@ export default function AdminPage() {
                               <div style={{ fontSize: 13, color: 'var(--text-dim)' }}>{e.user.email}</div>
                             </div>
                           </div>
-                          {/* Status + Date */}
                           <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0 }}>
                             <span style={{ padding: '5px 18px', borderRadius: 999, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, background: sb.bg, color: sb.color, border: sb.border }}>{e.status}</span>
                             <span style={{ fontSize: 13, color: 'var(--text-dim)', minWidth: 150, textAlign: 'right' }}>{fmt(e.enrolledAt)}</span>
@@ -1222,14 +1214,11 @@ export default function AdminPage() {
                               <div style={{ fontSize: 13, color: 'var(--text-dim)' }}>{p.user.email}</div>
                             </div>
                           </div>
-                          {/* Course + status */}
                           <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0 }}>
                             <span style={{ padding: '5px 16px', borderRadius: 999, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, background: pc.bg, color: pc.text, border: `1px solid ${pc.text}33` }}>{pc.label}</span>
                             <span style={{ fontSize: 13, color: 'var(--text-dim)', minWidth: 120, textAlign: 'right' }}>{fmt(p.lastAccessed)}</span>
                           </div>
                         </div>
-
-                        {/* Course name + progress bar */}
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 24, alignItems: 'center', paddingLeft: 64 }}>
                           <div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
@@ -1282,8 +1271,6 @@ export default function AdminPage() {
                             <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 6 }}>
                               {editingProgress === p.id ? editModules.length : p.completedModules.length} of {p.totalModules} modules completed
                             </div>
-
-                            {/* Module checkboxes (editing mode) */}
                             {editingProgress === p.id && (
                               <div style={{ marginTop: 16, padding: '16px 20px', background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
   backdropFilter: 'blur(20px) saturate(1.6)',
@@ -1782,16 +1769,12 @@ export default function AdminPage() {
                                   </div>
                                 )}
                               </div>
-
-                              {/* Unlock/Lock student panel */}
                               <div style={{ marginBottom: 24 }}>
                                 <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-light)', marginBottom: 12 }}>
                                   <i className="fa-solid fa-unlock" style={{ color: 'var(--accent)', marginRight: 8 }}></i>Test Access — Enrolled Students
                                 </h4>
                                 {(() => {
-                                  // Use enrolled students directly from the API (already filtered for this course)
                                   const students = testEnrolledStudents;
-                                  // Use selectedTest.unlocks (has full unlock data) NOT t.unlocks (summary list has no unlock data)
                                   const unlockedUserIds = new Set((selectedTest?.unlocks || []).map((u: { userId: string }) => u.userId));
 
                                   if (students.length === 0) {
@@ -1837,8 +1820,6 @@ export default function AdminPage() {
                                   );
                                 })()}
                               </div>
-
-                              {/* Attempts / Grades */}
                               <div>
                                 <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-light)', marginBottom: 12 }}>
                                   <i className="fa-solid fa-chart-bar" style={{ color: 'var(--accent)', marginRight: 8 }}></i>Student Attempts
@@ -2482,8 +2463,6 @@ export default function AdminPage() {
         icon={confirmModal.icon}
       />
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} query={searchQuery} setQuery={setSearchQuery} results={filteredSearch} onSelect={(link) => router.push(link)} />
-
-      {/* GRADUAL BLUR — bottom page-level scroll blur */}
       {!atBottom && (
         <GradualBlur target="page" position="bottom" height="3.5rem" strength={1} divCount={6} curve="bezier" exponential={false} opacity={1} zIndex={50} />
       )}

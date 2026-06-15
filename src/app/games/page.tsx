@@ -73,7 +73,7 @@ export default function GamesPage() {
   const [elapsed, setElapsed] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
   const [submitting, setSubmitting] = useState(false);
-  const [phaseKey, setPhaseKey] = useState(0); // for re-triggering animations
+  const [phaseKey, setPhaseKey] = useState(0);
   const [scoreAnimated, setScoreAnimated] = useState(false);
   const [atBottom, setAtBottom] = useState(false);
 
@@ -116,7 +116,6 @@ export default function GamesPage() {
     };
   }, [checkReveals]);
 
-  // Re-check reveals when loading finishes (content mounts after loading)
   useEffect(() => {
     if (!loading && !minLoading) {
       const t = setTimeout(checkReveals, 50);
@@ -200,7 +199,7 @@ export default function GamesPage() {
       if (res.ok) {
         toast({ title: 'Score Saved!', description: `Score: ${totalScore}` });
       }
-    } catch { /* ignore */ }
+    } catch {  }
     setSubmitting(false);
   };
 
@@ -216,7 +215,7 @@ export default function GamesPage() {
         const data = await res.json();
         setLbData(data.leaderboard || []);
       }
-    } catch { /* ignore */ }
+    } catch {  }
     setLbLoading(false);
   }, [lbGame, lbLang, lbDiff]);
 
@@ -792,7 +791,6 @@ export default function GamesPage() {
             const gamesPlayed = entry.gamesPlayed || 1;
 
             if (isMobile) {
-              // Mobile: card layout
               return (
                 <div key={entry.userId || entry.id}
                   style={{
@@ -821,7 +819,6 @@ export default function GamesPage() {
                       <span style={{ fontFamily: "var(--font-heading)", fontSize: 10, fontWeight: 700, color: rankColor }}>{i + 1}</span>
                     )}
                   </div>
-                  {/* Avatar + Name */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
                     <div style={{
                       width: 28, height: 28, borderRadius: '50%',
@@ -847,7 +844,6 @@ export default function GamesPage() {
                       {entry.userName}
                     </span>
                   </div>
-                  {/* Score + Time stacked */}
                   <div style={{ textAlign: 'right', flexShrink: 0 }}>
                     <div style={{
                       fontFamily: "var(--font-heading)", fontSize: 13, fontWeight: 700,
@@ -863,7 +859,6 @@ export default function GamesPage() {
               );
             }
 
-            // Desktop: clean row layout
             return (
               <div key={entry.userId || entry.id}
                 style={{

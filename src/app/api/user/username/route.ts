@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 
-// GET: Check if username is available
 export async function GET(request: NextRequest) {
   try {
     const user = await getCurrentUser();
@@ -22,7 +21,6 @@ export async function GET(request: NextRequest) {
 
     const normalized = username.toLowerCase().trim();
 
-    // Validate format
     if (normalized.length < 3 || normalized.length > 20) {
       return NextResponse.json({ available: false, error: 'Username must be 3-20 characters' });
     }
@@ -46,7 +44,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// PUT: Change username
 export async function PUT(request: NextRequest) {
   try {
     const user = await getCurrentUser();
@@ -63,7 +60,6 @@ export async function PUT(request: NextRequest) {
 
     const normalized = username.toLowerCase().trim();
 
-    // Validate
     if (normalized.length < 3 || normalized.length > 20) {
       return NextResponse.json(
         { error: 'Username must be 3-20 characters' },
@@ -78,7 +74,6 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Check if taken by another user
     const existing = await db.user.findUnique({
       where: { username: normalized },
     });
@@ -87,7 +82,6 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'This username is already taken' }, { status: 409 });
     }
 
-    // Update
     const updatedUser = await db.user.update({
       where: { id: user.id },
       data: { username: normalized },

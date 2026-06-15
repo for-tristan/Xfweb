@@ -3,10 +3,7 @@ import { db } from '@/lib/db';
 import { requireInstructorOrAdmin } from '@/lib/auth';
 import { sendEnrollmentStatusEmail } from '@/lib/email';
 
-/**
- * Helper: get course slugs that belong to the instructor.
- * Enrollment.courseId stores the course SLUG (not CUID), so we need slugs for filtering.
- */
+
 async function getInstructorCourseSlugs(instructorId: string): Promise<string[]> {
   const courses = await db.course.findMany({
     where: { instructorId },
@@ -15,16 +12,13 @@ async function getInstructorCourseSlugs(instructorId: string): Promise<string[]>
   return courses.map(c => c.slug);
 }
 
-/**
- * Helper: verify that an enrollment belongs to a course owned by the instructor.
- * Enrollment.courseId is the course slug; we look up the course by slug to check instructorId.
- */
+
 async function verifyEnrollmentAccess(
   enrollmentCourseSlug: string,
   instructorId: string | undefined,
   isInstructor: boolean,
 ): Promise<boolean> {
-  if (!isInstructor || !instructorId) return true; // admins always pass
+  if (!isInstructor || !instructorId) return true;
 
   const course = await db.course.findUnique({ where: { slug: enrollmentCourseSlug } });
   if (!course || course.instructorId !== instructorId) return false;
@@ -41,7 +35,6 @@ export async function GET(request: NextRequest) {
 
     const whereClause: Record<string, unknown> = { deletedAt: null };
 
-    // Instructors only see enrollments for their courses
     if (isInstructor && user) {
       const slugs = await getInstructorCourseSlugs(user.id);
       whereClause.courseId = { in: slugs };
@@ -102,7 +95,6 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Cannot update a cancelled enrollment' }, { status: 400 });
     }
 
-    // Instructors can only manage enrollments for their own courses
     if (!(await verifyEnrollmentAccess(enrollment.courseId, user?.id, isInstructor))) {
       return NextResponse.json({ error: 'Forbidden: You can only manage enrollments for your own courses' }, { status: 403 });
     }
@@ -123,7 +115,6 @@ export async function PUT(request: NextRequest) {
       },
     });
 
-    // Create notification for the user
     if (status === 'approved') {
       await db.notification.create({
         data: {
@@ -134,8 +125,6 @@ export async function PUT(request: NextRequest) {
         },
       });
 
-      // Auto-unlock first module
-      // enrollment.courseId stores the slug, but courseModule.courseId is the Course CUID
       const course = await db.course.findUnique({
         where: { slug: updated.courseId },
       });
@@ -153,7 +142,6 @@ export async function PUT(request: NextRequest) {
         }
       }
 
-      // Create CourseProgress record for the student
       await db.courseProgress.upsert({
         where: { userId_courseId: { userId: updated.userId, courseId: updated.courseId } },
         create: {
@@ -176,7 +164,6 @@ export async function PUT(request: NextRequest) {
       });
     }
 
-    // Send email notification
     try {
       await sendEnrollmentStatusEmail({
         userName: updated.user.name,
@@ -218,21 +205,17 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Enrollment not found' }, { status: 404 });
     }
 
-    // Instructors can only delete enrollments for their own courses
     if (!(await verifyEnrollmentAccess(enrollment.courseId, user?.id, isInstructor))) {
       return NextResponse.json({ error: 'Forbidden: You can only delete enrollments for your own courses' }, { status: 403 });
     }
 
     const userId = enrollment.userId;
-    const courseId = enrollment.courseId; // This is the slug
+    const courseId = enrollment.courseId;
 
-    // Delete the enrollment
     await db.enrollment.delete({ where: { id: enrollmentId } });
 
-    // Remove student's progress for this course
     await db.courseProgress.deleteMany({ where: { userId, courseId } });
 
-    // Lock all modules by deleting unlocks for this course's modules
     const course = await db.course.findUnique({ where: { slug: courseId } });
     if (course) {
       const courseModuleIds = await db.courseModule.findMany({
@@ -249,7 +232,6 @@ export async function DELETE(request: NextRequest) {
       }
     }
 
-    // Notify user
     await db.notification.create({
       data: {
         userId,
