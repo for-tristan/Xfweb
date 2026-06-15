@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 
 interface ScrollFadeSectionProps {
   children: React.ReactNode;
@@ -172,63 +172,58 @@ export default function ScrollFadeSection({
   };
 
   /**
-   * Continuous animation loop — lerps visual values toward targets.
-   * This recreates the buttery-smooth GSAP "scrub" easing.
+   * On-demand animation — lerps visual values toward targets.
+   * Only runs when targets differ from current values (no idle rAF loop).
    */
-  useEffect(() => {
-    let running = true;
+  const startAnimation = useCallback(() => {
+    if (rafRef.current !== null) return; // already running
 
     const animate = () => {
-      if (!running) return;
-
       const inner = innerRef.current;
-      if (inner) {
-        const cur = currentRef.current;
-        const tgt = targetRef.current;
+      if (!inner) { rafRef.current = null; return; }
 
-        cur.opacity = lerp(cur.opacity, tgt.opacity, scrub);
-        cur.scale = lerp(cur.scale, tgt.scale, scrub);
-        cur.blur = lerp(cur.blur, tgt.blur, scrub);
+      const cur = currentRef.current;
+      const tgt = targetRef.current;
 
-        // Snap values that are very close to target to avoid infinite sub-pixel lerp
-        if (Math.abs(cur.opacity - tgt.opacity) < 0.001) cur.opacity = tgt.opacity;
-        if (Math.abs(cur.scale - tgt.scale) < 0.0001) cur.scale = tgt.scale;
-        if (Math.abs(cur.blur - tgt.blur) < 0.01) cur.blur = tgt.blur;
+      cur.opacity = lerp(cur.opacity, tgt.opacity, scrub);
+      cur.scale = lerp(cur.scale, tgt.scale, scrub);
+      cur.blur = lerp(cur.blur, tgt.blur, scrub);
 
-        // Hide element entirely when fully faded or in "past" state
-        // to prevent blocking clicks/scroll on content below.
-        // Also prevents the "appears twice" bug where the hero
-        // would be visible at a different position.
-        const pinState = pinStateRef.current;
-        if (cur.opacity < 0.01 || pinState === 'past') {
-          inner.style.visibility = 'hidden';
-        } else {
-          inner.style.visibility = 'visible';
-          inner.style.opacity = String(cur.opacity);
-          inner.style.transform = `scale(${cur.scale})`;
-          inner.style.filter = `blur(${cur.blur}px)`;
-        }
+      // Snap values that are very close to target
+      const opacityDone = Math.abs(cur.opacity - tgt.opacity) < 0.001;
+      const scaleDone = Math.abs(cur.scale - tgt.scale) < 0.0001;
+      const blurDone = Math.abs(cur.blur - tgt.blur) < 0.01;
+
+      if (opacityDone) cur.opacity = tgt.opacity;
+      if (scaleDone) cur.scale = tgt.scale;
+      if (blurDone) cur.blur = tgt.blur;
+
+      const pinState = pinStateRef.current;
+      if (cur.opacity < 0.01 || pinState === 'past') {
+        inner.style.visibility = 'hidden';
+      } else {
+        inner.style.visibility = 'visible';
+        inner.style.opacity = String(cur.opacity);
+        inner.style.transform = `scale(${cur.scale})`;
+        inner.style.filter = `blur(${cur.blur}px)`;
       }
 
-      rafRef.current = requestAnimationFrame(animate);
+      // Stop the loop when all values have reached their targets
+      if (opacityDone && scaleDone && blurDone) {
+        rafRef.current = null;
+      } else {
+        rafRef.current = requestAnimationFrame(animate);
+      }
     };
 
     rafRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      running = false;
-      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
-    };
   }, [scrub]);
 
-  /**
-   * Setup: measure, listen for scroll/resize, initialize.
-   */
+  // Trigger animation on scroll/resize
   useEffect(() => {
-    // Measure content height
     measureAndSetHeight();
-    // Set initial target and position
     updateTarget();
+    startAnimation();
 
     let scrollRaf: number | null = null;
 
@@ -236,6 +231,7 @@ export default function ScrollFadeSection({
       if (scrollRaf !== null) return;
       scrollRaf = requestAnimationFrame(() => {
         updateTarget();
+        startAnimation();
         scrollRaf = null;
       });
     };
@@ -245,11 +241,12 @@ export default function ScrollFadeSection({
       scrollRaf = null;
       measureAndSetHeight();
       updateTarget();
+      startAnimation();
     };
 
-    // Listen for Lenis scroll events (custom event from Lenis)
     const onLenisScroll = () => {
       updateTarget();
+      startAnimation();
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -261,9 +258,10 @@ export default function ScrollFadeSection({
       window.removeEventListener('resize', onResize);
       window.removeEventListener('xf:lenis-scroll', onLenisScroll);
       if (scrollRaf !== null) cancelAnimationFrame(scrollRaf);
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pin, fadeVh]);
+  }, [pin, fadeVh, startAnimation]);
 
   return (
     <div

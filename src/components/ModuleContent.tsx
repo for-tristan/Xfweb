@@ -33,21 +33,21 @@ function getEmbedUrl(url: string): string | null {
   return getVimeoEmbedUrl(url);
 }
 
-// Inline styles for markdown rendered elements
+// Inline styles for markdown rendered elements — using site fonts (Inter Tight / Space Grotesk)
 const mdStyles: Record<string, React.CSSProperties> = {
-  h1: { fontFamily: "'Orbitron', sans-serif", fontWeight: 700, fontSize: 22, color: 'var(--text-light)', margin: '24px 0 12px', lineHeight: 1.3 },
-  h2: { fontFamily: "'Orbitron', sans-serif", fontWeight: 700, fontSize: 18, color: 'var(--text-light)', margin: '20px 0 10px', lineHeight: 1.3 },
-  h3: { fontFamily: "'Orbitron', sans-serif", fontWeight: 700, fontSize: 16, color: 'var(--text-light)', margin: '16px 0 8px', lineHeight: 1.4 },
-  h4: { fontFamily: "'Orbitron', sans-serif", fontWeight: 700, fontSize: 14, color: 'var(--text-light)', margin: '14px 0 6px', lineHeight: 1.4 },
-  p: { fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.8, margin: '8px 0' },
-  ul: { fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.8, margin: '8px 0', paddingLeft: 24 },
-  ol: { fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.8, margin: '8px 0', paddingLeft: 24 },
+  h1: { fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: 22, color: 'var(--text-light)', margin: '24px 0 12px', lineHeight: 1.3 },
+  h2: { fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: 18, color: 'var(--text-light)', margin: '20px 0 10px', lineHeight: 1.3 },
+  h3: { fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: 16, color: 'var(--text-light)', margin: '16px 0 8px', lineHeight: 1.4 },
+  h4: { fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: 14, color: 'var(--text-light)', margin: '14px 0 6px', lineHeight: 1.4 },
+  p: { fontFamily: "var(--font-body)", fontSize: 15, color: 'var(--text-dim)', lineHeight: 1.8, margin: '8px 0' },
+  ul: { fontFamily: "var(--font-body)", fontSize: 15, color: 'var(--text-dim)', lineHeight: 1.8, margin: '8px 0', paddingLeft: 24 },
+  ol: { fontFamily: "var(--font-body)", fontSize: 15, color: 'var(--text-dim)', lineHeight: 1.8, margin: '8px 0', paddingLeft: 24 },
   li: { margin: '4px 0' },
   a: { color: 'var(--primary-red)', textDecoration: 'underline', fontWeight: 600 },
   blockquote: { borderLeft: '3px solid var(--primary-red)', paddingLeft: 16, margin: '16px 0', fontStyle: 'italic', color: 'var(--text-dim)' },
   code: { background: 'var(--input-bg)', padding: '2px 6px', borderRadius: 3, fontSize: 13, color: 'var(--primary-red)', fontFamily: "'Space Grotesk', monospace" },
   hr: { border: 'none', borderTop: '1px solid var(--border-color)', margin: '24px 0' },
-  table: { width: '100%', borderCollapse: 'collapse', margin: '16px 0', fontSize: 14 },
+  table: { width: '100%', borderCollapse: 'collapse', margin: '16px 0', fontSize: 15 },
   th: { background: 'var(--input-bg)', padding: '10px 14px', border: '1px solid var(--border-color)', color: 'var(--text-light)', fontWeight: 700, textAlign: 'left' },
   td: { padding: '10px 14px', border: '1px solid var(--border-color)', color: 'var(--text-dim)' },
   strong: { color: 'var(--text-light)', fontWeight: 700 },

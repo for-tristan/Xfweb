@@ -51,8 +51,7 @@ export function SectionReveal({ children, direction = 'up', delay = 0, className
       ([entry]) => {
         if (entry.isIntersecting) {
           el.classList.add('visible');
-        } else {
-          el.classList.remove('visible');
+          obs.disconnect(); // Only reveal once — prevents lag from constant re-triggering
         }
       },
       { threshold: 0.1 }
@@ -89,10 +88,7 @@ export function StaggerReveal({ children, className = '', staggerDelay = 80, dir
           for (let i = 0; i < children.length; i++) {
             (children[i] as HTMLElement).classList.add('visible');
           }
-        } else {
-          for (let i = 0; i < children.length; i++) {
-            (children[i] as HTMLElement).classList.remove('visible');
-          }
+          obs.disconnect(); // Only reveal once
         }
       },
       { threshold: 0.1 }
@@ -185,11 +181,7 @@ export function TextSplitReveal({ text, className = '', tag = 'h2', delay = 0 }:
             (s as HTMLElement).style.opacity = '1';
             (s as HTMLElement).style.transform = 'translate3d(0,0,0)';
           });
-        } else {
-          spans.forEach((s, i) => {
-            (s as HTMLElement).style.opacity = '0';
-            (s as HTMLElement).style.transform = 'translate3d(50px,0,0)';
-          });
+          obs.disconnect(); // Only reveal once
         }
       },
       { threshold: 0.3 }

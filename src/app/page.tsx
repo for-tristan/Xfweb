@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { useCustomCursor } from '@/hooks/useCustomCursor';
 
 import { SkeletonHero, SkeletonSectionHeader, SkeletonServiceCard, SkeletonCourseCard } from '@/components/SkeletonScreens';
 // WordSpinner removed — replaced by .xf-loader CSS dots
@@ -99,16 +98,6 @@ const staticSearchData = [
   { title: 'Our Team', category: 'Page', desc: 'Meet Marwan Montaser', link: '#team' },
 ];
 
-function generateParticles(count: number) {
-  return Array.from({ length: count }, (_, i) => ({
-    id: i,
-    left: `${Math.random() * 100}%`,
-    size: `${Math.random() * 2 + 1}px`,
-    duration: `${Math.random() * 20 + 15}s`,
-    delay: `${Math.random() * 15}s`,
-  }));
-}
-
 
 //
 // ═══════════════════════════════════════════════════
@@ -116,6 +105,7 @@ function generateParticles(count: number) {
 // ═══════════════════════════════════════════════════
 
 // Character-by-character reveal component (Vaulta SplitText style)
+// Reveals once on scroll into view — does NOT re-hide on scroll away to prevent lag spikes
 function BlurText({ text, tag = 'span', className = '', stagger = 0.02 }: { text: string; tag?: string; className?: string; stagger?: number }) {
   const ref = useRef<HTMLElement>(null);
   const [revealed, setRevealed] = useState(false);
@@ -126,8 +116,8 @@ function BlurText({ text, tag = 'span', className = '', stagger = 0.02 }: { text
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
         setRevealed(true);
-      } else {
-        setRevealed(false);
+        // Disconnect after first reveal — no need to re-trigger
+        observer.disconnect();
       }
     }, { threshold: 0.1 });
     observer.observe(el);
@@ -342,7 +332,7 @@ export default function Home() {
   const [selectedChatFriend, setSelectedChatFriend] = useState<{id:string;friendId:string;name:string;username:string;avatar:string|null;createdAt:string} | null>(null);
 
   // ── UI ──
-  const [scrolled, setScrolled] = useState(false); const [particles, setParticles] = useState<Array<{id:number;left:string;size:string;duration:string;delay:string}>>([]);
+  const [scrolled, setScrolled] = useState(false);
   const [atBottom, setAtBottom] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeNav, setActiveNav] = useState('home');
@@ -351,17 +341,10 @@ export default function Home() {
 
 
 
-  // ── Refs ──
-  const cursorDotRef = useRef<HTMLDivElement>(null);
-  useCustomCursor(cursorDotRef);
-
 
   // ═══════════════════════════════════════════════════
   // EFFECTS
   // ═══════════════════════════════════════════════════
-useEffect(() => {
-  setParticles(generateParticles(75));
-}, []);
   // Minimum 3-second loader display
   useEffect(() => {
     const timer = setTimeout(() => setMinLoading(false), 3000);
@@ -969,17 +952,6 @@ useEffect(() => {
 
      {/* ──── RESPONSIVE NAV ──── */}
 
-
-      {/* ──── GLOBAL PARTICLES ──── */}
-      {particles.length > 0 && (
-      <div className="global-particles" style={{ zIndex: 9 }}>
-      {particles.map((p) => (
-          <div key={p.id} className="particle" style={{ left: p.left, width: p.size, height: p.size, animationDuration: p.duration, animationDelay: p.delay }} />
-        ))}
-      </div>
-     )}
-      {/* ──── CUSTOM CURSOR ──── */}
-      <div ref={cursorDotRef} className="cursor-dot" />
 
       {/* ═══════════════════════════════════════════════════
           NAVIGATION

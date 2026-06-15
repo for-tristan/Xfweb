@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback, Suspense, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useCustomCursor } from '@/hooks/useCustomCursor';
 import { usePageFeatures } from '@/lib/usePageFeatures';
 import { AuthGate, HeroEffects } from '@/lib/PageModals';
 import ReactMarkdown from 'react-markdown';
@@ -71,9 +70,6 @@ export default function ChatPage() {
 
 function ChatContent() {
   const router = useRouter();
-  const dotRef = useRef<HTMLDivElement>(null);
-  useCustomCursor(dotRef);
-
   const {
     user, loading, minLoading, theme, toggleTheme, changeTheme, scrolled, mobileMenuOpen, setMobileMenuOpen,
     searchOpen, setSearchOpen, searchQuery, setSearchQuery, filteredSearch,
@@ -400,7 +396,6 @@ function ChatContent() {
       <title>XF AI | Chat</title>
       <meta name="description" content="Chat with XF AI — your intelligent assistant for coding, learning, and tech career advice." />
 
-      <div className="cursor-dot" ref={dotRef} id="cursorDot" />
 
       <AuthGate loading={loading} minLoading={minLoading} user={user} onSignIn={() => openAuthModal('signin', 'Sign in to chat with XF AI')} onSignUp={() => openAuthModal('signup')} />
 

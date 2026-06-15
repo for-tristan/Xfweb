@@ -1013,94 +1013,28 @@ select optgroup {
 .notif-panel .notif-unread {
     background: color-mix(in srgb, var(--accent) 4%, transparent) !important;
 }
-/* Light-mode cursor adjustments for visibility */
-[data-theme="light"] .cursor-dot,
-[data-theme="sand"] .cursor-dot,
-[data-theme="lavender"] .cursor-dot,
-[data-theme="mint"] .cursor-dot,
-[data-theme="rose-gold"] .cursor-dot,
-[data-theme="honey"] .cursor-dot,
-[data-theme="clay"] .cursor-dot,
-[data-theme="sage"] .cursor-dot,
-[data-theme="peach"] .cursor-dot,
-.cursor-dot {
-    background: var(--accent);
-    box-shadow:
-        0 0 8px 2px var(--accent),
-        0 0 20px 4px color-mix(in srgb, var(--accent) 40%, transparent),
-        0 0 40px 8px color-mix(in srgb, var(--accent) 15%, transparent);
+/* Light-mode particles canvas visibility — ensure white dots show on light backgrounds */
+#xf-particles-js canvas {
+    pointer-events: none;
 }
 
-/* Light-mode navbar starts transparent just like dark mode — scrolled state has its own rule below */
-
-.cursor-active *, .cursor-active *::before, .cursor-active *::after {
-    cursor: none !important;
+/* ── Click Splash Particles ── */
+.click-splash-container {
+    pointer-events: none;
 }
+
+/* ── DEPRECATED: cursor-dot, cursor-particle, global-particles ── */
+/* Kept for any residual references but no longer rendered */
+.cursor-dot,
+.cursor-ring,
+.cursor-particle,
+.cursor-particles { display: none !important; }
+
+.global-particles { display: none !important; }
+.particle { display: none !important; }
 
 @media (hover: none), (pointer: coarse) {
-    .cursor-dot,
-    .cursor-ring,
-    .cursor-particle,
-    .cursor-particles { display: none !important; }
-    .cursor-active *, .cursor-active *::before, .cursor-active *::after { cursor: auto !important; }
     body, *, *::before, *::after { cursor: auto !important; }
-}
-
-/* ── CUSTOM CURSOR — Glowing Orb Dot ── */
-.cursor-dot {
-    width: 10px; height: 10px;
-    background: var(--accent);
-    border-radius: 50%;
-    position: fixed; top: 0; left: 0;
-    pointer-events: none; z-index: 9999999;
-    transform: translate(-50%, -50%);
-    transition: width 0.3s cubic-bezier(0.16,1,0.3,1), height 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s ease, opacity 0.2s ease;
-    box-shadow:
-        0 0 8px 2px var(--accent),
-        0 0 20px 4px color-mix(in srgb, var(--accent) 50%, transparent),
-        0 0 40px 8px color-mix(in srgb, var(--accent) 20%, transparent);
-}
-.cursor-dot.hovered {
-    width: 16px; height: 16px;
-    box-shadow:
-        0 0 12px 4px var(--accent),
-        0 0 30px 8px color-mix(in srgb, var(--accent) 50%, transparent),
-        0 0 60px 12px color-mix(in srgb, var(--accent) 20%, transparent);
-}
-.cursor-dot.clicked {
-    width: 6px; height: 6px;
-    transition: width 0.1s ease, height 0.1s ease;
-    box-shadow:
-        0 0 4px 1px var(--accent),
-        0 0 12px 2px color-mix(in srgb, var(--accent) 40%, transparent);
-}
-
-/* ── Click Particles ── */
-.cursor-particle {
-    background: var(--accent);
-    border-radius: 50%;
-    pointer-events: none;
-    will-change: transform, opacity;
-}
-
-/* ── GLOBAL PARTICLES ── */
-.global-particles {
-    position: fixed; inset: 0;
-    overflow: hidden; pointer-events: none; z-index: 1;
-}
-.particle {
-    position: absolute;
-    width: 2px; height: 2px;
-    background: var(--primary-red);
-    border-radius: 50%;
-    animation: float linear infinite;
-    opacity: 0.6;
-}
-@keyframes float {
-    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-    10% { opacity: 0.4; }
-    90% { opacity: 0.4; }
-    100% { transform: translateY(-10vh) rotate(720deg); opacity: 0; }
 }
 
 /* ── THEME TOGGLE ── */
@@ -4050,7 +3984,9 @@ body {
 
   .particle,
   .cursor-dot,
-  .cursor-ring {
+  .cursor-ring,
+  #xf-particles-js,
+  .click-splash-container {
     display: none !important;
   }
 }

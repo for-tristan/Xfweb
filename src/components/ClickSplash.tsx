@@ -1,9 +1,11 @@
+'use client';
+
 import { useEffect } from 'react';
 
 /**
- * Click Splash hook — Particle Burst on click only.
- * Custom cursor dot, magnetic snap, and hover detection removed.
- * Keeps the satisfying particle burst effect on click.
+ * Global click splash effect — particle burst on click.
+ * Replaces the old per-page useCustomCursor hook.
+ * No cursor dot, just the splash effect.
  */
 
 interface Particle {
@@ -17,21 +19,19 @@ interface Particle {
   el: HTMLDivElement;
 }
 
-export function useClickSplash() {
+export default function ClickSplash() {
   useEffect(() => {
     // Skip on touch devices
     const hasHover = window.matchMedia('(hover: hover)').matches;
     const isCoarse = window.matchMedia('(pointer: coarse)').matches;
-    const isTouchDevice = !hasHover || isCoarse;
-    if (isTouchDevice) return;
+    if (!hasHover || isCoarse) return;
 
-    // ── Particle Burst State ──
     const particles: Particle[] = [];
     let particleContainer: HTMLDivElement | null = null;
 
-    const createParticleContainer = () => {
+    const createContainer = () => {
       const container = document.createElement('div');
-      container.className = 'cursor-particles';
+      container.className = 'click-splash-container';
       container.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:9999997;overflow:hidden;';
       document.body.appendChild(container);
       particleContainer = container;
@@ -46,7 +46,6 @@ export function useClickSplash() {
         const size = 2 + Math.random() * 4;
         const maxLife = 30 + Math.random() * 20;
         const el = document.createElement('div');
-        el.className = 'cursor-particle';
         el.style.cssText = `
           position:absolute;
           width:${size}px;height:${size}px;
@@ -79,32 +78,31 @@ export function useClickSplash() {
       }
     };
 
-    // ── Click → Particle Burst ──
-    const onClick = (e: MouseEvent) => {
-      spawnParticles(e.clientX, e.clientY);
-      ensureLoopRunning();
-    };
-
-    // ── Particle animation loop (only runs when particles exist) ──
     let particleAnimId: number = 0;
     let loopRunning = false;
-    const animateParticles = () => {
+
+    const animate = () => {
       updateParticles();
       if (particles.length > 0) {
-        particleAnimId = requestAnimationFrame(animateParticles);
+        particleAnimId = requestAnimationFrame(animate);
       } else {
         loopRunning = false;
       }
     };
-    const ensureLoopRunning = () => {
+
+    const ensureLoop = () => {
       if (!loopRunning) {
         loopRunning = true;
-        particleAnimId = requestAnimationFrame(animateParticles);
+        particleAnimId = requestAnimationFrame(animate);
       }
     };
 
-    // ── Init ──
-    createParticleContainer();
+    const onClick = (e: MouseEvent) => {
+      spawnParticles(e.clientX, e.clientY);
+      ensureLoop();
+    };
+
+    createContainer();
     document.addEventListener('click', onClick);
 
     return () => {
@@ -116,12 +114,6 @@ export function useClickSplash() {
       }
     };
   }, []);
-}
 
-// Keep old export name as alias for backward compatibility (will be cleaned up from pages)
-export function useCustomCursor(
-  _dotRef: React.RefObject<HTMLDivElement | null>,
-) {
-  // Legacy — now just activates the click splash without cursor dot
-  useClickSplash();
+  return null;
 }

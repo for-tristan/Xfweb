@@ -52,7 +52,7 @@ const nextConfig: NextConfig = {
               "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com",
               "img-src 'self' data: blob: https://res.cloudinary.com https://lh3.googleusercontent.com https://avatars.githubusercontent.com",
               "connect-src 'self' https://vercel.live https://vitals.vercel-insights.com",
-              "frame-src 'none'",
+              "frame-src https://www.youtube.com https://youtube.com https://player.vimeo.com",
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",

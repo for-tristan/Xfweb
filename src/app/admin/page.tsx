@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { useCustomCursor } from '@/hooks/useCustomCursor';
 import { usePageFeatures } from '@/lib/usePageFeatures';
 import ConfirmModal from '@/components/ConfirmModal';
 import ReactMarkdown from 'react-markdown';
@@ -124,14 +123,6 @@ interface AdminQuote {
   updatedAt: string;
   user: { id: string; name: string; email: string; avatar: string | null };
 }
-
-function generateParticles(count: number) {
-  return Array.from({ length: count }, (_, i) => ({
-    id: i, left: `${Math.random() * 100}%`, size: `${Math.random() * 2 + 1}px`,
-    duration: `${Math.random() * 20 + 15}s`, delay: `${Math.random() * 15}s`,
-  }));
-}
-const particles = generateParticles(50);
 
 function UnlockStudentPanel({ admin, modules, unlockLoading, handleUnlock, handleLock, handleUnlockAll, enrollments, fmt, actionLoading, courses }: {
   admin: User;
@@ -325,9 +316,6 @@ export default function AdminPage() {
 
   const [unlockLoading, setUnlockLoading] = useState<string | null>(null);
   const [atBottom, setAtBottom] = useState(false);
-  const cursorDotRef = useRef<HTMLDivElement>(null);
-  useCustomCursor(cursorDotRef);
-
   // ── Theme (from usePageFeatures) ──
 
   useEffect(() => {
@@ -946,8 +934,6 @@ export default function AdminPage() {
 
   if (loading || minLoading) return (
     <>
-      <div className="global-particles">{particles.map(p => <div key={p.id} className="particle" style={{ left: p.left, width: p.size, height: p.size, animationDuration: p.duration, animationDelay: p.delay }} />)}</div>
-      <div ref={cursorDotRef} className="cursor-dot" />
       <div className="xf-loader"><div className="xf-loader-dot" /><div className="xf-loader-dot" /><div className="xf-loader-dot" /></div>
     </>
   );
@@ -970,8 +956,6 @@ export default function AdminPage() {
 
   return (
     <>
-      <div className="global-particles">{particles.map(p => <div key={p.id} className="particle" style={{ left: p.left, width: p.size, height: p.size, animationDuration: p.duration, animationDelay: p.delay }} />)}</div>
-      <div ref={cursorDotRef} className="cursor-dot" />
 
       <div style={{ minHeight: '100vh', background: 'var(--black)', color: 'var(--text-light)', fontFamily: "var(--font-body)", fontWeight: 400 }}>
 

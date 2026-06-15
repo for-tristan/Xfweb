@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { useCustomCursor } from '@/hooks/useCustomCursor';
 import { WaveInput } from '@/components/WaveInput';
 import { Logo } from '@/components/Logo';
 import VideoTemplate from '@/components/video/VideoTemplate';
@@ -23,16 +22,6 @@ function getPasswordStrength(pw: string): string {
   return 'strong';
 }
 
-function generateParticles(count: number) {
-  return Array.from({ length: count }, (_, i) => ({
-    id: i,
-    left: `${Math.random() * 100}%`,
-    size: `${Math.random() * 2 + 1}px`,
-    duration: `${Math.random() * 20 + 15}s`,
-    delay: `${Math.random() * 15}s`,
-  }));
-}
-
 export default function AuthPage() {
   return (
     <Suspense fallback={<div style={{ width: '100vw', height: '100vh', background: 'var(--black)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div className="xf-loader"><span /><span /><span /></div></div>}>
@@ -44,12 +33,6 @@ export default function AuthPage() {
 function AuthContent() {
   const router = useRouter();
   const { toast } = useToast();
-  const dotRef = useRef<HTMLDivElement>(null);
-  useCustomCursor(dotRef);
-
-  // Particles
-  const [particles, setParticles] = useState<Array<{id:number;left:string;size:string;duration:string;delay:string}>>([]);
-  useEffect(() => { setParticles(generateParticles(30)); }, []);
 
   // Theme — read from localStorage only, no picker on auth page
   useEffect(() => {
@@ -228,9 +211,6 @@ function AuthContent() {
     <>
       <title>Sign In | XFoundry</title>
 
-      {/* ═══ Custom Cursor ═══ */}
-      <div className="cursor-dot" ref={dotRef} />
-
       {/* ═══ Split Layout: Video Left | Auth Right ═══ */}
       <div style={{
         minHeight: '100vh',
@@ -239,15 +219,6 @@ function AuthContent() {
         position: 'relative',
         overflow: 'hidden',
       }}>
-        {/* ═══ Particles ═══ */}
-        {particles.length > 0 && (
-          <div className="global-particles" style={{ zIndex: 1 }}>
-            {particles.map((p) => (
-              <div key={p.id} className="particle" style={{ left: p.left, width: p.size, height: p.size, animationDuration: p.duration, animationDelay: p.delay }} />
-            ))}
-          </div>
-        )}
-
         {/* ── Left Panel: Video Animation ── */}
         <div className="auth-left-panel" style={{
           flex: 1,

@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useCustomCursor } from '@/hooks/useCustomCursor';
 import { usePageFeatures } from '@/lib/usePageFeatures';
 import { SearchModal, AuthModal, AuthGate, ProfileModal, HeroEffects } from '@/lib/PageModals';
 import { Navbar } from '@/components/Navbar';
@@ -259,9 +258,6 @@ export default function DashboardPage() {
   const [dataLoading, setDataLoading] = useState(true);
   const [atBottom, setAtBottom] = useState(false);
 
-  const dotRef = useRef<HTMLDivElement>(null);
-  useCustomCursor(dotRef);
-
   // ── Data Loading ──
   const loadedRef = useRef(false);
 
@@ -357,19 +353,6 @@ export default function DashboardPage() {
   // ── Effects ──
   useEffect(() => {
     window.scrollTo(0, 0);
-    const c = document.getElementById('globalParticles');
-    if (c) {
-      for (let i = 0; i < 50; i++) {
-        const p = document.createElement('div');
-        p.classList.add('particle');
-        p.setAttribute('data-particle', 'true');
-        p.style.left = Math.random() * 100 + '%';
-        p.style.width = p.style.height = Math.random() * 2 + 1 + 'px';
-        p.style.animationDuration = (Math.random() * 20 + 15) + 's';
-        p.style.animationDelay = (Math.random() * 15) + 's';
-        c.appendChild(p);
-      }
-    }
 
     const onScroll = () => {
       document.querySelectorAll('.reveal, .reveal-up, .reveal-scale, .reveal-left, .reveal-right').forEach((el) => {
@@ -387,11 +370,6 @@ export default function DashboardPage() {
     return () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('scroll', checkBottom);
-      // Remove ALL particles from container (not just our array)
-      const container = document.getElementById('globalParticles');
-      if (container) {
-        container.querySelectorAll('[data-particle]').forEach(p => p.remove());
-      }
     };
   }, []);
 
@@ -428,8 +406,6 @@ export default function DashboardPage() {
   if (!user && !loading) {
     return (
       <>
-        <div className="global-particles" id="globalParticles" />
-        <div className="cursor-dot" ref={dotRef} id="cursorDot" />
         <AuthGate loading={loading} minLoading={minLoading} user={user} onSignIn={() => openAuthModal('signin', 'Sign in to access your dashboard')} onSignUp={() => openAuthModal('signup')} />
         {renderModals()}
         {renderNavbar()}
@@ -452,9 +428,6 @@ export default function DashboardPage() {
     <>
       <title>Dashboard | XFoundry</title>
       <meta name="description" content="Your XFoundry learning dashboard. Track courses, tests, and study progress." />
-
-      <div className="global-particles" id="globalParticles" />
-      <div className="cursor-dot" ref={dotRef} id="cursorDot" />
 
       <AuthGate loading={loading} minLoading={minLoading} user={user} onSignIn={() => openAuthModal('signin', 'Sign in to access your dashboard')} onSignUp={() => openAuthModal('signup')} />
       {renderModals()}

@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
-import { useCustomCursor } from '@/hooks/useCustomCursor';
 import { usePageFeatures } from '@/lib/usePageFeatures';
 import { SearchModal, AuthModal, AuthGate, ProfileModal, HeroEffects } from '@/lib/PageModals';
 import { Navbar } from '@/components/Navbar';
@@ -57,10 +56,7 @@ export default function DynamicServicePage() {
   const [fetching, setFetching] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
-  const dotRef = useRef<HTMLDivElement>(null);
-  useCustomCursor(dotRef);
 
-  // Fetch service data
   useEffect(() => {
     if (!slug) return;
     setFetching(true);
@@ -85,20 +81,6 @@ export default function DynamicServicePage() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    // Particles
-    const c = document.getElementById('globalParticles');
-    if (c) {
-      for (let i = 0; i < 50; i++) {
-        const p = document.createElement('div');
-        p.classList.add('particle');
-        p.setAttribute('data-particle', 'true');
-        p.style.left = Math.random() * 100 + '%';
-        p.style.width = p.style.height = Math.random() * 2 + 1 + 'px';
-        p.style.animationDuration = (Math.random() * 20 + 15) + 's';
-        p.style.animationDelay = (Math.random() * 15) + 's';
-        c.appendChild(p);
-      }
-    }
 
     // Scroll reveal
     const onScroll = () => {
@@ -113,11 +95,6 @@ export default function DynamicServicePage() {
     onScroll();
     return () => {
       window.removeEventListener('scroll', onScroll);
-      // Remove ALL particles from container (not just our array)
-      const container = document.getElementById('globalParticles');
-      if (container) {
-        container.querySelectorAll('[data-particle]').forEach(p => p.remove());
-      }
     };
   }, []);
 
@@ -125,9 +102,6 @@ export default function DynamicServicePage() {
   if (fetching) {
     return (
       <>
-        <div className="global-particles" id="globalParticles" />
-        <div className="cursor-dot" ref={dotRef} id="cursorDot" />
-
         <AuthGate loading={loading} minLoading={minLoading} user={user} onSignIn={() => openAuthModal('signin', 'Sign in to access this page')} onSignUp={() => openAuthModal('signup')} />
 
         <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} query={searchQuery} setQuery={setSearchQuery} results={filteredSearch} onSelect={(link) => router.push(link)} />
@@ -158,8 +132,6 @@ export default function DynamicServicePage() {
   if (notFound) {
     return (
       <>
-        <div className="global-particles" id="globalParticles" />
-        <div className="cursor-dot" ref={dotRef} id="cursorDot" />
         <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} query={searchQuery} setQuery={setSearchQuery} results={filteredSearch} onSelect={(link) => router.push(link)} />
         <AuthModal open={authModalOpen} onClose={() => setAuthModalOpen(false)} tab={authTab} setTab={setAuthTab} message={authMessage}
           loginEmail={loginEmail} setLoginEmail={setLoginEmail} loginPassword={loginPassword} setLoginPassword={setLoginPassword} loginLoading={loginLoading} onLogin={handleLogin}
@@ -244,9 +216,6 @@ export default function DynamicServicePage() {
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={`${service.title} | XFoundry`} />
       <meta name="twitter:description" content={service.description || `${service.title} services by XFoundry.`} />
-
-      <div className="global-particles" id="globalParticles" />
-      <div className="cursor-dot" ref={dotRef} id="cursorDot" />
 
       {/* AUTH GATE */}
       <AuthGate loading={loading} minLoading={minLoading} user={user} onSignIn={() => openAuthModal('signin', 'Sign in to access this page')} onSignUp={() => openAuthModal('signup')} />

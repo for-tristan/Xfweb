@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useCustomCursor } from '@/hooks/useCustomCursor';
 import { usePageFeatures } from '@/lib/usePageFeatures';
 import { useToast } from '@/hooks/use-toast';
 import { Navbar } from '@/components/Navbar';
@@ -68,9 +67,6 @@ export default function GamesPage() {
     scrollToSection,
   } = usePageFeatures();
 
-  const dotRef = useRef<HTMLDivElement>(null);
-  useCustomCursor(dotRef);
-
   // ── Game State ──
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
   const [selectedLang, setSelectedLang] = useState('python');
@@ -111,19 +107,6 @@ export default function GamesPage() {
   // ── Effects ──
   useEffect(() => {
     window.scrollTo(0, 0);
-    const c = document.getElementById('globalParticles');
-    if (c) {
-      for (let i = 0; i < 50; i++) {
-        const p = document.createElement('div');
-        p.classList.add('particle');
-        p.setAttribute('data-particle', 'true');
-        p.style.left = Math.random() * 100 + '%';
-        p.style.width = p.style.height = Math.random() * 2 + 1 + 'px';
-        p.style.animationDuration = (Math.random() * 20 + 15) + 's';
-        p.style.animationDelay = (Math.random() * 15) + 's';
-        c.appendChild(p);
-      }
-    }
     const onScroll = () => {
       document.querySelectorAll('.reveal, .reveal-up, .reveal-scale, .reveal-left, .reveal-right').forEach((el) => {
         const rect = el.getBoundingClientRect();
@@ -140,8 +123,6 @@ export default function GamesPage() {
     return () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('scroll', checkBottom);
-      const container = document.getElementById('globalParticles');
-      if (container) container.querySelectorAll('[data-particle]').forEach(p => p.remove());
     };
   }, []);
 
@@ -1041,9 +1022,6 @@ export default function GamesPage() {
     <>
       <title>Code Games | XFoundry</title>
       <meta name="description" content="Sharpen your coding skills with fun interactive games. Bug Hunter, What's the Output, and Code Completion." />
-
-      <div className="global-particles" id="globalParticles" />
-      <div className="cursor-dot" ref={dotRef} id="cursorDot" />
 
       <AuthGate loading={loading} minLoading={minLoading} user={user} onSignIn={() => openAuthModal('signin', 'Sign in to play code games')} onSignUp={() => openAuthModal('signup')} />
       {renderNavbar()}
