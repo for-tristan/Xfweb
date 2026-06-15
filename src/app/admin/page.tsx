@@ -905,8 +905,9 @@ export default function AdminPage() {
   };
 
   const handleRoleChange = (userId: string, newRole: string) => {
-    const action = newRole === 'admin' ? 'promote to admin' : 'remove admin rights from';
-    openConfirm('Change Role', `Are you sure you want to ${action} this user?`, async () => {
+    const roleLabels: Record<string, string> = { admin: 'admin', instructor: 'instructor', student: 'student' };
+    const action = `change this user's role to ${roleLabels[newRole] || newRole}`;
+    openConfirm('Change Role', `Are you sure you want to ${action}?`, async () => {
       setActionLoading(userId);
       try { const r = await fetch('/api/admin/users', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId, role: newRole }) }); if (r.ok) fetchUsers(); else toast({ title: 'Error', description: (await r.json()).error, variant: 'destructive' }); } catch { toast({ title: 'Error', description: 'Operation failed. Please try again.', variant: 'destructive' }); }
       setActionLoading(null);
@@ -1139,7 +1140,7 @@ export default function AdminPage() {
                 {users.map((u, idx) => (
                   <div key={u.id} className={`project-card reveal reveal-delay-${Math.min(idx + 1, 5)}`} style={{ padding: '28px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                      <div style={{ width: 44, height: 44, borderRadius: '50%', background: u.avatar ? 'transparent' : (u.role === 'admin' ? 'color-mix(in srgb, var(--accent) 15%, transparent)' : 'var(--input-bg)'), border: u.role === 'admin' ? '1px solid color-mix(in srgb, var(--accent) 30%, transparent)' : '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, color: u.role === 'admin' ? 'var(--accent)' : 'var(--text-dim)', overflow: 'hidden', flexShrink: 0 }}>
+                      <div style={{ width: 44, height: 44, borderRadius: '50%', background: u.avatar ? 'transparent' : (u.role === 'admin' ? 'color-mix(in srgb, var(--accent) 15%, transparent)' : u.role === 'instructor' ? 'color-mix(in srgb, #6b9bf5 15%, transparent)' : 'var(--input-bg)'), border: u.role === 'admin' ? '1px solid color-mix(in srgb, var(--accent) 30%, transparent)' : u.role === 'instructor' ? '1px solid color-mix(in srgb, #6b9bf5 30%, transparent)' : '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, color: u.role === 'admin' ? 'var(--accent)' : u.role === 'instructor' ? '#6b9bf5' : 'var(--text-dim)', overflow: 'hidden', flexShrink: 0 }}>
                         {u.avatar
                           ? <img src={u.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                           : u.name.charAt(0).toUpperCase()
@@ -1151,19 +1152,43 @@ export default function AdminPage() {
                       </div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-                      <span style={{ padding: '5px 16px', borderRadius: 999, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, background: u.role === 'admin' ? 'color-mix(in srgb, var(--accent) 12%, transparent)' : 'rgba(148,163,184,0.1)', color: u.role === 'admin' ? 'var(--accent)' : '#94a3b8', border: u.role === 'admin' ? '1px solid color-mix(in srgb, var(--accent) 25%, transparent)' : '1px solid rgba(148,163,184,0.15)' }}>{u.role}</span>
+                      <span style={{ padding: '5px 16px', borderRadius: 999, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, background: u.role === 'admin' ? 'color-mix(in srgb, var(--accent) 12%, transparent)' : u.role === 'instructor' ? 'color-mix(in srgb, #6b9bf5 12%, transparent)' : 'rgba(148,163,184,0.1)', color: u.role === 'admin' ? 'var(--accent)' : u.role === 'instructor' ? '#6b9bf5' : '#94a3b8', border: u.role === 'admin' ? '1px solid color-mix(in srgb, var(--accent) 25%, transparent)' : u.role === 'instructor' ? '1px solid color-mix(in srgb, #6b9bf5 25%, transparent)' : '1px solid rgba(148,163,184,0.15)' }}>{u.role}</span>
                       <span style={{ fontSize: 13, color: 'var(--text-dim)', minWidth: 120 }}>{fmt(u.createdAt)}</span>
                       {u.id !== user!.id && (
                         <>
-                          <button
-                            onClick={() => handleRoleChange(u.id, u.role === 'admin' ? 'student' : 'admin')}
-                            disabled={actionLoading === u.id}
-                            className="btn"
-                            style={{ padding: '8px 16px', fontSize: 11, background: u.role === 'admin' ? 'transparent' : 'color-mix(in srgb, var(--accent) 10%, transparent)', border: u.role === 'admin' ? '1px solid rgba(234,179,8,0.4)' : '1px solid color-mix(in srgb, var(--accent) 30%, transparent)', color: u.role === 'admin' ? 'var(--warning-color)' : 'var(--accent)' }}
-                          >
-                            <i className={actionLoading === u.id ? 'fa-solid fa-spinner fa-spin' : u.role === 'admin' ? 'fa-solid fa-user-shield' : 'fa-solid fa-shield-alt'} style={{ marginRight: 6 }}></i>
-                            {u.role === 'admin' ? 'Remove Admin' : 'Make Admin'}
-                          </button>
+                          {u.role !== 'admin' && (
+                            <button
+                              onClick={() => handleRoleChange(u.id, 'admin')}
+                              disabled={actionLoading === u.id}
+                              className="btn"
+                              style={{ padding: '8px 16px', fontSize: 11, background: 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 30%, transparent)', color: 'var(--accent)' }}
+                            >
+                              <i className={actionLoading === u.id ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-shield-alt'} style={{ marginRight: 6 }}></i>
+                              Make Admin
+                            </button>
+                          )}
+                          {u.role !== 'instructor' && (
+                            <button
+                              onClick={() => handleRoleChange(u.id, 'instructor')}
+                              disabled={actionLoading === u.id}
+                              className="btn"
+                              style={{ padding: '8px 16px', fontSize: 11, background: 'color-mix(in srgb, #6b9bf5 10%, transparent)', border: '1px solid color-mix(in srgb, #6b9bf5 30%, transparent)', color: '#6b9bf5' }}
+                            >
+                              <i className={actionLoading === u.id ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-chalkboard-user'} style={{ marginRight: 6 }}></i>
+                              Make Instructor
+                            </button>
+                          )}
+                          {u.role !== 'student' && (
+                            <button
+                              onClick={() => handleRoleChange(u.id, 'student')}
+                              disabled={actionLoading === u.id}
+                              className="btn"
+                              style={{ padding: '8px 16px', fontSize: 11, background: 'transparent', border: '1px solid rgba(234,179,8,0.4)', color: 'var(--warning-color)' }}
+                            >
+                              <i className={actionLoading === u.id ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-user'} style={{ marginRight: 6 }}></i>
+                              Make Student
+                            </button>
+                          )}
                           <button
                             onClick={() => handleDeleteUser(u.id)}
                             disabled={actionLoading === u.id}
