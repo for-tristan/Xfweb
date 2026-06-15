@@ -105,8 +105,8 @@ export default function ParticlesBackground() {
         }
       }
 
-      // Lower alpha for light themes (dark particles on light bg need less opacity)
-      particleAlpha = isLight ? 0.15 : 0.25;
+      // Alpha per theme type — light themes need higher alpha since bg is bright
+      particleAlpha = isLight ? 0.35 : 0.3;
 
       colorDirty = true;
       lastTheme = themeAttr;
@@ -138,8 +138,8 @@ export default function ParticlesBackground() {
         if (p.y > canvas.height + 10) p.y = -10;
 
         // Animate opacity (subtle pulsing)
-        p.opacity += p.opacityDir * 0.004;
-        if (p.opacity >= 0.6) { p.opacity = 0.6; p.opacityDir = -1; }
+        p.opacity += p.opacityDir * 0.005;
+        if (p.opacity >= 0.8) { p.opacity = 0.8; p.opacityDir = -1; }
         if (p.opacity <= 0) { p.opacity = 0; p.opacityDir = 1; }
 
         // Draw
