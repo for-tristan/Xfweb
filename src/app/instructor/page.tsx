@@ -7,6 +7,9 @@ import { usePageFeatures } from '@/lib/usePageFeatures';
 import ConfirmModal from '@/components/ConfirmModal';
 import { Navbar } from '@/components/Navbar';
 import { SearchModal } from '@/lib/PageModals';
+import ReactMarkdown from 'react-markdown';
+import { WaveInput } from '@/components/WaveInput';
+import { WaveTextarea } from '@/components/WaveTextarea';
 
 // ── TYPES ──
 
@@ -272,6 +275,7 @@ export default function InstructorPage() {
   const [moduleSaving, setModuleSaving] = useState(false);
   const [unlockLoading, setUnlockLoading] = useState<string | null>(null);
   const [showModuleUnlock, setShowModuleUnlock] = useState<string | null>(null);
+  const [modulePreviewOpen, setModulePreviewOpen] = useState(false);
 
   const fetchModules = useCallback(async (courseId?: string) => {
     setModulesLoading(true);
@@ -586,47 +590,12 @@ export default function InstructorPage() {
   );
   if (!user || (user.role !== 'instructor' && user.role !== 'admin')) return null;
 
-  // ── Modal overlay styles ──
-  const modalOverlay: React.CSSProperties = {
-    position: 'fixed', inset: 0, zIndex: 10002,
-    background: 'rgba(0,0,0,0.75)',
-    backdropFilter: 'blur(16px) saturate(1.4)',
-    WebkitBackdropFilter: 'blur(16px) saturate(1.4)',
-    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
-    animation: 'confirmFadeIn 0.2s ease',
-  };
 
-  const modalCard: React.CSSProperties = {
-    width: '100%', maxWidth: 560,
-    background: 'color-mix(in srgb, var(--card-bg) 92%, transparent)',
-    backdropFilter: 'blur(24px) saturate(1.6)',
-    WebkitBackdropFilter: 'blur(24px) saturate(1.6)',
-    border: '1px solid color-mix(in srgb, var(--border-color) 60%, transparent)',
-    borderRadius: 16, overflow: 'hidden',
-    boxShadow: '0 0 0 1px color-mix(in srgb, var(--accent) 8%, transparent), 0 24px 80px rgba(0,0,0,0.5), 0 0 120px color-mix(in srgb, var(--accent) 6%, transparent)',
-    animation: 'confirmSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-    maxHeight: '90vh', overflowY: 'auto',
-  };
-
-  const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '10px 14px', borderRadius: 8,
-    border: '1px solid color-mix(in srgb, var(--border-color) 70%, transparent)',
-    background: 'var(--input-bg)', color: 'var(--text-light)',
-    fontFamily: 'var(--font-body)', fontSize: 13, outline: 'none',
-    transition: 'border-color 0.2s',
-  };
-
-  const labelStyle: React.CSSProperties = {
-    fontSize: 11, fontWeight: 700, color: 'var(--text-dim)',
-    textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6, display: 'block',
-    fontFamily: 'var(--font-heading)',
-  };
 
   return (
     <>
     <style>{`
       @keyframes confirmFadeIn { from { opacity: 0 } to { opacity: 1 } }
-      @keyframes confirmSlideUp { from { opacity: 0; transform: translateY(12px) scale(0.98) } to { opacity: 1; transform: translateY(0) scale(1) } }
     `}</style>
 
       <div style={{ minHeight: '100vh', background: 'var(--black)', color: 'var(--text-light)', fontFamily: "var(--font-body)", fontWeight: 400 }}>
@@ -827,6 +796,74 @@ export default function InstructorPage() {
                 </button>
               </div>
 
+              {showCourseForm && (
+                <div style={{ background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
+                  backdropFilter: 'blur(20px) saturate(1.6)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
+                  border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
+                  padding: '32px 40px', borderRadius: 12, marginBottom: 24 }}>
+                  <h4 style={{ fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: 14, color: 'var(--text-light)', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <i className="fa-solid fa-edit" style={{ color: 'var(--accent)' }}></i>{editingCourse ? 'Edit Course' : 'New Course'}
+                  </h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+                    <WaveInput label="Title" value={courseForm.title} onChange={e => handleCourseTitleChange(e.target.value)} />
+                    <WaveInput label="Slug" value={courseForm.slug} onChange={e => setCourseForm(f => ({ ...f, slug: e.target.value }))} />
+                    <div>
+                      <label style={{ fontSize: 10, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4, display: 'block' }}>Level</label>
+                      <select value={courseForm.level} onChange={e => setCourseForm(f => ({ ...f, level: e.target.value }))} style={{ width: '100%' }}>
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Advanced">Advanced</option>
+                        <option value="All Levels">All Levels</option>
+                      </select>
+                    </div>
+                    <WaveInput label="Duration" value={courseForm.duration} onChange={e => setCourseForm(f => ({ ...f, duration: e.target.value }))} />
+                    <WaveInput label="Price" value={courseForm.price} onChange={e => setCourseForm(f => ({ ...f, price: e.target.value }))} />
+                    <WaveInput label="Icon (FA class)" value={courseForm.icon} onChange={e => setCourseForm(f => ({ ...f, icon: e.target.value }))} />
+                    <div>
+                      <label style={{ fontSize: 10, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4, display: 'block' }}>Status</label>
+                      <select value={courseForm.status} onChange={e => setCourseForm(f => ({ ...f, status: e.target.value }))} style={{ width: '100%' }}>
+                        <option value="active">Active</option>
+                        <option value="hidden">Hidden</option>
+                      </select>
+                    </div>
+                    <WaveInput label="Tech Stack" value={courseForm.techStack} onChange={e => setCourseForm(f => ({ ...f, techStack: e.target.value }))} />
+                  </div>
+                  <WaveTextarea label="Description" value={courseForm.description} onChange={e => setCourseForm(f => ({ ...f, description: e.target.value }))} rows={3} style={{ marginBottom: 16 }} />
+                  <WaveTextarea label="Prerequisites" value={courseForm.prerequisites} onChange={e => setCourseForm(f => ({ ...f, prerequisites: e.target.value }))} rows={2} style={{ marginBottom: 16 }} />
+                  {/* Features */}
+                  <div style={{ marginBottom: 16 }}>
+                    <label style={{ fontSize: 10, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <i className="fa-solid fa-list" style={{ color: 'var(--accent)' }}></i>Features ({courseForm.features.length})
+                    </label>
+                    {courseForm.features.length > 0 && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+                        {courseForm.features.map((feat, idx) => (
+                          <span key={idx} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)',
+                            backdropFilter: 'blur(12px) saturate(1.4)',
+                            WebkitBackdropFilter: 'blur(12px) saturate(1.4)', border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', borderRadius: 12, fontSize: 12, color: 'var(--text-light)' }}>
+                            {feat}
+                            <button onClick={() => setCourseForm(prev => ({ ...prev, features: prev.features.filter((_, fi) => fi !== idx) }))} style={{ background: 'none', border: 'none', color: 'var(--error-color)', cursor: 'pointer', fontSize: 11, padding: 0 }}><i className="fa-solid fa-times"></i></button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <div style={{ flex: 1 }}><WaveInput label="Add a feature and press Enter" value={courseFeatureInput} onChange={e => setCourseFeatureInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); const t = courseFeatureInput.trim(); if (t) { setCourseForm(f => ({ ...f, features: [...f.features, t] })); setCourseFeatureInput(''); } } }} /></div>
+                      <button onClick={() => { const t = courseFeatureInput.trim(); if (t) { setCourseForm(f => ({ ...f, features: [...f.features, t] })); setCourseFeatureInput(''); } }} className="btn" style={{ padding: '8px 14px', fontSize: 11, background: 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 30%, transparent)', color: 'var(--accent)' }}>
+                        <i className="fa-solid fa-plus" style={{ marginRight: 4 }}></i>Add
+                      </button>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 10, paddingTop: 16, borderTop: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)' }}>
+                    <button onClick={handleSaveCourse} disabled={courseSaving} className="btn btn-primary" style={{ padding: '10px 24px', fontSize: 11 }}>
+                      <i className={courseSaving ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-save'} style={{ marginRight: 6 }}></i>{courseSaving ? 'Saving...' : editingCourse ? 'Update Course' : 'Create Course'}
+                    </button>
+                    <button onClick={() => setShowCourseForm(false)} className="btn" style={{ padding: '10px 24px', fontSize: 11, background: 'transparent', border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', color: 'var(--text-dim)' }}>Cancel</button>
+                  </div>
+                </div>
+              )}
+
               {courses.length === 0 ? (
                 <div className="reveal" style={{ textAlign: 'center', padding: '80px 20px' }}>
                   <i className="fa-solid fa-graduation-cap" style={{ fontSize: 56, marginBottom: 20, display: 'block', opacity: 0.3 }}></i>
@@ -881,7 +918,7 @@ export default function InstructorPage() {
               <div className="reveal" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 12 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                   <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: 18, color: 'var(--text-light)' }}>Modules</h3>
-                  <select value={modulesCourseFilter} onChange={e => { setModulesCourseFilter(e.target.value); fetchModules(e.target.value); }} style={{ ...inputStyle, width: 'auto', minWidth: 180, padding: '8px 12px', fontSize: 12 }}>
+                  <select value={modulesCourseFilter} onChange={e => { setModulesCourseFilter(e.target.value); fetchModules(e.target.value); }} style={{ width: 'auto', minWidth: 180, padding: '8px 12px', fontSize: 12 }}>
                     <option value="all">All Courses</option>
                     {courses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
                   </select>
@@ -890,6 +927,70 @@ export default function InstructorPage() {
                   <i className="fa-solid fa-plus" style={{ marginRight: 8 }}></i>Add Module
                 </button>
               </div>
+
+              {showModuleForm && (
+                <div style={{ background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)',
+                  backdropFilter: 'blur(12px) saturate(1.4)',
+                  WebkitBackdropFilter: 'blur(12px) saturate(1.4)', border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', padding: '20px 24px', borderRadius: 12, marginBottom: 16 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 12 }}>
+                    <i className="fa-solid fa-edit" style={{ color: 'var(--accent)', marginRight: 6 }}></i>{editingModule ? 'Edit Module' : 'New Module'}
+                  </div>
+                  {!editingModule && (
+                    <div style={{ marginBottom: 12 }}>
+                      <label style={{ fontSize: 10, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4, display: 'block' }}>Course</label>
+                      <select value={moduleForm.courseId} onChange={e => setModuleForm(f => ({ ...f, courseId: e.target.value }))} style={{ width: '100%' }}>
+                        <option value="">Select a course</option>
+                        {courses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
+                      </select>
+                    </div>
+                  )}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 80px', gap: 12, marginBottom: 12 }}>
+                    <WaveInput label="Title" value={moduleForm.title} onChange={e => setModuleForm(f => ({ ...f, title: e.target.value }))} />
+                    <WaveInput label="Order" type="number" value={moduleForm.moduleOrder} onChange={e => setModuleForm(f => ({ ...f, moduleOrder: parseInt(e.target.value) || 1 }))} style={{ width: 80 }} />
+                  </div>
+                  <WaveInput label="Description" value={moduleForm.description} onChange={e => setModuleForm(f => ({ ...f, description: e.target.value }))} style={{ marginBottom: 12 }} />
+                  <div style={{ marginBottom: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 4 }}>
+                      <button onClick={() => setModulePreviewOpen(!modulePreviewOpen)} className="btn" style={{ padding: '3px 10px', fontSize: 10, fontFamily: "var(--font-body)", fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', background: modulePreviewOpen ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent', border: modulePreviewOpen ? '1px solid color-mix(in srgb, var(--accent) 30%, transparent)' : '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', color: modulePreviewOpen ? 'var(--accent)' : 'var(--text-dim)' }}>
+                        <i className={modulePreviewOpen ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'} style={{ marginRight: 4, fontSize: 9 }}></i>{modulePreviewOpen ? 'Hide' : 'Preview'}
+                      </button>
+                    </div>
+                    <div style={{ fontSize: 10, color: 'var(--text-dim)', marginBottom: 6, opacity: 0.6 }}>
+                      Markdown supported. YouTube/Vimeo URLs auto-embed.
+                    </div>
+                    <WaveTextarea label="Content" value={moduleForm.content} onChange={e => setModuleForm(f => ({ ...f, content: e.target.value }))} rows={6} />
+                  </div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button onClick={handleSaveModule} disabled={moduleSaving} className="btn btn-primary" style={{ padding: '8px 18px', fontSize: 11 }}>
+                      <i className={moduleSaving ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-save'} style={{ marginRight: 4 }}></i>{moduleSaving ? 'Saving...' : 'Save'}
+                    </button>
+                    <button onClick={() => { setShowModuleForm(false); setEditingModule(null); setModulePreviewOpen(false); }} className="btn" style={{ padding: '8px 18px', fontSize: 11, background: 'transparent', border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', color: 'var(--text-dim)' }}>Cancel</button>
+                  </div>
+                  {modulePreviewOpen && moduleForm.content && (
+                    <div style={{ marginTop: 16, padding: '16px 20px', background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)',
+                      backdropFilter: 'blur(12px) saturate(1.4)',
+                      WebkitBackdropFilter: 'blur(12px) saturate(1.4)', border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', borderRadius: 12, maxHeight: 300, overflowY: 'auto' }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10 }}>
+                        <i className="fa-solid fa-eye" style={{ color: 'var(--accent)', marginRight: 6 }}></i>Preview
+                      </div>
+                      <div className="markdown-preview" style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+                        <ReactMarkdown components={{
+                          h1: ({children}: any) => <h1 style={{fontSize: 20, fontWeight: 700, color: 'var(--text-light)', marginBottom: 8, marginTop: 16}}>{children}</h1>,
+                          h2: ({children}: any) => <h2 style={{fontSize: 17, fontWeight: 700, color: 'var(--text-light)', marginBottom: 6, marginTop: 14}}>{children}</h2>,
+                          h3: ({children}: any) => <h3 style={{fontSize: 15, fontWeight: 700, color: 'var(--text-light)', marginBottom: 4, marginTop: 12}}>{children}</h3>,
+                          p: ({children}: any) => <p style={{marginBottom: 8}}>{children}</p>,
+                          code: ({children}: any) => <code style={{background: 'color-mix(in srgb, var(--accent) 10%, transparent)', padding: '1px 5px', borderRadius: 8, fontSize: 12, fontFamily: 'monospace'}}>{children}</code>,
+                          pre: ({children}: any) => <pre style={{background: 'color-mix(in srgb, var(--card-bg) 80%, transparent)', padding: 12, borderRadius: 12, overflowX: 'auto', marginBottom: 8}}>{children}</pre>,
+                          ul: ({children}: any) => <ul style={{paddingLeft: 20, marginBottom: 8}}>{children}</ul>,
+                          ol: ({children}: any) => <ol style={{paddingLeft: 20, marginBottom: 8}}>{children}</ol>,
+                          blockquote: ({children}: any) => <blockquote style={{borderLeft: '3px solid var(--accent)', paddingLeft: 12, opacity: 0.8, marginBottom: 8}}>{children}</blockquote>,
+                          a: ({children, href}: any) => <a href={href} target="_blank" rel="noopener noreferrer" style={{color: 'var(--accent)', textDecoration: 'underline'}}>{children}</a>,
+                        }}>{moduleForm.content}</ReactMarkdown>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {modulesLoading ? (
                 <div style={{ textAlign: 'center', padding: 60 }}><i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 24, color: 'var(--accent)' }}></i></div>
@@ -1055,6 +1156,37 @@ export default function InstructorPage() {
                 </button>
               </div>
 
+              {showTestForm && (
+                <div style={{ background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
+                  backdropFilter: 'blur(20px) saturate(1.6)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(1.6)', border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', padding: '32px 40px', borderRadius: 12, marginBottom: 24 }}>
+                  <h4 style={{ fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: 14, color: 'var(--text-light)', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <i className="fa-solid fa-edit" style={{ color: 'var(--accent)' }}></i>{editingTest ? 'Edit Test' : 'New Test'}
+                  </h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+                    {!editingTest && (
+                      <div>
+                        <label style={{ fontSize: 10, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4, display: 'block' }}>Module</label>
+                        <select value={testForm.moduleId} onChange={e => setTestForm(f => ({ ...f, moduleId: e.target.value }))} style={{ width: '100%' }}>
+                          <option value="">Select a module</option>
+                          {modules.map(m => <option key={m.id} value={m.id}>{m.title} ({courses.find(c => c.id === m.courseId)?.title || 'Unknown'})</option>)}
+                        </select>
+                      </div>
+                    )}
+                    <WaveInput label="Title" value={testForm.title} onChange={e => setTestForm(f => ({ ...f, title: e.target.value }))} />
+                    <WaveInput label="Time Limit (minutes)" type="number" value={testForm.timeLimit} onChange={e => setTestForm(f => ({ ...f, timeLimit: parseInt(e.target.value) || 30 }))} />
+                    <WaveInput label="Passing Score (%)" type="number" value={testForm.passingScore} onChange={e => setTestForm(f => ({ ...f, passingScore: parseInt(e.target.value) || 70 }))} />
+                  </div>
+                  <WaveTextarea label="Description" value={testForm.description} onChange={e => setTestForm(f => ({ ...f, description: e.target.value }))} rows={2} style={{ marginBottom: 16 }} />
+                  <div style={{ display: 'flex', gap: 10, paddingTop: 16, borderTop: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)' }}>
+                    <button onClick={editingTest ? handleUpdateTest : handleCreateTest} disabled={testsSaving} className="btn btn-primary" style={{ padding: '10px 24px', fontSize: 11 }}>
+                      <i className={testsSaving ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-save'} style={{ marginRight: 6 }}></i>{testsSaving ? 'Saving...' : editingTest ? 'Update Test' : 'Create Test'}
+                    </button>
+                    <button onClick={() => setShowTestForm(false)} className="btn" style={{ padding: '10px 24px', fontSize: 11, background: 'transparent', border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', color: 'var(--text-dim)' }}>Cancel</button>
+                  </div>
+                </div>
+              )}
+
               {testsLoading ? (
                 <div style={{ textAlign: 'center', padding: 60 }}><i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 24, color: 'var(--accent)' }}></i></div>
               ) : tests.length === 0 ? (
@@ -1124,6 +1256,33 @@ export default function InstructorPage() {
                     <h4 style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: 14, color: 'var(--text-light)', marginBottom: 14 }}>
                       <i className="fa-solid fa-list-ol" style={{ color: 'var(--accent)', marginRight: 8 }}></i>Questions
                     </h4>
+
+                    {showQuestionForm && (
+                      <div style={{ background: 'color-mix(in srgb, var(--card-bg) 40%, transparent)', border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', padding: 20, borderRadius: 12, marginBottom: 16 }}>
+                        <h5 style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-light)', marginBottom: 12 }}>New Question</h5>
+                        <WaveInput label="Question Text" value={questionForm.questionText} onChange={e => setQuestionForm(f => ({ ...f, questionText: e.target.value }))} style={{ marginBottom: 12 }} />
+                        <div style={{ marginBottom: 12 }}>
+                          <label style={{ fontSize: 10, color: 'var(--text-dim)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+                            Options <span style={{ fontSize: 9, color: 'var(--warning-color)' }}>(select correct answer by clicking the radio button)</span>
+                          </label>
+                          {questionForm.options.map((opt, i) => (
+                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                              <input type="radio" name="correctAnswer" checked={questionForm.correctAnswer === i} onChange={() => setQuestionForm(f => ({ ...f, correctAnswer: i }))} style={{ accentColor: 'var(--accent)', cursor: 'pointer' }} />
+                              <span style={{ fontSize: 12, color: 'var(--text-dim)', width: 20, flexShrink: 0 }}>{String.fromCharCode(65 + i)}.</span>
+                              <div style={{ flex: 1 }}><WaveInput label={`Option ${String.fromCharCode(65 + i)}`} value={opt} onChange={e => { const newOpts = [...questionForm.options]; newOpts[i] = e.target.value; setQuestionForm(f => ({ ...f, options: newOpts })); }} /></div>
+                            </div>
+                          ))}
+                        </div>
+                        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                          <WaveInput label="Points" type="number" value={questionForm.points} onChange={e => setQuestionForm(f => ({ ...f, points: parseInt(e.target.value) || 1 }))} style={{ width: 80 }} />
+                          <button onClick={handleAddQuestion} disabled={testsSaving} className="btn btn-primary" style={{ padding: '8px 20px', fontSize: 11, marginTop: 16 }}>
+                            <i className={testsSaving ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-check'} style={{ marginRight: 4 }}></i>{testsSaving ? 'Adding...' : 'Add Question'}
+                          </button>
+                          <button onClick={() => { setShowQuestionForm(false); setQuestionForm({ questionText: '', options: ['', '', '', ''], correctAnswer: 0, points: 1 }); }} className="btn" style={{ padding: '8px 20px', fontSize: 11, marginTop: 16, background: 'transparent', border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', color: 'var(--text-dim)' }}>Cancel</button>
+                        </div>
+                      </div>
+                    )}
+
                     {selectedTest.questions.length === 0 ? (
                       <p style={{ fontSize: 13, color: 'var(--text-dim)', opacity: 0.7 }}>No questions yet. Add some to make this test functional.</p>
                     ) : (
@@ -1344,228 +1503,6 @@ export default function InstructorPage() {
         danger={confirmModal.danger}
         icon={confirmModal.icon}
       />
-
-      {/* Course Form Modal */}
-      {showCourseForm && (
-        <div style={modalOverlay} onClick={e => { if (e.target === e.currentTarget) setShowCourseForm(false); }}>
-          <div style={modalCard}>
-            <div style={{ padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid color-mix(in srgb, var(--border-color) 50%, transparent)' }}>
-              <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: 16, color: 'var(--text-light)' }}>{editingCourse ? 'Edit Course' : 'Create Course'}</h3>
-              <button onClick={() => setShowCourseForm(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-dim)', fontSize: 16, padding: 4 }}><i className="fa-solid fa-times"></i></button>
-            </div>
-            <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 18 }}>
-              <div>
-                <label style={labelStyle}>Title</label>
-                <input style={inputStyle} placeholder="Course title" value={courseForm.title} onChange={e => handleCourseTitleChange(e.target.value)} />
-              </div>
-              <div>
-                <label style={labelStyle}>Slug</label>
-                <input style={inputStyle} placeholder="course-slug" value={courseForm.slug} onChange={e => setCourseForm(f => ({ ...f, slug: e.target.value }))} />
-              </div>
-              <div>
-                <label style={labelStyle}>Description</label>
-                <textarea style={{ ...inputStyle, minHeight: 80, resize: 'vertical' }} placeholder="Course description" value={courseForm.description} onChange={e => setCourseForm(f => ({ ...f, description: e.target.value }))} />
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                <div>
-                  <label style={labelStyle}>Level</label>
-                  <select style={inputStyle} value={courseForm.level} onChange={e => setCourseForm(f => ({ ...f, level: e.target.value }))}>
-                    <option value="Beginner">Beginner</option>
-                    <option value="Intermediate">Intermediate</option>
-                    <option value="Advanced">Advanced</option>
-                  </select>
-                </div>
-                <div>
-                  <label style={labelStyle}>Duration</label>
-                  <input style={inputStyle} placeholder="e.g. 8 Weeks" value={courseForm.duration} onChange={e => setCourseForm(f => ({ ...f, duration: e.target.value }))} />
-                </div>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                <div>
-                  <label style={labelStyle}>Price</label>
-                  <input style={inputStyle} placeholder="e.g. Free or $99" value={courseForm.price} onChange={e => setCourseForm(f => ({ ...f, price: e.target.value }))} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Icon (FontAwesome)</label>
-                  <input style={inputStyle} placeholder="fa-solid fa-book" value={courseForm.icon} onChange={e => setCourseForm(f => ({ ...f, icon: e.target.value }))} />
-                </div>
-              </div>
-              <div>
-                <label style={labelStyle}>Status</label>
-                <select style={inputStyle} value={courseForm.status} onChange={e => setCourseForm(f => ({ ...f, status: e.target.value }))}>
-                  <option value="active">Active</option>
-                  <option value="hidden">Hidden</option>
-                </select>
-              </div>
-              <div>
-                <label style={labelStyle}>Features</label>
-                <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-                  <input style={{ ...inputStyle, flex: 1 }} placeholder="Add a feature" value={courseFeatureInput} onChange={e => setCourseFeatureInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); const t = courseFeatureInput.trim(); if (t) { setCourseForm(f => ({ ...f, features: [...f.features, t] })); setCourseFeatureInput(''); } } }} />
-                  <button onClick={() => { const t = courseFeatureInput.trim(); if (t) { setCourseForm(f => ({ ...f, features: [...f.features, t] })); setCourseFeatureInput(''); } }} className="btn btn-secondary" style={{ padding: '8px 16px', fontSize: 12 }}><i className="fa-solid fa-plus"></i></button>
-                </div>
-                {courseForm.features.length > 0 && (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                    {courseForm.features.map((f, i) => (
-                      <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 6, background: 'color-mix(in srgb, var(--accent) 8%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 15%, transparent)', fontSize: 12, color: 'var(--text-light)' }}>
-                        {f}
-                        <button onClick={() => setCourseForm(prev => ({ ...prev, features: prev.features.filter((_, fi) => fi !== i) }))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--error-color)', fontSize: 10, padding: 0 }}><i className="fa-solid fa-times"></i></button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <div>
-                <label style={labelStyle}>Prerequisites</label>
-                <input style={inputStyle} placeholder="Course prerequisites" value={courseForm.prerequisites} onChange={e => setCourseForm(f => ({ ...f, prerequisites: e.target.value }))} />
-              </div>
-              <div>
-                <label style={labelStyle}>Tech Stack</label>
-                <input style={inputStyle} placeholder="e.g. Python, TensorFlow, PyTorch" value={courseForm.techStack} onChange={e => setCourseForm(f => ({ ...f, techStack: e.target.value }))} />
-              </div>
-            </div>
-            <div style={{ padding: '16px 24px', borderTop: '1px solid color-mix(in srgb, var(--border-color) 50%, transparent)', display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-              <button onClick={() => setShowCourseForm(false)} className="btn" style={{ padding: '10px 24px', fontSize: 12, background: 'transparent', border: '1px solid color-mix(in srgb, var(--border-color) 60%, transparent)', color: 'var(--text-dim)' }}>Cancel</button>
-              <button onClick={editingCourse ? handleSaveCourse : handleSaveCourse} disabled={courseSaving} className="btn btn-primary" style={{ padding: '10px 24px', fontSize: 12 }}>
-                {courseSaving && <i className="fa-solid fa-spinner fa-spin" style={{ marginRight: 6 }}></i>}
-                {editingCourse ? 'Update Course' : 'Create Course'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Module Form Modal */}
-      {showModuleForm && (
-        <div style={modalOverlay} onClick={e => { if (e.target === e.currentTarget) setShowModuleForm(false); }}>
-          <div style={modalCard}>
-            <div style={{ padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid color-mix(in srgb, var(--border-color) 50%, transparent)' }}>
-              <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: 16, color: 'var(--text-light)' }}>{editingModule ? 'Edit Module' : 'Add Module'}</h3>
-              <button onClick={() => setShowModuleForm(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-dim)', fontSize: 16, padding: 4 }}><i className="fa-solid fa-times"></i></button>
-            </div>
-            <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 18 }}>
-              {!editingModule && (
-                <div>
-                  <label style={labelStyle}>Course</label>
-                  <select style={inputStyle} value={moduleForm.courseId} onChange={e => setModuleForm(f => ({ ...f, courseId: e.target.value }))}>
-                    <option value="">Select a course</option>
-                    {courses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
-                  </select>
-                </div>
-              )}
-              <div>
-                <label style={labelStyle}>Title</label>
-                <input style={inputStyle} placeholder="Module title" value={moduleForm.title} onChange={e => setModuleForm(f => ({ ...f, title: e.target.value }))} />
-              </div>
-              <div>
-                <label style={labelStyle}>Description</label>
-                <textarea style={{ ...inputStyle, minHeight: 80, resize: 'vertical' }} placeholder="Module description" value={moduleForm.description} onChange={e => setModuleForm(f => ({ ...f, description: e.target.value }))} />
-              </div>
-              <div>
-                <label style={labelStyle}>Content (Markdown)</label>
-                <textarea style={{ ...inputStyle, minHeight: 120, resize: 'vertical', fontFamily: 'var(--font-mono)', fontSize: 12 }} placeholder="Module content in markdown..." value={moduleForm.content} onChange={e => setModuleForm(f => ({ ...f, content: e.target.value }))} />
-              </div>
-              <div>
-                <label style={labelStyle}>Module Order</label>
-                <input type="number" style={inputStyle} value={moduleForm.moduleOrder} onChange={e => setModuleForm(f => ({ ...f, moduleOrder: parseInt(e.target.value) || 1 }))} min={1} />
-              </div>
-            </div>
-            <div style={{ padding: '16px 24px', borderTop: '1px solid color-mix(in srgb, var(--border-color) 50%, transparent)', display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-              <button onClick={() => setShowModuleForm(false)} className="btn" style={{ padding: '10px 24px', fontSize: 12, background: 'transparent', border: '1px solid color-mix(in srgb, var(--border-color) 60%, transparent)', color: 'var(--text-dim)' }}>Cancel</button>
-              <button onClick={handleSaveModule} disabled={moduleSaving} className="btn btn-primary" style={{ padding: '10px 24px', fontSize: 12 }}>
-                {moduleSaving && <i className="fa-solid fa-spinner fa-spin" style={{ marginRight: 6 }}></i>}
-                {editingModule ? 'Update Module' : 'Create Module'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Test Form Modal */}
-      {showTestForm && (
-        <div style={modalOverlay} onClick={e => { if (e.target === e.currentTarget) setShowTestForm(false); }}>
-          <div style={modalCard}>
-            <div style={{ padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid color-mix(in srgb, var(--border-color) 50%, transparent)' }}>
-              <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: 16, color: 'var(--text-light)' }}>{editingTest ? 'Edit Test' : 'Create Test'}</h3>
-              <button onClick={() => setShowTestForm(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-dim)', fontSize: 16, padding: 4 }}><i className="fa-solid fa-times"></i></button>
-            </div>
-            <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 18 }}>
-              {!editingTest && (
-                <div>
-                  <label style={labelStyle}>Module</label>
-                  <select style={inputStyle} value={testForm.moduleId} onChange={e => setTestForm(f => ({ ...f, moduleId: e.target.value }))}>
-                    <option value="">Select a module</option>
-                    {modules.map(m => <option key={m.id} value={m.id}>{m.title} ({courses.find(c => c.id === m.courseId)?.title || 'Unknown'})</option>)}
-                  </select>
-                </div>
-              )}
-              <div>
-                <label style={labelStyle}>Title</label>
-                <input style={inputStyle} placeholder="Test title" value={testForm.title} onChange={e => setTestForm(f => ({ ...f, title: e.target.value }))} />
-              </div>
-              <div>
-                <label style={labelStyle}>Description</label>
-                <textarea style={{ ...inputStyle, minHeight: 60, resize: 'vertical' }} placeholder="Test description" value={testForm.description} onChange={e => setTestForm(f => ({ ...f, description: e.target.value }))} />
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                <div>
-                  <label style={labelStyle}>Time Limit (minutes)</label>
-                  <input type="number" style={inputStyle} value={testForm.timeLimit} onChange={e => setTestForm(f => ({ ...f, timeLimit: parseInt(e.target.value) || 30 }))} min={1} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Passing Score (%)</label>
-                  <input type="number" style={inputStyle} value={testForm.passingScore} onChange={e => setTestForm(f => ({ ...f, passingScore: parseInt(e.target.value) || 70 }))} min={0} max={100} />
-                </div>
-              </div>
-            </div>
-            <div style={{ padding: '16px 24px', borderTop: '1px solid color-mix(in srgb, var(--border-color) 50%, transparent)', display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-              <button onClick={() => setShowTestForm(false)} className="btn" style={{ padding: '10px 24px', fontSize: 12, background: 'transparent', border: '1px solid color-mix(in srgb, var(--border-color) 60%, transparent)', color: 'var(--text-dim)' }}>Cancel</button>
-              <button onClick={editingTest ? handleUpdateTest : handleCreateTest} disabled={testsSaving} className="btn btn-primary" style={{ padding: '10px 24px', fontSize: 12 }}>
-                {testsSaving && <i className="fa-solid fa-spinner fa-spin" style={{ marginRight: 6 }}></i>}
-                {editingTest ? 'Update Test' : 'Create Test'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Question Form Modal */}
-      {showQuestionForm && (
-        <div style={modalOverlay} onClick={e => { if (e.target === e.currentTarget) setShowQuestionForm(false); }}>
-          <div style={modalCard}>
-            <div style={{ padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid color-mix(in srgb, var(--border-color) 50%, transparent)' }}>
-              <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: 16, color: 'var(--text-light)' }}>Add Question</h3>
-              <button onClick={() => setShowQuestionForm(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-dim)', fontSize: 16, padding: 4 }}><i className="fa-solid fa-times"></i></button>
-            </div>
-            <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 18 }}>
-              <div>
-                <label style={labelStyle}>Question Text</label>
-                <textarea style={{ ...inputStyle, minHeight: 60, resize: 'vertical' }} placeholder="Enter your question" value={questionForm.questionText} onChange={e => setQuestionForm(f => ({ ...f, questionText: e.target.value }))} />
-              </div>
-              <div>
-                <label style={labelStyle}>Options</label>
-                {questionForm.options.map((opt, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                    <input type="radio" name="correctAnswer" checked={questionForm.correctAnswer === i} onChange={() => setQuestionForm(f => ({ ...f, correctAnswer: i }))} style={{ accentColor: 'var(--accent)' }} />
-                    <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-dim)', width: 20 }}>{String.fromCharCode(65 + i)}</span>
-                    <input style={inputStyle} placeholder={`Option ${String.fromCharCode(65 + i)}`} value={opt} onChange={e => { const newOpts = [...questionForm.options]; newOpts[i] = e.target.value; setQuestionForm(f => ({ ...f, options: newOpts })); }} />
-                  </div>
-                ))}
-                <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 4 }}>Select the radio button next to the correct answer.</div>
-              </div>
-              <div>
-                <label style={labelStyle}>Points</label>
-                <input type="number" style={{ ...inputStyle, width: 100 }} value={questionForm.points} onChange={e => setQuestionForm(f => ({ ...f, points: parseInt(e.target.value) || 1 }))} min={1} />
-              </div>
-            </div>
-            <div style={{ padding: '16px 24px', borderTop: '1px solid color-mix(in srgb, var(--border-color) 50%, transparent)', display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-              <button onClick={() => setShowQuestionForm(false)} className="btn" style={{ padding: '10px 24px', fontSize: 12, background: 'transparent', border: '1px solid color-mix(in srgb, var(--border-color) 60%, transparent)', color: 'var(--text-dim)' }}>Cancel</button>
-              <button onClick={handleAddQuestion} disabled={testsSaving} className="btn btn-primary" style={{ padding: '10px 24px', fontSize: 12 }}>
-                {testsSaving && <i className="fa-solid fa-spinner fa-spin" style={{ marginRight: 6 }}></i>}Add Question
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ═══ GLOBAL MODALS ═══ */}
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} query={searchQuery} setQuery={setSearchQuery} results={filteredSearch} onSelect={(link) => { router.push(link); setSearchOpen(false); }} />

@@ -2,8 +2,6 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  // Enable instrumentation.ts — runs DB migrations before serving requests
-  instrumentationHook: true,
   // SECURITY: Do not ignore TypeScript errors — they should be caught and fixed
   typescript: {
     ignoreBuildErrors: false,
