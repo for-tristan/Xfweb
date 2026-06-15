@@ -113,9 +113,18 @@ export function usePageFeatures() {
   const scrollToSection = useCallback((sectionId: string) => {
     setMobileMenuOpen(false);
     const doScroll = () => {
+      const lenis = (window as any).__lenis;
+      // 'home' = scroll to very top (pinned hero can't be scrollIntoView'd)
+      if (sectionId === 'home') {
+        if (lenis) {
+          lenis.scrollTo(0, { duration: 1.2 });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        return;
+      }
       const el = document.getElementById(sectionId);
       if (!el) return;
-      const lenis = (window as any).__lenis;
       if (lenis) {
         lenis.scrollTo(el, { offset: 0, duration: 1.2 });
       } else {

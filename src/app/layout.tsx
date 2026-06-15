@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -66,7 +65,6 @@ export default function RootLayout({
       </head>
       <body className="xf-body">
         <a href="#main-content" className="skip-link">Skip to main content</a>
-        <Script src="/js/particles.min.js" strategy="beforeInteractive" />
         <ParticlesBackground />
         <ClickSplash />
         <ClientProviders>

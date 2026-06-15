@@ -3,136 +3,123 @@
 import { useEffect, useRef } from 'react';
 
 /**
- * ParticlesBackground — Replaces the old CSS-animated floating particles.
- * Uses particles.js (vanilla) loaded via <Script> in layout.tsx.
+ * ParticlesBackground — Pure canvas implementation.
+ * No external library dependency. Renders floating circles
+ * that drift gently across the viewport.
  *
- * The container and canvas both have pointer-events: none so clicks
- * pass through to all content (footer, links, buttons, etc.).
- * Interactivity (hover bubble, click repulse) is disabled since
- * pointer-events must be none to avoid blocking page interaction.
+ * Container and canvas both have pointer-events: none so
+ * all clicks pass through to page content (footer, links, etc.).
  */
 
-function getParticleColor(): string {
-  if (typeof window === 'undefined') return '#ffffff';
-  try {
-    const bg = getComputedStyle(document.documentElement).getPropertyValue('--black').trim();
-    const hex = bg.replace('#', '');
-    if (hex.length >= 6) {
-      const r = parseInt(hex.substring(0, 2), 16);
-      const g = parseInt(hex.substring(2, 4), 2);
-      const b = parseInt(hex.substring(4, 6), 16);
-      const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-      // On light backgrounds use a subtle dark color; on dark use white
-      return lum > 0.5 ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.6)';
-    }
-  } catch {}
-  return '#ffffff';
+interface Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  radius: number;
+  opacity: number;
+  opacityDir: number;
 }
 
 export default function ParticlesBackground() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const initializedRef = useRef(false);
-  const retryCountRef = useRef(0);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef<number>(0);
+  const particlesRef = useRef<Particle[]>([]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const tryInit = () => {
-      if (initializedRef.current) return;
-      if (!(window as any).particlesJS) {
-        // Script not loaded yet — retry up to 20 times with 300ms intervals
-        if (retryCountRef.current < 20) {
-          retryCountRef.current++;
-          setTimeout(tryInit, 300);
-        }
-        return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Determine particle color based on theme background
+    let particleColor = 'rgba(255,255,255,0.6)';
+    try {
+      const bg = getComputedStyle(document.documentElement).getPropertyValue('--black').trim();
+      const hex = bg.replace('#', '');
+      if (hex.length >= 6) {
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 2);
+        const b = parseInt(hex.substring(4, 6), 16);
+        const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        particleColor = lum > 0.5 ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.6)';
       }
-      if (!containerRef.current) return;
+    } catch {}
 
-      initializedRef.current = true;
-      const particleColor = getParticleColor();
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener('resize', resize);
 
-      (window as any).particlesJS(containerRef.current.id, {
-        particles: {
-          number: { value: 160, density: { enable: true, value_area: 800 } },
-          color: { value: particleColor },
-          shape: {
-            type: 'circle',
-            stroke: { width: 0, color: '#000000' },
-            polygon: { nb_sides: 5 },
-            image: { src: 'img/github.svg', width: 100, height: 100 },
-          },
-          opacity: {
-            value: 1,
-            random: true,
-            anim: { enable: true, speed: 1, opacity_min: 0, sync: false },
-          },
-          size: {
-            value: 3,
-            random: true,
-            anim: { enable: false, speed: 4, size_min: 0.3, sync: false },
-          },
-          line_linked: { enable: false, distance: 150, color: '#ffffff', opacity: 0.4, width: 1 },
-          move: {
-            enable: true,
-            speed: 1,
-            direction: 'none',
-            random: true,
-            straight: false,
-            out_mode: 'out',
-            bounce: false,
-            attract: { enable: false, rotateX: 600, rotateY: 600 },
-          },
-        },
-        interactivity: {
-          detect_on: 'canvas',
-          events: {
-            onhover: { enable: false, mode: 'bubble' },
-            onclick: { enable: false, mode: 'repulse' },
-            resize: true,
-          },
-          modes: {
-            grab: { distance: 400, line_linked: { opacity: 1 } },
-            bubble: { distance: 250, size: 0, duration: 2, opacity: 0, speed: 3 },
-            repulse: { distance: 400, duration: 0.4 },
-            push: { particles_nb: 4 },
-            remove: { particles_nb: 2 },
-          },
-        },
-        retina_detect: true,
+    // Create particles
+    const count = 160;
+    const particles: Particle[] = [];
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 1,
+        vy: (Math.random() - 0.5) * 1,
+        radius: Math.random() * 2 + 1,
+        opacity: Math.random(),
+        opacityDir: Math.random() > 0.5 ? 1 : -1,
       });
+    }
+    particlesRef.current = particles;
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (const p of particles) {
+        // Move
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Wrap around
+        if (p.x < -10) p.x = canvas.width + 10;
+        if (p.x > canvas.width + 10) p.x = -10;
+        if (p.y < -10) p.y = canvas.height + 10;
+        if (p.y > canvas.height + 10) p.y = -10;
+
+        // Animate opacity
+        p.opacity += p.opacityDir * 0.005;
+        if (p.opacity >= 1) { p.opacity = 1; p.opacityDir = -1; }
+        if (p.opacity <= 0) { p.opacity = 0; p.opacityDir = 1; }
+
+        // Draw
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = particleColor;
+        ctx.globalAlpha = p.opacity;
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+
+      rafRef.current = requestAnimationFrame(animate);
     };
 
-    tryInit();
+    rafRef.current = requestAnimationFrame(animate);
 
     return () => {
-      if (initializedRef.current && (window as any).pJSDom && (window as any).pJSDom.length > 0) {
-        try {
-          // Find and destroy our instance
-          const dom = (window as any).pJSDom;
-          for (let i = dom.length - 1; i >= 0; i--) {
-            if (dom[i]?.pJS?.canvas?.el?.parentElement?.id === 'xf-particles-js') {
-              dom[i].pJS.fn.vendors.destroypJS();
-              dom.splice(i, 1);
-            }
-          }
-        } catch {
-          // Ignore cleanup errors
-        }
-        initializedRef.current = false;
-      }
+      cancelAnimationFrame(rafRef.current);
+      window.removeEventListener('resize', resize);
     };
   }, []);
 
   return (
-    <div
-      ref={containerRef}
-      id="xf-particles-js"
+    <canvas
+      ref={canvasRef}
       style={{
         position: 'fixed',
         inset: 0,
         zIndex: 1,
         pointerEvents: 'none',
+        width: '100%',
+        height: '100%',
       }}
     />
   );

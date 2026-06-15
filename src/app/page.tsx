@@ -845,10 +845,20 @@ export default function Home() {
     setMobileMenuOpen(false);
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
+        const lenis = (window as any).__lenis;
+        // 'home' = scroll to very top (the hero section is pinned
+        // and becomes position:fixed/visibility:hidden when scrolled,
+        // so scrollIntoView/scrollTo(element) fails silently).
+        if (id === 'home') {
+          if (lenis) {
+            lenis.scrollTo(0, { duration: 1.2 });
+          } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+          return;
+        }
         const el = document.getElementById(id);
         if (!el) return;
-        // Prefer Lenis smooth scroll (handles the pinned hero correctly)
-        const lenis = (window as any).__lenis;
         if (lenis) {
           lenis.scrollTo(el, { offset: 0, duration: 1.2 });
         } else {

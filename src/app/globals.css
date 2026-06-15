@@ -1013,16 +1013,8 @@ select optgroup {
 .notif-panel .notif-unread {
     background: color-mix(in srgb, var(--accent) 4%, transparent) !important;
 }
-/* Particles container AND canvas: pointer-events: none so clicks pass
-   through to all content underneath (footer, links, buttons, etc.).
-   Interactivity (hover bubble, click repulse) is disabled since
-   pointer-events must be none. */
-#xf-particles-js {
-    pointer-events: none;
-}
-#xf-particles-js canvas {
-    pointer-events: none;
-}
+/* Particles background canvas: pointer-events: none so clicks pass
+   through to all content underneath (footer, links, buttons, etc.). */
 
 /* ── Click Splash Particles ── */
 .click-splash-container {
@@ -3991,7 +3983,7 @@ body {
   .particle,
   .cursor-dot,
   .cursor-ring,
-  #xf-particles-js,
+  canvas[style*="position: fixed"],
   .click-splash-container {
     display: none !important;
   }
