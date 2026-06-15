@@ -49,6 +49,8 @@ export default function DynamicCoursePage() {
   const router = useRouter();
   const params = useParams();
   const slug = params.slug as string;
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => { const check = () => setIsMobile(window.innerWidth < 768); check(); window.addEventListener('resize', check); return () => window.removeEventListener('resize', check); }, []);
 
   const {
     user, loading, minLoading, theme, toggleTheme, changeTheme, scrolled, mobileMenuOpen, setMobileMenuOpen,
@@ -488,12 +490,11 @@ export default function DynamicCoursePage() {
       {/* NAVBAR */}
       {!(loading || minLoading) && <Navbar activePage="courses" scrolled={scrolled} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} user={user} scrollToSection={scrollToSection} theme={theme} onToggleTheme={toggleTheme} onChangeTheme={changeTheme} onSearchOpen={() => setSearchOpen(true)} onOpenAuth={openAuthModal} onLogout={handleLogout} notifOpen={notifOpen} setNotifOpen={setNotifOpen} notifications={notifications} unreadCount={unreadCount} loadNotifications={loadNotifications} setNotifications={setNotifications} setUnreadCount={setUnreadCount} dashboardOpen={dashboardOpen} setDashboardOpen={setDashboardOpen} />}
 
-      {/* HERO */}
       {!(loading || minLoading) && <div className="page-transition-enter">
 
       {/* MAIN CONTENT */}
-      <section style={{ background: 'var(--black)', padding: '0 60px 80px', position: 'relative', overflow: 'hidden', zIndex: 2, paddingTop: 80 }}>
-        <div className="container-max">
+      <section style={{ background: 'var(--black)', padding: '100px 60px 80px', position: 'relative', overflow: 'hidden', zIndex: 2 }}>
+        <div className="container-max" style={{ paddingLeft: isMobile ? 16 : undefined, paddingRight: isMobile ? 16 : undefined }}>
           {/* Course header */}
           <div style={{ marginBottom: 32 }}>
             <div className="breadcrumb" style={{ marginBottom: 16 }}>
