@@ -13,6 +13,111 @@ async function requireAdmin() {
   return { error: null, user };
 }
 
+const WEBDEV_MODULES = [
+  {
+    courseId: 'web-dev-bootcamp',
+    title: 'HTML & CSS Foundations',
+    description: 'HTML structure, CSS styling, responsive design, Flexbox, Grid, semantic markup',
+    moduleOrder: 1,
+    content: `HTML (HyperText Markup Language) and CSS (Cascading Style Sheets) are the foundational building blocks of every website on the internet. In this module, you will learn how to structure content with HTML and style it beautifully with CSS, creating the visual foundation for all web applications.
+
+We begin with HTML fundamentals — the structure of an HTML document, DOCTYPE declarations, and the box model that underpins every element. You will learn semantic HTML5 elements like <header>, <nav>, <main>, <article>, <section>, and <footer>, and why using them correctly matters for accessibility and SEO. We cover headings, paragraphs, lists, links, images, forms, tables, and multimedia elements in depth.
+
+CSS is where design comes to life. You will master selectors (element, class, ID, attribute, pseudo-class, pseudo-element), the cascade and specificity rules, and the box model (content, padding, border, margin). We explore the CSS custom properties (variables) that make themes and design systems possible, and learn how to organize stylesheets using methodologies like BEM.
+
+Responsive design is no longer optional — it is essential. You will learn mobile-first design principles, media queries, fluid typography with clamp(), and viewport units. We dedicate significant time to CSS Flexbox for one-dimensional layouts and CSS Grid for two-dimensional layouts, including grid-template-areas, auto-fit/auto-fill, and subgrid.
+
+By the end of this module, you will be able to take a design mockup and convert it into a pixel-perfect, responsive web page using semantic HTML and modern CSS techniques. You will build a complete portfolio landing page as your first project.`,
+  },
+  {
+    courseId: 'web-dev-bootcamp',
+    title: 'JavaScript Essentials',
+    description: 'Variables, functions, DOM manipulation, events, async programming, ES6+ features',
+    moduleOrder: 2,
+    content: `JavaScript is the programming language of the web, and mastering it is essential for building interactive, dynamic applications. This module takes you from JavaScript basics to advanced concepts that professional developers use daily.
+
+We start with the fundamentals: variable declarations (let, const, and why var is avoided), data types (primitives vs reference types), operators, and control flow. You will understand type coercion, strict equality (===), and the quirks that make JavaScript both powerful and surprising.
+
+Functions are the backbone of JavaScript. We cover function declarations, expressions, arrow functions, default parameters, rest and spread operators, and closures — one of the most important concepts in JavaScript. You will understand scope (global, function, block), hoisting, and the execution context.
+
+DOM (Document Object Model) manipulation is how JavaScript interacts with web pages. You will learn to select elements (querySelector, querySelectorAll), modify content and attributes, create and remove elements, and work with CSS classes and inline styles. We cover event handling (click, submit, input, keyboard events), event delegation, and preventing default behaviors.
+
+Asynchronous JavaScript is critical for modern web development. We cover callbacks, Promises, async/await, the event loop, microtasks vs macrotasks, and error handling with try/catch. You will learn to make HTTP requests with the Fetch API, handle JSON data, and implement loading states and error boundaries.
+
+By the end of this module, you will build an interactive task manager application that uses DOM manipulation, event handling, localStorage for persistence, and asynchronous operations for data fetching.`,
+  },
+  {
+    courseId: 'web-dev-bootcamp',
+    title: 'React & Next.js',
+    description: 'Components, hooks, state management, server-side rendering, routing, data fetching',
+    moduleOrder: 3,
+    content: `React has revolutionized how we build user interfaces, and Next.js extends React with server-side rendering, routing, and production optimizations. This module teaches you both frameworks from the ground up.
+
+We begin with React fundamentals: JSX syntax, component composition, props, and the virtual DOM. You will understand why React uses a declarative approach and how reconciliation works under the hood. We cover functional components exclusively — class components are a legacy pattern you should understand but not use for new code.
+
+React Hooks are the modern way to manage state and side effects. You will master useState for local state, useEffect for side effects (data fetching, subscriptions, timers), useContext for shared state, useReducer for complex state logic, useMemo and useCallback for performance optimization, and useRef for DOM references and mutable values. We also cover custom hooks — how to extract reusable logic into composable functions.
+
+Next.js provides the full-stack framework layer on top of React. You will learn file-based routing (pages and app router), server components vs client components, server actions, layout patterns, and metadata management for SEO. We cover data fetching strategies: static generation (SSG), server-side rendering (SSR), incremental static regeneration (ISR), and client-side fetching.
+
+State management in larger applications requires patterns beyond useState. We cover the Context API for simple shared state, Zustand for lightweight global state management, and patterns for managing complex application state without prop drilling.
+
+By the end of this module, you will build a full-featured blog platform with dynamic routing, server-side rendering, authentication-aware components, and optimized data fetching using Next.js App Router patterns.`,
+  },
+  {
+    courseId: 'web-dev-bootcamp',
+    title: 'Backend with Node.js',
+    description: 'Express, REST APIs, authentication, middleware, WebSockets, file uploads',
+    moduleOrder: 4,
+    content: `Node.js enables JavaScript to run on the server, making it possible to build complete web applications using a single language throughout the stack. This module covers backend development with Node.js and Express.
+
+We start with Node.js fundamentals: the event loop, non-blocking I/O, the module system (CommonJS and ES Modules), and the built-in modules (fs, path, http, crypto). You will understand why Node.js excels at I/O-heavy applications and when it might not be the best choice.
+
+Express.js is the most popular Node.js web framework. You will learn to create RESTful APIs with routing, middleware, request/response handling, and error management. We cover HTTP methods (GET, POST, PUT, PATCH, DELETE), status codes, request validation, and API design best practices including versioning, pagination, and filtering.
+
+Authentication and authorization are critical for any real application. We implement JWT (JSON Web Token) authentication from scratch, covering token generation, verification, refresh tokens, and secure cookie-based storage. You will understand the difference between authentication (who are you?) and authorization (what can you do?), and implement role-based access control (RBAC).
+
+Database integration connects your API to persistent storage. We cover connecting to PostgreSQL with parameterized queries (preventing SQL injection), connection pooling, transactions, and migrations. You will also learn to work with Prisma ORM for type-safe database access.
+
+By the end of this module, you will build a complete REST API with user authentication, CRUD operations, file upload handling, input validation, rate limiting, and comprehensive error handling.`,
+  },
+  {
+    courseId: 'web-dev-bootcamp',
+    title: 'Database Design',
+    description: 'SQL, NoSQL, schema design, queries, migrations, ORMs, data modeling',
+    moduleOrder: 5,
+    content: `Every non-trivial application needs a database, and choosing the right one — along with designing an effective schema — is a skill that separates junior developers from senior engineers. This module covers database theory, SQL, NoSQL, and practical data modeling.
+
+We begin with relational database fundamentals: tables, rows, columns, primary keys, foreign keys, and relationships (one-to-one, one-to-many, many-to-many). You will learn normalization (1NF, 2NF, 3NF) and when to denormalize for performance. PostgreSQL is our primary SQL database, and you will master SELECT queries with JOINs (INNER, LEFT, RIGHT, FULL), subqueries, CTEs (Common Table Expressions), window functions, and aggregate functions.
+
+Indexing is crucial for performance. You will understand B-tree indexes, when to create them, covering indexes, partial indexes, and how to read query execution plans with EXPLAIN ANALYZE. We cover the N+1 query problem and how to solve it with eager loading or batch queries.
+
+NoSQL databases serve different use cases. We explore MongoDB for document storage, Redis for caching and sessions, and discuss when each is appropriate. You will understand CAP theorem, eventual consistency, and the trade-offs between SQL and NoSQL.
+
+Database migrations manage schema changes safely in production. We use Prisma Migrate for version-controlled schema evolution, covering creating migrations, applying them, rolling back, and seeding data. You will also learn about connection pooling, database backups, and monitoring.
+
+By the end of this module, you will design and implement a complete database schema for a real-world application, write optimized queries, set up migrations, and understand how to scale databases as your application grows.`,
+  },
+  {
+    courseId: 'web-dev-bootcamp',
+    title: 'Deployment & DevOps',
+    description: 'Cloud deployment, CI/CD, Docker, monitoring, SSL, domain setup, performance',
+    moduleOrder: 6,
+    content: `Building a great application is only half the battle — deploying it reliably and keeping it running smoothly is equally important. This module covers deployment strategies, DevOps practices, and production readiness.
+
+We start with cloud platforms: deploying Next.js applications to Vercel (the platform built by the Next.js team), traditional VPS hosting on DigitalOcean or Linode, and containerized deployment with Docker on AWS/GCP. You will understand the trade-offs between managed platforms (easy, more expensive) and self-hosted (more control, more responsibility).
+
+Docker containerizes your application for consistent environments across development, staging, and production. You will learn to write Dockerfiles, use multi-stage builds for smaller images, compose multi-container applications with Docker Compose, and manage container orchestration basics. We cover environment variable management, secrets handling, and container networking.
+
+CI/CD (Continuous Integration/Continuous Deployment) automates your development workflow. We set up GitHub Actions for running tests, linting, building, and deploying on every push. You will learn branch protection rules, preview deployments for pull requests, and rollback strategies when deployments fail.
+
+Domain and SSL configuration connects your application to the internet. We cover DNS records (A, CNAME, MX, TXT), domain registration, SSL/TLS certificates with Let's Encrypt and Cloudflare, and HTTPS best practices. You will configure custom domains for your deployed applications.
+
+Monitoring and observability ensure you know when things go wrong. We cover application logging (structured logs, log levels), error tracking with Sentry, performance monitoring, uptime monitoring, and alerting. You will set up a monitoring dashboard for your production application.
+
+By the end of this module, you will deploy a complete full-stack application to production with CI/CD, custom domain, HTTPS, monitoring, and automated backups — ready for real users.`,
+  },
+];
+
 const ML_MODULES = [
   {
     courseId: 'ml-bootcamp',
@@ -326,23 +431,54 @@ export async function POST() {
     const { error, user } = await requireAdmin();
     if (error) return error;
 
-    const allModules = [...ML_MODULES, ...LINUX_MODULES];
+    // Resolve course slugs to actual CUIDs
+    const courses = await db.course.findMany({ select: { id: true, slug: true } });
+    const slugToId = new Map(courses.map(c => [c.slug, c.id]));
+
+    const allModules = [...WEBDEV_MODULES, ...ML_MODULES, ...LINUX_MODULES];
 
     let created = 0;
     let skipped = 0;
+    let updated = 0;
+    let notFound = 0;
 
     for (const mod of allModules) {
+      // Resolve slug to real CUID
+      const realCourseId = slugToId.get(mod.courseId);
+      if (!realCourseId) {
+        console.warn(`[Seed] Course slug "${mod.courseId}" not found in DB — skipping module "${mod.title}"`);
+        notFound++;
+        continue;
+      }
+
       const existing = await db.courseModule.findFirst({
         where: {
-          courseId: mod.courseId,
+          courseId: realCourseId,
           moduleOrder: mod.moduleOrder,
         },
       });
 
       if (existing) {
-        skipped++;
+        // Update content if module exists but has no content
+        if (!existing.content || existing.content.trim() === '') {
+          await db.courseModule.update({
+            where: { id: existing.id },
+            data: { content: mod.content, title: mod.title, description: mod.description },
+          });
+          updated++;
+        } else {
+          skipped++;
+        }
       } else {
-        await db.courseModule.create({ data: mod });
+        await db.courseModule.create({
+          data: {
+            courseId: realCourseId,
+            title: mod.title,
+            description: mod.description,
+            content: mod.content,
+            moduleOrder: mod.moduleOrder,
+          },
+        });
         created++;
       }
     }
@@ -351,6 +487,8 @@ export async function POST() {
       message: 'Module seeding complete',
       created,
       skipped,
+      updated,
+      notFound,
       total: allModules.length,
     });
   } catch (error) {
