@@ -328,5 +328,6 @@ export async function ensureMigrations() {
   }
 }
 
-// Run migrations on first import (cold start)
-ensureMigrations().catch(() => {});
+// NOTE: Migrations are now run via src/instrumentation.ts on server startup,
+// which AWAITs ensureMigrations() before any requests are served.
+// This prevents race conditions where queries fire before columns exist.
