@@ -112,13 +112,21 @@ export function usePageFeatures() {
   // ── Scroll to section (for navbar hash links) ──
   const scrollToSection = useCallback((sectionId: string) => {
     setMobileMenuOpen(false);
+    const doScroll = () => {
+      const el = document.getElementById(sectionId);
+      if (!el) return;
+      const lenis = (window as any).__lenis;
+      if (lenis) {
+        lenis.scrollTo(el, { offset: 0, duration: 1.2 });
+      } else {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    };
     if (window.location.pathname === '/') {
-      document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+      doScroll();
     } else {
       router.push('/');
-      setTimeout(() => {
-        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
-      }, 500);
+      setTimeout(doScroll, 500);
     }
   }, [router]);
 

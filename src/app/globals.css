@@ -1013,14 +1013,15 @@ select optgroup {
 .notif-panel .notif-unread {
     background: color-mix(in srgb, var(--accent) 4%, transparent) !important;
 }
-/* Particles container: pointer-events: none so clicks pass through to
-   content underneath. The canvas inside needs pointer-events: auto so
-   particles.js can detect hover/repulse interactions. */
+/* Particles container AND canvas: pointer-events: none so clicks pass
+   through to all content underneath (footer, links, buttons, etc.).
+   Interactivity (hover bubble, click repulse) is disabled since
+   pointer-events must be none. */
 #xf-particles-js {
     pointer-events: none;
 }
 #xf-particles-js canvas {
-    pointer-events: auto;
+    pointer-events: none;
 }
 
 /* ── Click Splash Particles ── */

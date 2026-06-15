@@ -4,54 +4,57 @@ import { useEffect, useRef } from 'react';
 
 /**
  * ParticlesBackground — Replaces the old CSS-animated floating particles.
- * Uses particles.js (vanilla) loaded from /js/particles.min.js.
- * Renders a full-viewport canvas behind all content.
+ * Uses particles.js (vanilla) loaded via <Script> in layout.tsx.
  *
- * The container div has pointer-events: none so clicks pass through to
- * content underneath. The canvas inside gets pointer-events: auto (via CSS)
- * so particles.js hover/repulse interactions work.
+ * The container and canvas both have pointer-events: none so clicks
+ * pass through to all content (footer, links, buttons, etc.).
+ * Interactivity (hover bubble, click repulse) is disabled since
+ * pointer-events must be none to avoid blocking page interaction.
  */
 
 function getParticleColor(): string {
   if (typeof window === 'undefined') return '#ffffff';
-  // Read --black (page background) to decide particle visibility.
-  // On light themes --black is white-ish, on dark themes it's dark.
-  const bg = getComputedStyle(document.documentElement).getPropertyValue('--black').trim();
-  // If background is light, use dark particles; if dark, use light particles.
-  const hex = bg.replace('#', '');
-  if (hex.length >= 6) {
-    const r = parseInt(hex.substring(0, 2), 16);
-    const g = parseInt(hex.substring(2, 4), 2);
-    const b = parseInt(hex.substring(4, 6), 16);
-    const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    return lum > 0.5 ? '#999999' : '#ffffff';
-  }
+  try {
+    const bg = getComputedStyle(document.documentElement).getPropertyValue('--black').trim();
+    const hex = bg.replace('#', '');
+    if (hex.length >= 6) {
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 2);
+      const b = parseInt(hex.substring(4, 6), 16);
+      const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      // On light backgrounds use a subtle dark color; on dark use white
+      return lum > 0.5 ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.6)';
+    }
+  } catch {}
   return '#ffffff';
 }
 
 export default function ParticlesBackground() {
   const containerRef = useRef<HTMLDivElement>(null);
   const initializedRef = useRef(false);
+  const retryCountRef = useRef(0);
 
   useEffect(() => {
-    // Skip on server
     if (typeof window === 'undefined') return;
 
-    const initParticles = () => {
+    const tryInit = () => {
       if (initializedRef.current) return;
-      if (!(window as any).particlesJS) return;
+      if (!(window as any).particlesJS) {
+        // Script not loaded yet — retry up to 20 times with 300ms intervals
+        if (retryCountRef.current < 20) {
+          retryCountRef.current++;
+          setTimeout(tryInit, 300);
+        }
+        return;
+      }
       if (!containerRef.current) return;
 
       initializedRef.current = true;
-
       const particleColor = getParticleColor();
 
       (window as any).particlesJS(containerRef.current.id, {
         particles: {
-          number: {
-            value: 160,
-            density: { enable: true, value_area: 800 },
-          },
+          number: { value: 160, density: { enable: true, value_area: 800 } },
           color: { value: particleColor },
           shape: {
             type: 'circle',
@@ -69,13 +72,7 @@ export default function ParticlesBackground() {
             random: true,
             anim: { enable: false, speed: 4, size_min: 0.3, sync: false },
           },
-          line_linked: {
-            enable: false,
-            distance: 150,
-            color: '#ffffff',
-            opacity: 0.4,
-            width: 1,
-          },
+          line_linked: { enable: false, distance: 150, color: '#ffffff', opacity: 0.4, width: 1 },
           move: {
             enable: true,
             speed: 1,
@@ -90,8 +87,8 @@ export default function ParticlesBackground() {
         interactivity: {
           detect_on: 'canvas',
           events: {
-            onhover: { enable: true, mode: 'bubble' },
-            onclick: { enable: true, mode: 'repulse' },
+            onhover: { enable: false, mode: 'bubble' },
+            onclick: { enable: false, mode: 'repulse' },
             resize: true,
           },
           modes: {
@@ -106,28 +103,19 @@ export default function ParticlesBackground() {
       });
     };
 
-    // Check if particles.js is already loaded
-    if ((window as any).particlesJS) {
-      initParticles();
-    } else {
-      // Load the script
-      const script = document.createElement('script');
-      script.src = '/js/particles.min.js';
-      script.async = true;
-      script.onload = initParticles;
-      document.head.appendChild(script);
-    }
+    tryInit();
 
     return () => {
-      // Cleanup: destroy particles instance
       if (initializedRef.current && (window as any).pJSDom && (window as any).pJSDom.length > 0) {
         try {
-          const pjsInst = (window as any).pJSDom[0];
-          if (pjsInst && pjsInst.pJS && pjsInst.pJS.canvas) {
-            pjsInst.pJS.canvas.particles = [];
-            pjsInst.pJS.fn.particlesEmpty();
+          // Find and destroy our instance
+          const dom = (window as any).pJSDom;
+          for (let i = dom.length - 1; i >= 0; i--) {
+            if (dom[i]?.pJS?.canvas?.el?.parentElement?.id === 'xf-particles-js') {
+              dom[i].pJS.fn.vendors.destroypJS();
+              dom.splice(i, 1);
+            }
           }
-          (window as any).pJSDom = [];
         } catch {
           // Ignore cleanup errors
         }
@@ -143,7 +131,7 @@ export default function ParticlesBackground() {
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 0,
+        zIndex: 1,
         pointerEvents: 'none',
       }}
     />

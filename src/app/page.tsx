@@ -845,7 +845,15 @@ export default function Home() {
     setMobileMenuOpen(false);
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+        const el = document.getElementById(id);
+        if (!el) return;
+        // Prefer Lenis smooth scroll (handles the pinned hero correctly)
+        const lenis = (window as any).__lenis;
+        if (lenis) {
+          lenis.scrollTo(el, { offset: 0, duration: 1.2 });
+        } else {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
       });
     });
   };
@@ -859,7 +867,12 @@ export default function Home() {
       const poll = setInterval(() => {
         const el = document.getElementById(id);
         if (el) {
-          el.scrollIntoView({ behavior: 'smooth' });
+          const lenis = (window as any).__lenis;
+          if (lenis) {
+            lenis.scrollTo(el, { offset: 0, duration: 1.2 });
+          } else {
+            el.scrollIntoView({ behavior: 'smooth' });
+          }
           // Clean up hash without re-triggering
           history.replaceState(null, '', window.location.pathname);
           clearInterval(poll);
