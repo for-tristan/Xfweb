@@ -1013,9 +1013,14 @@ select optgroup {
 .notif-panel .notif-unread {
     background: color-mix(in srgb, var(--accent) 4%, transparent) !important;
 }
-/* Light-mode particles canvas visibility — ensure white dots show on light backgrounds */
-#xf-particles-js canvas {
+/* Particles container: pointer-events: none so clicks pass through to
+   content underneath. The canvas inside needs pointer-events: auto so
+   particles.js can detect hover/repulse interactions. */
+#xf-particles-js {
     pointer-events: none;
+}
+#xf-particles-js canvas {
+    pointer-events: auto;
 }
 
 /* ── Click Splash Particles ── */

@@ -2,6 +2,7 @@
 
 import React, { HTMLAttributes } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
@@ -52,7 +53,11 @@ const mdStyles: Record<string, React.CSSProperties> = {
   td: { padding: '10px 14px', border: '1px solid var(--border-color)', color: 'var(--text-dim)' },
   strong: { color: 'var(--text-light)', fontWeight: 700 },
   em: { fontStyle: 'italic' },
+  del: { textDecoration: 'line-through', color: 'var(--text-dim)' },
   img: { maxWidth: '100%', borderRadius: 4, margin: '12px 0' },
+  tr: { borderBottom: '1px solid var(--border-color)' },
+  thead: { background: 'var(--input-bg)' },
+  input: { marginRight: 8, accentColor: 'var(--accent)' },
 };
 
 export default function ModuleContent({ content }: { content: string }) {
@@ -100,6 +105,7 @@ export default function ModuleContent({ content }: { content: string }) {
         return (
           <div key={idx}>
             <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
               components={{
                 h1: ({ children }) => <h1 style={mdStyles.h1}>{children}</h1>,
                 h2: ({ children }) => <h2 style={mdStyles.h2}>{children}</h2>,
@@ -149,7 +155,11 @@ export default function ModuleContent({ content }: { content: string }) {
                 td: ({ children }) => <td style={mdStyles.td}>{children}</td>,
                 strong: ({ children }) => <strong style={mdStyles.strong}>{children}</strong>,
                 em: ({ children }) => <em style={mdStyles.em}>{children}</em>,
+                del: ({ children }) => <del style={mdStyles.del}>{children}</del>,
                 img: ({ src, alt }) => <img src={src} alt={alt || ''} style={mdStyles.img} />,
+                tr: ({ children }) => <tr style={mdStyles.tr}>{children}</tr>,
+                thead: ({ children }) => <thead style={mdStyles.thead}>{children}</thead>,
+                input: ({ checked, ...props }) => <input type="checkbox" defaultChecked={checked ?? false} style={mdStyles.input} disabled {...props} />,
               }}
             >
               {part.content}

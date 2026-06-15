@@ -569,7 +569,7 @@ export default function DynamicCoursePage() {
                     {mod.unlocked && expandedModule === mod.id && (() => {
                       const moduleTests = studentTests.filter(t => t.moduleId === mod.id);
                       return (
-                        <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--border-color)', paddingLeft: 56 }}>
+                        <div onClick={(e) => e.stopPropagation()} style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--border-color)', paddingLeft: 56 }}>
                           <ModuleContent content={mod.content} />
                           {moduleTests.length > 0 && (
                             <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--border-color)' }}>
