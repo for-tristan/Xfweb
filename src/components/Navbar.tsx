@@ -88,6 +88,7 @@ export function Navbar({
       { label: 'AI', ariaLabel: 'AI chatbot', link: '/chat', highlight: true },
     ] : []),
     ...(user && user.role === 'admin' ? [{ label: 'Admin', ariaLabel: 'Admin panel', link: '/admin' }] : []),
+    ...(user && user.role === 'instructor' ? [{ label: 'Instructor', ariaLabel: 'Instructor panel', link: '/instructor' }] : []),
   ];
 
   return (
@@ -149,6 +150,9 @@ export function Navbar({
           {user && user.role === 'admin' && (
             <li><Link href="/admin" style={{ color: 'var(--primary-red)' }}>Admin</Link></li>
           )}
+          {user && user.role === 'instructor' && (
+            <li><Link href="/instructor" style={{ color: 'var(--primary-red)' }}>Instructor</Link></li>
+          )}
         </ul>
 
         {/* Full desktop nav links — only shown on >1570px desktop */}
@@ -179,6 +183,9 @@ export function Navbar({
           {user && <li><Link href="/chat" className={`nav-ai-link${isActive('chat') ? ' active' : ''}`}>AI</Link></li>}
           {user && user.role === 'admin' && (
             <li><Link href="/admin" style={{ color: 'var(--primary-red)' }}>Admin</Link></li>
+          )}
+          {user && user.role === 'instructor' && (
+            <li><Link href="/instructor" style={{ color: 'var(--primary-red)' }}>Instructor</Link></li>
           )}
         </ul>
       </GlassSurface>

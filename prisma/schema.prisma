@@ -17,7 +17,7 @@ model User {
   company   String?
   avatar    String?
   bio       String?
-  role          String  @default("student")
+  role          String  @default("student")  // "student" | "instructor" | "admin"
   emailVerified DateTime?
   createdAt     DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -40,6 +40,7 @@ model User {
   sessions            Session[]
   gameScores          GameScore[]
   aiConversations     AiConversation[]
+  instructedCourses   Course[]      @relation("CourseInstructor")
 }
 
 model Enrollment {
@@ -270,10 +271,12 @@ model Course {
   prerequisites  String   @default("")
   displayOrder   Int      @default(0)
   techStack      String   @default("")
+  instructorId   String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  modules CourseModule[]
+  modules    CourseModule[]
+  instructor User?         @relation("CourseInstructor", fields: [instructorId], references: [id])
 }
 
 model TeamMember {

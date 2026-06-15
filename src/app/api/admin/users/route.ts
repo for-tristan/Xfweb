@@ -55,9 +55,9 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    if (!['student', 'admin'].includes(role)) {
+    if (!['student', 'instructor', 'admin'].includes(role)) {
       return NextResponse.json(
-        { error: 'Role must be "student" or "admin"' },
+        { error: 'Role must be "student", "instructor", or "admin"' },
         { status: 400 }
       );
     }

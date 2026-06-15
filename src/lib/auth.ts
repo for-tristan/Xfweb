@@ -1,5 +1,6 @@
 import { createHash, randomBytes, scryptSync } from 'crypto';
 import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
 // SECURITY: No fallback — throw if SESSION_SECRET is not set
@@ -172,4 +173,51 @@ export async function deleteAllUserSessions(userId: string): Promise<void> {
   } catch {
     // Ignore errors
   }
+}
+
+// ═══════════════════════════════════════════════════
+// ROLE-BASED ACCESS HELPERS
+// ═══════════════════════════════════════════════════
+
+type AuthUser = NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>;
+
+/**
+ * Require the current user to be an admin.
+ * Returns { error: NextResponse, user: null } on failure.
+ */
+export async function requireAdmin(): Promise<{ error: NextResponse | null; user: AuthUser | null }> {
+  const user = await getCurrentUser();
+  if (!user) return { error: NextResponse.json({ error: 'Not authenticated' }, { status: 401 }), user: null };
+  if (user.role !== 'admin') return { error: NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 }), user: null };
+  return { error: null, user };
+}
+
+/**
+ * Require the current user to be an instructor.
+ * Returns { error: NextResponse, user: null } on failure.
+ */
+export async function requireInstructor(): Promise<{ error: NextResponse | null; user: AuthUser | null }> {
+  const user = await getCurrentUser();
+  if (!user) return { error: NextResponse.json({ error: 'Not authenticated' }, { status: 401 }), user: null };
+  if (user.role !== 'instructor') return { error: NextResponse.json({ error: 'Forbidden: Instructor access required' }, { status: 403 }), user: null };
+  return { error: null, user };
+}
+
+/**
+ * Require the current user to be either an instructor or an admin.
+ * Admins get full access; instructors get course-scoped access.
+ * Returns { error: NextResponse | null, user: AuthUser | null, isInstructor: boolean, isAdmin: boolean }
+ */
+export async function requireInstructorOrAdmin(): Promise<{
+  error: NextResponse | null;
+  user: AuthUser | null;
+  isInstructor: boolean;
+  isAdmin: boolean;
+}> {
+  const user = await getCurrentUser();
+  if (!user) return { error: NextResponse.json({ error: 'Not authenticated' }, { status: 401 }), user: null, isInstructor: false, isAdmin: false };
+  const isInstructor = user.role === 'instructor';
+  const isAdmin = user.role === 'admin';
+  if (!isInstructor && !isAdmin) return { error: NextResponse.json({ error: 'Forbidden: Instructor or Admin access required' }, { status: 403 }), user: null, isInstructor: false, isAdmin: false };
+  return { error: null, user, isInstructor, isAdmin };
 }
