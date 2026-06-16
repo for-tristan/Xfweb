@@ -25,6 +25,7 @@ interface InstructorCourse {
   features: string[];
   prerequisites: string;
   techStack: string;
+  isGlobal: boolean;
   moduleCount: number;
   enrollmentCount: number;
   instructor?: { id: string; name: string; email: string; avatar: string | null };
@@ -836,7 +837,10 @@ export default function InstructorPage() {
                             <div style={{ fontSize: 12, color: 'var(--text-dim)' }}>{c.level} &middot; {c.duration}</div>
                           </div>
                         </div>
-                        <span style={{ padding: '3px 12px', borderRadius: 999, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', background: c.status === 'active' ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)', color: c.status === 'active' ? 'var(--success-color)' : 'var(--error-color)', border: c.status === 'active' ? '1px solid rgba(34,197,94,0.25)' : '1px solid rgba(239,68,68,0.25)' }}>{c.status}</span>
+                        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                          {c.isGlobal && <span style={{ padding: '3px 10px', borderRadius: 999, fontSize: 9, fontWeight: 700, textTransform: 'uppercase', background: 'rgba(99,102,241,0.12)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.25)', letterSpacing: 0.5 }}><i className="fa-solid fa-globe" style={{ marginRight: 4 }}></i>Global</span>}
+                          <span style={{ padding: '3px 12px', borderRadius: 999, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', background: c.status === 'active' ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)', color: c.status === 'active' ? 'var(--success-color)' : 'var(--error-color)', border: c.status === 'active' ? '1px solid rgba(34,197,94,0.25)' : '1px solid rgba(239,68,68,0.25)' }}>{c.status}</span>
+                        </div>
                       </div>
 
                       {c.description && <p style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{c.description}</p>}
@@ -851,9 +855,11 @@ export default function InstructorPage() {
                         <button onClick={() => openEditCourseForm(c)} className="btn btn-secondary" style={{ padding: '8px 16px', fontSize: 11 }}>
                           <i className="fa-solid fa-pen" style={{ marginRight: 6 }}></i>Edit
                         </button>
-                        <button onClick={() => handleDeleteCourse(c)} className="btn" style={{ padding: '8px 16px', fontSize: 11, background: 'transparent', border: '1px solid rgba(239,68,68,0.4)', color: 'var(--error-color)' }}>
-                          <i className="fa-solid fa-trash-alt" style={{ marginRight: 6 }}></i>Delete
-                        </button>
+                        {!c.isGlobal && (
+                          <button onClick={() => handleDeleteCourse(c)} className="btn" style={{ padding: '8px 16px', fontSize: 11, background: 'transparent', border: '1px solid rgba(239,68,68,0.4)', color: 'var(--error-color)' }}>
+                            <i className="fa-solid fa-trash-alt" style={{ marginRight: 6 }}></i>Delete
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))}

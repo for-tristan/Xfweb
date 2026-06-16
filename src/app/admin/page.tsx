@@ -81,6 +81,7 @@ interface AdminCourse {
   features: string[];
   prerequisites: string;
   techStack: string;
+  isGlobal: boolean;
   moduleCount?: number;
   createdAt: string;
   updatedAt: string;
@@ -2283,6 +2284,7 @@ export default function AdminPage() {
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4, flexWrap: 'wrap' }}>
                               <div style={{ fontWeight: 700, fontSize: 16, color: 'var(--text-light)' }}>{c.title}</div>
+                              {c.isGlobal && <span style={{ padding: '2px 10px', borderRadius: 999, fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, background: 'rgba(99,102,241,0.12)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.25)' }}><i className="fa-solid fa-globe" style={{ marginRight: 4 }}></i>Global</span>}
                               <span style={{ padding: '2px 10px', borderRadius: 999, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, background: c.status === 'active' ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)', color: c.status === 'active' ? 'var(--success-color)' : 'var(--error-color)', border: c.status === 'active' ? '1px solid rgba(34,197,94,0.25)' : '1px solid rgba(239,68,68,0.25)' }}>{c.status}</span>
                               <span style={{ padding: '2px 10px', borderRadius: 999, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, background: 'color-mix(in srgb, var(--accent) 10%, transparent)', color: 'var(--accent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)' }}>{c.level}</span>
                             </div>

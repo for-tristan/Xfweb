@@ -70,6 +70,7 @@ export async function POST(request: NextRequest) {
         features: features ? JSON.stringify(features) : '[]',
         prerequisites: prerequisites || '',
         techStack: techStack || '',
+        isGlobal: true,
       },
     });
 

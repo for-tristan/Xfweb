@@ -6,7 +6,12 @@ import { sendEnrollmentStatusEmail } from '@/lib/email';
 
 async function getInstructorCourseSlugs(instructorId: string): Promise<string[]> {
   const courses = await db.course.findMany({
-    where: { instructorId },
+    where: {
+      OR: [
+        { instructorId },
+        { isGlobal: true },
+      ],
+    },
     select: { slug: true },
   });
   return courses.map(c => c.slug);
@@ -21,7 +26,7 @@ async function verifyEnrollmentAccess(
   if (!isInstructor || !instructorId) return true;
 
   const course = await db.course.findUnique({ where: { slug: enrollmentCourseSlug } });
-  if (!course || course.instructorId !== instructorId) return false;
+  if (!course || (course.instructorId !== instructorId && !course.isGlobal)) return false;
   return true;
 }
 
@@ -96,7 +101,7 @@ export async function PUT(request: NextRequest) {
     }
 
     if (!(await verifyEnrollmentAccess(enrollment.courseId, user?.id, isInstructor))) {
-      return NextResponse.json({ error: 'Forbidden: You can only manage enrollments for your own courses' }, { status: 403 });
+      return NextResponse.json({ error: 'Forbidden: You can only manage enrollments for your own courses or global courses' }, { status: 403 });
     }
 
     const updated = await db.enrollment.update({
@@ -206,7 +211,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     if (!(await verifyEnrollmentAccess(enrollment.courseId, user?.id, isInstructor))) {
-      return NextResponse.json({ error: 'Forbidden: You can only delete enrollments for your own courses' }, { status: 403 });
+      return NextResponse.json({ error: 'Forbidden: You can only delete enrollments for your own courses or global courses' }, { status: 403 });
     }
 
     const userId = enrollment.userId;

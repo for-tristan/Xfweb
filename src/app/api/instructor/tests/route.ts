@@ -20,8 +20,8 @@ async function verifyTestAccess(
 
   if (isInstructor && instructorId) {
     const course = await db.course.findUnique({ where: { id: test.module.courseId } });
-    if (!course || course.instructorId !== instructorId) {
-      return { test: null, error: NextResponse.json({ error: 'Forbidden: You can only manage tests in your own courses' }, { status: 403 }) };
+    if (!course || (course.instructorId !== instructorId && !course.isGlobal)) {
+      return { test: null, error: NextResponse.json({ error: 'Forbidden: You can only manage tests in your own courses or global courses' }, { status: 403 }) };
     }
   }
 
@@ -42,8 +42,8 @@ async function verifyModuleCourseAccess(
 
   if (isInstructor && instructorId) {
     const course = await db.course.findUnique({ where: { id: module_.courseId } });
-    if (!course || course.instructorId !== instructorId) {
-      return { module: null, error: NextResponse.json({ error: 'Forbidden: You can only manage tests in your own courses' }, { status: 403 }) };
+    if (!course || (course.instructorId !== instructorId && !course.isGlobal)) {
+      return { module: null, error: NextResponse.json({ error: 'Forbidden: You can only manage tests in your own courses or global courses' }, { status: 403 }) };
     }
   }
 
@@ -107,7 +107,15 @@ export async function GET(request: NextRequest) {
     }
 
     const instructorCourseIds = isInstructor && user
-      ? (await db.course.findMany({ where: { instructorId: user.id }, select: { id: true } })).map(c => c.id)
+      ? (await db.course.findMany({
+          where: {
+            OR: [
+              { instructorId: user.id },
+              { isGlobal: true },
+            ],
+          },
+          select: { id: true },
+        })).map(c => c.id)
       : [];
 
     const moduleFilter = isInstructor

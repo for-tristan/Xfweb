@@ -12,7 +12,12 @@ export async function GET() {
 
     if (isInstructor && user) {
       const courses = await db.course.findMany({
-        where: { instructorId: user.id },
+        where: {
+          OR: [
+            { instructorId: user.id },
+            { isGlobal: true },
+          ],
+        },
         select: { id: true, slug: true },
       });
       courseSlugs = courses.map(c => c.slug);

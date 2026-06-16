@@ -8,11 +8,16 @@ async function getInstructorCourseIds(instructorId: string | undefined, isAdmin:
     const all = await db.course.findMany({ select: { id: true } });
     return all.map(c => c.id);
   }
-  const mine = await db.course.findMany({
-    where: { instructorId },
+  const accessible = await db.course.findMany({
+    where: {
+      OR: [
+        { instructorId },
+        { isGlobal: true },
+      ],
+    },
     select: { id: true },
   });
-  return mine.map(c => c.id);
+  return accessible.map(c => c.id);
 }
 
 export async function GET(request: NextRequest) {
@@ -90,8 +95,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Course not found' }, { status: 404 });
     }
 
-    if (isInstructor && course.instructorId !== user!.id) {
-      return NextResponse.json({ error: 'Forbidden: You can only add modules to your own courses' }, { status: 403 });
+    if (isInstructor && course.instructorId !== user!.id && !course.isGlobal) {
+      return NextResponse.json({ error: 'Forbidden: You can only add modules to your own courses or global courses' }, { status: 403 });
     }
 
     const module_ = await db.courseModule.create({
@@ -128,8 +133,8 @@ export async function PUT(request: NextRequest) {
 
       if (isInstructor) {
         const course = await db.course.findUnique({ where: { id: mod.courseId } });
-        if (!course || course.instructorId !== user!.id) {
-          return NextResponse.json({ error: 'Forbidden: You can only manage modules in your own courses' }, { status: 403 });
+        if (!course || (course.instructorId !== user!.id && !course.isGlobal)) {
+          return NextResponse.json({ error: 'Forbidden: You can only manage modules in your own courses or global courses' }, { status: 403 });
         }
       }
 
@@ -164,8 +169,8 @@ export async function PUT(request: NextRequest) {
         return NextResponse.json({ error: 'Course not found' }, { status: 404 });
       }
 
-      if (isInstructor && course.instructorId !== user!.id) {
-        return NextResponse.json({ error: 'Forbidden: You can only manage modules in your own courses' }, { status: 403 });
+      if (isInstructor && course.instructorId !== user!.id && !course.isGlobal) {
+        return NextResponse.json({ error: 'Forbidden: You can only manage modules in your own courses or global courses' }, { status: 403 });
       }
 
       const courseModules = await db.courseModule.findMany({ where: { courseId } });
@@ -196,8 +201,8 @@ export async function PUT(request: NextRequest) {
 
     if (isInstructor) {
       const course = await db.course.findUnique({ where: { id: existing.courseId } });
-      if (!course || course.instructorId !== user!.id) {
-        return NextResponse.json({ error: 'Forbidden: You can only update modules in your own courses' }, { status: 403 });
+      if (!course || (course.instructorId !== user!.id && !course.isGlobal)) {
+        return NextResponse.json({ error: 'Forbidden: You can only update modules in your own courses or global courses' }, { status: 403 });
       }
     }
 
@@ -234,8 +239,8 @@ export async function DELETE(request: NextRequest) {
 
       if (isInstructor) {
         const course = await db.course.findUnique({ where: { id: mod.courseId } });
-        if (!course || course.instructorId !== user!.id) {
-          return NextResponse.json({ error: 'Forbidden: You can only manage modules in your own courses' }, { status: 403 });
+        if (!course || (course.instructorId !== user!.id && !course.isGlobal)) {
+          return NextResponse.json({ error: 'Forbidden: You can only manage modules in your own courses or global courses' }, { status: 403 });
         }
       }
 
@@ -270,8 +275,8 @@ export async function DELETE(request: NextRequest) {
 
     if (isInstructor) {
       const course = await db.course.findUnique({ where: { id: mod.courseId } });
-      if (!course || course.instructorId !== user!.id) {
-        return NextResponse.json({ error: 'Forbidden: You can only delete modules in your own courses' }, { status: 403 });
+      if (!course || (course.instructorId !== user!.id && !course.isGlobal)) {
+        return NextResponse.json({ error: 'Forbidden: You can only delete modules in your own courses or global courses' }, { status: 403 });
       }
     }
 

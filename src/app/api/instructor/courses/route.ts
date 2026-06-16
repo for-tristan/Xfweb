@@ -9,7 +9,10 @@ export async function GET() {
 
     const whereClause: Record<string, unknown> = {};
     if (isInstructor && user) {
-      whereClause.instructorId = user.id;
+      whereClause.OR = [
+        { instructorId: user.id },
+        { isGlobal: true },
+      ];
     }
 
     const courses = await db.course.findMany({
@@ -117,8 +120,8 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Course not found' }, { status: 404 });
     }
 
-    if (isInstructor && existing.instructorId !== user!.id) {
-      return NextResponse.json({ error: 'Forbidden: You can only update your own courses' }, { status: 403 });
+    if (isInstructor && existing.instructorId !== user!.id && !existing.isGlobal) {
+      return NextResponse.json({ error: 'Forbidden: You can only update your own courses or global courses' }, { status: 403 });
     }
 
     const updateData: Record<string, unknown> = {
@@ -175,7 +178,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     if (isInstructor && existing.instructorId !== user!.id) {
-      return NextResponse.json({ error: 'Forbidden: You can only delete your own courses' }, { status: 403 });
+      return NextResponse.json({ error: 'Forbidden: Only the course owner or admin can delete courses' }, { status: 403 });
     }
 
     const slug = existing.slug;
