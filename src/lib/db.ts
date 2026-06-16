@@ -66,7 +66,14 @@ export async function ensureMigrations() {
 
     await addColumn('ModuleTest', 'status', "TEXT NOT NULL DEFAULT 'active'");
 
-    await addColumn('TestAttempt', 'startedat', "TEXT NOT NULL DEFAULT '{}'");
+    // TestAttempt.startedAt is a DateTime in the Prisma schema (@default(now())).
+    // The previous default '{}' was a copy-paste bug from the `answers` JSON
+    // column above — '{}' is not a valid ISO-8601 date and would produce
+    // Invalid Date when Prisma or `new Date(...)` reads it back. Use
+    // CURRENT_TIMESTAMP (UTC ISO-8601, which is what Prisma expects from
+    // SQLite DateTime columns) so any raw insert without an explicit
+    // startedAt still gets a valid timestamp.
+    await addColumn('TestAttempt', 'startedat', "DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP");
 
     await addColumn('CourseModule', 'content', "TEXT NOT NULL DEFAULT ''");
 
@@ -292,7 +299,7 @@ export async function ensureMigrations() {
       "score" INTEGER NOT NULL DEFAULT 0,
       "totalpoints" INTEGER NOT NULL DEFAULT 0,
       "passed" BOOLEAN NOT NULL DEFAULT false,
-      "startedat" TEXT NOT NULL DEFAULT '{}',
+      "startedat" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
       "submittedat" DATETIME,
       "createdat" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     `);

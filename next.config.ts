@@ -59,12 +59,14 @@ const nextConfig: NextConfig = {
               "frame-ancestors 'self'",
             ].join("; "),
           },
-          // HSTS — force HTTPS for 1 year (only in production with proper domain)
-          // Uncomment after confirming HTTPS is working correctly:
-          // {
-          //   key: "Strict-Transport-Security",
-          //   value: "max-age=31536000; includeSubDomains; preload",
-          // },
+          // HSTS — force HTTPS for 1 year, including subdomains.
+          // Browsers will refuse any plain-HTTP connection to this origin
+          // after seeing this header once, blocking SSL-strip / downgrade
+          // attacks on hostile networks (public Wi-Fi, captive portals).
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains; preload",
+          },
         ],
       },
     ];

@@ -648,7 +648,7 @@ export default function DynamicCoursePage() {
                       </select>
                     </div>
                     <WaveInput label="What motivates you? *" type="text" value={formMotivation} onChange={(e) => setFormMotivation(e.target.value)} required />
-                    <button type="submit" className="enroll-btn" disabled={enrolling}>
+                    <button type="submit" className="btn btn-primary" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 8 }} disabled={enrolling}>
                       <i className={enrolling ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-paper-plane'} /> {enrolling ? 'Submitting...' : 'Request Enrollment'}
                     </button>
                   </form>

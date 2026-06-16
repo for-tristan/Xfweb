@@ -33,24 +33,10 @@ async function runMigrations() {
   return { results };
 }
 
-export async function GET(request: NextRequest) {
-  try {
-    const user = await getCurrentUser();
-    if (!user || user.role !== 'admin') {
-      return NextResponse.json({ error: 'Unauthorized — admin only' }, { status: 403 });
-    }
-
-    const result = await runMigrations();
-    return NextResponse.json(result);
-  } catch (error: any) {
-    console.error('Migration error:', error);
-    return NextResponse.json(
-      { error: 'Migration failed' },
-      { status: 500 }
-    );
-  }
-}
-
+// NOTE: This endpoint mutates the database schema and must NOT be exposed via GET.
+// GET requests can be triggered by browsers prefetching links, by <img> tags,
+// or by CSRF-style navigation — none of which we want running migrations.
+// Use POST (admin-gated) to run migrations intentionally.
 export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser();
