@@ -407,7 +407,7 @@ export default function DashboardPage() {
       {renderNavbar('dashboard')}
 
       {!(loading || minLoading) && <div className="page-transition-enter">
-        <section style={{ background: 'var(--black)', padding: '140px 60px 160px', position: 'relative', zIndex: 2 }}>
+        <section style={{ background: 'var(--black)', padding: '180px 60px 160px', position: 'relative', zIndex: 2 }}>
           <div className="container-max" style={{ paddingLeft: isMobile ? 16 : undefined, paddingRight: isMobile ? 16 : undefined }}>
 
             <div className="reveal-up" style={{ marginBottom: isMobile ? 24 : 36, display: 'flex', alignItems: 'center', gap: isMobile ? 12 : 16 }}>

@@ -254,7 +254,7 @@ export default function StudyFocusPage() {
       <AuthGate loading={loading} minLoading={minLoading} user={user} onSignIn={() => openAuthModal('signin', 'Sign in to access Study Focus')} onSignUp={() => openAuthModal('signup')} />
 
       {!(loading || minLoading) && <div className="page-transition-enter">
-        <section style={{ background: 'var(--black)', padding: `${isMobile ? '140px 16px' : '140px 60px'} 160px`, position: 'relative', zIndex: 2 }}>
+        <section style={{ background: 'var(--black)', padding: `${isMobile ? '180px 16px' : '180px 60px'} 160px`, position: 'relative', zIndex: 2 }}>
           <div className="container-max">
             <div className="study-focus-grid">
               <div className="reveal-up reveal-delay-1 study-card" style={{
