@@ -60,7 +60,7 @@ export default function GamesPage() {
     scrollToSection,
   } = usePageFeatures();
 
-  const [selectedGame, setSelectedGame] = useState<string | null>(null);
+  const [selectedGame, setSelectedGame] = useState<string | null>('bug-hunter');
   const [selectedLang, setSelectedLang] = useState('python');
   const [selectedDiff, setSelectedDiff] = useState('easy');
   const [phase, setPhase] = useState<'select' | 'loading' | 'playing' | 'results' | 'leaderboard'>('select');
