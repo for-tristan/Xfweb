@@ -68,6 +68,7 @@ async function main() {
 
   // ── Course table ────────────────────────────────────────────────────
   await addColumn('Course', 'instructorId', 'TEXT');
+  await addColumn('Course', 'isGlobal', 'BOOLEAN NOT NULL DEFAULT 0');
   await addColumn('Course', 'description', "TEXT NOT NULL DEFAULT ''");
   await addColumn('Course', 'level', "TEXT NOT NULL DEFAULT 'Beginner'");
   await addColumn('Course', 'duration', "TEXT NOT NULL DEFAULT '4 Weeks'");

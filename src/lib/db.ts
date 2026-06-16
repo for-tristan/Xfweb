@@ -62,6 +62,7 @@ export async function ensureMigrations() {
     await addColumn('User', 'emailVerified', 'DATETIME');
 
     await addColumn('Course', 'instructorId', 'TEXT');
+    await addColumn('Course', 'isGlobal', 'BOOLEAN NOT NULL DEFAULT 0');
 
     await addColumn('ModuleTest', 'status', "TEXT NOT NULL DEFAULT 'active'");
 
