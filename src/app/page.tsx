@@ -1089,13 +1089,27 @@ export default function Home() {
           {availableCourses.length > 0 ? availableCourses.map((course, idx) => {
             const techTags = course.features.slice(0, 4);
             return (
-              <div key={course.id} className="v-course-card">
+              <div
+                key={course.id}
+                className="v-course-card"
+                role="button"
+                tabIndex={0}
+                onClick={() => router.push(`/courses/${course.id}`)}
+                onKeyDown={(e) => {
+                  // Enter / Space triggers navigation, matching native link behavior.
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    router.push(`/courses/${course.id}`);
+                  }
+                }}
+                aria-label={`View ${course.name} course details`}
+              >
                   <div className="v-course-body">
                     <div className="v-course-top-row">
                       <span className="v-course-category">{course.category}</span>
                       <span className="v-course-level">{course.level}</span>
                     </div>
-                    <h3 style={{ cursor: 'pointer' }} onClick={() => router.push(`/courses/${course.id}`)}>{course.name}</h3>
+                    <h3>{course.name}</h3>
                     <p>{course.description}</p>
                     <div className="v-course-meta">
                       <span><i className="fa-solid fa-clock"></i> {course.duration}</span>
@@ -1104,8 +1118,13 @@ export default function Home() {
                     <div className="v-course-tags">
                       {techTags.map((tag, ti) => <span key={ti} className="v-course-tag">{tag}</span>)}
                     </div>
-                    <div className="v-course-footer" style={{ justifyContent: 'flex-end' }}>
-                      <EnrollButton courseId={course.id} courseName={course.name} onEnroll={() => openEnrollModal(course)} status={enrollmentStatus[course.id]} />
+                    <div className="v-course-footer">
+                      <span className="v-course-view-link" aria-hidden="true">
+                        View Course <i className="fa-solid fa-arrow-right"></i>
+                      </span>
+                      <div onClick={(e) => e.stopPropagation()} style={{ display: 'inline-block' }}>
+                        <EnrollButton courseId={course.id} courseName={course.name} onEnroll={() => openEnrollModal(course)} status={enrollmentStatus[course.id]} />
+                      </div>
                     </div>
                   </div>
                 </div>
