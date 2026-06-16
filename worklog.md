@@ -471,3 +471,24 @@ Stage Summary:
 - Auth page is vibrant with gradient orbs, accent borders, glassmorphic card
 - Responsive: left panel hides on mobile, form goes full-width
 - Commit: 41ac9d8
+
+---
+Task ID: perf-landing-scroll
+Agent: main
+Task: Fix lag spikes and "random flying words" when scrolling on the landing page
+
+Work Log:
+- Read page.tsx + ScrollAnimations.tsx + ScrollFadeSection.tsx + ParticlesBackground.tsx + LenisProvider.tsx + GradualBlur.tsx + DraggableScroll.tsx + ClickSplash.tsx + PageTransition.tsx + useScroll3D.ts to identify perf culprits
+- Identified 7 compounding lag sources: unthrottled onScroll handler with sync DOM reads, per-frame filter:blur on pinned hero, nested ParallaxLayer inside ScrollFadeSection, 160-particle always-on canvas, always-on DraggableScroll rAF, 6 stacked backdrop-filter divs, long-running BlurText char animations
+- Fix 1: page.tsx onScroll — wrapped in rAF throttle, cached section offsetTop/offsetHeight (re-measured on debounced resize)
+- Fix 2: ScrollFadeSection — removed `filter: blur()` from per-frame loop (kept opacity+scale only). Eliminated `blur` from refs and target state. Updated willChange to drop `filter`.
+- Fix 3: page.tsx — removed <ParallaxLayer> wrapping inside the pinned <ScrollFadeSection> hero (eliminated double-transform). Trimmed unused imports (ParallaxLayer, TextSplitReveal, CounterAnimation, TiltCard, GlowButton, FloatingParticles, MorphingShape).
+- Fix 4: ParticlesBackground — reduced particle count 160 → 70 (40 on mobile, 25 if prefers-reduced-motion), capped FPS to ~30 (frameSkip every other rAF), pause rAF on tab hide (visibilitychange), split drawFrame into reusable function, lower particle velocity.
+- Fix 5: DraggableScroll — added IntersectionObserver to pause rAF when container scrolls offscreen, added visibilitychange listener to pause when tab hidden. Auto-resumes when visible again.
+- Fix 6: GradualBlur in page.tsx — reduced divCount 6 → 3, raised strength 1 → 1.2 to keep visual identical at half the GPU cost.
+- Fix 7: BlurText in page.tsx — reduced default stagger 0.02s → 0.012s, added `contain: layout paint` inline style. CSS: reduced blur radius 12px → 8px, reduced transition duration 0.5s → 0.32s, added `will-change: opacity, filter` on .blur-char. Whole word now finishes animating in <0.4s instead of 1s+ (no more "flying" perception while scrolling).
+- Fix 8: globals.css .v-section — added `content-visibility: auto` + `contain-intrinsic-size: 1px 700px` so offscreen sections skip paint/render work entirely.
+
+Stage Summary:
+- 5 files modified: src/app/page.tsx, src/components/ScrollFadeSection.tsx, src/components/ParticlesBackground.tsx, src/components/DraggableScroll.tsx, src/app/globals.css
+- Major wins: (a) eliminated per-frame filter:blur on the hero — this was the single biggest lag source, (b) halved ParticlesBackground CPU via fewer particles + 30 FPS cap + tab-hide pause, (c) eliminated layout-thrashing sync DOM reads in the scroll handler, (d) DraggableScroll no longer burns rAF when offscreen, (e) BlurText animations finish 2.5x faster so they no longer overlap with scroll-driven transforms (the "flying words" effect).

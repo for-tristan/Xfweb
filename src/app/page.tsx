@@ -14,7 +14,7 @@ import Link from 'next/link';
 import { Navbar } from '@/components/Navbar';
 import { WaveInput } from '@/components/WaveInput';
 import { WaveTextarea } from '@/components/WaveTextarea';
-import { SectionReveal, StaggerReveal, ScrollProgressBar, ParallaxLayer, TextSplitReveal, CounterAnimation, TiltCard, GlowButton, FloatingParticles, MorphingShape } from '@/components/ScrollAnimations';
+import { SectionReveal, StaggerReveal, ScrollProgressBar } from '@/components/ScrollAnimations';
 import { Logo } from '@/components/Logo';
 import GradualBlur from '@/components/GradualBlur';
 import ScrollFadeSection from '@/components/ScrollFadeSection';
@@ -91,7 +91,16 @@ const staticSearchData = [
 ];
 
 
-function BlurText({ text, tag = 'span', className = '', stagger = 0.02 }: { text: string; tag?: string; className?: string; stagger?: number }) {
+// Character-by-character reveal component (Vaulta SplitText style)
+// Reveals once on scroll into view — does NOT re-hide on scroll away to prevent lag spikes.
+//
+// Performance notes:
+//  - Default stagger reduced 0.02s -> 0.012s so the whole word finishes animating
+//    in <0.4s instead of running 1s+ (which made characters appear to "fly" while
+//    the user kept scrolling).
+//  - Per-char filter:blur is GPU-expensive; we keep it but cap the blur radius
+//    (see globals.css) and let CSS `contain` isolate the layout/paint work.
+function BlurText({ text, tag = 'span', className = '', stagger = 0.012 }: { text: string; tag?: string; className?: string; stagger?: number }) {
   const ref = useRef<HTMLElement>(null);
   const [revealed, setRevealed] = useState(false);
 
@@ -119,7 +128,7 @@ function BlurText({ text, tag = 'span', className = '', stagger = 0.02 }: { text
   ));
 
   const El = tag as any;
-  return <El ref={ref} className={`blur-text${revealed ? ' revealed' : ''} ${className}`}>{chars}</El>;
+  return <El ref={ref} className={`blur-text${revealed ? ' revealed' : ''} ${className}`} style={{ contain: 'layout paint' }}>{chars}</El>;
 }
 
 function FaqItem({ question, answer, index }: { question: string; answer: string; index: number }) {
@@ -438,23 +447,60 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [user, loadNotifications, loadFriends]);
 
+  // Scroll detection — rAF-throttled to avoid layout thrashing.
+  // Section positions are cached and only re-read on resize, so the per-frame
+  // work is just a few cheap comparisons.
   useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 80);
-      const distFromBottom = document.documentElement.scrollHeight - window.innerHeight - window.scrollY;
-      setAtBottom(distFromBottom < 80);
-      const scrollPos = window.scrollY + 150;
-      const ids = ['home', 'services', 'courses', 'contact'];
-      for (const id of ids) {
+    const SECTION_IDS = ['home', 'services', 'courses', 'contact'];
+    const sectionCache: Record<string, { top: number; height: number }> = {};
+
+    const measureSections = () => {
+      for (const id of SECTION_IDS) {
         const el = document.getElementById(id);
-        if (el && scrollPos >= el.offsetTop && scrollPos < el.offsetTop + el.offsetHeight) {
-          setActiveNav(id);
-          break;
+        if (el) {
+          sectionCache[id] = { top: el.offsetTop, height: el.offsetHeight };
         }
       }
     };
+    measureSections();
+
+    // Re-measure on resize (debounced) — layout shifts invalidate offsets
+    let resizeTimer: ReturnType<typeof setTimeout> | null = null;
+    const onResize = () => {
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(measureSections, 200);
+    };
+    window.addEventListener('resize', onResize, { passive: true });
+
+    let rafId: number | null = null;
+    const onScroll = () => {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        const scrollY = window.scrollY;
+        setScrolled(scrollY > 80);
+        const distFromBottom = document.documentElement.scrollHeight - window.innerHeight - scrollY;
+        setAtBottom(distFromBottom < 80);
+        const scrollPos = scrollY + 150;
+        for (const id of SECTION_IDS) {
+          const cached = sectionCache[id];
+          if (cached && scrollPos >= cached.top && scrollPos < cached.top + cached.height) {
+            setActiveNav(id);
+            break;
+          }
+        }
+      });
+    };
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    // Re-measure after fonts/images settle
+    const settleTimer = setTimeout(measureSections, 600);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+      if (resizeTimer) clearTimeout(resizeTimer);
+      clearTimeout(settleTimer);
+    };
   }, []);
 
   const [theme, setTheme] = useState<string>(() => {
@@ -898,24 +944,26 @@ export default function Home() {
           target="page"
           position="bottom"
           height="3.5rem"
-          strength={1}
-          divCount={6}
+          strength={1.2}
+          divCount={3}
           curve="bezier"
           exponential={false}
           opacity={1}
           zIndex={50}
         />
       )}
+      {/* HERO — Pinned + Fade on Scroll
+          (ParallaxLayer removed — stacking a second transform on top of the
+          pinned+scale+opacity transform from ScrollFadeSection was a major
+          cause of scroll jank and "flying" visual artifacts.) */}
       <ScrollFadeSection pin fadeDistance="60vh" zIndex={1}>
       <section className="v-hero" id="home">
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', position: 'relative', zIndex: 10 }}>
-          <ParallaxLayer speed={0.15}>
             <div style={{ position: 'relative', width: 720, height: 520, maxWidth: '90vw', maxHeight: '60vh' }}>
               <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
                 <VideoTemplate />
               </div>
             </div>
-          </ParallaxLayer>
         </div>
 
         <div className="scroll-indicator" style={{ left: 0, right: 0 }}>
