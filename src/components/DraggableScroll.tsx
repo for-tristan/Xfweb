@@ -43,13 +43,6 @@ export default function DraggableScroll({ children, className = '', autoSpeed = 
   const MAX_MOMENTUM = 600; // cap momentum so cards don't fly off
   const halfWidth = useRef(0);
 
-  // Measure the half-width for infinite loop
-  const measureHalfWidth = useCallback(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    halfWidth.current = track.scrollWidth / 2;
-  }, []);
-
   // ── Normalize position into the [-halfWidth, 0] range ──
   // This keeps targetPos and currentPos always within one loop cycle
   const normalizePosition = useCallback((pos: number) => {
@@ -59,11 +52,45 @@ export default function DraggableScroll({ children, className = '', autoSpeed = 
     return pos;
   }, []);
 
+  // Measure the half-width for infinite loop.
+  // Also normalize the current position into the new range so the track
+  // never gets stranded off-screen when content loads late.
+  const measureHalfWidth = useCallback(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const newHalf = track.scrollWidth / 2;
+    halfWidth.current = newHalf;
+    if (newHalf > 0) {
+      // Bring positions back into the valid [-halfWidth, 0] range so a
+      // previously-empty track (whose targetPos drifted to -5000px etc.)
+      // snaps back into view instead of staying off-screen forever.
+      targetPos.current = normalizePosition(targetPos.current);
+      currentPos.current = normalizePosition(currentPos.current);
+    } else {
+      // No content yet — reset positions so we don't accumulate drift.
+      targetPos.current = 0;
+      currentPos.current = 0;
+    }
+  }, [normalizePosition]);
+
   // ── Core animation loop ──
   const animate = useCallback(() => {
-    // Auto-scroll: move target leftward when not dragging and not paused
-    if (autoSpeed > 0 && !isDragging.current && !autoPaused.current) {
+    // Auto-scroll: move target leftward when not dragging and not paused.
+    // Skip when halfWidth is 0 (no content yet) so targetPos doesn't drift
+    // off-screen while waiting for children to load.
+    if (autoSpeed > 0 && !isDragging.current && !autoPaused.current && halfWidth.current > 0) {
       targetPos.current -= autoSpeed;
+    }
+
+    // If there's no content, hold the track at 0 and keep looping — we'll
+    // pick up real content when measureHalfWidth fires (ResizeObserver).
+    if (halfWidth.current <= 0) {
+      targetPos.current = 0;
+      currentPos.current = 0;
+      const track = trackRef.current;
+      if (track) track.style.transform = 'translate3d(0, 0, 0)';
+      animFrame.current = requestAnimationFrame(animate);
+      return;
     }
 
     // Normalize target into loop range
@@ -275,11 +302,26 @@ export default function DraggableScroll({ children, className = '', autoSpeed = 
       io.observe(container);
     }
 
+    // ── Re-measure when the track's content size changes ──
+    // This is critical: children often mount AFTER the carousel (e.g. async
+    // fetched project data). Without this, halfWidth stays at 0 and the
+    // track drifts off-screen. ResizeObserver fires when the track's
+    // border-box grows from 0 to its real size as children populate.
+    let ro: ResizeObserver | null = null;
+    const track = trackRef.current;
+    if (track && typeof ResizeObserver !== 'undefined') {
+      ro = new ResizeObserver(() => {
+        measureHalfWidth();
+      });
+      ro.observe(track);
+    }
+
     return () => {
       window.removeEventListener('resize', onResize);
       window.removeEventListener('mouseup', onGlobalMouseUp);
       document.removeEventListener('visibilitychange', onVisibility);
       if (io) io.disconnect();
+      if (ro) ro.disconnect();
       if (animFrame.current !== null) cancelAnimationFrame(animFrame.current);
       if (resumeTimer.current) clearTimeout(resumeTimer.current);
     };
