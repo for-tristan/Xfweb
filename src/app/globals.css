@@ -1855,17 +1855,17 @@ select optgroup {
 .blur-text .blur-char {
     display: inline;
     opacity: 0;
-    filter: blur(8px);
+    transform: translateY(0.4em);
     transition: none;
-    will-change: opacity, filter;
+    will-change: opacity, transform;
 }
 .blur-text.revealed {
     visibility: visible;
 }
 .blur-text.revealed .blur-char {
     opacity: 1;
-    filter: blur(0px);
-    transition: opacity 0.32s ease, filter 0.32s ease;
+    transform: translateY(0);
+    transition: opacity 0.32s ease, transform 0.32s ease;
 }
 .blur-text.revealed .blur-char.space {
     width: 0.3em;
@@ -4639,13 +4639,13 @@ body {
 }
 
 .reveal-up:not(.visible) .v-highlight {
-  filter: blur(10px);
   opacity: 0;
+  transform: translateY(0.3em);
 }
 .reveal-up.visible .v-highlight {
-  filter: blur(0);
   opacity: 1;
-  transition: filter 0.5s ease 0.15s, opacity 0.5s ease 0.15s;
+  transform: translateY(0);
+  transition: opacity 0.5s ease 0.15s, transform 0.5s ease 0.15s;
 }
 
 .v-card {

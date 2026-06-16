@@ -128,6 +128,13 @@ function BlurText({ text, tag = 'span', className = '', stagger = 0.012 }: { tex
   ));
 
   const El = tag as any;
+  // NOTE: chars animate opacity + translateY only. We deliberately do NOT use
+  // filter:blur() here — animating filter:blur on individual chars inside a
+  // parent that is also being transformed (SectionReveal translateY,
+  // ScrollFadeSection scale) forces the browser to re-rasterize each char's
+  // layer every frame, producing the "flying letters" visual artifact when
+  // scrolling through hero/services/projects sections. Opacity + a tiny
+  // translateY gives the same staggered-reveal feel without the repaint cost.
   return <El ref={ref} className={`blur-text${revealed ? ' revealed' : ''} ${className}`} style={{ contain: 'layout paint' }}>{chars}</El>;
 }
 
@@ -458,7 +465,17 @@ export default function Home() {
       for (const id of SECTION_IDS) {
         const el = document.getElementById(id);
         if (el) {
-          sectionCache[id] = { top: el.offsetTop, height: el.offsetHeight };
+          // Use getBoundingClientRect + scrollY instead of offsetTop.
+          // offsetTop is relative to offsetParent, which breaks when a
+          // section is inside a transformed/fixed container (the hero is
+          // wrapped in <ScrollFadeSection pin> which sets position:fixed
+          // on its inner div — offsetTop for #home then returns ~0
+          // relative to that fixed parent, not the document, so the
+          // scroll-spy never detects that the user has scrolled past it).
+          // getBoundingClientRect().top + scrollY gives the true
+          // document-absolute Y regardless of parent positioning.
+          const rect = el.getBoundingClientRect();
+          sectionCache[id] = { top: rect.top + window.scrollY, height: rect.height };
         }
       }
     };

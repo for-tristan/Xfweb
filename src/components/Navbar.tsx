@@ -118,64 +118,64 @@ export function Navbar({
           {isHome ? (
             <li><a href="#home" className={isActive('home') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('home'); }}>Home</a></li>
           ) : (
-            <li><Link href="/">Home</Link></li>
+            <li><Link href="/" className={isActive('home') ? 'active' : ''}>Home</Link></li>
           )}
           {isHome ? (
             <li><a href="#services" className={isActive('services') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('services'); }}>Services</a></li>
           ) : (
-            <li><Link href="/#services">Services</Link></li>
+            <li><Link href="/#services" className={isActive('services') ? 'active' : ''}>Services</Link></li>
           )}
           {isHome ? (
             <li><a href="#courses" className={isActive('courses') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('courses'); }}>Programs</a></li>
           ) : (
-            <li><Link href="/#courses">Programs</Link></li>
+            <li><Link href="/#courses" className={isActive('courses') ? 'active' : ''}>Programs</Link></li>
           )}
           {isHome ? (
             <li><a href="#contact" className={isActive('contact') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('contact'); }}>Contact</a></li>
           ) : (
-            <li><Link href="/#contact">Contact</Link></li>
+            <li><Link href="/#contact" className={isActive('contact') ? 'active' : ''}>Contact</Link></li>
           )}
           {user && <li><Link href="/games" className={isActive('games') ? 'active' : ''}>Games</Link></li>}
           {user && <li><Link href="/study" className={isActive('study') ? 'active' : ''}>Study</Link></li>}
           {user && <li><Link href="/dashboard" className={isActive('dashboard') ? 'active' : ''}>Dashboard</Link></li>}
           {user && <li><Link href="/chat" className={`nav-ai-link${isActive('chat') ? ' active' : ''}`}>AI</Link></li>}
           {user && user.role === 'admin' && (
-            <li><Link href="/admin" style={{ color: 'var(--primary-red)' }}>Admin</Link></li>
+            <li><Link href="/admin" className={isActive('admin') ? 'active' : ''} style={{ color: 'var(--primary-red)' }}>Admin</Link></li>
           )}
           {user && user.role === 'instructor' && (
-            <li><Link href="/instructor" style={{ color: 'var(--primary-red)' }}>Instructor</Link></li>
+            <li><Link href="/instructor" className={isActive('instructor') ? 'active' : ''} style={{ color: 'var(--primary-red)' }}>Instructor</Link></li>
           )}
         </ul>
         <ul className="nav-links" id="navLinks">
           {isHome ? (
             <li><a href="#home" className={isActive('home') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('home'); }}>Home</a></li>
           ) : (
-            <li><Link href="/">Home</Link></li>
+            <li><Link href="/" className={isActive('home') ? 'active' : ''}>Home</Link></li>
           )}
           {isHome ? (
             <li><a href="#services" className={isActive('services') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('services'); }}>Services</a></li>
           ) : (
-            <li><Link href="/#services">Services</Link></li>
+            <li><Link href="/#services" className={isActive('services') ? 'active' : ''}>Services</Link></li>
           )}
           {isHome ? (
             <li><a href="#courses" className={isActive('courses') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('courses'); }}>Programs</a></li>
           ) : (
-            <li><Link href="/#courses">Programs</Link></li>
+            <li><Link href="/#courses" className={isActive('courses') ? 'active' : ''}>Programs</Link></li>
           )}
           {isHome ? (
             <li><a href="#contact" className={isActive('contact') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('contact'); }}>Contact</a></li>
           ) : (
-            <li><Link href="/#contact">Contact</Link></li>
+            <li><Link href="/#contact" className={isActive('contact') ? 'active' : ''}>Contact</Link></li>
           )}
           {user && <li><Link href="/games" className={isActive('games') ? 'active' : ''}>Games</Link></li>}
           {user && <li><Link href="/study" className={isActive('study') ? 'active' : ''}>Study</Link></li>}
           {user && <li><Link href="/dashboard" className={isActive('dashboard') ? 'active' : ''}>Dashboard</Link></li>}
           {user && <li><Link href="/chat" className={`nav-ai-link${isActive('chat') ? ' active' : ''}`}>AI</Link></li>}
           {user && user.role === 'admin' && (
-            <li><Link href="/admin" style={{ color: 'var(--primary-red)' }}>Admin</Link></li>
+            <li><Link href="/admin" className={isActive('admin') ? 'active' : ''} style={{ color: 'var(--primary-red)' }}>Admin</Link></li>
           )}
           {user && user.role === 'instructor' && (
-            <li><Link href="/instructor" style={{ color: 'var(--primary-red)' }}>Instructor</Link></li>
+            <li><Link href="/instructor" className={isActive('instructor') ? 'active' : ''} style={{ color: 'var(--primary-red)' }}>Instructor</Link></li>
           )}
         </ul>
       </GlassSurface>
