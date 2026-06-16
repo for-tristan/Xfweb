@@ -835,7 +835,6 @@ select option {
     color: var(--text-light);
 }
 
-   CUSTOM DROPDOWN SELECTS — iOS /
 select {
     appearance: none;
     -webkit-appearance: none;
@@ -4588,8 +4587,6 @@ body {
   }
 }
 
-   VAULTA DESIGN SYSTEM — Light, Clean,
-
 .v-section-badge {
   display: inline-flex;
   align-items: center;
@@ -5842,7 +5839,6 @@ body {
   z-index: 2;
 }
 
-   PROJECTS — Infinite Marquee +
 .v-projects-showcase {
   position: relative;
   padding: 0 60px;
