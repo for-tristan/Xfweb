@@ -961,8 +961,8 @@ export default function Home() {
           target="page"
           position="bottom"
           height="3.5rem"
-          strength={1.2}
-          divCount={3}
+          strength={1.0}
+          divCount={2}
           curve="bezier"
           exponential={false}
           opacity={1}
