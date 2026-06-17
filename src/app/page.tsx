@@ -833,8 +833,6 @@ export default function Home() {
 
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false);
-    // Wake Lenis rAF loop in case it's idle-paused (it'll auto-stop after scroll settles)
-    window.dispatchEvent(new CustomEvent('xf:lenis-wake'));
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         const lenis = (window as any).__lenis;
@@ -864,8 +862,6 @@ export default function Home() {
       const poll = setInterval(() => {
         const el = document.getElementById(id);
         if (el) {
-          // Wake Lenis before scrolling (idle-paused rAF loop)
-          window.dispatchEvent(new CustomEvent('xf:lenis-wake'));
           const lenis = (window as any).__lenis;
           if (lenis) {
             lenis.scrollTo(el, { offset: 0, duration: 1.2 });

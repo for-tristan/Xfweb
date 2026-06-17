@@ -94,8 +94,6 @@ export function usePageFeatures() {
     setMobileMenuOpen(false);
     const doScroll = () => {
       const lenis = (window as any).__lenis;
-      // Wake Lenis rAF loop in case it's idle-paused, then it'll auto-stop after.
-      window.dispatchEvent(new CustomEvent('xf:lenis-wake'));
       if (sectionId === 'home') {
         if (lenis) {
           lenis.scrollTo(0, { duration: 1.2 });
