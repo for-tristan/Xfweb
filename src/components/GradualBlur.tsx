@@ -183,13 +183,18 @@ const GradualBlur: React.FC<GradualBlurProps> = props => {
   // GradualBlur stacks N (default 3-5) backdrop-filter:blur() divs on top
   // of each other, each of which forces a per-frame GPU re-raster of the
   // area behind it. On low-end devices that's prohibitive. Skip entirely.
-  const skipForLowEnd = useMemo(() => {
-    if (typeof navigator === 'undefined') return false;
+  //
+  // NOTE: useMemo runs during SSR too — must guard ALL browser-only APIs.
+  // Previously this called window.matchMedia unconditionally and broke
+  // the /games prerender with "window is not defined".
+  const [skipForLowEnd, setSkipForLowEnd] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') return;
     const cores = navigator.hardwareConcurrency || 4;
     const memory = (navigator as any).deviceMemory || 4;
     const saveData = (navigator as any).connection?.saveData === true;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    return saveData || reduceMotion || cores <= 4 || memory <= 4;
+    setSkipForLowEnd(saveData || reduceMotion || cores <= 4 || memory <= 4);
   }, []);
 
   const blurDivs = useMemo(() => {

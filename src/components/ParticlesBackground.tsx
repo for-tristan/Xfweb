@@ -63,7 +63,7 @@ function hexToRgb(hex: string): [number, number, number] | null {
  * Returns one of: 'skip' | 'minimal' | 'normal'
  */
 function getDeviceTier(): 'skip' | 'minimal' | 'normal' {
-  if (typeof navigator === 'undefined') return 'normal';
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') return 'normal';
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const saveData = (navigator as any).connection?.saveData === true;
   const cores = navigator.hardwareConcurrency || 4;
