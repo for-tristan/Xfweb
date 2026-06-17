@@ -16,8 +16,15 @@ import { useEffect, useRef } from 'react';
  *    so 30fps is visually identical to 60fps but halves the per-frame cost
  *  - Animation loop pauses when the tab is hidden (visibilitychange) so the
  *    rAF loop doesn't keep burning CPU in the background
+ *  - Animation loop ALSO pauses when the user is idle (no input for 3s) —
+ *    particles are decorative and don't need to keep moving when nobody is
+ *    looking. Resumes on any pointer/scroll/keyboard activity.
  *  - Color recalculation only happens when data-theme actually changes
  *  - Reduces particle count on small screens (mobile / narrow viewports)
+ *  - On low-end devices (≤4 logical cores or ≤4GB RAM), particle count is
+ *    halved and the idle-pause threshold is raised to 1.5s.
+ *  - On very low-end devices (≤2 cores OR save-data OR reduced-motion),
+ *    particles are skipped entirely.
  */
 
 interface Particle {
@@ -35,6 +42,9 @@ const LIGHT_THEMES = new Set([
   'honey', 'clay', 'sage', 'peach',
 ]);
 
+const IDLE_TIMEOUT_MS = 3000;
+const LOW_END_IDLE_MS = 1500;
+
 /**
  * Parse a hex color string into RGB components.
  */
@@ -48,16 +58,33 @@ function hexToRgb(hex: string): [number, number, number] | null {
   ];
 }
 
+/**
+ * Decide whether to skip particles entirely on this device.
+ * Returns one of: 'skip' | 'minimal' | 'normal'
+ */
+function getDeviceTier(): 'skip' | 'minimal' | 'normal' {
+  if (typeof navigator === 'undefined') return 'normal';
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const saveData = (navigator as any).connection?.saveData === true;
+  const cores = navigator.hardwareConcurrency || 4;
+  const memory = (navigator as any).deviceMemory || 4;
+
+  if (reduceMotion || saveData || cores <= 2) return 'skip';
+  if (cores <= 4 || memory <= 4) return 'minimal';
+  return 'normal';
+}
+
 export default function ParticlesBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>(0);
-  const particlesRef = useRef<Particle[]>([]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // Respect reduced-motion preference — render a single static frame
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const tier = getDeviceTier();
+
+    // Reduced-motion / very low-end: render nothing at all
+    if (tier === 'skip') return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -71,9 +98,11 @@ export default function ParticlesBackground() {
     resize();
     window.addEventListener('resize', resize);
 
-    // Scale particle count down on small screens
+    // Scale particle count down on small screens + low-end devices
     const w = window.innerWidth;
-    const count = prefersReducedMotion ? 25 : w < 768 ? 40 : w < 1280 ? 55 : 70;
+    const baseCount = w < 768 ? 40 : w < 1280 ? 55 : 70;
+    const count = tier === 'minimal' ? Math.floor(baseCount / 2) : baseCount;
+    const idleMs = tier === 'minimal' ? LOW_END_IDLE_MS : IDLE_TIMEOUT_MS;
 
     // Create particles
     const particles: Particle[] = [];
@@ -88,30 +117,26 @@ export default function ParticlesBackground() {
         opacityDir: Math.random() > 0.5 ? 1 : -1,
       });
     }
-    particlesRef.current = particles;
 
     // Cache: only recalculate color when theme attribute changes
     let lastTheme: string | null = '__UNINIT__';
     let particleR = 255;
     let particleG = 255;
     let particleB = 255;
-    let particleAlpha = 0.25; // for dark bg
+    let particleAlpha = 0.25;
 
     const recalcColor = () => {
       const themeAttr = document.documentElement.getAttribute('data-theme') || '';
       const isLight = LIGHT_THEMES.has(themeAttr);
 
-      // Read --accent from computed styles (updated by CSS when data-theme changes)
       const accentRaw = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
       const rgb = hexToRgb(accentRaw);
 
       if (rgb) {
-        // Use the theme's accent color at low opacity
         particleR = rgb[0];
         particleG = rgb[1];
         particleB = rgb[2];
       } else {
-        // Fallback: white on dark, dark on light
         if (isLight) {
           particleR = 0; particleG = 0; particleB = 0;
         } else {
@@ -119,12 +144,10 @@ export default function ParticlesBackground() {
         }
       }
 
-      // Alpha per theme type — light themes need higher alpha since bg is bright
       particleAlpha = isLight ? 0.35 : 0.3;
       lastTheme = themeAttr;
     };
 
-    // Single draw pass (used for the reduced-motion static frame)
     const drawFrame = () => {
       const currentTheme = document.documentElement.getAttribute('data-theme') || '';
       if (currentTheme !== lastTheme) recalcColor();
@@ -150,18 +173,27 @@ export default function ParticlesBackground() {
       ctx.globalAlpha = 1;
     };
 
-    if (prefersReducedMotion) {
-      drawFrame();
-      return () => {
-        window.removeEventListener('resize', resize);
-      };
-    }
-
-    // ── Animation loop with FPS cap + tab-visibility pause ──
-    // 30 FPS cap: skip every other rAF. Particles drift slowly so this is
-    // visually indistinguishable from 60 FPS but halves CPU/GPU cost.
+    // ── Animation loop with FPS cap + tab-visibility pause + idle pause ──
     let frameSkip = false;
-    let running = true;
+    let running = false;
+    let idleTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const stopLoop = () => {
+      if (!running) return;
+      running = false;
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+
+    const startLoop = () => {
+      if (running) return;
+      running = true;
+      rafRef.current = requestAnimationFrame(animate);
+    };
+
+    const scheduleIdleStop = () => {
+      if (idleTimer) clearTimeout(idleTimer);
+      idleTimer = setTimeout(stopLoop, idleMs);
+    };
 
     const animate = () => {
       if (!running) return;
@@ -175,28 +207,52 @@ export default function ParticlesBackground() {
       rafRef.current = requestAnimationFrame(animate);
     };
 
-    rafRef.current = requestAnimationFrame(animate);
+    // Kick off on mount, then auto-pause after idleMs of inactivity
+    startLoop();
+    scheduleIdleStop();
 
-    // Pause the loop when the tab is hidden — saves CPU/battery
+    // Resume loop on any user activity, then reset idle timer
+    const onUserActivity = () => {
+      startLoop();
+      scheduleIdleStop();
+    };
+    const activityEvents: Array<keyof WindowEventMap> = [
+      'pointermove',
+      'pointerdown',
+      'keydown',
+      'scroll',
+      'touchstart',
+      'wheel',
+    ];
+    activityEvents.forEach((evt) =>
+      window.addEventListener(evt, onUserActivity, { passive: true })
+    );
+
+    // Tab visibility: pause immediately when hidden, resume when visible + active
     const onVisibility = () => {
       if (document.hidden) {
-        running = false;
-        if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      } else if (!running) {
-        running = true;
-        rafRef.current = requestAnimationFrame(animate);
+        if (idleTimer) clearTimeout(idleTimer);
+        stopLoop();
+      } else {
+        startLoop();
+        scheduleIdleStop();
       }
     };
     document.addEventListener('visibilitychange', onVisibility);
 
     return () => {
-      running = false;
-      cancelAnimationFrame(rafRef.current);
+      if (idleTimer) clearTimeout(idleTimer);
+      stopLoop();
       window.removeEventListener('resize', resize);
+      activityEvents.forEach((evt) =>
+        window.removeEventListener(evt, onUserActivity)
+      );
       document.removeEventListener('visibilitychange', onVisibility);
     };
   }, []);
 
+  // Render the canvas even if we end up skipping (tier=skip returns early
+  // and never paints a frame, which is fine — canvas stays transparent).
   return (
     <canvas
       ref={canvasRef}

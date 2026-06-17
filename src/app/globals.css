@@ -1228,7 +1228,10 @@ select optgroup {
 }
 .orb {
     position: absolute; border-radius: 50%;
-    filter: blur(60px);
+    /* No filter:blur — the radial-gradient already fades to transparent, which
+       produces the same soft-glow look at a fraction of the GPU cost. CSS
+       filter:blur on a 500x500 element forces a constant offscreen raster
+       pass on every composite frame. */
     animation: orbFloat ease-in-out infinite;
     pointer-events: none;
     opacity: 0.7;
@@ -1236,13 +1239,13 @@ select optgroup {
 }
 .orb-1 {
     width: 500px; height: 500px;
-    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 60%);
+    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 18%, transparent) 0%, transparent 70%);
     top: -80px; left: -120px;
     animation-duration: 14s;
 }
 .orb-2 {
     width: 350px; height: 350px;
-    background: radial-gradient(circle, color-mix(in srgb, var(--accent-dark) 12%, transparent) 0%, transparent 55%);
+    background: radial-gradient(circle, color-mix(in srgb, var(--accent-dark) 22%, transparent) 0%, transparent 65%);
     bottom: 40px; right: -80px;
     animation-duration: 18s; animation-delay: -6s;
 }
@@ -3211,8 +3214,8 @@ select optgroup {
 .hero-orb {
     position: absolute;
     width: 400px; height: 400px;
-    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 8%, transparent) 0%, transparent 55%);
-    filter: blur(60px);
+    /* No filter:blur — radial-gradient already soft-fades to transparent. */
+    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 16%, transparent) 0%, transparent 70%);
     top: -60px; right: -100px;
     animation: orbFloat ease-in-out infinite;
     pointer-events: none;
@@ -3262,7 +3265,9 @@ select optgroup {
     background-size: 200% 100%;
     -webkit-background-clip: text; background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: v-gradient-shift 4s ease infinite;
+    /* Static gradient — no animation. Animating background-position on
+       background-clip:text forces a text raster repaint every frame,
+       which is always-on GPU cost for a barely-perceptible shimmer. */
     padding: 0 0.05em;
 }
 .page-subtitle { font-size: 18px; color: var(--text-dim); max-width: 600px; margin: 0 auto; line-height: 1.7; }
@@ -4634,7 +4639,7 @@ body {
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: v-gradient-shift 4s ease infinite;
+  /* Static gradient — see .hero-content h1 .v-highlight for rationale. */
   padding: 0 0.05em;
 }
 
@@ -4917,7 +4922,7 @@ body {
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: v-gradient-shift 4s ease infinite;
+  /* Static gradient — see .hero-content h1 .v-highlight for rationale. */
   padding: 0 0.05em;
 }
 .v-hero-subtitle {

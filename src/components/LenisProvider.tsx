@@ -3,6 +3,23 @@
 import { useEffect, useRef } from 'react';
 import Lenis from 'lenis';
 
+/**
+ * LenisProvider — smooth-scroll wrapper that DOESN'T burn a 60fps rAF loop
+ * forever. The rAF loop only runs while scrolling is actually happening
+ * (or for a short tail after the last input). When idle, the loop is
+ * cancelled entirely so the browser can sleep the compositor.
+ *
+ * How it works:
+ *  - On any wheel/touch/keydown/pointerdown/scroll event, we (re)start
+ *    the rAF loop and reset an idle timer.
+ *  - When the idle timer fires (default 400ms after last input), we
+ *    cancel the rAF. Lenis keeps its internal state so the next input
+ *    resumes seamlessly.
+ *  - We also start the loop once on mount so anchor-link/smooth-scroll
+ *    programmatic calls work.
+ */
+const IDLE_TIMEOUT_MS = 400;
+
 export default function LenisProvider({ children }: { children: React.ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null);
 
@@ -42,16 +59,73 @@ export default function LenisProvider({ children }: { children: React.ReactNode 
       window.dispatchEvent(new CustomEvent('xf:lenis-scroll'));
     });
 
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
+    // ── Gated rAF loop: only runs while user is interacting ──
+    let rafId: number | null = null;
+    let idleTimer: ReturnType<typeof setTimeout> | null = null;
+    let running = false;
 
-    requestAnimationFrame(raf);
+    const stopLoop = () => {
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      running = false;
+    };
+
+    const raf = (time: number) => {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
+    };
+
+    const startLoop = () => {
+      if (running) return;
+      running = true;
+      rafId = requestAnimationFrame(raf);
+    };
+
+    const scheduleStop = () => {
+      if (idleTimer) clearTimeout(idleTimer);
+      idleTimer = setTimeout(stopLoop, IDLE_TIMEOUT_MS);
+    };
+
+    const onUserInput = () => {
+      startLoop();
+      scheduleStop();
+    };
+
+    // Kick off once on mount so programmatic smooth-scrolls work
+    startLoop();
+    scheduleStop();
+
+    // Listen for any input that might cause scrolling
+    const inputEvents: Array<keyof WindowEventMap> = [
+      'wheel',
+      'touchstart',
+      'touchmove',
+      'keydown',
+      'pointerdown',
+    ];
+    inputEvents.forEach((evt) =>
+      window.addEventListener(evt, onUserInput, { passive: true })
+    );
+
+    // Custom event so other code can request the loop to wake
+    // (e.g. before calling lenis.scrollTo)
+    const onWake = () => {
+      startLoop();
+      scheduleStop();
+    };
+    window.addEventListener('xf:lenis-wake', onWake);
 
     (window as unknown as Record<string, unknown>).__lenis = lenis;
 
     return () => {
+      if (idleTimer) clearTimeout(idleTimer);
+      stopLoop();
+      inputEvents.forEach((evt) =>
+        window.removeEventListener(evt, onUserInput)
+      );
+      window.removeEventListener('xf:lenis-wake', onWake);
       lenis.destroy();
       (window as unknown as Record<string, unknown>).__lenis = null;
     };

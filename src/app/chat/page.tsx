@@ -550,19 +550,20 @@ function ChatContent() {
           position: absolute;
           border-radius: 50%;
           pointer-events: none;
-          filter: blur(100px);
+          /* No filter:blur — radial-gradient already soft-fades. Saves a constant
+             100px offscreen raster pass per composite frame on the chat page. */
           z-index: 0;
         }
         .zai-bg-orb-1 {
           width: 500px; height: 500px;
           top: -120px; right: -100px;
-          background: radial-gradient(circle, color-mix(in srgb, var(--accent) 8%, transparent) 0%, transparent 70%);
+          background: radial-gradient(circle, color-mix(in srgb, var(--accent) 18%, transparent) 0%, transparent 75%);
           animation: zai-orb-float 20s ease-in-out infinite;
         }
         .zai-bg-orb-2 {
           width: 400px; height: 400px;
           bottom: -80px; left: -60px;
-          background: radial-gradient(circle, color-mix(in srgb, var(--accent) 5%, transparent) 0%, transparent 70%);
+          background: radial-gradient(circle, color-mix(in srgb, var(--accent) 12%, transparent) 0%, transparent 75%);
           animation: zai-orb-float 24s ease-in-out infinite reverse;
         }
         @keyframes zai-orb-float {
