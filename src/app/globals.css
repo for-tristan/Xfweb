@@ -1885,7 +1885,8 @@ select optgroup {
     position: absolute; bottom: 40px;
     left: 0; right: 0;
     display: flex; flex-direction: column; align-items: center; gap: 10px;
-    animation: bounce 2.5s ease-in-out infinite;
+    /* No infinite bounce — was burning CPU/GPU on every page that shows the
+       hero. A static scroll hint is just as clear visually. */
     z-index: 10;
     pointer-events: none;
 }
@@ -1896,12 +1897,17 @@ select optgroup {
 .scroll-line {
     width: 1px; height: 50px;
     background: linear-gradient(180deg, var(--primary-red), transparent);
-    animation: lineGrow 2.5s ease-in-out infinite;
+    /* One-shot entrance only — runs once on mount then stays at full height. */
+    animation: lineGrowOnce 1s ease-out 1 both;
 }
 @keyframes lineGrow {
     0% { transform: scaleY(0); transform-origin: top; opacity: 0; }
     50% { transform: scaleY(1); transform-origin: top; opacity: 1; }
     100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
+}
+@keyframes lineGrowOnce {
+    0% { transform: scaleY(0); transform-origin: top; opacity: 0; }
+    100% { transform: scaleY(1); transform-origin: top; opacity: 1; }
 }
 @keyframes bounce {
     0%,100% { transform: translateY(0); }

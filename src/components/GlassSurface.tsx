@@ -250,6 +250,14 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
         boxShadow: 'none',
       };
     } else {
+      // Use the actual prop values instead of hardcoded ones, so callers
+      // (like the Navbar) can request a cheaper blur/saturation.
+      // Previously this fallback hardcoded blur(16px) saturate(1.6) brightness(1.1)
+      // which was 2-3x more expensive than necessary for a small pill that
+      // doesn't need that level of glass fidelity.
+      const blurPx = Math.max(4, Math.min(20, blur));
+      const sat = Math.max(1, Math.min(2, saturation));
+      const filterStr = `blur(${blurPx}px) saturate(${sat})`;
       if (isDarkMode) {
         if (!backdropFilterSupported) {
           return {
@@ -261,9 +269,9 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
         } else {
           return {
             ...baseStyles,
-            background: 'rgba(255, 255, 255, 0.03)',
-            backdropFilter: 'blur(16px) saturate(1.6) brightness(1.1)',
-            WebkitBackdropFilter: 'blur(16px) saturate(1.6) brightness(1.1)',
+            background: `rgba(255, 255, 255, ${backgroundOpacity * 0.3})`,
+            backdropFilter: filterStr,
+            WebkitBackdropFilter: filterStr,
             border: '1px solid rgba(255, 255, 255, 0.1)',
             boxShadow: 'none',
           };
@@ -279,9 +287,9 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
         } else {
           return {
             ...baseStyles,
-            background: 'rgba(255, 255, 255, 0.04)',
-            backdropFilter: 'blur(16px) saturate(1.6) brightness(1.05)',
-            WebkitBackdropFilter: 'blur(16px) saturate(1.6) brightness(1.05)',
+            background: `rgba(255, 255, 255, ${backgroundOpacity * 0.4})`,
+            backdropFilter: filterStr,
+            WebkitBackdropFilter: filterStr,
             border: '1px solid rgba(255, 255, 255, 0.15)',
             boxShadow: 'none',
           };

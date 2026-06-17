@@ -179,6 +179,19 @@ const GradualBlur: React.FC<GradualBlurProps> = props => {
 
   const isVisible = useIntersectionObserver(containerRef, config.animated === 'scroll');
 
+  // ── Low-end device gate ───────────────────────────────────────────
+  // GradualBlur stacks N (default 3-5) backdrop-filter:blur() divs on top
+  // of each other, each of which forces a per-frame GPU re-raster of the
+  // area behind it. On low-end devices that's prohibitive. Skip entirely.
+  const skipForLowEnd = useMemo(() => {
+    if (typeof navigator === 'undefined') return false;
+    const cores = navigator.hardwareConcurrency || 4;
+    const memory = (navigator as any).deviceMemory || 4;
+    const saveData = (navigator as any).connection?.saveData === true;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    return saveData || reduceMotion || cores <= 4 || memory <= 4;
+  }, []);
+
   const blurDivs = useMemo(() => {
     const divs: React.ReactNode[] = [];
     const increment = 100 / config.divCount;
@@ -264,6 +277,12 @@ const GradualBlur: React.FC<GradualBlurProps> = props => {
       return () => clearTimeout(t);
     }
   }, [isVisible, animated, onAnimationComplete, duration]);
+
+  // Low-end devices: render nothing. The page is still fully functional
+  // without the gradual fade — it's a polish effect.
+  if (skipForLowEnd) {
+    return props.children ? <>{props.children}</> : null;
+  }
 
   return (
     <div
