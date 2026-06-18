@@ -1,4 +1,4 @@
-import { createHash, randomBytes, scryptSync } from 'crypto';
+import { createHash, randomBytes, scryptSync, timingSafeEqual } from 'crypto';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
@@ -6,6 +6,24 @@ import { db } from '@/lib/db';
 const SESSION_SECRET = process.env.SESSION_SECRET;
 if (!SESSION_SECRET) {
   console.error('[AUTH] FATAL: SESSION_SECRET environment variable is not set. Session tokens cannot be validated.');
+}
+
+/**
+ * Constant-time hex string comparison.
+ *
+ * Plain === short-circuits on the first mismatched byte, so the time it
+ * takes to reject a wrong password leaks how many leading bytes of the
+ * hash were correct — a textbook timing side-channel. crypto.timingSafeEqual
+ * requires equal-length Buffers, so we guard for length mismatch first
+ * (length itself is not sensitive — both hashes are fixed-width outputs).
+ */
+function safeCompareHex(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  try {
+    return timingSafeEqual(Buffer.from(a, 'hex'), Buffer.from(b, 'hex'));
+  } catch {
+    return false;
+  }
 }
 
 export function hashPassword(password: string): string {
@@ -16,7 +34,8 @@ export function hashPassword(password: string): string {
 
 export function verifyPassword(password: string, stored: string): boolean {
   if (!stored.includes(':')) {
-    const legacyMatch = createHash('sha256').update(password + 'x-foundry-salt').digest('hex') === stored;
+    const computedLegacy = createHash('sha256').update(password + 'x-foundry-salt').digest('hex');
+    const legacyMatch = safeCompareHex(computedLegacy, stored);
     if (legacyMatch) {
       console.warn('[AUTH] Legacy SHA-256 password verified. Consider forcing a password reset for this user.');
     }
@@ -25,7 +44,7 @@ export function verifyPassword(password: string, stored: string): boolean {
   const [salt, hash] = stored.split(':');
   if (!salt || !hash) return false;
   const computed = scryptSync(password, salt, 64).toString('hex');
-  return computed === hash;
+  return safeCompareHex(computed, hash);
 }
 
 export function createSessionToken(userId: string): string {

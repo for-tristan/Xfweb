@@ -33,7 +33,17 @@ export async function GET(request: NextRequest) {
       enrollmentCount: countMap.get(c.slug) || 0,
     }));
 
-    return NextResponse.json({ courses: parsed });
+    return NextResponse.json(
+      { courses: parsed },
+      {
+        headers: {
+          // Public homepage content — only changes when an admin edits it.
+          // CDN/browser can serve a fresh copy for 60s, and a stale copy
+          // for up to 5 min while revalidating in the background.
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        },
+      }
+    );
   } catch (error) {
     console.error('Public courses fetch error:', error);
     return NextResponse.json(

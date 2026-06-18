@@ -7,7 +7,14 @@ export async function GET() {
       orderBy: { displayOrder: 'asc' },
     });
 
-    return NextResponse.json({ members });
+    return NextResponse.json(
+      { members },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        },
+      }
+    );
   } catch (error) {
     console.error('Public team members fetch error:', error);
     return NextResponse.json(

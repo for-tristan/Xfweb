@@ -7,6 +7,10 @@ export async function GET() {
     const { error, user, isInstructor, isAdmin } = await requireInstructorOrAdmin();
     if (error) return error;
 
+    // For instructors, we first need to fetch their accessible course
+    // slugs/CUIDs (one round-trip) because those values are inputs to
+    // the subsequent filters. For admins, no preliminary fetch is
+    // needed — the queries below can all fire in parallel.
     let courseSlugs: string[] = [];
     let courseCUIDs: string[] = [];
 
@@ -24,52 +28,57 @@ export async function GET() {
       courseCUIDs = courses.map(c => c.id);
     }
 
-    const totalStudents = isAdmin
-      ? await db.enrollment.count({ where: { deletedAt: null, status: 'approved' } })
-      : await db.enrollment.count({
-          where: { deletedAt: null, status: 'approved', courseId: { in: courseSlugs } },
-        });
-
-    const pendingEnrollments = isAdmin
-      ? await db.enrollment.count({ where: { deletedAt: null, status: 'pending' } })
-      : await db.enrollment.count({
-          where: { deletedAt: null, status: 'pending', courseId: { in: courseSlugs } },
-        });
-
-    const approvedEnrollments = isAdmin
-      ? await db.enrollment.count({ where: { deletedAt: null, status: 'approved' } })
-      : await db.enrollment.count({
-          where: { deletedAt: null, status: 'approved', courseId: { in: courseSlugs } },
-        });
-
-    const coursePopularity = isAdmin
-      ? await db.enrollment.groupBy({
-          by: ['courseId', 'courseName'],
-          where: { deletedAt: null },
-          _count: { id: true },
-          orderBy: { _count: { id: 'desc' } },
-        })
-      : await db.enrollment.groupBy({
-          by: ['courseId', 'courseName'],
-          where: { deletedAt: null, courseId: { in: courseSlugs } },
-          _count: { id: true },
-          orderBy: { _count: { id: 'desc' } },
-        });
-
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    const recentEnrollments = isAdmin
-      ? await db.enrollment.findMany({
-          where: { deletedAt: null, enrolledAt: { gte: sevenDaysAgo } },
-          select: { enrolledAt: true, courseId: true, courseName: true, status: true },
-          orderBy: { enrolledAt: 'asc' },
-        })
-      : await db.enrollment.findMany({
-          where: { deletedAt: null, enrolledAt: { gte: sevenDaysAgo }, courseId: { in: courseSlugs } },
-          select: { enrolledAt: true, courseId: true, courseName: true, status: true },
-          orderBy: { enrolledAt: 'asc' },
-        });
+    // ── Parallelize the 6 independent queries ──
+    // Each branch (admin vs instructor) only differs in the WHERE clause,
+    // but the queries themselves never depend on each other's results.
+    // Previously this ran as 6 sequential awaits, so latency was the SUM
+    // of 6 libSQL round-trips. Now it's the MAX.
+    const enrollmentWhere = isAdmin
+      ? { deletedAt: null }
+      : { deletedAt: null, courseId: { in: courseSlugs } };
+
+    const [
+      totalStudents,
+      pendingEnrollments,
+      approvedEnrollments,
+      coursePopularity,
+      recentEnrollments,
+      testModules,
+    ] = await Promise.all([
+      db.enrollment.count({ where: { ...enrollmentWhere, status: 'approved' } }),
+      db.enrollment.count({ where: { ...enrollmentWhere, status: 'pending' } }),
+      db.enrollment.count({ where: { ...enrollmentWhere, status: 'approved' } }),
+      db.enrollment.groupBy({
+        by: ['courseId', 'courseName'],
+        where: enrollmentWhere,
+        _count: { id: true },
+        orderBy: { _count: { id: 'desc' } },
+      }),
+      db.enrollment.findMany({
+        where: { ...enrollmentWhere, enrolledAt: { gte: sevenDaysAgo } },
+        select: { enrolledAt: true, courseId: true, courseName: true, status: true },
+        orderBy: { enrolledAt: 'asc' },
+      }),
+      isAdmin
+        ? db.moduleTest.findMany({
+            include: {
+              _count: { select: { attempts: true } },
+              attempts: { select: { passed: true } },
+              module: { select: { title: true, courseId: true } },
+            },
+          })
+        : db.moduleTest.findMany({
+            where: { module: { courseId: { in: courseCUIDs } } },
+            include: {
+              _count: { select: { attempts: true } },
+              attempts: { select: { passed: true } },
+              module: { select: { title: true, courseId: true } },
+            },
+          }),
+    ]);
 
     const dailyTrends: Record<string, number> = {};
     for (let i = 6; i >= 0; i--) {
@@ -82,23 +91,6 @@ export async function GET() {
       const key = e.enrolledAt.toISOString().split('T')[0];
       if (dailyTrends[key] !== undefined) dailyTrends[key]++;
     });
-
-    const testModules = isAdmin
-      ? await db.moduleTest.findMany({
-          include: {
-            _count: { select: { attempts: true } },
-            attempts: { select: { passed: true } },
-            module: { select: { title: true, courseId: true } },
-          },
-        })
-      : await db.moduleTest.findMany({
-          where: { module: { courseId: { in: courseCUIDs } } },
-          include: {
-            _count: { select: { attempts: true } },
-            attempts: { select: { passed: true } },
-            module: { select: { title: true, courseId: true } },
-          },
-        });
 
     const testPassRates = testModules.map((t) => {
       const totalAttempts = t.attempts.length;

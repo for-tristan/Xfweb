@@ -11,6 +11,19 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  // Allow next/image to optimize remote images from these hosts.
+  // Matches the hosts already allowed in the CSP img-src directive.
+  // NOTE: this is groundwork for swapping <img> -> <Image /> on the
+  // homepage. The actual <img> tags have NOT been converted yet
+  // because admin-entered imageUrl values are freeform — converting
+  // blindly would 500 on any host not listed here.
+  images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: 'res.cloudinary.com' },
+      { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
+      { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
+    ],
+  },
   // SECURITY: HTTP security headers for production
   async headers() {
     return [

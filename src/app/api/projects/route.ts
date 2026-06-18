@@ -13,7 +13,14 @@ export async function GET() {
       tags: JSON.parse(p.tags || '[]'),
     }));
 
-    return NextResponse.json({ projects: parsed });
+    return NextResponse.json(
+      { projects: parsed },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        },
+      }
+    );
   } catch (error) {
     console.error('Projects fetch error:', error);
     return NextResponse.json({ projects: [] });
