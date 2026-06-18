@@ -509,3 +509,25 @@ Stage Summary:
 - Commit d06bff6 pushed to origin/main on Xfweb
 - Net: -62 lines / +36 lines (smaller, simpler CSS)
 - Side benefit: killing cardGlowPulse removes another continuous-rAF-style box-shadow repaint loop (helps the GPU optimization work)
+
+---
+Task ID: project-card-frameless
+Agent: main
+Task: Remove the glassy container/frame from project showcase cards
+
+Work Log:
+- Analyzed uploaded screenshot via VLM — confirmed user wants the glassy translucent card holder gone
+- src/app/globals.css .v-project-showcase-card:
+  * Removed: background (was card-bg 55% mix), border (1px accent 10%), backdrop-filter blur(16px), box-shadow on hover (4-layer glow)
+  * Kept: width 420px, border-radius 1.25rem, overflow hidden, position relative
+  * Hover reduced to just translateY(-4px); no glow, no border shift
+- .v-projects-showcase:hover .v-project-showcase-card:not(:hover): replaced blur(4px)+scale(0.96)+opacity 0.5 with just opacity 0.55 (the blur/scale combo only made sense with a visible frame)
+- .v-project-showcase-img: added border-radius 1rem + the accent gradient background (moved up from .v-project-showcase-placeholder so the image tile reads as a distinct rounded tile even when no image). Added scale(1.02) on hover.
+- .v-project-showcase-placeholder: now just width/height 100% (gradient moved up to .img)
+- .v-project-showcase-info: padding 28px -> 20px 4px 0 (no card frame to inset from)
+- Removed dead .v-project-showcase-placeholder i + :hover i rules (FA icon was already gone)
+
+Stage Summary:
+- Commit deb864d pushed to origin/main on Xfweb
+- Net: -38 / +16 lines
+- Card is now frameless: image tile with rounded corners + accent gradient placeholder, text below floats directly on page background, hover gives a tiny lift + image scale, non-hovered cards dim slightly
