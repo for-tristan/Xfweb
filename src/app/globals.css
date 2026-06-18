@@ -1991,7 +1991,7 @@ select optgroup {
     backdrop-filter: blur(16px) saturate(1.4);
     -webkit-backdrop-filter: blur(16px) saturate(1.4);
     transform: translateY(-4px);
-    box-shadow: 0 12px 40px color-mix(in srgb, var(--accent) 15%, transparent);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 7%, transparent);
 }
 .service-card:hover::before { height: 100%; }
 
@@ -2085,7 +2085,7 @@ select optgroup {
     backdrop-filter: blur(16px) saturate(1.4);
     -webkit-backdrop-filter: blur(16px) saturate(1.4);
     transform: translateY(-4px);
-    box-shadow: 0 12px 40px color-mix(in srgb, var(--accent) 15%, transparent);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 7%, transparent);
 }
 
 .project-image {
@@ -4983,18 +4983,17 @@ body {
 }
 
 .v-service-card:hover {
-  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
   transform: translateY(-4px) scale(1.02);
   backdrop-filter: blur(16px) saturate(1.4);
   -webkit-backdrop-filter: blur(16px) saturate(1.4);
   box-shadow:
-    0 0 15px color-mix(in srgb, var(--accent) 15%, transparent),
-    0 0 30px color-mix(in srgb, var(--accent) 8%, transparent),
-    0 0 60px color-mix(in srgb, var(--accent) 4%, transparent),
-    0 20px 40px color-mix(in srgb, var(--accent) 10%, transparent),
-    inset 0 1px 0 color-mix(in srgb, var(--accent) 8%, transparent);
+    0 0 8px color-mix(in srgb, var(--accent) 7%, transparent),
+    0 0 16px color-mix(in srgb, var(--accent) 4%, transparent),
+    0 0 32px color-mix(in srgb, var(--accent) 2%, transparent),
+    0 12px 28px color-mix(in srgb, var(--accent) 5%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--accent) 4%, transparent);
   background: color-mix(in srgb, var(--card-bg) 70%, transparent);
-  animation: cardGlowPulse 2s ease-in-out infinite;
 }
 
 .v-services-grid:hover > .v-service-card:not(:hover) {
@@ -5080,36 +5079,17 @@ body {
 }
 
 .v-course-card:hover {
-  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
   transform: translateY(-3px);
   backdrop-filter: blur(16px) saturate(1.4);
   -webkit-backdrop-filter: blur(16px) saturate(1.4);
   box-shadow:
-    0 0 15px color-mix(in srgb, var(--accent) 15%, transparent),
-    0 0 30px color-mix(in srgb, var(--accent) 8%, transparent),
-    0 0 60px color-mix(in srgb, var(--accent) 4%, transparent),
-    0 16px 40px color-mix(in srgb, var(--accent) 8%, transparent),
-    inset 0 1px 0 color-mix(in srgb, var(--accent) 8%, transparent);
+    0 0 8px color-mix(in srgb, var(--accent) 7%, transparent),
+    0 0 16px color-mix(in srgb, var(--accent) 4%, transparent),
+    0 0 32px color-mix(in srgb, var(--accent) 2%, transparent),
+    0 10px 24px color-mix(in srgb, var(--accent) 4%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--accent) 4%, transparent);
   background: color-mix(in srgb, var(--card-bg) 70%, transparent);
-  animation: cardGlowPulse 2s ease-in-out infinite;
-}
-@keyframes cardGlowPulse {
-  0%, 100% {
-    box-shadow:
-      0 0 15px color-mix(in srgb, var(--accent) 15%, transparent),
-      0 0 30px color-mix(in srgb, var(--accent) 8%, transparent),
-      0 0 60px color-mix(in srgb, var(--accent) 4%, transparent),
-      0 16px 40px color-mix(in srgb, var(--accent) 8%, transparent),
-      inset 0 1px 0 color-mix(in srgb, var(--accent) 8%, transparent);
-  }
-  50% {
-    box-shadow:
-      0 0 20px color-mix(in srgb, var(--accent) 25%, transparent),
-      0 0 40px color-mix(in srgb, var(--accent) 14%, transparent),
-      0 0 80px color-mix(in srgb, var(--accent) 7%, transparent),
-      0 20px 50px color-mix(in srgb, var(--accent) 12%, transparent),
-      inset 0 1px 0 color-mix(in srgb, var(--accent) 12%, transparent);
-  }
 }
 .v-course-card.featured {
   background: var(--v-gradient);
@@ -5397,16 +5377,15 @@ body {
 }
 
 .v-team-card:hover {
-  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
   transform: translateY(-4px);
   box-shadow:
-    0 0 15px color-mix(in srgb, var(--accent) 15%, transparent),
-    0 0 30px color-mix(in srgb, var(--accent) 8%, transparent),
-    0 0 60px color-mix(in srgb, var(--accent) 4%, transparent),
-    0 20px 40px color-mix(in srgb, var(--accent) 8%, transparent),
-    inset 0 1px 0 color-mix(in srgb, var(--accent) 8%, transparent);
+    0 0 8px color-mix(in srgb, var(--accent) 7%, transparent),
+    0 0 16px color-mix(in srgb, var(--accent) 4%, transparent),
+    0 0 32px color-mix(in srgb, var(--accent) 2%, transparent),
+    0 12px 28px color-mix(in srgb, var(--accent) 4%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--accent) 4%, transparent);
   background: color-mix(in srgb, var(--card-bg) 70%, transparent);
-  animation: cardGlowPulse 2s ease-in-out infinite;
 }
 .v-team-avatar {
   width: 96px;
@@ -5808,16 +5787,15 @@ body {
 }
 
 .v-project-card:hover {
-  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
   transform: translateY(-4px);
   box-shadow:
-    0 0 15px color-mix(in srgb, var(--accent) 15%, transparent),
-    0 0 30px color-mix(in srgb, var(--accent) 8%, transparent),
-    0 0 60px color-mix(in srgb, var(--accent) 4%, transparent),
-    0 20px 40px color-mix(in srgb, var(--accent) 10%, transparent),
-    inset 0 1px 0 color-mix(in srgb, var(--accent) 8%, transparent);
+    0 0 8px color-mix(in srgb, var(--accent) 7%, transparent),
+    0 0 16px color-mix(in srgb, var(--accent) 4%, transparent),
+    0 0 32px color-mix(in srgb, var(--accent) 2%, transparent),
+    0 12px 28px color-mix(in srgb, var(--accent) 5%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--accent) 4%, transparent);
   background: color-mix(in srgb, var(--card-bg) 70%, transparent);
-  animation: cardGlowPulse 2s ease-in-out infinite;
 }
 .v-project-card .v-project-info {
   padding: 28px;
@@ -5925,13 +5903,13 @@ body {
   position: relative;
 }
 .v-project-showcase-card:hover {
-  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
-  transform: translateY(-6px) scale(1.02);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  transform: translateY(-4px) scale(1.01);
   box-shadow:
-    0 0 15px color-mix(in srgb, var(--accent) 15%, transparent),
-    0 0 30px color-mix(in srgb, var(--accent) 8%, transparent),
-    0 0 60px color-mix(in srgb, var(--accent) 4%, transparent),
-    0 20px 40px color-mix(in srgb, var(--accent) 10%, transparent);
+    0 0 8px color-mix(in srgb, var(--accent) 7%, transparent),
+    0 0 16px color-mix(in srgb, var(--accent) 4%, transparent),
+    0 0 32px color-mix(in srgb, var(--accent) 2%, transparent),
+    0 12px 28px color-mix(in srgb, var(--accent) 5%, transparent);
   background: color-mix(in srgb, var(--card-bg) 70%, transparent);
 }
 
@@ -5967,8 +5945,8 @@ body {
 }
 .v-project-showcase-card:hover .v-project-showcase-placeholder i {
   color: var(--accent);
-  transform: scale(1.1);
-  filter: drop-shadow(0 0 20px color-mix(in srgb, var(--accent) 40%, transparent));
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--accent) 20%, transparent));
 }
 
 .v-project-showcase-info {

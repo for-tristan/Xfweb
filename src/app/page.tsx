@@ -1037,9 +1037,7 @@ export default function Home() {
                   {project.imageUrl ? (
                     <img src={project.imageUrl} alt={project.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
-                    <div className="v-project-showcase-placeholder">
-                      <i className={project.icon || 'fa-solid fa-code'} />
-                    </div>
+                    <div className="v-project-showcase-placeholder" aria-hidden="true" />
                   )}
                 </div>
                 <div className="v-project-showcase-info">
@@ -1062,9 +1060,7 @@ export default function Home() {
                   {project.imageUrl ? (
                     <img src={project.imageUrl} alt={project.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
-                    <div className="v-project-showcase-placeholder">
-                      <i className={project.icon || 'fa-solid fa-code'} />
-                    </div>
+                    <div className="v-project-showcase-placeholder" aria-hidden="true" />
                   )}
                 </div>
                 <div className="v-project-showcase-info">
