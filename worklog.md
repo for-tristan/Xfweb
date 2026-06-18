@@ -492,3 +492,20 @@ Work Log:
 Stage Summary:
 - 5 files modified: src/app/page.tsx, src/components/ScrollFadeSection.tsx, src/components/ParticlesBackground.tsx, src/components/DraggableScroll.tsx, src/app/globals.css
 - Major wins: (a) eliminated per-frame filter:blur on the hero — this was the single biggest lag source, (b) halved ParticlesBackground CPU via fewer particles + 30 FPS cap + tab-hide pause, (c) eliminated layout-thrashing sync DOM reads in the scroll handler, (d) DraggableScroll no longer burns rAF when offscreen, (e) BlurText animations finish 2.5x faster so they no longer overlap with scroll-driven transforms (the "flying words" effect).
+
+---
+Task ID: cards-cleanup
+Agent: main
+Task: Remove FA icons from project cards + dim hover glow across all cards
+
+Work Log:
+- Removed `<i className={project.icon || 'fa-solid fa-code'} />` placeholders from both render loops (main + dup) in src/app/page.tsx — placeholder now an empty gradient block with aria-hidden
+- Dimmed hover box-shadow alpha on 5 v-* card types: v-service-card, v-course-card, v-team-card, v-project-card, v-project-showcase-card (15/8/4/10%% -> 7/4/2/5%%)
+- Removed @keyframes cardGlowPulse + all 4 animation refs (was causing continuous box-shadow repaints AND had a 25%% peak brightness pulse — too bright)
+- Dimmed legacy .service-card:hover and .project-card:hover (15%% -> 7%%)
+- Verified: tsc --noEmit passes clean
+
+Stage Summary:
+- Commit d06bff6 pushed to origin/main on Xfweb
+- Net: -62 lines / +36 lines (smaller, simpler CSS)
+- Side benefit: killing cardGlowPulse removes another continuous-rAF-style box-shadow repaint loop (helps the GPU optimization work)
