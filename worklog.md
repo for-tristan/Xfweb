@@ -608,3 +608,18 @@ Work Log:
 Stage Summary:
 - Commit d0e38ce pushed to origin/main on Xfweb
 - Service card FA icons now render as just the icon (accent-colored, slightly larger) — no red square behind them
+
+---
+Task ID: service-desc-cleanup
+Agent: main
+Task: Remove service description from landing card + dedupe on detail page
+
+Work Log:
+- src/app/page.tsx: removed <p>{service.description}</p> from .v-service-card. Card now shows: icon, title, "Learn More →" link only.
+- src/app/services/[slug]/page.tsx: removed the duplicate <p>{service.description}</p> that appeared under the "What We Deliver" H2. The description is still rendered once as the page-subtitle under the H1 title (the canonical location).
+- tsc --noEmit clean.
+
+Stage Summary:
+- Commit feda959 pushed to origin/main on Xfweb
+- Landing service cards are now minimal (icon + title + link)
+- Service detail page no longer shows the description twice — it appears once under the page title, then "What We Deliver" goes straight into the features list
