@@ -5002,21 +5002,13 @@ body {
   opacity: 0.6;
 }
 .v-service-card .v-service-icon {
-  width: 48px;
-  height: 48px;
-  background: color-mix(in srgb, var(--accent) 8%, transparent);
-  border: 1px solid color-mix(in srgb, var(--accent) 15%, transparent);
-  border-radius: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   color: var(--accent);
-  font-size: 20px;
+  font-size: 24px;
   margin-bottom: 20px;
-  transition: all 0.3s ease;
+  display: inline-block;
+  transition: transform 0.3s ease;
 }
 .v-service-card:hover .v-service-icon {
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
   transform: translateY(-2px);
 }
 .v-service-card h3 {
