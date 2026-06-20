@@ -1033,13 +1033,11 @@ export default function Home() {
           {dynamicProjects.length > 0 && <>
             {dynamicProjects.map((project) => (
               <div key={project.id} className="v-project-showcase-card" data-category={project.category}>
-                <div className="v-project-showcase-img">
-                  {project.imageUrl ? (
+                {project.imageUrl && (
+                  <div className="v-project-showcase-img">
                     <img src={project.imageUrl} alt={project.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : (
-                    <div className="v-project-showcase-placeholder" aria-hidden="true" />
-                  )}
-                </div>
+                  </div>
+                )}
                 <div className="v-project-showcase-info">
                   <div className="v-project-tags">
                     {Array.isArray(project.tags) ? project.tags.map((tag: string, i: number) => (
@@ -1056,13 +1054,11 @@ export default function Home() {
             ))}
             {dynamicProjects.map((project) => (
               <div key={`dup-${project.id}`} className="v-project-showcase-card" data-category={project.category} aria-hidden="true">
-                <div className="v-project-showcase-img">
-                  {project.imageUrl ? (
+                {project.imageUrl && (
+                  <div className="v-project-showcase-img">
                     <img src={project.imageUrl} alt={project.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : (
-                    <div className="v-project-showcase-placeholder" aria-hidden="true" />
-                  )}
-                </div>
+                  </div>
+                )}
                 <div className="v-project-showcase-info">
                   <div className="v-project-tags">
                     {Array.isArray(project.tags) ? project.tags.map((tag: string, i: number) => (
