@@ -548,3 +548,24 @@ Stage Summary:
 - Commit 37b4463 pushed to origin/main on Xfweb
 - Glassy card style is back (matches what the user wanted in commit d06bff6 + the original design)
 - Only the image placeholder gradient is gone — cards without an imageUrl show as a clean glassy frame with text content, no empty gradient block
+
+---
+Task ID: admin-cache-bust
+Agent: main
+Task: Fix newly added services (and courses/team/projects) not appearing on landing page
+
+Work Log:
+- Root cause: public /api/{services,courses,team,projects} routes return Cache-Control: public, s-maxage=60, stale-while-revalidate=300. On Vercel this means after an admin mutation, the CDN edge serves the OLD cached list for up to 5 minutes — admin sees their new service "missing" from the landing page.
+- Prisma default for Service.status IS 'active', so this wasn't a status issue. Admin form also explicitly sends status='active'.
+- Fix: added revalidatePath() calls in the POST/PUT/DELETE handlers of all 4 admin mutation routes:
+  * src/app/api/admin/services/route.ts -> bustServicesCache(): revalidates /api/services, /, /services
+  * src/app/api/admin/courses/route.ts  -> bustCoursesCache():  revalidates /api/courses, /, /courses, /courses/[slug]
+  * src/app/api/admin/team/route.ts     -> bustTeamCache():     revalidates /api/team, /
+  * src/app/api/admin/projects/route.ts -> bustProjectsCache(): revalidates /api/projects, /
+- Each helper is wrapped in try/catch — revalidatePath is a no-op in local dev / non-Vercel runtimes, and we don't want a cache-bust failure to mask a successful DB write.
+- tsc --noEmit clean.
+
+Stage Summary:
+- Commit 1a36a47 pushed to origin/main on Xfweb
+- After this deploys, admin add/edit/delete on services/courses/team/projects will be visible on the landing page immediately (next page load, no more 5-min CDN staleness).
+- The public GET cache (s-maxage=60) is preserved for anonymous traffic — only mutations trigger a purge.
