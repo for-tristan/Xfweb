@@ -245,11 +245,11 @@ export default function DynamicServicePage() {
             <h1 style={{ fontFamily: "var(--font-heading)", fontSize: 36, fontWeight: 800, color: 'var(--text-light)' }}>
               <span className="v-highlight">{service.title}</span>
             </h1>
-            {service.description && <p className="page-subtitle" style={{ marginTop: 8, color: 'var(--text-dim)', fontSize: 16 }}>{service.description}</p>}
           </div>
           <div className="service-layout">
             <div className="service-main reveal-up">
               <h2>What We Deliver</h2>
+              {service.description && <p>{service.description}</p>}
 
               {service.features && service.features.length > 0 && (
                 <>
