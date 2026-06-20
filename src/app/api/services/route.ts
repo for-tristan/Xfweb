@@ -13,11 +13,17 @@ export async function GET(request: NextRequest) {
       orderBy: { displayOrder: 'asc' },
     });
 
+    console.log('[Public GET /api/services] returning', services.length, 'services:', services.map(s => ({ id: s.id, title: s.title, status: s.status, displayOrder: s.displayOrder })));
+
     return NextResponse.json(
       { services },
       {
         headers: {
-          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+          // Admins need to see mutations appear immediately. We rely on
+          // revalidatePath in the admin mutation handlers, but to be
+          // 100% sure no stale response is served by the browser HTTP
+          // cache or Vercel CDN, we mark this as no-store.
+          'Cache-Control': 'no-store',
         },
       }
     );

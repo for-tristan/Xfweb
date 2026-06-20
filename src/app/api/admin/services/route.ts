@@ -62,6 +62,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { title, slug, description, icon, features } = body;
 
+    console.log('[Admin POST /api/admin/services] incoming body:', { title, slug, description, icon, featuresCount: features?.length || 0 });
+
     if (!title || !slug) {
       return NextResponse.json(
         { error: 'title and slug are required' },
@@ -93,6 +95,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    console.log('[Admin POST /api/admin/services] created service:', { id: service.id, title: service.title, status: service.status, displayOrder: service.displayOrder });
     bustServicesCache();
     return NextResponse.json({ service }, { status: 201 });
   } catch (error) {

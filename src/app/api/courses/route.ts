@@ -37,10 +37,11 @@ export async function GET(request: NextRequest) {
       { courses: parsed },
       {
         headers: {
-          // Public homepage content — only changes when an admin edits it.
-          // CDN/browser can serve a fresh copy for 60s, and a stale copy
-          // for up to 5 min while revalidating in the background.
-          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+          // Admins need to see mutations appear immediately. no-store
+          // guarantees the browser HTTP cache + Vercel CDN never serve
+          // a stale response. revalidatePath is also called in admin
+          // mutations as defense-in-depth.
+          'Cache-Control': 'no-store',
         },
       }
     );

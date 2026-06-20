@@ -886,11 +886,17 @@ export default function Home() {
   useEffect(() => {
     const fetchDynamicData = async () => {
       try {
+        // cache: 'no-store' tells the browser to bypass its HTTP cache
+        // and always go to the network. Combined with the Cache-Control:
+        // no-store response header on the public API routes, this
+        // guarantees the landing page sees DB-fresh data on every visit
+        // — required so admin mutations (add/edit/delete of services,
+        // courses, team, projects) appear immediately.
         const [servicesRes, coursesRes, teamRes, projectsRes] = await Promise.all([
-          fetch('/api/services'),
-          fetch('/api/courses'),
-          fetch('/api/team'),
-          fetch('/api/projects'),
+          fetch('/api/services', { cache: 'no-store' }),
+          fetch('/api/courses', { cache: 'no-store' }),
+          fetch('/api/team', { cache: 'no-store' }),
+          fetch('/api/projects', { cache: 'no-store' }),
         ]);
         if (servicesRes.ok) {
           const servicesData = await servicesRes.json();
