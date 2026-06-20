@@ -594,3 +594,17 @@ Stage Summary:
   (b) The Service table doesn't exist or has wrong schema (check migration logs)
   (c) The new service is being created with status != 'active' somehow (check the [Public GET /api/services] log to see what status it has)
 - Once confirmed working, we can re-add conservative caching (e.g. s-maxage=10 with max-age=0, must-revalidate) if performance becomes an issue
+
+---
+Task ID: service-icon-strip-container
+Agent: main
+Task: Remove the square red container behind service card FA icons
+
+Work Log:
+- Diagnosed: user is on crimson theme (--accent: #dc143c = red). The .v-service-icon had a 48x48px container with background: accent 8%, border: 1px solid accent 15%, border-radius: 0.75rem. On a dark bg with red accent, the 8% red tint + 15% red border reads as a visible red rounded square.
+- src/app/globals.css .v-service-card .v-service-icon: stripped width/height/background/border/border-radius/flex centering. Now just color: var(--accent), font-size: 24px (up from 20 to compensate for losing the 48px block), margin-bottom: 20px, display: inline-block, transition on transform.
+- Hover: kept the translateY(-2px) lift; removed the background-color shift (no longer relevant).
+
+Stage Summary:
+- Commit d0e38ce pushed to origin/main on Xfweb
+- Service card FA icons now render as just the icon (accent-colored, slightly larger) — no red square behind them
