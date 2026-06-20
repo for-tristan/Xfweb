@@ -569,3 +569,28 @@ Stage Summary:
 - Commit 1a36a47 pushed to origin/main on Xfweb
 - After this deploys, admin add/edit/delete on services/courses/team/projects will be visible on the landing page immediately (next page load, no more 5-min CDN staleness).
 - The public GET cache (s-maxage=60) is preserved for anonymous traffic — only mutations trigger a purge.
+
+---
+Task ID: admin-cache-bust-aggressive
+Agent: main
+Task: revalidatePath alone didn't fix it — new services still not appearing on landing page
+
+Work Log:
+- Diagnosed: previous fix (revalidatePath only) was insufficient because:
+  * Cache-Control: 'public, s-maxage=60, stale-while-revalidate=300' has no max-age, so browsers use heuristic caching
+  * Browser HTTP cache was serving stale responses between CDN revalidations
+- Aggressive fix (commit 1c8fbe2):
+  1. Public API routes /api/{services,courses,team,projects}: Cache-Control changed to 'no-store' — kills browser cache AND Vercel CDN edge cache
+  2. Landing page useEffect fetches: added cache: 'no-store' to all 4 fetch() calls — bypasses browser HTTP cache from request side too
+  3. Diagnostic console.log added to POST /api/admin/services (logs incoming body + created service with id/title/status/displayOrder) and GET /api/services (logs count + list) — will let us confirm via Vercel logs whether write is happening and read is returning the new row
+- revalidatePath calls from previous commit kept as defense in depth (purges Next.js data cache which no-store doesn't address)
+- tsc --noEmit clean
+
+Stage Summary:
+- Commit 1c8fbe2 pushed to origin/main on Xfweb
+- This is bulletproof — every landing page visit now hits the DB directly
+- If after Vercel redeploys it STILL doesn't work, the issue is NOT caching. Possible suspects then:
+  (a) The admin POST is silently failing (check Vercel logs for the [Admin POST /api/admin/services] log)
+  (b) The Service table doesn't exist or has wrong schema (check migration logs)
+  (c) The new service is being created with status != 'active' somehow (check the [Public GET /api/services] log to see what status it has)
+- Once confirmed working, we can re-add conservative caching (e.g. s-maxage=10 with max-age=0, must-revalidate) if performance becomes an issue
