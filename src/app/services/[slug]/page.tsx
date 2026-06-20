@@ -250,7 +250,6 @@ export default function DynamicServicePage() {
           <div className="service-layout">
             <div className="service-main reveal-up">
               <h2>What We Deliver</h2>
-              <p>{service.description}</p>
 
               {service.features && service.features.length > 0 && (
                 <>

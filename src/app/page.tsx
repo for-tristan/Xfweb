@@ -1014,7 +1014,6 @@ export default function Home() {
                 <i className={service.icon}></i>
               </div>
               <h3>{service.title}</h3>
-              <p>{service.description}</p>
               <span className="v-service-link">Learn More <i className="fa-solid fa-arrow-right" style={{ fontSize: 11 }}></i></span>
             </div>
           )) : (
