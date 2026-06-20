@@ -636,3 +636,18 @@ Work Log:
 Stage Summary:
 - Commit bcc2488 pushed to origin/main on Xfweb
 - Service detail page now reads: H1 title -> breadcrumb stays -> "What We Deliver" H2 -> description paragraph -> "Service Features" H2 -> feature list
+
+---
+Task ID: scroll-indicator-restore
+Agent: main
+Task: Restore infinite animation on landing page scroll indicator
+
+Work Log:
+- Root cause: commit efdedac (GPU Round 2) replaced the infinite `lineGrow 2.5s` animation on .scroll-line with a one-shot `lineGrowOnce 1s ease-out 1 both` entry animation. After the 1s entrance, the line stayed static — user noticed it no longer animates.
+- src/app/globals.css .scroll-line: changed animation back to `lineGrow 2.5s ease-in-out infinite`. The `lineGrow` keyframes (scaleY 0 -> 1 -> 0 with transform-origin flip from top to bottom) were already defined and reused as-is.
+- Removed the now-unused @keyframes lineGrowOnce block.
+- Updated comments to note this is a compositor-only transform on a 1px x 50px element with no children — negligible GPU cost, well below the steady-state usage threshold that motivated Round 2.
+
+Stage Summary:
+- Commit a716a34 pushed to origin/main on Xfweb
+- Scroll indicator on the landing page hero now pulses continuously again (line grows from top, fades, grows from bottom, fades, repeat every 2.5s)
