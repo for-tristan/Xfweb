@@ -1,6 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
+
+/**
+ * Bust the CDN/edge cache for the public services list + any page that
+ * renders services. Called after every successful mutation so admins
+ * see their changes immediately on the landing page (the public
+ * /api/services route has Cache-Control: s-maxage=60, swr=300).
+ */
+function bustServicesCache() {
+  try {
+    revalidatePath('/api/services');
+    revalidatePath('/');
+    revalidatePath('/services', 'page');
+  } catch {
+    /* revalidatePath is a no-op in dev / non-Vercel runtimes */
+  }
+}
 
 async function requireAdmin() {
   const user = await getCurrentUser();
@@ -76,6 +93,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    bustServicesCache();
     return NextResponse.json({ service }, { status: 201 });
   } catch (error) {
     console.error('Admin service create error:', error);
@@ -142,6 +160,7 @@ export async function PUT(request: NextRequest) {
       },
     });
 
+    bustServicesCache();
     return NextResponse.json({ service });
   } catch (error) {
     console.error('Admin service update error:', error);
@@ -177,6 +196,7 @@ export async function DELETE(request: NextRequest) {
 
     await db.service.delete({ where: { id } });
 
+    bustServicesCache();
     return NextResponse.json({ message: 'Service deleted successfully' });
   } catch (error) {
     console.error('Admin service delete error:', error);

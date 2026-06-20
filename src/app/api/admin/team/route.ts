@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
+
+/** Bust CDN/edge cache for the public team list + landing page. */
+function bustTeamCache() {
+  try {
+    revalidatePath('/api/team');
+    revalidatePath('/');
+  } catch {
+    /* no-op in dev / non-Vercel runtimes */
+  }
+}
 
 async function requireAdmin() {
   const user = await getCurrentUser();
@@ -60,6 +71,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    bustTeamCache();
     return NextResponse.json({ member }, { status: 201 });
   } catch (error) {
     console.error('Admin team member create error:', error);
@@ -107,6 +119,7 @@ export async function PUT(request: NextRequest) {
       },
     });
 
+    bustTeamCache();
     return NextResponse.json({ member });
   } catch (error) {
     console.error('Admin team member update error:', error);
@@ -142,6 +155,7 @@ export async function DELETE(request: NextRequest) {
 
     await db.teamMember.delete({ where: { id } });
 
+    bustTeamCache();
     return NextResponse.json({ message: 'Team member deleted successfully' });
   } catch (error) {
     console.error('Admin team member delete error:', error);

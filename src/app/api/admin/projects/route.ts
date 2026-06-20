@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
+
+/** Bust CDN/edge cache for the public projects list + landing page. */
+function bustProjectsCache() {
+  try {
+    revalidatePath('/api/projects');
+    revalidatePath('/');
+  } catch {
+    /* no-op in dev / non-Vercel runtimes */
+  }
+}
 
 async function requireAdmin() {
   const user = await getCurrentUser();
@@ -56,6 +67,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    bustProjectsCache();
     return NextResponse.json({ project }, { status: 201 });
   } catch (error: any) {
     console.error('Admin project create error:', error);
@@ -99,6 +111,7 @@ export async function PUT(request: NextRequest) {
       },
     });
 
+    bustProjectsCache();
     return NextResponse.json({ project });
   } catch (error: any) {
     console.error('Admin project update error:', error);
@@ -128,6 +141,7 @@ export async function DELETE(request: NextRequest) {
 
     await db.project.delete({ where: { id } });
 
+    bustProjectsCache();
     return NextResponse.json({ message: 'Project deleted successfully' });
   } catch (error) {
     console.error('Admin project delete error:', error);

@@ -1,6 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
+
+/**
+ * Bust CDN/edge cache for the public courses list + landing + course
+ * detail pages. Public /api/courses route is cached with s-maxage=60.
+ */
+function bustCoursesCache() {
+  try {
+    revalidatePath('/api/courses');
+    revalidatePath('/');
+    revalidatePath('/courses', 'page');
+    revalidatePath('/courses/[slug]', 'page');
+  } catch {
+    /* no-op in dev / non-Vercel runtimes */
+  }
+}
 
 async function requireAdmin() {
   const user = await getCurrentUser();
@@ -74,6 +90,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    bustCoursesCache();
     return NextResponse.json({ course }, { status: 201 });
   } catch (error) {
     console.error('Admin course create error:', error);
@@ -125,6 +142,7 @@ export async function PUT(request: NextRequest) {
       },
     });
 
+    bustCoursesCache();
     return NextResponse.json({ course });
   } catch (error) {
     console.error('Admin course update error:', error);
@@ -180,6 +198,7 @@ export async function DELETE(request: NextRequest) {
 
     await db.course.delete({ where: { id } });
 
+    bustCoursesCache();
     return NextResponse.json({ message: 'Course deleted successfully' });
   } catch (error) {
     console.error('Admin course delete error:', error);
