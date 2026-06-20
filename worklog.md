@@ -531,3 +531,20 @@ Stage Summary:
 - Commit deb864d pushed to origin/main on Xfweb
 - Net: -38 / +16 lines
 - Card is now frameless: image tile with rounded corners + accent gradient placeholder, text below floats directly on page background, hover gives a tiny lift + image scale, non-hovered cards dim slightly
+
+---
+Task ID: project-card-placeholder-only
+Agent: main
+Task: User clarification — only remove the image placeholder, NOT the glassy card frame
+
+Work Log:
+- Reverted deb864d (frameless card) via `git revert` — restored glassy background, accent border, backdrop-filter blur, hover glow, and the blur+scale+opacity dimming of non-hovered cards. Commit 6f50b86.
+- In src/app/page.tsx: changed both render loops so the .v-project-showcase-img wrapper only renders when project.imageUrl is truthy. Cards without an image now show just the glassy frame with tags/title/description/link directly.
+- In src/app/globals.css: removed the now-orphan .v-project-showcase-placeholder block + the dead .v-project-showcase-placeholder i :hover rule (FA icons were already gone in d06bff6).
+- Kept .v-project-showcase-img CSS intact (still used when imageUrl is present).
+- tsc --noEmit clean.
+
+Stage Summary:
+- Commit 37b4463 pushed to origin/main on Xfweb
+- Glassy card style is back (matches what the user wanted in commit d06bff6 + the original design)
+- Only the image placeholder gradient is gone — cards without an imageUrl show as a clean glassy frame with text content, no empty gradient block
