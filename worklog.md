@@ -623,3 +623,16 @@ Stage Summary:
 - Commit feda959 pushed to origin/main on Xfweb
 - Landing service cards are now minimal (icon + title + link)
 - Service detail page no longer shows the description twice — it appears once under the page title, then "What We Deliver" goes straight into the features list
+
+---
+Task ID: service-desc-move
+Agent: main
+Task: Move service description from under H1 title to under "What We Deliver" H2
+
+Work Log:
+- src/app/services/[slug]/page.tsx: removed <p className="page-subtitle">{service.description}</p> from under the H1 title; added <p>{service.description}</p> directly under the "What We Deliver" H2.
+- tsc --noEmit clean.
+
+Stage Summary:
+- Commit bcc2488 pushed to origin/main on Xfweb
+- Service detail page now reads: H1 title -> breadcrumb stays -> "What We Deliver" H2 -> description paragraph -> "Service Features" H2 -> feature list
