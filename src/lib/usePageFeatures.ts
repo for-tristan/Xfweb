@@ -96,7 +96,7 @@ export function usePageFeatures() {
       const lenis = (window as any).__lenis;
       if (sectionId === 'home') {
         if (lenis) {
-          lenis.scrollTo(0, { duration: 0.8 });
+          lenis.scrollTo(0, { duration: 1.2 });
         } else {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -105,7 +105,7 @@ export function usePageFeatures() {
       const el = document.getElementById(sectionId);
       if (!el) return;
       if (lenis) {
-        lenis.scrollTo(el, { offset: 0, duration: 0.8 });
+        lenis.scrollTo(el, { offset: 0, duration: 1.2 });
       } else {
         el.scrollIntoView({ behavior: 'smooth' });
       }
@@ -114,7 +114,7 @@ export function usePageFeatures() {
       doScroll();
     } else {
       router.push('/');
-      setTimeout(doScroll, 400);
+      setTimeout(doScroll, 500);
     }
   }, [router]);
 

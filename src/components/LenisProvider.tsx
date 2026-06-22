@@ -8,10 +8,7 @@ export default function LenisProvider({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     const lenis = new Lenis({
-      // Reduced from 1.2s → 0.8s so scroll-to-section and anchor jumps
-      // feel snappier. 1.2s was contributing to the "laggy" perception
-      // — every click felt like it was waiting for a slow animation.
-      duration: 0.8,
+      duration: 1.2,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
