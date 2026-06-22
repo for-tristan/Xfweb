@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 
-export const dynamic = 'force-dynamic';
-
 export const metadata: Metadata = {
   title: 'Dashboard — X Foundry',
   description: 'Your personal learning dashboard. Track course progress, recent test results, study streaks, and continue where you left off.',

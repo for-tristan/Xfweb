@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 
-export const dynamic = 'force-dynamic';
-
 export const metadata: Metadata = {
   title: 'Study Sessions — X Foundry',
   description: 'Track your focused study sessions, build streaks, and climb the leaderboard. Timer-based deep work with weekly stats.',

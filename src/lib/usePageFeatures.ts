@@ -53,12 +53,12 @@ export function usePageFeatures() {
 
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [minLoading, setMinLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setMinLoading(false), 3000);
-    return () => clearTimeout(timer);
-  }, []);
+  // NOTE: previously this had a 3-second `minLoading` timer that forced
+  // AuthGate to show the 3-dot loader for at least 3s on every protected
+  // page, even when /api/auth/me returned in 100ms. That was the main
+  // cause of "navigation feels laggy" — every page had a 3s artificial
+  // delay baked in. Now we just track the actual loading state.
+  const [minLoading, setMinLoading] = useState(false);
 
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authTab, setAuthTab] = useState<'signin' | 'signup'>('signin');
@@ -96,7 +96,7 @@ export function usePageFeatures() {
       const lenis = (window as any).__lenis;
       if (sectionId === 'home') {
         if (lenis) {
-          lenis.scrollTo(0, { duration: 1.2 });
+          lenis.scrollTo(0, { duration: 0.8 });
         } else {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -105,7 +105,7 @@ export function usePageFeatures() {
       const el = document.getElementById(sectionId);
       if (!el) return;
       if (lenis) {
-        lenis.scrollTo(el, { offset: 0, duration: 1.2 });
+        lenis.scrollTo(el, { offset: 0, duration: 0.8 });
       } else {
         el.scrollIntoView({ behavior: 'smooth' });
       }
@@ -114,7 +114,7 @@ export function usePageFeatures() {
       doScroll();
     } else {
       router.push('/');
-      setTimeout(doScroll, 500);
+      setTimeout(doScroll, 400);
     }
   }, [router]);
 

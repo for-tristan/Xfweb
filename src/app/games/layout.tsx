@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 
-export const dynamic = 'force-dynamic';
-
 export const metadata: Metadata = {
   title: 'Coding Games — X Foundry',
   description: 'Sharpen your programming skills with bite-sized coding challenges. Race against the clock, earn points, and climb the global leaderboard.',

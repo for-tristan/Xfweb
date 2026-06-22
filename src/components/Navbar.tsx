@@ -141,15 +141,15 @@ export function Navbar({
           ) : (
             <li><Link href="/#contact" className={isActive('contact') ? 'active' : ''}>Contact</Link></li>
           )}
-          {user && <li><Link href="/games" className={isActive('games') ? 'active' : ''}>Games</Link></li>}
-          {user && <li><Link href="/study" className={isActive('study') ? 'active' : ''}>Study</Link></li>}
-          {user && <li><Link href="/dashboard" className={isActive('dashboard') ? 'active' : ''}>Dashboard</Link></li>}
-          {user && <li><Link href="/chat" className={`nav-ai-link${isActive('chat') ? ' active' : ''}`}>AI</Link></li>}
+          {user && <li><Link href="/games" prefetch className={isActive('games') ? 'active' : ''}>Games</Link></li>}
+          {user && <li><Link href="/study" prefetch className={isActive('study') ? 'active' : ''}>Study</Link></li>}
+          {user && <li><Link href="/dashboard" prefetch className={isActive('dashboard') ? 'active' : ''}>Dashboard</Link></li>}
+          {user && <li><Link href="/chat" prefetch className={`nav-ai-link${isActive('chat') ? ' active' : ''}`}>AI</Link></li>}
           {user && user.role === 'admin' && (
-            <li><Link href="/admin" className={isActive('admin') ? 'active' : ''} style={{ color: 'var(--primary-red)' }}>Admin</Link></li>
+            <li><Link href="/admin" prefetch className={isActive('admin') ? 'active' : ''} style={{ color: 'var(--primary-red)' }}>Admin</Link></li>
           )}
           {user && user.role === 'instructor' && (
-            <li><Link href="/instructor" className={isActive('instructor') ? 'active' : ''} style={{ color: 'var(--primary-red)' }}>Instructor</Link></li>
+            <li><Link href="/instructor" prefetch className={isActive('instructor') ? 'active' : ''} style={{ color: 'var(--primary-red)' }}>Instructor</Link></li>
           )}
         </ul>
         <ul className="nav-links" id="navLinks">
@@ -173,15 +173,15 @@ export function Navbar({
           ) : (
             <li><Link href="/#contact" className={isActive('contact') ? 'active' : ''}>Contact</Link></li>
           )}
-          {user && <li><Link href="/games" className={isActive('games') ? 'active' : ''}>Games</Link></li>}
-          {user && <li><Link href="/study" className={isActive('study') ? 'active' : ''}>Study</Link></li>}
-          {user && <li><Link href="/dashboard" className={isActive('dashboard') ? 'active' : ''}>Dashboard</Link></li>}
-          {user && <li><Link href="/chat" className={`nav-ai-link${isActive('chat') ? ' active' : ''}`}>AI</Link></li>}
+          {user && <li><Link href="/games" prefetch className={isActive('games') ? 'active' : ''}>Games</Link></li>}
+          {user && <li><Link href="/study" prefetch className={isActive('study') ? 'active' : ''}>Study</Link></li>}
+          {user && <li><Link href="/dashboard" prefetch className={isActive('dashboard') ? 'active' : ''}>Dashboard</Link></li>}
+          {user && <li><Link href="/chat" prefetch className={`nav-ai-link${isActive('chat') ? ' active' : ''}`}>AI</Link></li>}
           {user && user.role === 'admin' && (
-            <li><Link href="/admin" className={isActive('admin') ? 'active' : ''} style={{ color: 'var(--primary-red)' }}>Admin</Link></li>
+            <li><Link href="/admin" prefetch className={isActive('admin') ? 'active' : ''} style={{ color: 'var(--primary-red)' }}>Admin</Link></li>
           )}
           {user && user.role === 'instructor' && (
-            <li><Link href="/instructor" className={isActive('instructor') ? 'active' : ''} style={{ color: 'var(--primary-red)' }}>Instructor</Link></li>
+            <li><Link href="/instructor" prefetch className={isActive('instructor') ? 'active' : ''} style={{ color: 'var(--primary-red)' }}>Instructor</Link></li>
           )}
         </ul>
       </GlassSurface>
