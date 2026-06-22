@@ -962,179 +962,20 @@ select optgroup {
 .particle { display: none !important; }
 
 /* ─────────────────────────────────────────────────────────────────────
-   Aurora background — drifting blurred orbs + mouse-reactive spotlight
-   Drives off CSS vars set by AuroraBackground.tsx:
-     --aurora-mx / --aurora-my       spotlight position (0%..100%)
-     --aurora-pull-{1,2,3,4}-{x,y}   parallax offset per orb (px)
+   Grain background — pure CSS film grain overlay.
+   Just a tiny SVG noise texture at low opacity, multiplied over the
+   background. Kills the "flat plastic" feel with zero animation/JS.
+   Dial --grain-opacity up/down to taste (0.04 subtle → 0.12 heavy).
    ───────────────────────────────────────────────────────────────────── */
-.aurora-bg {
+.grain-bg {
     position: fixed;
     inset: 0;
     z-index: 1;
     pointer-events: none;
-    overflow: hidden;
-    /* Defaults so first paint isn't blank before JS sets vars */
-    --aurora-mx: 50%;
-    --aurora-my: 50%;
-    --aurora-pull-1-x: 0px;
-    --aurora-pull-1-y: 0px;
-    --aurora-pull-2-x: 0px;
-    --aurora-pull-2-y: 0px;
-    --aurora-pull-3-x: 0px;
-    --aurora-pull-3-y: 0px;
-    --aurora-pull-4-x: 0px;
-    --aurora-pull-4-y: 0px;
-}
-
-.aurora-orb {
-    position: absolute;
-    border-radius: 50%;
-    /* Heavy blur is the key — at this scale the orb's edge dissolves
-       completely and reads as a smooth field of color rather than a
-       distinct blob. The gradient's transparent stop also extends to
-       80% so the falloff is gradual, not a hard rim. */
-    filter: blur(160px);
-    will-change: transform;
-    mix-blend-mode: multiply;
-    opacity: 0.75;
-}
-
-.aurora-orb-1 {
-    width: 80vw;
-    height: 80vw;
-    top: -25%;
-    left: -20%;
-    background: radial-gradient(circle, var(--accent) 0%, transparent 80%);
-    animation: aurora-drift-1 28s ease-in-out infinite alternate;
-    transform: translate3d(var(--aurora-pull-1-x), var(--aurora-pull-1-y), 0);
-}
-
-.aurora-orb-2 {
-    width: 75vw;
-    height: 75vw;
-    top: 10%;
-    right: -25%;
-    background: radial-gradient(circle, var(--accent-dark) 0%, transparent 80%);
-    animation: aurora-drift-2 34s ease-in-out infinite alternate;
-    transform: translate3d(var(--aurora-pull-2-x), var(--aurora-pull-2-y), 0);
-}
-
-.aurora-orb-3 {
-    width: 70vw;
-    height: 70vw;
-    bottom: -30%;
-    left: 15%;
-    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 50%, white) 0%, transparent 80%);
-    animation: aurora-drift-3 24s ease-in-out infinite alternate;
-    transform: translate3d(var(--aurora-pull-3-x), var(--aurora-pull-3-y), 0);
-    opacity: 0.55;
-}
-
-.aurora-orb-4 {
-    width: 65vw;
-    height: 65vw;
-    top: 35%;
-    left: 30%;
-    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 30%, var(--accent-dark)) 0%, transparent 80%);
-    animation: aurora-drift-4 38s ease-in-out infinite alternate;
-    transform: translate3d(var(--aurora-pull-4-x), var(--aurora-pull-4-y), 0);
-    opacity: 0.5;
-}
-
-/* Mouse-reactive spotlight — wide and very diffuse so it reads as
-   ambient light shifting across the page, not a flashlight beam.
-   Two stacked gradients: a wide low-contrast base + a tighter bright
-   core, both with very gradual falloffs (transparent at 100%). */
-.aurora-spotlight {
-    position: absolute;
-    inset: 0;
-    background:
-        radial-gradient(
-            circle 900px at var(--aurora-mx) var(--aurora-my),
-            color-mix(in srgb, var(--accent) 12%, transparent) 0%,
-            transparent 100%
-        ),
-        radial-gradient(
-            circle 400px at var(--aurora-mx) var(--aurora-my),
-            color-mix(in srgb, var(--accent) 18%, transparent) 0%,
-            transparent 100%
-        );
-    opacity: 1;
-    mix-blend-mode: multiply;
-}
-
-/* Grain — tiny inline SVG noise at low opacity to kill the "flat plastic"
-   feel on white. Sits on top of everything else in this layer. */
-.aurora-grain {
-    position: absolute;
-    inset: 0;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>");
-    opacity: 0.035;
+    --grain-opacity: 0.045;
+    opacity: var(--grain-opacity);
     mix-blend-mode: multiply;
-}
-
-@keyframes aurora-drift-1 {
-    0%   { translate: 0% 0%; }
-    50%  { translate: 8% 6%; }
-    100% { translate: -6% 12%; }
-}
-@keyframes aurora-drift-2 {
-    0%   { translate: 0% 0%; }
-    50%  { translate: -10% 8%; }
-    100% { translate: 6% -6%; }
-}
-@keyframes aurora-drift-3 {
-    0%   { translate: 0% 0%; }
-    50%  { translate: 5% -8%; }
-    100% { translate: -8% -4%; }
-}
-@keyframes aurora-drift-4 {
-    0%   { translate: 0% 0%; }
-    33%  { translate: -6% 5%; }
-    66%  { translate: 7% -4%; }
-    100% { translate: -4% -7%; }
-}
-
-/* On dark themes, multiply → screen so the orbs actually glow instead
-   of darkening. Override opacity for visibility. */
-:root[data-theme="midnight"] .aurora-orb,
-:root[data-theme="dark"] .aurora-orb,
-:root[data-theme="obsidian"] .aurora-orb {
-    mix-blend-mode: screen;
-    opacity: 0.6;
-}
-:root[data-theme="midnight"] .aurora-spotlight,
-:root[data-theme="dark"] .aurora-spotlight,
-:root[data-theme="obsidian"] .aurora-spotlight {
-    mix-blend-mode: screen;
-}
-
-/* Reduced motion: kill all animation, freeze orbs at rest position.
-   The spotlight still works (driven by JS, not keyframes) but we also
-   pause that loop in JS via prefers-reduced-motion check. */
-@media (prefers-reduced-motion: reduce) {
-    .aurora-orb { animation: none !important; }
-}
-
-/* Small screens: shrink the orbs a touch so they don't dominate. */
-@media (max-width: 768px) {
-    .aurora-orb-1 { width: 110vw; height: 110vw; }
-    .aurora-orb-2 { width: 100vw; height: 100vw; }
-    .aurora-orb-3 { width: 95vw; height: 95vw; }
-    .aurora-orb-4 { width: 90vw; height: 90vw; }
-    .aurora-spotlight {
-        background:
-            radial-gradient(
-                circle 600px at var(--aurora-mx) var(--aurora-my),
-                color-mix(in srgb, var(--accent) 12%, transparent) 0%,
-                transparent 100%
-            ),
-            radial-gradient(
-                circle 280px at var(--aurora-mx) var(--aurora-my),
-                color-mix(in srgb, var(--accent) 18%, transparent) 0%,
-                transparent 100%
-            );
-    }
 }
 
 @media (hover: none), (pointer: coarse) {
