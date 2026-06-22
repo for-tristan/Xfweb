@@ -961,6 +961,148 @@ select optgroup {
 .global-particles { display: none !important; }
 .particle { display: none !important; }
 
+/* ─────────────────────────────────────────────────────────────────────
+   Aurora background — drifting blurred orbs + mouse-reactive spotlight
+   Drives off CSS vars set by AuroraBackground.tsx:
+     --aurora-mx / --aurora-my       spotlight position (0%..100%)
+     --aurora-pull-{1,2,3}-{x,y}     parallax offset per orb (px)
+   ───────────────────────────────────────────────────────────────────── */
+.aurora-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+    /* Defaults so first paint isn't blank before JS sets vars */
+    --aurora-mx: 50%;
+    --aurora-my: 50%;
+    --aurora-pull-1-x: 0px;
+    --aurora-pull-1-y: 0px;
+    --aurora-pull-2-x: 0px;
+    --aurora-pull-2-y: 0px;
+    --aurora-pull-3-x: 0px;
+    --aurora-pull-3-y: 0px;
+}
+
+.aurora-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    will-change: transform;
+    /* Multiply blend keeps the white bg readable while letting the
+       accent color bloom where orbs overlap. Switches to screen on
+       dark themes via the [data-theme] override below. */
+    mix-blend-mode: multiply;
+    opacity: 0.55;
+}
+
+.aurora-orb-1 {
+    width: 55vw;
+    height: 55vw;
+    top: -15%;
+    left: -10%;
+    background: radial-gradient(circle, var(--accent) 0%, transparent 65%);
+    animation: aurora-drift-1 28s ease-in-out infinite alternate;
+    transform: translate3d(var(--aurora-pull-1-x), var(--aurora-pull-1-y), 0);
+}
+
+.aurora-orb-2 {
+    width: 50vw;
+    height: 50vw;
+    top: 30%;
+    right: -15%;
+    background: radial-gradient(circle, var(--accent-dark) 0%, transparent 65%);
+    animation: aurora-drift-2 34s ease-in-out infinite alternate;
+    transform: translate3d(var(--aurora-pull-2-x), var(--aurora-pull-2-y), 0);
+}
+
+.aurora-orb-3 {
+    width: 45vw;
+    height: 45vw;
+    bottom: -20%;
+    left: 25%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 50%, white) 0%, transparent 65%);
+    animation: aurora-drift-3 24s ease-in-out infinite alternate;
+    transform: translate3d(var(--aurora-pull-3-x), var(--aurora-pull-3-y), 0);
+    opacity: 0.4;
+}
+
+/* Mouse-reactive spotlight — a soft glow that follows the cursor.
+   Sits above the orbs but below content. */
+.aurora-spotlight {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        circle 500px at var(--aurora-mx) var(--aurora-my),
+        var(--accent-glow),
+        transparent 70%
+    );
+    opacity: 0.8;
+    mix-blend-mode: multiply;
+}
+
+/* Grain — tiny inline SVG noise at low opacity to kill the "flat plastic"
+   feel on white. Sits on top of everything else in this layer. */
+.aurora-grain {
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>");
+    opacity: 0.035;
+    mix-blend-mode: multiply;
+}
+
+@keyframes aurora-drift-1 {
+    0%   { translate: 0% 0%; }
+    50%  { translate: 8% 6%; }
+    100% { translate: -6% 12%; }
+}
+@keyframes aurora-drift-2 {
+    0%   { translate: 0% 0%; }
+    50%  { translate: -10% 8%; }
+    100% { translate: 6% -6%; }
+}
+@keyframes aurora-drift-3 {
+    0%   { translate: 0% 0%; }
+    50%  { translate: 5% -8%; }
+    100% { translate: -8% -4%; }
+}
+
+/* On dark themes, multiply → screen so the orbs actually glow instead
+   of darkening. Override opacity for visibility. */
+:root[data-theme="midnight"] .aurora-orb,
+:root[data-theme="dark"] .aurora-orb,
+:root[data-theme="obsidian"] .aurora-orb {
+    mix-blend-mode: screen;
+    opacity: 0.5;
+}
+:root[data-theme="midnight"] .aurora-spotlight,
+:root[data-theme="dark"] .aurora-spotlight,
+:root[data-theme="obsidian"] .aurora-spotlight {
+    mix-blend-mode: screen;
+    opacity: 0.6;
+}
+
+/* Reduced motion: kill all animation, freeze orbs at rest position.
+   The spotlight still works (driven by JS, not keyframes) but we also
+   pause that loop in JS via prefers-reduced-motion check. */
+@media (prefers-reduced-motion: reduce) {
+    .aurora-orb { animation: none !important; }
+}
+
+/* Small screens: shrink the orbs a touch so they don't dominate. */
+@media (max-width: 768px) {
+    .aurora-orb-1 { width: 75vw; height: 75vw; }
+    .aurora-orb-2 { width: 70vw; height: 70vw; }
+    .aurora-orb-3 { width: 65vw; height: 65vw; }
+    .aurora-spotlight {
+        background: radial-gradient(
+            circle 320px at var(--aurora-mx) var(--aurora-my),
+            var(--accent-glow),
+            transparent 70%
+        );
+    }
+}
+
 @media (hover: none), (pointer: coarse) {
     body, *, *::before, *::after { cursor: auto !important; }
 }

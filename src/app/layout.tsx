@@ -5,6 +5,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import PageTransition from '@/components/PageTransition';
 import NavigationInterceptor from '@/components/NavigationInterceptor';
 import ClientProviders from '@/components/ClientProviders';
+import AuroraBackground from '@/components/AuroraBackground';
 import ClickSplash from '@/components/ClickSplash';
 
 export const metadata: Metadata = {
@@ -64,6 +65,7 @@ export default function RootLayout({
       </head>
       <body className="xf-body">
         <a href="#main-content" className="skip-link">Skip to main content</a>
+        <AuroraBackground />
         <ClickSplash />
         <ClientProviders>
           <NavigationInterceptor />
