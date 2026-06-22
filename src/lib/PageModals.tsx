@@ -11,7 +11,16 @@ import type { User } from './usePageFeatures';
 
 
 function VaultaLoader() {
-  return <div className="xf-loader"><div className="xf-loader-dot" /><div className="xf-loader-dot" /><div className="xf-loader-dot" /></div>;
+  // Minimal themed loading overlay. Uses --black (the page background var
+  // that's defined for every theme) so the overlay is actually opaque
+  // instead of showing content through it.
+  return (
+    <div className="xf-loader" role="status" aria-label="Loading">
+      <div className="xf-loader-dot" />
+      <div className="xf-loader-dot" />
+      <div className="xf-loader-dot" />
+    </div>
+  );
 }
 
 function useFocusTrap(containerRef: React.RefObject<HTMLElement | null>, isActive: boolean) {

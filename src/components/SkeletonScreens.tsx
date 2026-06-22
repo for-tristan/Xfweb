@@ -179,12 +179,15 @@ export function SkeletonCourseCard() {
 
 
 export function SkeletonAuthGate() {
+  // Theme-aware loading overlay for auth-gated pages. Uses CSS vars that
+  // exist for every theme (--black, --border-color, --accent, --text-light,
+  // --text-dim) instead of hardcoded dark colors.
   return (
     <div style={{
       position: 'fixed',
       inset: 0,
       zIndex: 9990,
-      background: 'rgba(7,7,7,0.95)',
+      background: 'var(--black)',
       backdropFilter: 'blur(20px)',
       display: 'flex',
       alignItems: 'center',
@@ -197,7 +200,7 @@ export function SkeletonAuthGate() {
           fontFamily: "'Orbitron', sans-serif",
           fontWeight: 900,
           fontSize: 28,
-          color: 'var(--text-light, #fff)',
+          color: 'var(--text-light)',
           letterSpacing: 3,
           textTransform: 'uppercase',
         }}>
@@ -205,18 +208,18 @@ export function SkeletonAuthGate() {
         </span>
       </div>
 
-      <div style={{ width: 200, height: 2, background: 'var(--border-color, rgba(255,255,255,0.08))', borderRadius: 2, overflow: 'hidden' }}>
+      <div style={{ width: 200, height: 2, background: 'var(--border-color)', borderRadius: 2, overflow: 'hidden' }}>
         <div style={{
           width: '40%',
           height: '100%',
-          background: 'var(--primary-red)',
+          background: 'var(--accent)',
           borderRadius: 2,
           animation: 'skeleton-bar-slide 1.5s ease-in-out infinite',
         }} />
       </div>
 
       <span style={{
-        color: 'var(--text-dim, #888)',
+        color: 'var(--text-dim)',
         fontSize: 14,
         fontFamily: "'Space Grotesk', sans-serif",
       }}>

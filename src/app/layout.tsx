@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import PageTransition from '@/components/PageTransition';
-import NavigationInterceptor from '@/components/NavigationInterceptor';
 import ClientProviders from '@/components/ClientProviders';
 import GrainBackground from '@/components/GrainBackground';
 import ClickSplash from '@/components/ClickSplash';
@@ -68,10 +66,9 @@ export default function RootLayout({
         <GrainBackground />
         <ClickSplash />
         <ClientProviders>
-          <NavigationInterceptor />
           <main id="main-content">
             <ErrorBoundary>
-              <PageTransition>{children}</PageTransition>
+              {children}
             </ErrorBoundary>
           </main>
           <Toaster />
