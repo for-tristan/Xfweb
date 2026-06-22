@@ -2412,6 +2412,40 @@ select optgroup {
 
 .wave-group .xf-password-strength { margin-top: 6px; }
 .wave-group .pw-mismatch { color: var(--error-color); font-size: 11px; font-weight: 600; margin-top: 4px; display: block; }
+
+/* Live password requirement checklist under the signup password field.
+   Each <li> shows an empty circle + dim text by default; when the rule
+   is satisfied (.xf-pw-req--ok) it switches to a filled green check
+   + bright text. */
+.wave-group .xf-pw-reqs {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.wave-group .xf-pw-reqs li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 500;
+  color: var(--text-dim);
+  transition: color 0.2s ease;
+}
+.wave-group .xf-pw-reqs li i {
+  font-size: 11px;
+  color: var(--text-dim);
+  transition: color 0.2s ease;
+}
+.wave-group .xf-pw-reqs li.xf-pw-req--ok {
+  color: var(--success-color);
+}
+.wave-group .xf-pw-reqs li.xf-pw-req--ok i {
+  color: var(--success-color);
+}
 .wave-group-textarea .textarea {
     font-size: 15px;
     font-weight: 600;

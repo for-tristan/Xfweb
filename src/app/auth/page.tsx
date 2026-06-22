@@ -22,6 +22,36 @@ function getPasswordStrength(pw: string): string {
   return 'strong';
 }
 
+/**
+ * Live password requirement checklist. Mirrors the server-side validation
+ * in /api/auth/signup/route.ts (MIN_PASSWORD_LENGTH = 8, must contain
+ * uppercase, lowercase, and a digit). Each rule lights up green + shows
+ * a check icon as soon as the user satisfies it.
+ */
+const PASSWORD_REQUIREMENTS = [
+  { key: 'length',    label: 'At least 8 characters',  test: (pw: string) => pw.length >= 8 },
+  { key: 'uppercase', label: 'At least one uppercase letter (A-Z)', test: (pw: string) => /[A-Z]/.test(pw) },
+  { key: 'lowercase', label: 'At least one lowercase letter (a-z)', test: (pw: string) => /[a-z]/.test(pw) },
+  { key: 'number',    label: 'At least one number (0-9)', test: (pw: string) => /[0-9]/.test(pw) },
+] as const;
+
+function PasswordRequirements({ password }: { password: string }) {
+  if (!password) return null;
+  return (
+    <ul className="xf-pw-reqs">
+      {PASSWORD_REQUIREMENTS.map((req) => {
+        const ok = req.test(password);
+        return (
+          <li key={req.key} className={ok ? 'xf-pw-req--ok' : ''}>
+            <i className={ok ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'} aria-hidden="true" />
+            <span>{req.label}</span>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 export default function AuthPage() {
   return (
     <Suspense fallback={<div style={{ width: '100vw', height: '100vh', background: 'var(--black)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div className="xf-loader"><span /><span /><span /></div></div>}>
@@ -483,6 +513,7 @@ function AuthContent() {
                             <div className={`xf-password-strength-bar ${getPasswordStrength(signupPassword)}`}></div>
                           </div>
                         )}
+                        <PasswordRequirements password={signupPassword} />
                       </WaveInput>
                       <WaveInput label="Confirm Password *" type="password" value={signupConfirmPassword} onChange={(e) => setSignupConfirmPassword(e.target.value)} required>
                         {signupConfirmPassword && signupPassword !== signupConfirmPassword && (
