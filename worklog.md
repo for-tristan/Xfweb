@@ -671,3 +671,23 @@ Stage Summary:
 - Commit 159d5b8 pushed to origin/main on Xfweb
 - Signup form now shows a live checklist under the password field: "At least 8 characters", "At least one uppercase letter (A-Z)", "At least one lowercase letter (a-z)", "At least one number (0-9)". Each lights up green with a check icon as soon as the rule is met.
 - The existing 3-bar strength meter is preserved above the checklist for a quick at-a-glance strength read.
+
+---
+Task ID: lenis-revert
+Agent: main
+Task: Revert the Lenis-related changes from commit a47241c (1.2s → 0.8s duration reduction was based on misattributed feedback)
+
+Work Log:
+- Reviewed commit a47241c diff to identify exact Lenis-related changes
+- src/components/LenisProvider.tsx: duration 0.8 → 1.2, removed the (incorrectly attributed) 3-line comment claiming "1.2s was contributing to the laggy perception"
+- src/lib/usePageFeatures.ts: reverted 3 lines
+  * lenis.scrollTo(0, { duration: 0.8 }) → { duration: 1.2 }  (home section)
+  * lenis.scrollTo(el, { offset: 0, duration: 0.8 }) → { duration: 1.2 }  (other sections)
+  * setTimeout(doScroll, 400) → 500  (cross-page navigation delay)
+- tsc --noEmit clean
+- The other three fixes in a47241c (force-dynamic removal on 7 layouts, minLoading 3s timer removal, Navbar prefetch={true}) were based on real issues and STAY in place
+
+Stage Summary:
+- Commit 7f18a8d created locally
+- Push to origin/main FAILED — git credentials not available in this environment. User needs to push from their side, or set up credentials here.
+- Net effect: Lenis smooth-scroll feels exactly as it did before a47241c. Three real performance fixes (force-dynamic, minLoading timer, prefetch) remain in place.
