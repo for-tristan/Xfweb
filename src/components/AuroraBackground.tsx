@@ -110,12 +110,16 @@ export default function AuroraBackground() {
       const pull2y = (ny - 0.5) * -28;
       const pull3x = (nx - 0.5) * 20;
       const pull3y = (ny - 0.5) * -32;
+      const pull4x = (nx - 0.5) * -36;
+      const pull4y = (ny - 0.5) * 24;
       root.style.setProperty('--aurora-pull-1-x', `${pull1x.toFixed(1)}px`);
       root.style.setProperty('--aurora-pull-1-y', `${pull1y.toFixed(1)}px`);
       root.style.setProperty('--aurora-pull-2-x', `${pull2x.toFixed(1)}px`);
       root.style.setProperty('--aurora-pull-2-y', `${pull2y.toFixed(1)}px`);
       root.style.setProperty('--aurora-pull-3-x', `${pull3x.toFixed(1)}px`);
       root.style.setProperty('--aurora-pull-3-y', `${pull3y.toFixed(1)}px`);
+      root.style.setProperty('--aurora-pull-4-x', `${pull4x.toFixed(1)}px`);
+      root.style.setProperty('--aurora-pull-4-y', `${pull4y.toFixed(1)}px`);
 
       rafRef.current = requestAnimationFrame(animate);
     };
@@ -181,6 +185,7 @@ export default function AuroraBackground() {
       <div className="aurora-orb aurora-orb-1" />
       <div className="aurora-orb aurora-orb-2" />
       <div className="aurora-orb aurora-orb-3" />
+      <div className="aurora-orb aurora-orb-4" />
       {/* Mouse-reactive spotlight */}
       <div className="aurora-spotlight" />
       {/* Subtle grain for texture */}
