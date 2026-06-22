@@ -651,3 +651,23 @@ Work Log:
 Stage Summary:
 - Commit a716a34 pushed to origin/main on Xfweb
 - Scroll indicator on the landing page hero now pulses continuously again (line grows from top, fades, grows from bottom, fades, repeat every 2.5s)
+
+---
+Task ID: password-requirements-checklist
+Agent: main
+Task: Make password warnings on signup more informative (show specific rules live)
+
+Work Log:
+- Verified server-side password validation in src/app/api/auth/signup/route.ts: 4 rules (min 8 chars, 1 uppercase, 1 lowercase, 1 number). The previous client UX only showed a 3-bar strength meter (weak/medium/strong) — no specific rule hints. Users only found out about rules one at a time via server error toasts on Submit.
+- src/app/auth/page.tsx:
+  * Added PASSWORD_REQUIREMENTS constant — array of 4 {key, label, test} objects mirroring server validation
+  * Added PasswordRequirements React component — renders a <ul> of <li> rows; each row shows fa-regular fa-circle + dim text by default, switches to fa-solid fa-circle-check + green text when the rule is satisfied
+  * Rendered <PasswordRequirements password={signupPassword} /> inside the password WaveInput's children slot, below the existing strength bar
+- src/app/globals.css:
+  * Added .wave-group .xf-pw-reqs styles — 11px Space Grotesk, dim text by default, var(--success-color) green on .xf-pw-req--ok. Smooth 0.2s color transition.
+- tsc --noEmit clean.
+
+Stage Summary:
+- Commit 159d5b8 pushed to origin/main on Xfweb
+- Signup form now shows a live checklist under the password field: "At least 8 characters", "At least one uppercase letter (A-Z)", "At least one lowercase letter (a-z)", "At least one number (0-9)". Each lights up green with a check icon as soon as the rule is met.
+- The existing 3-bar strength meter is preserved above the checklist for a quick at-a-glance strength read.
