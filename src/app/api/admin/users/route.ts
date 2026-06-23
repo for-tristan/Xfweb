@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
           { username: { contains: search } },
         ],
       }),
-      ...(role && ['student', 'instructor', 'admin'].includes(role) ? { role } : {}),
+      ...(role && ['student', 'instructor', 'admin'].includes(role) ? { role: role as 'student' | 'instructor' | 'admin' } : {}),
     };
 
     const select = {
