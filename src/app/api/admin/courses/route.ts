@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { revalidatePath } from 'next/cache';
+import { revalidateTag } from 'next/cache';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 
 /**
  * Bust CDN/edge cache for the public courses list + landing + course
- * detail pages. Public /api/courses route is cached with s-maxage=60.
+ * detail pages. Using revalidateTag means any cache entry (unstable_cache,
+ * fetch with next.tags, ISR pages) tagged with 'public-courses' is purged
+ * in one shot — no need to enumerate every URL that displays courses.
  */
 function bustCoursesCache() {
   try {
-    revalidatePath('/api/courses');
-    revalidatePath('/');
-    revalidatePath('/courses', 'page');
-    revalidatePath('/courses/[slug]', 'page');
+    revalidateTag('public-courses');
+    // Also revalidate the landing page (it pulls from /api/courses via fetch).
+    revalidateTag('landing');
   } catch {
     /* no-op in dev / non-Vercel runtimes */
   }
@@ -34,22 +35,72 @@ export async function GET(request: NextRequest) {
     const { error } = await requireAdmin();
     if (error) return error;
 
-    const courses = await db.course.findMany({
-      include: {
-        modules: {
-          orderBy: { moduleOrder: 'asc' },
-        },
-      },
-      orderBy: { displayOrder: 'asc' },
-    });
+    // Pagination: ?page=1&limit=50. If neither param is supplied, return the
+    // full list (preserves the existing admin UI behaviour). When either is
+    // supplied, both default sensibly and the response includes `total` /
+    // `totalPages` for the client to render pagination controls.
+    const url = new URL(request.url);
+    const pageParam = url.searchParams.get('page');
+    const limitParam = url.searchParams.get('limit');
+    const paginating = pageParam !== null || limitParam !== null;
 
-    const parsed = courses.map(c => ({
+    const page = Math.max(1, parseInt(pageParam || '1', 10) || 1);
+    const limit = Math.min(200, Math.max(1, parseInt(limitParam || '50', 10) || 50));
+    const search = url.searchParams.get('search')?.trim() || '';
+    const status = url.searchParams.get('status')?.trim() || '';
+
+    const where = {
+      ...(search && {
+        OR: [
+          { title: { contains: search } },
+          { slug: { contains: search } },
+          { description: { contains: search } },
+        ],
+      }),
+      ...(status && ['active', 'draft', 'archived'].includes(status) ? { status } : {}),
+    };
+
+    const include = {
+      modules: {
+        orderBy: { moduleOrder: 'asc' },
+      },
+    };
+
+    const parseCourse = (c: any) => ({
       ...c,
       features: JSON.parse(c.features || '[]'),
       moduleCount: c.modules.length,
-    }));
+    });
 
-    return NextResponse.json({ courses: parsed });
+    if (!paginating) {
+      const courses = await db.course.findMany({
+        where,
+        include,
+        orderBy: { displayOrder: 'asc' },
+      });
+      return NextResponse.json({ courses: courses.map(parseCourse) });
+    }
+
+    const [courses, total] = await Promise.all([
+      db.course.findMany({
+        where,
+        include,
+        orderBy: { displayOrder: 'asc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      db.course.count({ where }),
+    ]);
+
+    return NextResponse.json({
+      courses: courses.map(parseCourse),
+      page,
+      limit,
+      total,
+      totalPages: Math.max(1, Math.ceil(total / limit)),
+      hasNextPage: page * limit < total,
+      hasPrevPage: page > 1,
+    });
   } catch (error) {
     console.error('Admin courses fetch error:', error);
     return NextResponse.json(

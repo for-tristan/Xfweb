@@ -13,24 +13,76 @@ async function requireAdmin() {
   return { error: null, user };
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const { error } = await requireAdmin();
     if (error) return error;
 
-    const users = await db.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        avatar: true,
-        createdAt: true,
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+    // Pagination: ?page=1&limit=50. If neither param is supplied, return the
+    // full list (preserves the existing admin UI behaviour). When either is
+    // supplied, both default sensibly and the response includes `total` /
+    // `totalPages` for the client to render pagination controls.
+    const url = new URL(request.url);
+    const pageParam = url.searchParams.get('page');
+    const limitParam = url.searchParams.get('limit');
+    const paginating = pageParam !== null || limitParam !== null;
 
-    return NextResponse.json({ users });
+    const page = Math.max(1, parseInt(pageParam || '1', 10) || 1);
+    const limit = Math.min(200, Math.max(1, parseInt(limitParam || '50', 10) || 50));
+    const search = url.searchParams.get('search')?.trim() || '';
+    const role = url.searchParams.get('role')?.trim() || '';
+
+    const where = {
+      ...(search && {
+        OR: [
+          { name: { contains: search } },
+          { email: { contains: search } },
+          { username: { contains: search } },
+        ],
+      }),
+      ...(role && ['student', 'instructor', 'admin'].includes(role) ? { role } : {}),
+    };
+
+    const select = {
+      id: true,
+      name: true,
+      email: true,
+      username: true,
+      role: true,
+      avatar: true,
+      createdAt: true,
+    };
+
+    if (!paginating) {
+      // Legacy path: no pagination requested — return the full list as before.
+      const users = await db.user.findMany({
+        where,
+        select,
+        orderBy: { createdAt: 'desc' },
+      });
+      return NextResponse.json({ users });
+    }
+
+    const [users, total] = await Promise.all([
+      db.user.findMany({
+        where,
+        select,
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      db.user.count({ where }),
+    ]);
+
+    return NextResponse.json({
+      users,
+      page,
+      limit,
+      total,
+      totalPages: Math.max(1, Math.ceil(total / limit)),
+      hasNextPage: page * limit < total,
+      hasPrevPage: page > 1,
+    });
   } catch (error) {
     console.error('Admin users fetch error:', error);
     return NextResponse.json(

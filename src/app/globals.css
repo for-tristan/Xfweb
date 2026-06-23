@@ -3972,6 +3972,58 @@ body {
   .click-splash-container {
     display: none !important;
   }
+
+  /* backdrop-filter: blur() is one of the most GPU-expensive CSS properties.
+     For users who requested reduced motion, kill it entirely and fall back
+     to a solid (slightly translucent) background. Visual cost is minimal;
+     compositor cost drops to near-zero. */
+  .navbar,
+  .nav-pill-wrapper,
+  .v-service-card,
+  .v-course-card,
+  .v-contact-info,
+  .v-contact-form,
+  .v-leaderboard-card,
+  .v-timer-card,
+  [style*="backdrop-filter"],
+  [style*="WebkitBackdropFilter"],
+  [style*="-webkit-backdrop-filter"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background-color: var(--card-bg) !important;
+  }
+
+  /* Lenis smooth-scroll is JS-driven; under reduced-motion it should defer
+     to the browser's native scroll, which respects the OS setting. */
+  html.lenis,
+  html.lenis body {
+    height: auto !important;
+  }
+  .lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: auto !important;
+  }
+  .lenis-stopped {
+    overflow: auto !important;
+  }
+}
+
+/* Users on metered / slow connections: skip the heavy decorative layers
+   (grain, particles, splashes). They're nice-to-have, not content. */
+@media (prefers-reduced-data: reduce) {
+  .grain-background,
+  .particle,
+  .click-splash-container,
+  canvas[style*="position: fixed"] {
+    display: none !important;
+  }
+  /* Stop preloading the 3D model assets on the homepage hero */
+  video,
+  .v-hero-3d {
+    preload: none !important;
+  }
 }
 
 

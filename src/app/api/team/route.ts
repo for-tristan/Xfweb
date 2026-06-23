@@ -1,17 +1,27 @@
 import { NextResponse } from 'next/server';
+import { unstable_cache } from 'next/cache';
 import { db } from '@/lib/db';
 
-export async function GET() {
-  try {
+const getTeamMembers = unstable_cache(
+  async () => {
     const members = await db.teamMember.findMany({
       orderBy: { displayOrder: 'asc' },
     });
+    return members;
+  },
+  ['public-team-v1'],
+  { tags: ['public-team'], revalidate: 60 }
+);
+
+export async function GET() {
+  try {
+    const members = await getTeamMembers();
 
     return NextResponse.json(
       { members },
       {
         headers: {
-          'Cache-Control': 'no-store',
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
         },
       }
     );

@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { unstable_cache } from 'next/cache';
 import { db } from '@/lib/db';
 
-export async function GET(request: NextRequest) {
-  try {
+// Tagged cache: revalidateTag('public-courses') from admin mutations
+// invalidates this immediately. CDN layer (s-maxage) handles the rest.
+const getCourses = unstable_cache(
+  async () => {
     const courses = await db.course.findMany({
       where: { status: 'active' },
       orderBy: { displayOrder: 'asc' },
@@ -26,22 +29,32 @@ export async function GET(request: NextRequest) {
       enrollmentCounts.map(e => [e.courseId, e._count.id])
     );
 
-    const parsed = courses.map(c => ({
+    return courses.map(c => ({
       ...c,
       features: JSON.parse(c.features || '[]'),
       moduleCount: c._count.modules,
       enrollmentCount: countMap.get(c.slug) || 0,
     }));
+  },
+  ['public-courses-v1'],
+  {
+    tags: ['public-courses'],
+    revalidate: 60,
+  }
+);
+
+export async function GET(request: NextRequest) {
+  try {
+    const parsed = await getCourses();
 
     return NextResponse.json(
       { courses: parsed },
       {
         headers: {
-          // Admins need to see mutations appear immediately. no-store
-          // guarantees the browser HTTP cache + Vercel CDN never serve
-          // a stale response. revalidatePath is also called in admin
-          // mutations as defense-in-depth.
-          'Cache-Control': 'no-store',
+          // CDN caches for 60s, then serves stale while revalidating for 300s.
+          // Browser still gets fresh data (must-revalidate). Admin mutations
+          // call revalidateTag('public-courses') for immediate invalidation.
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
         },
       }
     );

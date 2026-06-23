@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { unstable_cache } from 'next/cache';
 import { db } from '@/lib/db';
 
-export async function GET(request: NextRequest) {
-  try {
+const getServices = unstable_cache(
+  async () => {
     const services = await db.service.findMany({
       where: { status: 'active' },
       include: {
@@ -12,18 +13,21 @@ export async function GET(request: NextRequest) {
       },
       orderBy: { displayOrder: 'asc' },
     });
+    return services;
+  },
+  ['public-services-v1'],
+  { tags: ['public-services'], revalidate: 60 }
+);
 
-    console.log('[Public GET /api/services] returning', services.length, 'services:', services.map(s => ({ id: s.id, title: s.title, status: s.status, displayOrder: s.displayOrder })));
+export async function GET(request: NextRequest) {
+  try {
+    const services = await getServices();
 
     return NextResponse.json(
       { services },
       {
         headers: {
-          // Admins need to see mutations appear immediately. We rely on
-          // revalidatePath in the admin mutation handlers, but to be
-          // 100% sure no stale response is served by the browser HTTP
-          // cache or Vercel CDN, we mark this as no-store.
-          'Cache-Control': 'no-store',
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
         },
       }
     );
