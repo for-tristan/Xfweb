@@ -65,13 +65,13 @@ export async function GET(request: NextRequest) {
       ...(status && ['active', 'draft', 'archived'].includes(status) ? { status: status as 'active' | 'draft' | 'archived' } : {}),
     };
 
-    // `as const` on the orderBy values prevents TypeScript from widening
+    // `as const` on the orderBy value prevents TypeScript from widening
     // 'asc' to string, which would break Prisma's SortOrder type check.
     const include = {
       modules: {
         orderBy: { moduleOrder: 'asc' as const },
       },
-    } satisfies Parameters<typeof db.course.findMany>[0]['include'];
+    };
 
     const parseCourse = (c: any) => ({
       ...c,
