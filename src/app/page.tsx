@@ -998,7 +998,6 @@ export default function Home() {
       <section className="v-section" id="services">
         <SectionReveal direction="up" delay={0}>
           <div className="v-section-header">
-            <div className="v-section-badge"><span className="v-badge-text">Services</span></div>
           <h2 className="v-section-title"><BlurText text="Your Digital Future," tag="span" stagger={0.02} /> <span className="v-highlight">Built with Care</span></h2>
           <p className="v-section-desc" style={{ marginTop: 16 }}>
             Comprehensive technology solutions designed to accelerate your digital transformation.
@@ -1026,7 +1025,6 @@ export default function Home() {
 
         <SectionReveal direction="up" delay={0}>
           <div className="v-section-header">
-            <div className="v-section-badge"><span className="v-badge-text">Projects</span></div>
             <h2 className="v-section-title"><BlurText text="Featured" tag="span" stagger={0.02} /> <span className="v-highlight">Projects</span></h2>
             <p className="v-section-desc" style={{ marginTop: 16 }}>
               Explore our portfolio of real-world projects.
@@ -1090,7 +1088,6 @@ export default function Home() {
 
         <SectionReveal direction="up" delay={0}>
           <div className="v-section-header">
-            <div className="v-section-badge"><span className="v-badge-text">Programs</span></div>
             <h2 className="v-section-title"><BlurText text="Tech" tag="span" stagger={0.02} /> <span className="v-highlight">Programs</span></h2>
             <p className="v-section-desc" style={{ marginTop: 16 }}>
               Master technologies with our expert-led programs.
@@ -1152,7 +1149,6 @@ export default function Home() {
       <section className="v-section" id="faq">
         <SectionReveal direction="up" delay={0}>
           <div className="v-section-header">
-            <div className="v-section-badge"><span className="v-badge-text">FAQ</span></div>
             <h2 className="v-section-title"><BlurText text="Got" tag="span" stagger={0.02} /> <span className="v-highlight">Questions?</span></h2>
             <p className="v-section-desc" style={{ marginTop: 16 }}>Everything you need to know about X-Foundry courses and services.</p>
           </div>
@@ -1174,7 +1170,6 @@ export default function Home() {
 
         <SectionReveal direction="up" delay={0}>
           <div className="v-section-header">
-            <div className="v-section-badge"><span className="v-badge-text">Team</span></div>
             <h2 className="v-section-title"><BlurText text="Meet The" tag="span" stagger={0.02} /> <span className="v-highlight">Team</span></h2>
             <p className="v-section-desc" style={{ marginTop: 16 }}>
               The people behind {siteName}
@@ -1216,7 +1211,6 @@ export default function Home() {
 
         <SectionReveal direction="up" delay={0}>
           <div className="v-section-header">
-            <div className="v-section-badge"><span className="v-badge-text">Contact</span></div>
             <h2 className="v-section-title"><BlurText text="Request A" tag="span" stagger={0.02} /> <span className="v-highlight">Quote</span></h2>
             <p className="v-section-desc" style={{ marginTop: 16 }}>
               Ready to transform your project? Let&apos;s discuss how X-Foundry can help you achieve your goals.
