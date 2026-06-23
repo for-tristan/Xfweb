@@ -902,7 +902,7 @@ export default function Home({
       try {
         // Client-side refresh: picks up any data that changed since the
         // server render. The API routes are CDN-cached (s-maxage=60,
-        // swr=300) and purged via revalidateTag on admin mutations, so
+        // swr=300) and purged via revalidatePath on admin mutations, so
         // this fetch sees fresh data within ~60s of an admin edit.
         // Initial data comes from server-side props (no blocking fetch).
         const [servicesRes, coursesRes, teamRes, projectsRes] = await Promise.all([

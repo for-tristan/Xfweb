@@ -1,19 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { revalidateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 
 /**
  * Bust CDN/edge cache for the public services list + any page that renders
- * services. revalidateTag purges every cache entry tagged 'public-services'
- * (unstable_cache + fetch with next.tags + ISR pages) in one call.
+ * services. revalidatePath purges the route cache; the unstable_cache on
+ * /api/services also refreshes via its revalidate: 60 TTL.
  */
 function bustServicesCache() {
   try {
-    revalidateTag('public-services');
-    revalidateTag('landing');
+    revalidatePath('/api/services');
+    revalidatePath('/');
+    revalidatePath('/services', 'page');
   } catch {
-    /* revalidateTag is a no-op in dev / non-Vercel runtimes */
+    /* revalidatePath is a no-op in dev / non-Vercel runtimes */
   }
 }
 

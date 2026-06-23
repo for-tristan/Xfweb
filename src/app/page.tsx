@@ -2,12 +2,12 @@
  * Server component wrapper for the homepage.
  *
  * Fetches services, courses, team, and projects on the server (using
- * unstable_cache with the same tags as the public API routes) and passes
- * them as initial data to HomePageClient. This eliminates the client-side
- * fetch waterfall — the first paint now has real content.
+ * unstable_cache with 60s TTL) and passes them as initial data to
+ * HomePageClient. This eliminates the client-side fetch waterfall —
+ * the first paint now has real content.
  *
- * Admin mutations call revalidateTag('public-courses') etc., which
- * invalidates both this cache and the API route cache.
+ * Admin mutations call revalidatePath('/') etc., which re-renders this
+ * page; the unstable_cache entries refresh via their revalidate: 60 TTL.
  */
 
 import { unstable_cache } from 'next/cache';

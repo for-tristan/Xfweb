@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { revalidateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 
 /** Bust CDN/edge cache for the public projects list + landing page. */
 function bustProjectsCache() {
   try {
-    revalidateTag('public-projects');
-    revalidateTag('landing');
+    revalidatePath('/api/projects');
+    revalidatePath('/');
   } catch {
     /* no-op in dev / non-Vercel runtimes */
   }

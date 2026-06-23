@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { revalidateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 
 /** Bust CDN/edge cache for the public team list + landing page. */
 function bustTeamCache() {
   try {
-    revalidateTag('public-team');
-    revalidateTag('landing');
+    revalidatePath('/api/team');
+    revalidatePath('/');
   } catch {
     /* no-op in dev / non-Vercel runtimes */
   }

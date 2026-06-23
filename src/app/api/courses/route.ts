@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
 import { db } from '@/lib/db';
 
-// Tagged cache: revalidateTag('public-courses') from admin mutations
-// invalidates this immediately. CDN layer (s-maxage) handles the rest.
+// Server-side cache with 60s TTL. revalidatePath('/api/courses') in admin
+// mutations busts the route cache; the unstable_cache entry refreshes via
+// its revalidate: 60 option. CDN layer (s-maxage) handles edge caching.
 const getCourses = unstable_cache(
   async () => {
     const courses = await db.course.findMany({
@@ -53,7 +54,7 @@ export async function GET(request: NextRequest) {
         headers: {
           // CDN caches for 60s, then serves stale while revalidating for 300s.
           // Browser still gets fresh data (must-revalidate). Admin mutations
-          // call revalidateTag('public-courses') for immediate invalidation.
+          // call revalidatePath('/api/courses') for route-level invalidation.
           'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
         },
       }

@@ -1,19 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { revalidateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 
 /**
  * Bust CDN/edge cache for the public courses list + landing + course
- * detail pages. Using revalidateTag means any cache entry (unstable_cache,
- * fetch with next.tags, ISR pages) tagged with 'public-courses' is purged
- * in one shot — no need to enumerate every URL that displays courses.
+ * detail pages. revalidatePath purges the route cache for each path;
+ * the unstable_cache entries on /api/courses and the landing page also
+ * refresh via their revalidate: 60 TTL.
+ *
+ * Note: revalidateTag would be more surgical but in Next.js 16 it
+ * requires a 2nd cache-scope argument that isn't available in this
+ * context. revalidatePath is the stable API.
  */
 function bustCoursesCache() {
   try {
-    revalidateTag('public-courses');
-    // Also revalidate the landing page (it pulls from /api/courses via fetch).
-    revalidateTag('landing');
+    revalidatePath('/api/courses');
+    revalidatePath('/');
+    revalidatePath('/courses', 'page');
+    revalidatePath('/courses/[slug]', 'page');
   } catch {
     /* no-op in dev / non-Vercel runtimes */
   }
