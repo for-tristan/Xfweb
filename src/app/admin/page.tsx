@@ -17,6 +17,7 @@ import type {
   AdminUser,
   AdminEnrollment,
   ProgressEntry,
+  ServiceFeature,
   AdminService,
   AdminCourse,
   CourseModuleItem,
