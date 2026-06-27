@@ -21,6 +21,16 @@ import ScrollFadeSection from '@/components/ScrollFadeSection';
 import DraggableScroll from '@/components/DraggableScroll';
 import { SmartImage } from '@/components/SmartImage';
 
+// Extracted section components (see src/components/home/)
+import { BlurText } from '@/components/home/BlurText';
+import { FaqItem } from '@/components/home/FaqItem';
+import { EnrollButton } from '@/components/home/EnrollButton';
+import { ServicesSection } from '@/components/home/ServicesSection';
+import { ProjectsSection } from '@/components/home/ProjectsSection';
+import { FaqSection } from '@/components/home/FaqSection';
+import { TeamSection } from '@/components/home/TeamSection';
+import { Footer } from '@/components/home/Footer';
+
 
 interface User {
   id: string;
@@ -91,105 +101,9 @@ const staticSearchData = [
   { title: 'Our Team', category: 'Page', desc: 'Meet Marwan Montaser', link: '#team' },
 ];
 
-
-// Character-by-character reveal component (Vaulta SplitText style)
-// Reveals once on scroll into view — does NOT re-hide on scroll away to prevent lag spikes.
-//
-// Performance notes:
-//  - Default stagger reduced 0.02s -> 0.012s so the whole word finishes animating
-//    in <0.4s instead of running 1s+ (which made characters appear to "fly" while
-//    the user kept scrolling).
-//  - Per-char filter:blur is GPU-expensive; we keep it but cap the blur radius
-//    (see globals.css) and let CSS `contain` isolate the layout/paint work.
-function BlurText({ text, tag = 'span', className = '', stagger = 0.012 }: { text: string; tag?: string; className?: string; stagger?: number }) {
-  const ref = useRef<HTMLElement>(null);
-  const [revealed, setRevealed] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setRevealed(true);
-        observer.disconnect();
-      }
-    }, { threshold: 0.1 });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  const chars = text.split('').map((char, i) => (
-    <span
-      key={i}
-      className={`blur-char${char === ' ' ? ' space' : ''}`}
-      style={revealed ? { transitionDelay: `${i * stagger}s` } : undefined}
-    >
-      {char === ' ' ? '\u00A0' : char}
-    </span>
-  ));
-
-  const El = tag as any;
-  // NOTE: chars animate opacity + translateY only. We deliberately do NOT use
-  // filter:blur() here — animating filter:blur on individual chars inside a
-  // parent that is also being transformed (SectionReveal translateY,
-  // ScrollFadeSection scale) forces the browser to re-rasterize each char's
-  // layer every frame, producing the "flying letters" visual artifact when
-  // scrolling through hero/services/projects sections. Opacity + a tiny
-  // translateY gives the same staggered-reveal feel without the repaint cost.
-  return <El ref={ref} className={`blur-text${revealed ? ' revealed' : ''} ${className}`} style={{ contain: 'layout paint' }}>{chars}</El>;
-}
-
-function FaqItem({ question, answer, index }: { question: string; answer: string; index: number }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className={`v-faq-item${open ? ' v-faq-active' : ''}`}>
-      <button onClick={() => setOpen(!open)}>
-        <span className="v-faq-question">{question}</span>
-        <span className="v-faq-icon-wrap">
-          <i className={`fa-solid ${open ? 'fa-minus' : 'fa-plus'}`} style={{ fontSize: 12 }} />
-        </span>
-      </button>
-      <div className="v-faq-answer" style={{ maxHeight: open ? 500 : 0, opacity: open ? 1 : 0, padding: open ? undefined : '0 24px 0', overflow: 'hidden' }}>
-        {answer}
-      </div>
-    </div>
-  );
-}
-
-
-function EnrollButton({ courseId, courseName, onEnroll, status }: {
-  courseId: string;
-  courseName: string;
-  onEnroll: () => void;
-  status?: string;
-}) {
-  if (status === 'approved') {
-    return (
-      <button className="v-course-enroll-btn enrolled" disabled>
-        <i className="fa-solid fa-check" /> Enrolled
-      </button>
-    );
-  }
-  if (status === 'pending') {
-    return (
-      <button className="v-course-enroll-btn pending" disabled>
-        <i className="fa-solid fa-hourglass-half" /> Pending...
-      </button>
-    );
-  }
-  if (status === 'declined') {
-    return (
-      <button className="v-course-enroll-btn" onClick={onEnroll}>
-        Re-apply →
-      </button>
-    );
-  }
-  return (
-    <button className="v-course-enroll-btn" onClick={onEnroll}>
-      Enroll Now →
-    </button>
-  );
-}
+// BlurText, FaqItem, and EnrollButton are now imported from @/components/home/
+// (see imports at top of file). This eliminates ~100 lines of inline component
+// definitions that were hard to find in a 1959-line file.
 
 
 export default function Home({
@@ -1008,95 +922,8 @@ export default function Home({
         </div>
       </section>
       </ScrollFadeSection>
-      <section className="v-section" id="services">
-        <SectionReveal direction="up" delay={0}>
-          <div className="v-section-header">
-          <h2 className="v-section-title"><BlurText text="Your Digital Future," tag="span" stagger={0.02} /> <span className="v-highlight">Built with Care</span></h2>
-          <p className="v-section-desc" style={{ marginTop: 16 }}>
-            Comprehensive technology solutions designed to accelerate your digital transformation.
-          </p>
-          </div>
-        </SectionReveal>
-
-        <StaggerReveal staggerDelay={100} direction="up">
-        <div className="v-services-grid">
-          {servicesDataArr.length > 0 ? servicesDataArr.map((service, idx) => (
-              <div key={service.id} className="v-service-card" onClick={() => router.push(`/services/${service.slug}`)}>
-              <div className="v-service-icon">
-                <i className={service.icon}></i>
-              </div>
-              <h3>{service.title}</h3>
-              <span className="v-service-link">Learn More <i className="fa-solid fa-arrow-right" style={{ fontSize: 11 }}></i></span>
-            </div>
-          )) : (
-            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: 40, color: '#5d5d5d' }}>No services available yet.</div>
-          )}
-        </div>
-        </StaggerReveal>
-      </section>
-      <section className="v-section" id="projects">
-
-        <SectionReveal direction="up" delay={0}>
-          <div className="v-section-header">
-            <h2 className="v-section-title"><BlurText text="Featured" tag="span" stagger={0.02} /> <span className="v-highlight">Projects</span></h2>
-            <p className="v-section-desc" style={{ marginTop: 16 }}>
-              Explore our portfolio of real-world projects.
-            </p>
-          </div>
-        </SectionReveal>
-
-        <DraggableScroll className="v-projects-showcase" autoSpeed={0.8}>
-          {dynamicProjects.length > 0 && <>
-            {dynamicProjects.map((project) => (
-              <div key={project.id} className="v-project-showcase-card" data-category={project.category}>
-                {project.imageUrl && (
-                  <div className="v-project-showcase-img">
-                    <SmartImage src={project.imageUrl} alt={project.title} width={600} height={400} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  </div>
-                )}
-                <div className="v-project-showcase-info">
-                  <div className="v-project-tags">
-                    {Array.isArray(project.tags) ? project.tags.map((tag: string, i: number) => (
-                      <span key={i} className="v-project-tag">{tag}</span>
-                    )) : <span className="v-project-tag">{project.category}</span>}
-                  </div>
-                  <h3>{project.title}</h3>
-                  <p>{project.description}</p>
-                  {project.projectUrl ? (
-                    <a href={project.projectUrl} target="_blank" rel="noopener noreferrer" className="v-project-link">View Case Study →</a>
-                  ) : null}
-                </div>
-              </div>
-            ))}
-            {dynamicProjects.map((project) => (
-              <div key={`dup-${project.id}`} className="v-project-showcase-card" data-category={project.category} aria-hidden="true">
-                {project.imageUrl && (
-                  <div className="v-project-showcase-img">
-                    <SmartImage src={project.imageUrl} alt={project.title} width={600} height={400} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  </div>
-                )}
-                <div className="v-project-showcase-info">
-                  <div className="v-project-tags">
-                    {Array.isArray(project.tags) ? project.tags.map((tag: string, i: number) => (
-                      <span key={i} className="v-project-tag">{tag}</span>
-                    )) : <span className="v-project-tag">{project.category}</span>}
-                  </div>
-                  <h3>{project.title}</h3>
-                  <p>{project.description}</p>
-                  {project.projectUrl ? (
-                    <a href={project.projectUrl} target="_blank" rel="noopener noreferrer" className="v-project-link">View Case Study →</a>
-                  ) : null}
-                </div>
-              </div>
-            ))}
-          </>}
-        </DraggableScroll>
-
-        <div className="v-projects-drag-hint">
-          <i className="fa-solid fa-arrows-left-right" />
-          <span>Drag to explore</span>
-        </div>
-      </section>
+      <ServicesSection services={servicesDataArr} />
+      <ProjectsSection projects={dynamicProjects} />
       <section className="v-section" id="courses">
 
         <SectionReveal direction="up" delay={0}>
@@ -1159,67 +986,8 @@ export default function Home({
         </div>
         </StaggerReveal>
       </section>
-      <section className="v-section" id="faq">
-        <SectionReveal direction="up" delay={0}>
-          <div className="v-section-header">
-            <h2 className="v-section-title"><BlurText text="Got" tag="span" stagger={0.02} /> <span className="v-highlight">Questions?</span></h2>
-            <p className="v-section-desc" style={{ marginTop: 16 }}>Everything you need to know about X-Foundry courses and services.</p>
-          </div>
-        </SectionReveal>
-        <StaggerReveal staggerDelay={100} direction="up">
-         <div style={{ maxWidth: 800, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
-         {[
-            { q: 'how do these programs work?', a: `We dont teach you We Guide, instruct and test you throughout the program, we show you how to do it yourself and work efficiently , dependently and be more productive at what you wanna Learn. ` },
-            { q: 'Are the programs really free?', a: 'Yes! For now since we are in our pre-production phase, all courses are completely free of charge.' },
-            { q: 'What technologies do you work with?', a: 'We specialize in various technologies including python, java, Frontend Development, and Backend Development, Software Engineering, and more.' },
-            { q: 'How do I request a custom project?', a: 'Navigate to our Contact section or use the "Request Quote" button on any service page. Fill in your project details, and our team will get back to you within 24 hours.' },
-          ].map((faq, i) => (
-            <FaqItem key={i} question={faq.q} answer={faq.a} index={i} />
-          ))}
-        </div>
-        </StaggerReveal>
-      </section>
-      <section className="v-section" id="team">
-
-        <SectionReveal direction="up" delay={0}>
-          <div className="v-section-header">
-            <h2 className="v-section-title"><BlurText text="Meet The" tag="span" stagger={0.02} /> <span className="v-highlight">Team</span></h2>
-            <p className="v-section-desc" style={{ marginTop: 16 }}>
-              The people behind {siteName}
-            </p>
-          </div>
-        </SectionReveal>
-
-        <StaggerReveal direction="up" staggerDelay={100}>
-        <div className="v-team-grid">
-          {dynamicTeam.length > 0 ? dynamicTeam.map((m) => (
-              <div key={m.id} className="v-team-card">
-              <div className="v-team-avatar" style={m.avatar ? { padding: 0 } : {}}>
-                {m.avatar
-                  ? <SmartImage src={m.avatar} alt={m.name} width={200} height={200} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
-                  : <i className={m.icon || 'fa-solid fa-user-tie'}></i>
-                }
-              </div>
-              <h3>{m.name}</h3>
-              <span className="v-team-role">{m.role}</span>
-              {m.bio && <p className="v-team-bio">{m.bio}</p>}
-              {(m.linkedinUrl || m.githubUrl) && (
-                <div className="v-team-socials">
-                  {m.linkedinUrl && <a href={m.linkedinUrl} target="_blank" rel="noopener noreferrer" style={{ position: 'relative', zIndex: 11 }}><i className="fa-brands fa-linkedin-in"></i></a>}
-                  {m.githubUrl && <a href={m.githubUrl} target="_blank" rel="noopener noreferrer" style={{ position: 'relative', zIndex: 11 }}><i className="fa-brands fa-github"></i></a>}
-                </div>
-              )}
-            </div>
-          )) : (
-            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '60px 20px', color: 'var(--text-dim)' }}>
-              <i className="fa-solid fa-users" style={{ fontSize: 32, marginBottom: 16, opacity: 0.3, display: 'block' }}></i>
-              <p style={{ fontSize: 15, fontWeight: 600 }}>No team members yet.</p>
-              <p style={{ fontSize: 13, marginTop: 8 }}>Check back soon to meet the team.</p>
-            </div>
-          )}
-        </div>
-        </StaggerReveal>
-      </section>
+      <FaqSection />
+      <TeamSection team={dynamicTeam} />
       <section className="v-section" id="contact">
 
         <SectionReveal direction="up" delay={0}>
@@ -1307,51 +1075,7 @@ export default function Home({
             </SectionReveal>
         </div>
       </section>
-      <footer className="v-footer">
-
-        <div className="v-footer-grid">
-          <div className="v-footer-brand">
-            <a href="/chat" className="nav-logo" style={{ display: 'inline-block', marginBottom: 20 }}><Logo className="nav-logo-img" style={{ height: 40 }} /></a>
-            <p>Pioneering the future of technology through innovation, research, and education. Building solutions that transform industries and empower human potential.</p>
-            <div className="v-footer-socials">
-              <a href={linkedinUrl} target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-linkedin-in"></i></a>
-              <a href={githubUrl} target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-github"></i></a>
-              <a href={discordUrl} target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-discord"></i></a>
-            </div>
-          </div>
-          <div className="v-footer-column">
-            <h4>Quick Links</h4>
-            <ul className="v-footer-links">
-              <li><a href="#home" onClick={(e) => { e.preventDefault(); scrollToSection('home'); }}>Home</a></li>
-              <li><a href="#services" onClick={(e) => { e.preventDefault(); scrollToSection('services'); }}>Services</a></li>
-              <li><a href="#courses" onClick={(e) => { e.preventDefault(); scrollToSection('courses'); }}>Programs</a></li>
-              <li><a href="/games">Games</a></li>
-              <li><a href="/study">Study</a></li>
-              <li><a href="/dashboard">Dashboard</a></li>
-            </ul>
-          </div>
-          <div className="v-footer-column">
-              <h4>Roadmap & Practice</h4>
-              <ul className="v-footer-links">
-                <li><Link href="https://roadmap.sh">Developer Roadmap</Link></li>
-                <li><Link href="https://neetcode.io/roadmap">NeetCode Roadmap</Link></li>
-                <li><Link href="https://leetcode.com/">LeetCode</Link></li>
-                <li><Link href="https://www.hackerrank.com/">HackerRank</Link></li>
-                <li><Link href="https://www.codewars.com/">CodeWars</Link></li>
-              </ul>
-            </div>
-          <div className="v-footer-column">
-            <h4>Contact</h4>
-            <ul className="v-footer-links">
-              <li><a href={`mailto:${contactEmail}`}>{contactEmail}</a></li>
-              <li><a href={`tel:${contactPhone}`}>{contactPhone}</a></li>
-            </ul>
-          </div>
-        </div>
-        <div className="v-footer-bottom">
-          <p>&copy; {new Date().getFullYear()} X-Foundry. All Rights Reserved.</p>
-        </div>
-      </footer>
+      <Footer scrollToSection={scrollToSection} />
 
       </>
       )}
