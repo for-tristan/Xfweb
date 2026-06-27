@@ -1,5 +1,36 @@
+/**
+ * globals.css — XFoundry global styles
+ *
+ * TABLE OF CONTENTS:
+ *   1.  Imports (Tailwind, tw-animate, theme tokens)
+ *   2.  View transitions
+ *   3.  Base reset & typography
+ *   4.  Accessibility (skip-link, focus, reduced-motion)
+ *   5.  Layout utilities (desktop-only, mobile-menu-backdrop)
+ *   6.  Background effects (grain, particles, splash)
+ *   7.  Error pages (.xf-error-*)
+ *   8.  Navbar + navigation
+ *   9.  Hero section
+ *   10. Vaulta design system (.v-*)
+ *   11. Section components (services, courses, projects, team, contact)
+ *   12. Footer
+ *   13. Auth pages (login/signup/forgot/reset)
+ *   14. Dashboard
+ *   15. Admin panel
+ *   16. Course/Service detail pages
+ *   17. Games
+ *   18. Chat / AI / Study
+ *   19. Modals & overlays
+ *   20. Skeleton loaders
+ *   21. Toasts & notifications
+ *   22. Responsive breakpoints
+ *
+ * Theme tokens (colors, fonts, spacing) live in theme.css.
+ */
+
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./theme.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -20,48 +51,7 @@
 }
 
 
-:root {
-
-  --accent: #6640ff;
-  --accent-dark: #3300ff;
-  --primary-red: var(--accent);
-  --dark-red: var(--accent-dark);
-  --darker-red: #2400b3;
-  --black: #ffffff;
-  --dark-gray: #f6f6f6;
-  --light-gray: #ededed;
-  --text-light: #191919;
-  --text-dim: #5d5d5d;
-  --accent-glow: rgba(102, 64, 255, 0.15);
-  --card-bg: #f6f6f6;
-  --input-bg: rgba(0, 0, 0, 0.03);
-  --border-color: #ededed;
-
-  --success-color: #22c55e;
-  --error-color: #ef4444;
-  --warning-color: #f59e0b;
-  --info-color: #6640ff;
-
-
-  --accent-purple: color-mix(in srgb, var(--accent) 55%, white);
-
-
-  --v-badge-border: color-mix(in srgb, var(--accent) 10%, transparent);
-  --v-badge-text: var(--accent);
-  --v-card-line: color-mix(in srgb, var(--accent) 8%, transparent);
-  --v-gradient: linear-gradient(299deg, color-mix(in srgb, var(--accent) 80%, white), var(--accent-dark) 55%, color-mix(in srgb, var(--accent) 80%, white));
-  --v-gradient-reverse: linear-gradient(344deg, color-mix(in srgb, var(--accent) 70%, transparent), color-mix(in srgb, var(--accent-dark) 70%, transparent) 55%, color-mix(in srgb, var(--accent) 70%, transparent));
-
-  --font-heading: 'Inter Tight', sans-serif;
-  --font-body: 'Inter Tight', sans-serif;
-}
-
-@theme inline {
-  --color-background: var(--black);
-  --color-foreground: var(--text-light);
-  --font-sans: var(--font-body);
-  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
-}
+/* Theme tokens (:root variables + @theme inline) live in theme.css */
 
 
 * {

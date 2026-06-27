@@ -1,0 +1,74 @@
+/**
+ * Theme tokens — CSS custom properties for the XFoundry design system.
+ *
+ * This file defines all color, font, and design tokens as CSS variables.
+ * Imported by globals.css so every component can reference them.
+ *
+ * To change the accent color site-wide, change --accent here and
+ * everything else (gradients, badges, glows) updates automatically
+ * via color-mix().
+ */
+
+:root {
+  /* ---- Core palette ---- */
+  --accent: #6640ff;
+  --accent-dark: #3300ff;
+
+  /* Legacy aliases (mapped to accent for backward compat with older CSS) */
+  --primary-red: var(--accent);
+  --dark-red: var(--accent-dark);
+  --darker-red: #2400b3;
+
+  /* ---- Surfaces ---- */
+  --black: #ffffff;
+  --dark-gray: #f6f6f6;
+  --light-gray: #ededed;
+  --card-bg: #f6f6f6;
+  --input-bg: rgba(0, 0, 0, 0.03);
+  --border-color: #ededed;
+
+  /* ---- Text ---- */
+  --text-light: #191919;
+  --text-dim: #5d5d5d;
+
+  /* ---- Accent glow / shadows ---- */
+  --accent-glow: rgba(102, 64, 255, 0.15);
+
+  /* ---- Status colors ---- */
+  --success-color: #22c55e;
+  --error-color: #ef4444;
+  --warning-color: #f59e0b;
+  --info-color: #6640ff;
+
+  /* ---- Derived accent shades ---- */
+  --accent-purple: color-mix(in srgb, var(--accent) 55%, white);
+
+  /* ---- Vaulta design system tokens ---- */
+  --v-badge-border: color-mix(in srgb, var(--accent) 10%, transparent);
+  --v-badge-text: var(--accent);
+  --v-card-line: color-mix(in srgb, var(--accent) 8%, transparent);
+  --v-gradient: linear-gradient(
+    299deg,
+    color-mix(in srgb, var(--accent) 80%, white),
+    var(--accent-dark) 55%,
+    color-mix(in srgb, var(--accent) 80%, white)
+  );
+  --v-gradient-reverse: linear-gradient(
+    344deg,
+    color-mix(in srgb, var(--accent) 70%, transparent),
+    color-mix(in srgb, var(--accent-dark) 70%, transparent) 55%,
+    color-mix(in srgb, var(--accent) 70%, transparent)
+  );
+
+  /* ---- Fonts ---- */
+  --font-heading: 'Inter Tight', sans-serif;
+  --font-body: 'Inter Tight', sans-serif;
+}
+
+/* Tailwind v4 theme bridge — maps CSS vars to Tailwind's @theme tokens */
+@theme inline {
+  --color-background: var(--black);
+  --color-foreground: var(--text-light);
+  --font-sans: var(--font-body);
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+}
