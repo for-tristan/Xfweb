@@ -157,6 +157,7 @@ export async function PUT(request: NextRequest) {
   try {
     const { error: adminError, user: adminUser } = await requireAdmin();
     if (adminError) return adminError;
+    if (!adminUser) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 
     const body = await request.json();
 

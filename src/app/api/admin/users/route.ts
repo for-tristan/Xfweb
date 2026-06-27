@@ -150,6 +150,7 @@ export async function DELETE(request: NextRequest) {
   try {
     const { error, user: admin } = await requireAdmin();
     if (error) return error;
+    if (!admin) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 
     const body = await request.json();
     const { userId } = body;
