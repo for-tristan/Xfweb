@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getCurrentUser } from '@/lib/auth';
+import { requireAdmin } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-    if (user.role !== 'admin') return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    const { error } = await requireAdmin();
+    if (error) return error;
 
     const { searchParams } = new URL(request.url);
     const testId = searchParams.get('testId');
@@ -113,9 +112,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-    if (user.role !== 'admin') return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    const { error } = await requireAdmin();
+    if (error) return error;
 
     const body = await request.json();
     const { moduleId, title, description, timeLimit, passingScore } = body;
@@ -146,9 +144,8 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-    if (user.role !== 'admin') return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    const { error } = await requireAdmin();
+    if (error) return error;
 
     const body = await request.json();
   const { action } = body;
@@ -330,9 +327,8 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-    if (user.role !== 'admin') return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    const { error } = await requireAdmin();
+    if (error) return error;
 
     const body = await request.json();
     const { id } = body;

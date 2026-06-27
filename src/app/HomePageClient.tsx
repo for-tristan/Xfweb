@@ -31,6 +31,9 @@ import { FaqSection } from '@/components/home/FaqSection';
 import { TeamSection } from '@/components/home/TeamSection';
 import { Footer } from '@/components/home/Footer';
 
+// Shared constants (single source of truth for contact info, socials, etc.)
+import { SITE, CONTACT, SOCIAL } from '@/lib/constants';
+
 
 interface User {
   id: string;
@@ -857,13 +860,14 @@ export default function Home({
     fetchDynamicData();
   }, []);
 
-  const siteName = 'X-Foundry';
-  const contactEmail = 'xfoundationcom@gmail.com';
-  const contactPhone = '+201234567890';
-  const businessHours = 'Sun - Thu: 9:00 AM - 6:00 PM EET';
-  const linkedinUrl = 'https://www.linkedin.com/in/marwan-montaser-067054387/';
-  const githubUrl = 'https://github.com/for-tristan';
-  const discordUrl = 'https://discord.gg/TVRxJg3rcN';
+  // Site constants from @/lib/constants (single source of truth)
+  const siteName = SITE.name;
+  const contactEmail = CONTACT.email;
+  const contactPhone = CONTACT.phone;
+  const businessHours = CONTACT.businessHours;
+  const linkedinUrl = SOCIAL.linkedin;
+  const githubUrl = SOCIAL.github;
+  const discordUrl = SOCIAL.discord;
 
   const availableCourses = dynamicCourses.length > 0 ? dynamicCourses : fallbackCourses;
   const servicesDataArr = dynamicServices;

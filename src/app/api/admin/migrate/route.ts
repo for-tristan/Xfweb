@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser } from '@/lib/auth';
+import { requireAdmin } from '@/lib/auth';
 import { createClient } from '@libsql/client';
 
 
@@ -39,10 +39,8 @@ async function runMigrations() {
 // Use POST (admin-gated) to run migrations intentionally.
 export async function POST(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user || user.role !== 'admin') {
-      return NextResponse.json({ error: 'Unauthorized — admin only' }, { status: 403 });
-    }
+    const { error } = await requireAdmin();
+    if (error) return error;
 
     const result = await runMigrations();
     return NextResponse.json(result);

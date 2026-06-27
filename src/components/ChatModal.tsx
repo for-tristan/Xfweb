@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { User } from '@/lib/usePageFeatures';
 import { WaveInput } from '@/components/WaveInput';
+import { SmartImage } from '@/components/SmartImage';
 
 
 interface Friend {
@@ -316,7 +317,7 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
                   overflow: 'hidden', flexShrink: 0,
                 }}>
                   {selectedFriend.avatar
-                    ? <img src={selectedFriend.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                    ? <SmartImage src={selectedFriend.avatar} alt="" width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                     : selectedFriend.name.charAt(0).toUpperCase()
                   }
                 </div>
@@ -425,7 +426,7 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
                       overflow: 'hidden', flexShrink: 0,
                     }}>
                       {convo.friend.avatar
-                        ? <img src={convo.friend.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                        ? <SmartImage src={convo.friend.avatar} alt="" width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                         : convo.friend.name.charAt(0).toUpperCase()
                       }
                     </div>
@@ -485,7 +486,7 @@ export function ChatModal({ open, onClose, user, friends, initialFriend }: ChatM
                       overflow: 'hidden',
                     }}>
                       {selectedFriend.avatar
-                        ? <img src={selectedFriend.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                        ? <SmartImage src={selectedFriend.avatar} alt="" width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                         : selectedFriend.name.charAt(0).toUpperCase()
                       }
                     </div>

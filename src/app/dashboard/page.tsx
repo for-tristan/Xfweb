@@ -12,6 +12,7 @@ import GradualBlur from '@/components/GradualBlur';
 // Extracted dashboard utilities + sub-components
 // (StatCard, ProgressBar, SectionHeader, WeekChart, formatDuration, etc.)
 import {
+import { SmartImage } from '@/components/SmartImage';
   StatCard,
   ProgressBar,
   SectionHeader,
@@ -268,7 +269,7 @@ export default function DashboardPage() {
                 overflow: 'hidden', flexShrink: 0,
               }}>
                 {user?.avatar
-                  ? <img src={user.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ? <SmartImage src={user.avatar} alt="" width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   : user?.name.charAt(0).toUpperCase()
                 }
               </div>

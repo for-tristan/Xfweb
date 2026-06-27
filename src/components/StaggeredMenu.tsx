@@ -4,6 +4,7 @@ import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useLayo
 import { createPortal } from 'react-dom';
 import { usePathname } from 'next/navigation';
 import { gsap } from 'gsap';
+import { SmartImage } from '@/components/SmartImage';
 
 export interface StaggeredMenuItem {
   label: string;
@@ -645,7 +646,7 @@ export const StaggeredMenu = forwardRef<StaggeredMenuHandle, StaggeredMenuProps>
                     onClick={() => { setDashboardOpen?.(true); closeMenu(); }}
                   >
                     <span className="sm-profile-avatar">
-                      {user.avatar ? <img src={user.avatar} alt="" className="sm-profile-avatar-img" /> : user.name?.charAt(0).toUpperCase()}
+                      {user.avatar ? <SmartImage src={user.avatar} alt="" width={48} height={48} className="sm-profile-avatar-img" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : user.name?.charAt(0).toUpperCase()}
                     </span>
                     <div className="flex flex-col">
                       <span className="sm-profile-name">{user.name}</span>

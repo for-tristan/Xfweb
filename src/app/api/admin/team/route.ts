@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
-import { getCurrentUser } from '@/lib/auth';
+import { requireAdmin } from '@/lib/auth';
 
 /** Bust CDN/edge cache for the public team list + landing page. */
 function bustTeamCache() {
@@ -11,17 +11,6 @@ function bustTeamCache() {
   } catch {
     /* no-op in dev / non-Vercel runtimes */
   }
-}
-
-async function requireAdmin() {
-  const user = await getCurrentUser();
-  if (!user) {
-    return { error: NextResponse.json({ error: 'Not authenticated' }, { status: 401 }), user: null };
-  }
-  if (user.role !== 'admin') {
-    return { error: NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 }), user: null };
-  }
-  return { error: null, user };
 }
 
 export async function GET() {

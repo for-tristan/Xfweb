@@ -24,6 +24,7 @@ import type {
   AdminQuote,
 } from '@/components/admin/types';
 import { UnlockStudentPanel } from '@/components/admin/UnlockStudentPanel';
+import { SmartImage } from '@/components/SmartImage';
 
 // Legacy type aliases for backward compat with inline references in this file
 type User = AdminUser;
@@ -852,7 +853,7 @@ export default function AdminPage() {
                           <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, minWidth: 250 }}>
                             <div style={{ width: 48, height: 48, borderRadius: '50%', background: e.user.avatar ? 'transparent' : 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', fontSize: 16, fontWeight: 700, flexShrink: 0, overflow: 'hidden' }}>
                               {e.user.avatar
-                                ? <img src={e.user.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                                ? <SmartImage src={e.user.avatar} alt="" width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                                 : e.user.name.charAt(0).toUpperCase()
                               }
                             </div>
@@ -924,7 +925,7 @@ export default function AdminPage() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                       <div style={{ width: 44, height: 44, borderRadius: '50%', background: u.avatar ? 'transparent' : (u.role === 'admin' ? 'color-mix(in srgb, var(--accent) 15%, transparent)' : u.role === 'instructor' ? 'color-mix(in srgb, #6b9bf5 15%, transparent)' : 'var(--input-bg)'), border: u.role === 'admin' ? '1px solid color-mix(in srgb, var(--accent) 30%, transparent)' : u.role === 'instructor' ? '1px solid color-mix(in srgb, #6b9bf5 30%, transparent)' : '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, color: u.role === 'admin' ? 'var(--accent)' : u.role === 'instructor' ? '#6b9bf5' : 'var(--text-dim)', overflow: 'hidden', flexShrink: 0 }}>
                         {u.avatar
-                          ? <img src={u.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                          ? <SmartImage src={u.avatar} alt="" width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                           : u.name.charAt(0).toUpperCase()
                         }
                       </div>
@@ -1033,7 +1034,7 @@ export default function AdminPage() {
                           <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, minWidth: 250 }}>
                             <div style={{ width: 48, height: 48, borderRadius: '50%', background: p.user.avatar ? 'transparent' : 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', fontSize: 16, fontWeight: 700, flexShrink: 0, overflow: 'hidden' }}>
                               {p.user.avatar
-                                ? <img src={p.user.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                                ? <SmartImage src={p.user.avatar} alt="" width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                                 : p.user.name.charAt(0).toUpperCase()
                               }
                             </div>
@@ -1308,7 +1309,7 @@ export default function AdminPage() {
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 14, flex: 1, minWidth: 200 }}>
                               <div style={{ width: 44, height: 44, borderRadius: '50%', background: q.user.avatar ? 'transparent' : 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', fontSize: 14, fontWeight: 700, flexShrink: 0, overflow: 'hidden' }}>
-                                {q.user.avatar ? <img src={q.user.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} /> : q.name.charAt(0).toUpperCase()}
+                                {q.user.avatar ? <SmartImage src={q.user.avatar} alt="" width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} /> : q.name.charAt(0).toUpperCase()}
                               </div>
                               <div>
                                 <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-light)', fontFamily: "var(--font-body)" }}>{q.name}</div>
@@ -1419,7 +1420,7 @@ export default function AdminPage() {
                   {adminTeam.map(m => (
                     <div key={m.id} className="project-card" style={{ padding: '20px 28px', display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
                       <div style={{ width: 52, height: 52, borderRadius: '50%', background: m.avatar ? 'transparent' : 'color-mix(in srgb, var(--accent) 8%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
-                        {m.avatar ? <img src={m.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} /> : <i className={m.icon || 'fa-solid fa-user-tie'} style={{ fontSize: 20, color: 'var(--accent)' }}></i>}
+                        {m.avatar ? <SmartImage src={m.avatar} alt="" width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} /> : <i className={m.icon || 'fa-solid fa-user-tie'} style={{ fontSize: 20, color: 'var(--accent)' }}></i>}
                       </div>
                       <div style={{ flex: 1, minWidth: 150 }}>
                         <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-light)' }}>{m.name}</div>
@@ -1622,7 +1623,7 @@ export default function AdminPage() {
                                           <div key={user.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 14px', background: 'color-mix(in srgb, var(--card-bg) 40%, transparent)', border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', borderRadius: 12, gap: 12 }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
                                               <div style={{ width: 28, height: 28, borderRadius: '50%', background: user.avatar ? 'transparent' : 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: 'var(--accent)', overflow: 'hidden', flexShrink: 0 }}>
-                                                {user.avatar ? <img src={user.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} /> : user.name.charAt(0).toUpperCase()}
+                                                {user.avatar ? <SmartImage src={user.avatar} alt="" width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} /> : user.name.charAt(0).toUpperCase()}
                                               </div>
                                               <div style={{ flex: 1, minWidth: 0 }}>
                                                 <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-light)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.name}</div>
@@ -1661,7 +1662,7 @@ export default function AdminPage() {
                                       return (
                                         <div key={a.id} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '10px 16px', background: 'color-mix(in srgb, var(--card-bg) 40%, transparent)', border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', borderRadius: 12, flexWrap: 'wrap' }}>
                                           <div style={{ width: 32, height: 32, borderRadius: '50%', background: a.user.avatar ? 'transparent' : 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: 'var(--accent)', overflow: 'hidden', flexShrink: 0 }}>
-                                            {a.user.avatar ? <img src={a.user.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} /> : a.user.name.charAt(0).toUpperCase()}
+                                            {a.user.avatar ? <SmartImage src={a.user.avatar} alt="" width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} /> : a.user.name.charAt(0).toUpperCase()}
                                           </div>
                                           <div style={{ flex: 1, minWidth: 150 }}>
                                             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-light)' }}>{a.user.name}</div>

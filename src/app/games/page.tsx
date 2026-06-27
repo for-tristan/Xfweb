@@ -17,6 +17,7 @@ import {
 
 import { SearchModal, AuthModal, AuthGate, ProfileModal } from '@/lib/PageModals';
 import GradualBlur from '@/components/GradualBlur';
+import { SmartImage } from '@/components/SmartImage';
 
 
 function useIsMobile(breakpoint = 768) {
@@ -831,7 +832,7 @@ export default function GamesPage() {
                       flexShrink: 0,
                     }}>
                       {entry.userAvatar
-                        ? <img src={entry.userAvatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ? <SmartImage src={entry.userAvatar} alt="" width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         : entry.userName?.charAt(0).toUpperCase()
                       }
                     </div>
@@ -901,7 +902,7 @@ export default function GamesPage() {
                     flexShrink: 0,
                   }}>
                     {entry.userAvatar
-                      ? <img src={entry.userAvatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ? <SmartImage src={entry.userAvatar} alt="" width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       : entry.userName?.charAt(0).toUpperCase()
                     }
                   </div>

@@ -11,6 +11,7 @@ import { SearchModal } from '@/lib/PageModals';
 import { WaveInput } from '@/components/WaveInput';
 import { WaveTextarea } from '@/components/WaveTextarea';
 import GradualBlur from '@/components/GradualBlur';
+import { SmartImage } from '@/components/SmartImage';
 
 interface InstructorCourse {
   id: string;
@@ -706,7 +707,7 @@ export default function InstructorPage() {
                           <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, minWidth: 250 }}>
                             <div style={{ width: 48, height: 48, borderRadius: '50%', background: e.user.avatar ? 'transparent' : 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', fontSize: 16, fontWeight: 700, flexShrink: 0, overflow: 'hidden' }}>
                               {e.user.avatar
-                                ? <img src={e.user.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                                ? <SmartImage src={e.user.avatar} alt="" width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                                 : e.user.name.charAt(0).toUpperCase()
                               }
                             </div>
@@ -1192,7 +1193,7 @@ export default function InstructorPage() {
                                     <div key={s.user.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px', background: innerGlass, backdropFilter: innerBlur, WebkitBackdropFilter: innerBlur, border: glassBorder, borderRadius: 12 }}>
                                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                                         <div style={{ width: 32, height: 32, borderRadius: '50%', background: s.user.avatar ? 'transparent' : 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: 'var(--accent)', overflow: 'hidden', flexShrink: 0 }}>
-                                          {s.user.avatar ? <img src={s.user.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} /> : s.user.name.charAt(0).toUpperCase()}
+                                          {s.user.avatar ? <SmartImage src={s.user.avatar} alt="" width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} /> : s.user.name.charAt(0).toUpperCase()}
                                         </div>
                                         <div>
                                           <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-light)' }}>{s.user.name}</div>
@@ -1220,7 +1221,7 @@ export default function InstructorPage() {
                                   <div key={a.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px', background: innerGlass, backdropFilter: innerBlur, WebkitBackdropFilter: innerBlur, border: glassBorder, borderRadius: 12 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                                       <div style={{ width: 32, height: 32, borderRadius: '50%', background: a.user.avatar ? 'transparent' : 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: 'var(--accent)', overflow: 'hidden', flexShrink: 0 }}>
-                                        {a.user.avatar ? <img src={a.user.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} /> : a.user.name.charAt(0).toUpperCase()}
+                                        {a.user.avatar ? <SmartImage src={a.user.avatar} alt="" width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} /> : a.user.name.charAt(0).toUpperCase()}
                                       </div>
                                       <div>
                                         <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-light)' }}>{a.user.name}</div>
@@ -1293,7 +1294,7 @@ export default function InstructorPage() {
                           <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, minWidth: 250 }}>
                             <div style={{ width: 48, height: 48, borderRadius: '50%', background: p.user.avatar ? 'transparent' : 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', fontSize: 16, fontWeight: 700, flexShrink: 0, overflow: 'hidden' }}>
                               {p.user.avatar
-                                ? <img src={p.user.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                                ? <SmartImage src={p.user.avatar} alt="" width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                                 : p.user.name.charAt(0).toUpperCase()
                               }
                             </div>

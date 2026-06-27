@@ -8,6 +8,7 @@ import { AvatarCropModal } from '@/components/AvatarCropModal';
 import { ThemePicker } from '@/components/ThemePicker';
 import { WaveInput } from '@/components/WaveInput';
 import type { User } from './usePageFeatures';
+import { SmartImage } from '@/components/SmartImage';
 
 
 function VaultaLoader() {
@@ -504,7 +505,7 @@ export function NavActions({
           <button className="nav-user-btn desktop-only" onClick={() => setDashboardOpen(true)}>
             <span className="nav-user-avatar">
               {user.avatar
-                ? <img src={user.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                ? <SmartImage src={user.avatar} alt="" width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                 : user.name.charAt(0).toUpperCase()
               }
             </span>
@@ -626,7 +627,7 @@ export function ProfileModal({
         <div className="dashboard-modal-header" style={{ padding: '16px 32px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: 12 }}>
           <div className="nav-user-avatar" style={{ width: 36, height: 36, fontSize: 14 }}>
             {user.avatar
-              ? <img src={user.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+              ? <SmartImage src={user.avatar} alt="" width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
               : user.name.charAt(0).toUpperCase()
             }
           </div>
@@ -645,7 +646,7 @@ export function ProfileModal({
               <div style={{ position: 'relative' }}>
                 <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '2px solid color-mix(in srgb, var(--accent) 30%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', fontSize: 24, fontWeight: 900, overflow: 'hidden' }}>
                   {user.avatar
-                    ? <img src={user.avatar} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ? <SmartImage src={user.avatar} alt="Avatar" width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     : <span>{user.name.charAt(0).toUpperCase()}</span>
                   }
                 </div>

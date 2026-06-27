@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
-import { getCurrentUser } from '@/lib/auth';
+import { requireAdmin } from '@/lib/auth';
 
 /**
  * Bust CDN/edge cache for the public services list + any page that renders
@@ -16,17 +16,6 @@ function bustServicesCache() {
   } catch {
     /* revalidatePath is a no-op in dev / non-Vercel runtimes */
   }
-}
-
-async function requireAdmin() {
-  const user = await getCurrentUser();
-  if (!user) {
-    return { error: NextResponse.json({ error: 'Not authenticated' }, { status: 401 }), user: null };
-  }
-  if (user.role !== 'admin') {
-    return { error: NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 }), user: null };
-  }
-  return { error: null, user };
 }
 
 export async function GET(request: NextRequest) {
@@ -61,8 +50,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { title, slug, description, icon, features } = body;
 
-    console.log('[Admin POST /api/admin/services] incoming body:', { title, slug, description, icon, featuresCount: features?.length || 0 });
-
     if (!title || !slug) {
       return NextResponse.json(
         { error: 'title and slug are required' },
@@ -94,7 +81,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    console.log('[Admin POST /api/admin/services] created service:', { id: service.id, title: service.title, status: service.status, displayOrder: service.displayOrder });
     bustServicesCache();
     return NextResponse.json({ service }, { status: 201 });
   } catch (error) {

@@ -10,6 +10,7 @@ import { Navbar } from '@/components/Navbar';
 import { Logo } from '@/components/Logo';
 import ConfirmModal from '@/components/ConfirmModal';
 import GradualBlur from '@/components/GradualBlur';
+import { SmartImage } from '@/components/SmartImage';
 
 export default function StudyFocusPage() {
   const { toast } = useToast();
@@ -485,7 +486,7 @@ export default function StudyFocusPage() {
                               color: 'var(--text-dim)', fontFamily: "var(--font-body)",
                             }}>
                               {entry.avatar
-                                ? <img src={entry.avatar} alt={`${entry.name}'s avatar`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                ? <SmartImage src={entry.avatar} alt={`${entry.name}'s avatar`} width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 : entry.name.charAt(0).toUpperCase()
                               }
                             </div>
