@@ -8,11 +8,11 @@ import { SearchModal, AuthModal, AuthGate, ProfileModal } from '@/lib/PageModals
 import { Navbar } from '@/components/Navbar';
 import { Logo } from '@/components/Logo';
 import GradualBlur from '@/components/GradualBlur';
+import { SmartImage } from '@/components/SmartImage';
 
 // Extracted dashboard utilities + sub-components
 // (StatCard, ProgressBar, SectionHeader, WeekChart, formatDuration, etc.)
 import {
-import { SmartImage } from '@/components/SmartImage';
   StatCard,
   ProgressBar,
   SectionHeader,
