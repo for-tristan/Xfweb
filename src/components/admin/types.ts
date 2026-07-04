@@ -31,6 +31,8 @@ export interface AdminEnrollment {
     id: string;
     name: string;
     email: string;
+    phone: string | null;
+    company: string | null;
     role: string;
     avatar: string | null;
   };
