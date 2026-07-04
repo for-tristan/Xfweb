@@ -100,12 +100,21 @@ export default function ScrollFadeSection({
       inner.style.bottom = '';
       inner.style.visibility = 'visible';
     } else if (state === 'past') {
-      inner.style.position = 'fixed';
-      inner.style.top = '0';
-      inner.style.left = '0';
-      inner.style.width = '100%';
+      // Switch to relative so the hero re-enters document flow and scrolls
+      // away naturally. Keeping it fixed+hidden leaves an empty gap equal to
+      // the hero's height that the user scrolls through before the next
+      // section appears — that's the "jump" feeling.
+      // The hero is already opacity 0 + visibility hidden from the fade,
+      // so switching to relative is invisible — it just fills the space
+      // so the next section follows immediately.
+      inner.style.position = 'relative';
+      inner.style.top = '';
+      inner.style.left = '';
+      inner.style.width = '';
       inner.style.bottom = '';
       inner.style.visibility = 'hidden';
+      inner.style.opacity = '0';
+      inner.style.transform = 'scale(0.96)';
     } else {
       inner.style.position = 'relative';
       inner.style.top = '';
