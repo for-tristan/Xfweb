@@ -4,13 +4,9 @@ import { useEffect, useRef, useCallback } from 'react';
 
 interface ScrollFadeSectionProps {
   children: React.ReactNode;
-  /** Whether this section pins at the top while fading */
   pin?: boolean;
-  /** Scroll distance for fade — percentage of viewport height (e.g. "100%") */
   fadeDistance?: string;
-  /** Stacking order — higher values appear on top of earlier sections */
   zIndex?: number;
-  /** Lerp smoothing factor (0–1). Lower = smoother. 0.08 ≈ GSAP scrub 0.6 */
   scrub?: number;
   className?: string;
 }
@@ -61,11 +57,9 @@ export default function ScrollFadeSection({
       return;
     }
 
-    // ── PINNED: position: fixed based pinning ──
     const rect = container.getBoundingClientRect();
     const innerHeight = innerHeightRef.current || inner.offsetHeight;
     const fadePx = fadePxRef.current;
-    const windowH = window.innerHeight;
 
     let state: PinState;
     let progress = 0;
@@ -80,6 +74,27 @@ export default function ScrollFadeSection({
       state = 'pinned';
       const scrolledPast = -rect.top;
       progress = Math.min(1, scrolledPast / fadePx);
+    }
+
+    // Hysteresis: prevent flickering between states when near boundaries.
+    // Only switch state if we've moved past the threshold by at least 2px.
+    // This prevents the pin from rapidly toggling when Lenis's animated
+    // scroll position is near a state boundary.
+    const prevState = pinStateRef.current;
+    if (state !== prevState) {
+      if (state === 'pinned' && prevState === 'unpinned') {
+        // unpinned → pinned: only switch if rect.top is clearly <= 0
+        if (rect.top > -2) return;
+      } else if (state === 'unpinned' && prevState === 'pinned') {
+        // pinned → unpinned: only switch if rect.top is clearly > 0
+        if (rect.top < 2) return;
+      } else if (state === 'past' && prevState === 'pinned') {
+        // pinned → past: only switch if rect.bottom is clearly < innerHeight
+        if (rect.bottom > innerHeight + 2) return;
+      } else if (state === 'pinned' && prevState === 'past') {
+        // past → pinned: only switch if rect.bottom is clearly > innerHeight
+        if (rect.bottom < innerHeight - 2) return;
+      }
     }
 
     pinStateRef.current = state;
@@ -97,8 +112,6 @@ export default function ScrollFadeSection({
       inner.style.bottom = '';
       inner.style.visibility = 'visible';
     } else if (state === 'past') {
-      // position:relative so the hero re-enters flow and scrolls away
-      // naturally (no empty gap). It's invisible (opacity 0 + hidden).
       inner.style.position = 'relative';
       inner.style.top = '';
       inner.style.left = '';
@@ -187,8 +200,6 @@ export default function ScrollFadeSection({
       } else {
         inner.style.visibility = 'visible';
         inner.style.opacity = String(cur.opacity);
-        // translateZ(0) forces GPU compositing — prevents Firefox from
-        // re-rendering the fixed element on the main thread during scroll.
         inner.style.transform = `scale(${cur.scale}) translateZ(0)`;
       }
 
@@ -245,16 +256,12 @@ export default function ScrollFadeSection({
       style={{
         position: 'relative',
         zIndex,
-        // NO overflow:hidden — it can interfere with position:fixed rendering
-        // in Firefox, causing the 1-frame jump during scroll.
       }}
     >
       <div
         ref={innerRef}
         style={{
           willChange: 'opacity, transform',
-          // GPU compositing hints — force Firefox to render this element on
-          // its own compositor layer, preventing async re-render jumps.
           backfaceVisibility: 'hidden',
           ...(pin ? {
             position: 'relative',
