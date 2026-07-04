@@ -240,6 +240,13 @@ export default function Home({
   const [atBottom, setAtBottom] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeNav, setActiveNav] = useState('home');
+  // Refs to track current scroll-state values without triggering re-renders.
+  // The onScroll handler reads these to decide whether setState is needed —
+  // calling setState with the same value still runs React's reconciler,
+  // which on a 1700-line component causes scroll jank.
+  const scrolledRef = useRef(false);
+  const atBottomRef = useRef(false);
+  const activeNavRef = useRef('home');
   const [projectFilter, setProjectFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -424,14 +431,30 @@ export default function Home({
       rafId = requestAnimationFrame(() => {
         rafId = null;
         const scrollY = window.scrollY;
-        setScrolled(scrollY > 80);
+        // Only call setState when the value ACTUALLY changes.
+        // Calling setState with the same value still runs React's
+        // reconciler on a 1700-line component = scroll jank.
+        const newScrolled = scrollY > 80;
+        if (newScrolled !== scrolledRef.current) {
+          scrolledRef.current = newScrolled;
+          setScrolled(newScrolled);
+        }
+
         const distFromBottom = document.documentElement.scrollHeight - window.innerHeight - scrollY;
-        setAtBottom(distFromBottom < 80);
+        const newAtBottom = distFromBottom < 80;
+        if (newAtBottom !== atBottomRef.current) {
+          atBottomRef.current = newAtBottom;
+          setAtBottom(newAtBottom);
+        }
+
         const scrollPos = scrollY + 150;
         for (const id of SECTION_IDS) {
           const cached = sectionCache[id];
           if (cached && scrollPos >= cached.top && scrollPos < cached.top + cached.height) {
-            setActiveNav(id);
+            if (id !== activeNavRef.current) {
+              activeNavRef.current = id;
+              setActiveNav(id);
+            }
             break;
           }
         }
