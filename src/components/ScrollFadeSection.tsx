@@ -44,6 +44,10 @@ export default function ScrollFadeSection({
   const pinStateRef = useRef<PinState>('unpinned');
   // The fade distance in pixels
   const fadePxRef = useRef(0);
+  // Cached inner height — reading offsetHeight on every scroll frame
+  // forces layout reflow (layout thrashing), which is the #1 cause of
+  // scroll jank. We only need to recalculate on resize.
+  const innerHeightRef = useRef(0);
   // Animation frame
   const rafRef = useRef<number | null>(null);
 
@@ -52,6 +56,10 @@ export default function ScrollFadeSection({
   /**
    * Update the pin state and target fade values based on scroll.
    * Called on scroll/resize. Does NOT apply styles — the animation loop does that.
+   *
+   * PERF: Only reads getBoundingClientRect() (unavoidable — need scroll
+   * position). Does NOT read offsetHeight — that's cached in innerHeightRef
+   * and only updated on resize via measureAndSetHeight().
    */
   const updateTarget = () => {
     const container = containerRef.current;
@@ -75,8 +83,12 @@ export default function ScrollFadeSection({
     }
 
     // ── PINNED: position: fixed based pinning ──
+    // PERF: Use cached innerHeight instead of reading offsetHeight.
+    // Reading offsetHeight forces layout reflow on every call, which
+    // when done on every scroll frame causes layout thrashing — the
+    // browser can't keep up and scroll becomes frame-by-frame.
     const rect = container.getBoundingClientRect();
-    const innerHeight = inner.offsetHeight;
+    const innerHeight = innerHeightRef.current || inner.offsetHeight;
     const fadePx = fadePxRef.current;
     const windowH = window.innerHeight;
 
@@ -159,6 +171,9 @@ export default function ScrollFadeSection({
       inner.style.bottom = '';
 
       const contentHeight = inner.offsetHeight;
+      // Cache the inner height so updateTarget() doesn't have to read
+      // offsetHeight on every scroll frame (which forces layout reflow).
+      innerHeightRef.current = contentHeight;
       container.style.height = `${contentHeight + fadePx}px`;
 
       // Restore

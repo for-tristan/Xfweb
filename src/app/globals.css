@@ -5254,14 +5254,12 @@ body {
 }
 
 .v-course-card {
-  background: color-mix(in srgb, var(--card-bg) 55%, transparent);
+  background: var(--card-bg);
   border: 1px solid color-mix(in srgb, var(--accent) 10%, transparent);
   border-radius: 1rem;
   overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   position: relative;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   box-shadow: 0 0 0 0 transparent;
   /* Card is a click target (navigates to course page) — show pointer
      everywhere except over the EnrollButton, which has its own action. */
@@ -5562,15 +5560,13 @@ body {
 }
 
 .v-team-card {
-  background: color-mix(in srgb, var(--card-bg) 55%, transparent);
+  background: var(--card-bg);
   border: 1px solid color-mix(in srgb, var(--accent) 10%, transparent);
   border-radius: 1rem;
   padding: 40px 28px;
   text-align: center;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   position: relative;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   box-shadow: 0 0 0 0 transparent;
 }
 
@@ -5756,10 +5752,8 @@ body {
   border: 1px solid color-mix(in srgb, var(--accent) 10%, transparent);
   border-radius: 1rem;
   overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  background: color-mix(in srgb, var(--card-bg) 55%, transparent);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background: var(--card-bg);
   box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 4%, transparent);
   position: relative;
 }
