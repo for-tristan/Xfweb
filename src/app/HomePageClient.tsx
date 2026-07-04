@@ -929,10 +929,7 @@ export default function Home({
           (ParallaxLayer removed — stacking a second transform on top of the
           pinned+scale+opacity transform from ScrollFadeSection was a major
           cause of scroll jank and "flying" visual artifacts.) */}
-      {/* Pin mode removed — switching position:fixed↔relative on scroll
-          caused frame-by-frame jumps in multiple browsers. The hero now
-          scrolls away naturally like any other section. */}
-      <ScrollFadeSection fadeDistance="40vh" zIndex={1}>
+      <ScrollFadeSection pin fadeDistance="60vh" zIndex={1}>
       <section className="v-hero" id="home">
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', position: 'relative', zIndex: 10 }}>
             <div style={{ position: 'relative', width: 720, height: 520, maxWidth: '90vw', maxHeight: '60vh' }}>
