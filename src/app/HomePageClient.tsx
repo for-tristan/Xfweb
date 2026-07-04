@@ -199,6 +199,7 @@ export default function Home({
   const [enrollCourse, setEnrollCourse] = useState<Course | null>(null);
   const [erExperience, setErExperience] = useState('');
   const [erMotivation, setErMotivation] = useState('');
+  const [erPhone, setErPhone] = useState('');
   const [enrollLoading, setEnrollLoading] = useState(false);
 
   const [notifications, setNotifications] = useState<Array<{id:string;title:string;message:string;read:boolean;createdAt:string;type?:string}>>([]);
@@ -629,7 +630,7 @@ export default function Home({
     e.preventDefault();
     if (!enrollCourse) return;
     if (!user) { openAuthModal('signin'); return; }
-    if (!erExperience || !erMotivation) { toast({ title: 'Missing Fields', description: 'Please fill in your experience level and motivation', variant: 'destructive' }); return; }
+    if (!erPhone || !erExperience || !erMotivation) { toast({ title: 'Missing Fields', description: 'Please fill in your phone number, experience level and motivation', variant: 'destructive' }); return; }
     openConfirm(
       'Confirm Enrollment',
       `Are you sure you want to enroll in "${enrollCourse.name}"? An admin will review your request.`,
@@ -644,6 +645,7 @@ export default function Home({
               courseName: enrollCourse!.name,
               courseLevel: enrollCourse!.level,
               duration: enrollCourse!.duration,
+              phone: erPhone,
               experienceLevel: erExperience,
               motivation: erMotivation,
             }),
@@ -927,7 +929,10 @@ export default function Home({
           (ParallaxLayer removed — stacking a second transform on top of the
           pinned+scale+opacity transform from ScrollFadeSection was a major
           cause of scroll jank and "flying" visual artifacts.) */}
-      <ScrollFadeSection pin fadeDistance="60vh" zIndex={1}>
+      {/* Pin mode removed — switching position:fixed↔relative on scroll
+          caused frame-by-frame jumps in multiple browsers. The hero now
+          scrolls away naturally like any other section. */}
+      <ScrollFadeSection fadeDistance="40vh" zIndex={1}>
       <section className="v-hero" id="home">
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', position: 'relative', zIndex: 10 }}>
             <div style={{ position: 'relative', width: 720, height: 520, maxWidth: '90vw', maxHeight: '60vh' }}>
@@ -1640,6 +1645,7 @@ export default function Home({
             <form onSubmit={handleEnrollSubmit}>
               <WaveInput label="Full Name" type="text" value={user?.name || ''} disabled />
               <WaveInput label="Email" type="email" value={user?.email || ''} disabled />
+              <WaveInput label="Phone Number *" type="tel" value={erPhone} onChange={(e) => setErPhone(e.target.value)} placeholder="+20..." required />
 
               <div className="form-group" style={{ marginBottom: 16 }}>
                 <label>Experience Level *</label>

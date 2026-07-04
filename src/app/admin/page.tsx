@@ -862,6 +862,11 @@ export default function AdminPage() {
                             <div>
                               <div style={{ fontWeight: 700, fontSize: 16, color: 'var(--text-light)', marginBottom: 4 }}>{e.user.name}</div>
                               <div style={{ fontSize: 13, color: 'var(--text-dim)' }}>{e.user.email}</div>
+                              {e.user.phone && (
+                                <div style={{ fontSize: 13, color: 'var(--text-dim)', marginTop: 2 }}>
+                                  <i className="fa-solid fa-phone" style={{ fontSize: 10, marginRight: 4 }}></i>{e.user.phone}
+                                </div>
+                              )}
                             </div>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0 }}>
