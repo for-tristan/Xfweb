@@ -19,8 +19,6 @@ function lerp(current: number, target: number, factor: number): number {
   return current + (target - current) * factor;
 }
 
-type PinState = 'unpinned' | 'pinned' | 'past';
-
 export default function ScrollFadeSection({
   children,
   pin = false,
@@ -32,44 +30,39 @@ export default function ScrollFadeSection({
   const containerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
 
-  // Lerp-smoothed current values
-  // NOTE: `blur` is kept in state for API compatibility but is NOT applied as a
-  // CSS filter every frame — animating `filter: blur()` forces the browser to
-  // re-rasterize the entire layer on every frame and is the #1 cause of scroll
-  // jank on this page. We instead apply a single static blur class on fade-out.
   const currentRef = useRef({ opacity: 1, scale: 1 });
-  // Instant target values from scroll position
   const targetRef = useRef({ opacity: 1, scale: 1 });
-  // Current pin state
-  const pinStateRef = useRef<PinState>('unpinned');
-  // The fade distance in pixels
-  const fadePxRef = useRef(0);
-  // Cached inner height — reading offsetHeight on every scroll frame
-  // forces layout reflow (layout thrashing), which is the #1 cause of
-  // scroll jank. We only need to recalculate on resize.
-  const innerHeightRef = useRef(0);
-  // Animation frame
   const rafRef = useRef<number | null>(null);
+  const fadePxRef = useRef(0);
 
   const fadeVh = parseFloat(fadeDistance) || 80;
 
   /**
-   * Update the pin state and target fade values based on scroll.
-   * Called on scroll/resize. Does NOT apply styles — the animation loop does that.
+   * STICKY-BASED PINNING (no more position: fixed switching).
    *
-   * PERF: Only reads getBoundingClientRect() (unavoidable — need scroll
-   * position). Does NOT read offsetHeight — that's cached in innerHeightRef
-   * and only updated on resize via measureAndSetHeight().
+   * The inner element uses CSS `position: sticky; top: 0` which keeps it
+   * in document flow while pinning it to the viewport. This means:
+   *   - NO document height change when pinning (no scroll jumps!)
+   *   - NO position switching (relative → fixed → relative)
+   *   - Works perfectly with Lenis smooth scroll
+   *   - GPU-accelerated by the browser
+   *
+   * The container is given extra height (content + fade distance) so
+   * there's scroll room for the fade. The inner element sticks at top:0
+   * until the container scrolls past, then naturally scrolls away.
+   *
+   * We only need JS for the opacity/scale fade based on scroll progress.
    */
-  const updateTarget = () => {
+  const updateTarget = useCallback(() => {
     const container = containerRef.current;
-    const inner = innerRef.current;
-    if (!container || !inner) return;
+    if (!container) return;
+
+    const rect = container.getBoundingClientRect();
+    const fadePx = fadePxRef.current;
+    const windowH = window.innerHeight;
 
     if (!pin) {
       // ── NON-PINNED: simple scroll-based fade ──
-      const rect = container.getBoundingClientRect();
-      const windowH = window.innerHeight;
       const fadeStart = windowH * 0.8;
       const fadeEnd = -(windowH * 0.3);
       const progress = 1 - (rect.top - fadeEnd) / (fadeStart - fadeEnd);
@@ -82,72 +75,26 @@ export default function ScrollFadeSection({
       return;
     }
 
-    // ── PINNED: position: fixed based pinning ──
-    // PERF: Use cached innerHeight instead of reading offsetHeight.
-    // Reading offsetHeight forces layout reflow on every call, which
-    // when done on every scroll frame causes layout thrashing — the
-    // browser can't keep up and scroll becomes frame-by-frame.
-    const rect = container.getBoundingClientRect();
-    const innerHeight = innerHeightRef.current || inner.offsetHeight;
-    const fadePx = fadePxRef.current;
-    const windowH = window.innerHeight;
-
-    let state: PinState;
-    let progress = 0;
-
-    if (rect.top > 0) {
-      // Container hasn't reached the top yet — not pinned
-      state = 'unpinned';
-      progress = 0;
-    } else if (rect.bottom < innerHeight) {
-      // Container has scrolled past — content should be at its final position
-      state = 'past';
-      progress = 1;
-    } else {
-      // Container top is at/above viewport, bottom is still below — PIN
-      state = 'pinned';
-      const scrolledPast = -rect.top;
-      progress = Math.min(1, scrolledPast / fadePx);
-    }
-
-    pinStateRef.current = state;
+    // ── PINNED (sticky): calculate fade progress ──
+    // With sticky, the inner element pins at top:0. As we scroll,
+    // rect.top goes negative. The fade happens over the first fadePx
+    // of scrolling past the container's natural top.
+    const scrolledPast = Math.max(0, -rect.top);
+    const progress = fadePx > 0 ? Math.min(1, scrolledPast / fadePx) : 0;
 
     targetRef.current = {
       opacity: 1 - progress,
       scale: 1 - progress * 0.04,
     };
-
-    // Apply pin positioning immediately (no lerp — position must be exact)
-    if (state === 'pinned') {
-      inner.style.position = 'fixed';
-      inner.style.top = '0';
-      inner.style.left = '0';
-      inner.style.width = '100%';
-      inner.style.bottom = '';
-      inner.style.visibility = 'visible';
-    } else if (state === 'past') {
-      inner.style.position = 'relative';
-      inner.style.top = '';
-      inner.style.left = '';
-      inner.style.width = '';
-      inner.style.bottom = '';
-      inner.style.visibility = 'hidden';
-    } else {
-      inner.style.position = 'relative';
-      inner.style.top = '';
-      inner.style.left = '';
-      inner.style.width = '';
-      inner.style.bottom = '';
-      inner.style.visibility = 'visible';
-    }
-  };
+  }, [pin]);
 
   /**
-   * Measure the inner content height and set the container height.
-   * Container = content height + fade distance in px.
-   * This creates the scroll room needed for the pin + fade.
+   * Measure and set the container height for the pin.
+   * Container = inner content height + fade distance.
+   * The inner element (sticky) pins at top:0 and stays there while
+   * the container scrolls past.
    */
-  const measureAndSetHeight = () => {
+  const measureAndSetHeight = useCallback(() => {
     const container = containerRef.current;
     const inner = innerRef.current;
     if (!container || !inner) return;
@@ -156,43 +103,22 @@ export default function ScrollFadeSection({
       const windowH = window.innerHeight;
       const fadePx = windowH * (fadeVh / 100);
       fadePxRef.current = fadePx;
-
-      // Temporarily switch to relative to measure true content height
-      const prevPosition = inner.style.position;
-      const prevTop = inner.style.top;
-      const prevLeft = inner.style.left;
-      const prevWidth = inner.style.width;
-      const prevBottom = inner.style.bottom;
-
-      inner.style.position = 'relative';
-      inner.style.top = '';
-      inner.style.left = '';
-      inner.style.width = '';
-      inner.style.bottom = '';
-
+      // Container height = content height + fade distance
+      // The sticky inner stays at top:0 for the entire fade distance,
+      // then scrolls away naturally.
       const contentHeight = inner.offsetHeight;
-      // Cache the inner height so updateTarget() doesn't have to read
-      // offsetHeight on every scroll frame (which forces layout reflow).
-      innerHeightRef.current = contentHeight;
       container.style.height = `${contentHeight + fadePx}px`;
-
-      // Restore
-      inner.style.position = prevPosition;
-      inner.style.top = prevTop;
-      inner.style.left = prevLeft;
-      inner.style.width = prevWidth;
-      inner.style.bottom = prevBottom;
     } else {
       container.style.height = '';
     }
-  };
+  }, [pin, fadeVh]);
 
   /**
    * On-demand animation — lerps visual values toward targets.
    * Only runs when targets differ from current values (no idle rAF loop).
    */
   const startAnimation = useCallback(() => {
-    if (rafRef.current !== null) return; // already running
+    if (rafRef.current !== null) return;
 
     const animate = () => {
       const inner = innerRef.current;
@@ -204,26 +130,20 @@ export default function ScrollFadeSection({
       cur.opacity = lerp(cur.opacity, tgt.opacity, scrub);
       cur.scale = lerp(cur.scale, tgt.scale, scrub);
 
-      // Snap values that are very close to target
       const opacityDone = Math.abs(cur.opacity - tgt.opacity) < 0.001;
       const scaleDone = Math.abs(cur.scale - tgt.scale) < 0.0001;
 
       if (opacityDone) cur.opacity = tgt.opacity;
       if (scaleDone) cur.scale = tgt.scale;
 
-      const pinState = pinStateRef.current;
-      if (cur.opacity < 0.01 || pinState === 'past') {
+      if (cur.opacity < 0.01) {
         inner.style.visibility = 'hidden';
       } else {
         inner.style.visibility = 'visible';
         inner.style.opacity = String(cur.opacity);
         inner.style.transform = `scale(${cur.scale})`;
-        // NOTE: do NOT apply `filter: blur()` every frame — it forces a
-        // re-rasterization of the whole layer and is the main cause of scroll
-        // lag on this page. A subtle scale + opacity fade is enough visually.
       }
 
-      // Stop the loop when all values have reached their targets
       if (opacityDone && scaleDone) {
         rafRef.current = null;
       } else {
@@ -234,7 +154,6 @@ export default function ScrollFadeSection({
     rafRef.current = requestAnimationFrame(animate);
   }, [scrub]);
 
-  // Trigger animation on scroll/resize
   useEffect(() => {
     measureAndSetHeight();
     updateTarget();
@@ -242,9 +161,6 @@ export default function ScrollFadeSection({
 
     let scrollRaf: number | null = null;
 
-    // Single scroll listener handles both native scroll and Lenis.
-    // Lenis dispatches native scroll events, so a separate
-    // 'xf:lenis-scroll' listener is redundant and causes double work.
     const onScroll = () => {
       if (scrollRaf !== null) return;
       scrollRaf = requestAnimationFrame(() => {
@@ -271,8 +187,7 @@ export default function ScrollFadeSection({
       if (scrollRaf !== null) cancelAnimationFrame(scrollRaf);
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pin, fadeVh, startAnimation]);
+  }, [pin, fadeVh, measureAndSetHeight, updateTarget, startAnimation]);
 
   return (
     <div
@@ -289,7 +204,12 @@ export default function ScrollFadeSection({
         style={{
           willChange: 'opacity, transform',
           ...(pin ? {
-            position: 'relative',
+            // STICKY: pins at top:0 while container scrolls past.
+            // This replaces the old position:fixed switching that
+            // caused scroll jumps with Lenis. Sticky stays in document
+            // flow, so no document height change = no jumps.
+            position: 'sticky',
+            top: 0,
             zIndex,
             background: 'var(--black)',
             minHeight: '100vh',
