@@ -65,8 +65,13 @@ function AuthContent() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const t = localStorage.getItem('x-foundry-theme') || 'oled';
-    document.documentElement.setAttribute('data-theme', t);
+    try {
+      const t = localStorage.getItem('x-foundry-theme') || 'oled';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch {
+      // localStorage blocked (Edge strict privacy, Safari private mode)
+      document.documentElement.setAttribute('data-theme', 'oled');
+    }
   }, []);
 
   const searchParams = useSearchParams();

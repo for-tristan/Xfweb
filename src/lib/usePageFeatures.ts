@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
+import { safeGetItem, safeSetItem } from '@/lib/safeStorage';
 
 
 export interface User {
@@ -82,7 +83,7 @@ export function usePageFeatures() {
 
   const [theme, setTheme] = useState<string>(() => {
     if (typeof window === 'undefined') return 'light';
-    return localStorage.getItem('x-foundry-theme') || 'oled';
+    return safeGetItem('x-foundry-theme') || 'oled';
   });
 
   const [scrolled, setScrolled] = useState(false);
@@ -201,12 +202,12 @@ export function usePageFeatures() {
     const isDark = theme !== 'light' && theme !== 'sand';
     const next = isDark ? 'light' : 'crimson';
     setTheme(next);
-    localStorage.setItem('x-foundry-theme', next);
+    safeSetItem('x-foundry-theme', next);
   }, [theme]);
 
   const changeTheme = useCallback((newTheme: string) => {
     setTheme(newTheme);
-    localStorage.setItem('x-foundry-theme', newTheme);
+    safeSetItem('x-foundry-theme', newTheme);
   }, []);
 
   const openAuthModal = useCallback((tab: 'signin' | 'signup', msg?: string) => {

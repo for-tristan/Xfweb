@@ -33,6 +33,7 @@ import { Footer } from '@/components/home/Footer';
 
 // Shared constants (single source of truth for contact info, socials, etc.)
 import { SITE, CONTACT, SOCIAL } from '@/lib/constants';
+import { safeGetItem, safeSetItem } from '@/lib/safeStorage';
 
 
 interface User {
@@ -474,7 +475,7 @@ export default function Home({
 
   const [theme, setTheme] = useState<string>(() => {
     if (typeof window === 'undefined') return 'light';
-    const saved = localStorage.getItem('x-foundry-theme') || 'oled';
+    const saved = safeGetItem('x-foundry-theme') || 'oled';
     if (saved === 'dark' || saved === 'vaulta') return 'light';
     return saved;
   });
@@ -529,12 +530,12 @@ export default function Home({
     const isDark = !lightThemeIds.includes(theme) && theme !== '';
     const next = isDark ? '' : 'crimson';
     setTheme(next);
-    localStorage.setItem('x-foundry-theme', next);
+    safeSetItem('x-foundry-theme', next);
   };
 
   const handleChangeTheme = (newTheme: string) => {
     setTheme(newTheme);
-    localStorage.setItem('x-foundry-theme', newTheme);
+    safeSetItem('x-foundry-theme', newTheme);
   };
 
   const openAuthModal = (tab: 'signin' | 'signup', msg?: string) => {
