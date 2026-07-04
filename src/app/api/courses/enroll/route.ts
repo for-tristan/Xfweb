@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { courseId, courseName, courseLevel, duration, experienceLevel, motivation } = body;
+    const { courseId, courseName, courseLevel, duration, phone, experienceLevel, motivation } = body;
 
     if (!courseId || !courseName) {
       return NextResponse.json(
@@ -28,6 +28,23 @@ export async function POST(request: NextRequest) {
         { error: 'Experience level and motivation are required' },
         { status: 400 }
       );
+    }
+
+    if (!phone || !phone.trim()) {
+      return NextResponse.json(
+        { error: 'Phone number is required' },
+        { status: 400 }
+      );
+    }
+
+    // Save the phone number to the user's profile if they don't have one,
+    // or update it if a new one was provided. This ensures admins can
+    // contact the student about their enrollment.
+    if (phone.trim() && user.phone !== phone.trim()) {
+      await db.user.update({
+        where: { id: user.id },
+        data: { phone: phone.trim() },
+      });
     }
 
     const existingEnrollment = await db.enrollment.findFirst({

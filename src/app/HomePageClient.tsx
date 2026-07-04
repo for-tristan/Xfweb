@@ -525,7 +525,24 @@ export default function Home({
       const res = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: loginEmail, password: loginPassword }) });
       const data = await res.json();
       if (res.ok) { setUser(data.user); setAuthModalOpen(false); setVerificationStep('idle'); setDqName(data.user.name); setDqEmail(data.user.email); setCqEmail(data.user.email); setProfileName(data.user.name); setProfilePhone(data.user.phone || ''); setProfileCompany(data.user.company || ''); toast({ title: 'Welcome back!', description: `Signed in as ${data.user.name}` }); setLoginEmail(''); setLoginPassword(''); }
-      else if (res.status === 403 && data.needsVerification) { setVerificationEmail(data.email); setVerificationCode(''); setVerificationStep('pending'); toast({ title: 'Verification Required', description: data.error }); }
+      else if (res.status === 403 && data.needsVerification) {
+        setVerificationEmail(data.email);
+        setVerificationCode('');
+        setVerificationStep('pending');
+        if (data.emailSent === false) {
+          // Email failed to send — auto-trigger a resend so the user
+          // isn't stuck looking at a code input that will never work.
+          toast({ title: 'Verification Required', description: 'Sending verification code...', variant: 'destructive' });
+          try {
+            const resendRes = await fetch('/api/auth/resend-verification', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: data.email }) });
+            const resendData = await resendRes.json();
+            if (resendRes.ok) { toast({ title: 'Code Sent!', description: 'A new verification code has been sent to your email.' }); }
+            else { toast({ title: 'Verification Required', description: 'Could not send code. Please click Resend below.', variant: 'destructive' }); }
+          } catch { toast({ title: 'Verification Required', description: 'Please click Resend Code below to get your code.', variant: 'destructive' }); }
+        } else {
+          toast({ title: 'Verification Required', description: data.error });
+        }
+      }
       else { toast({ title: 'Login Failed', description: data.error, variant: 'destructive' }); }
     } catch { toast({ title: 'Error', description: 'Something went wrong', variant: 'destructive' }); }
     setLoginLoading(false);

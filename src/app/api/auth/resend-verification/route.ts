@@ -48,8 +48,9 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    let emailSent = false;
     try {
-      await sendEmailVerificationEmail({
+      emailSent = await sendEmailVerificationEmail({
         userEmail: user.email,
         name: user.name,
         code,
@@ -59,7 +60,10 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({
-      message: 'If an account with that email exists, a new verification code has been sent.',
+      message: emailSent
+        ? 'A new verification code has been sent to your email.'
+        : 'Failed to send verification code. Please try again or contact support.',
+      emailSent,
     });
   } catch (error) {
     console.error('Resend verification error:', error);

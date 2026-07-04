@@ -81,6 +81,7 @@ export default function DynamicCoursePage() {
   const [canceling, setCanceling] = useState(false);
   const [formName, setFormName] = useState('');
   const [formEmail, setFormEmail] = useState('');
+  const [formPhone, setFormPhone] = useState('');
   const [formExperience, setFormExperience] = useState('');
   const [formMotivation, setFormMotivation] = useState('');
 
@@ -223,7 +224,7 @@ export default function DynamicCoursePage() {
   const handleEnroll = (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) { openAuthModal('signin', 'Please sign in to request enrollment'); return; }
-    if (!formName || !formEmail || !formMotivation) { toast({ title: 'Error', description: 'Please fill in all required fields', variant: 'destructive' }); return; }
+    if (!formName || !formEmail || !formPhone || !formMotivation) { toast({ title: 'Error', description: 'Please fill in all required fields', variant: 'destructive' }); return; }
     if (!course) return;
     openConfirm(
       'Confirm Enrollment',
@@ -239,6 +240,7 @@ export default function DynamicCoursePage() {
               courseName: course.title,
               courseLevel: course.level,
               duration: course.duration,
+              phone: formPhone,
               experienceLevel: formExperience,
               motivation: formMotivation,
             }),
@@ -639,6 +641,7 @@ export default function DynamicCoursePage() {
                   <form onSubmit={handleEnroll}>
                     <WaveInput label="Full Name *" type="text" value={formName} onChange={(e) => setFormName(e.target.value)} required />
                     <WaveInput label="Email Address *" type="email" value={formEmail} onChange={(e) => setFormEmail(e.target.value)} required />
+                    <WaveInput label="Phone Number *" type="tel" value={formPhone} onChange={(e) => setFormPhone(e.target.value)} placeholder="+20..." required />
                     <div className="form-group">
                       <label>Experience Level</label>
                       <select value={formExperience} onChange={(e) => setFormExperience(e.target.value)}>

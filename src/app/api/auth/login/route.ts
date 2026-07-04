@@ -51,8 +51,9 @@ export async function POST(request: NextRequest) {
         },
       });
 
+      let emailSent = false;
       try {
-        await sendEmailVerificationEmail({
+        emailSent = await sendEmailVerificationEmail({
           userEmail: user.email,
           name: user.name,
           code,
@@ -63,9 +64,12 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json(
         {
-          error: 'Please verify your email address before logging in',
+          error: emailSent
+            ? 'Please verify your email address before logging in'
+            : 'We could not send the verification code. Please click "Resend Code" below.',
           needsVerification: true,
           email: user.email,
+          emailSent,
         },
         { status: 403 }
       );

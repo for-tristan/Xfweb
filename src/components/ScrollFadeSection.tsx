@@ -74,7 +74,11 @@ export default function ScrollFadeSection({
       return;
     }
 
-    // ── PINNED: position: fixed based pinning ──
+    // ── PINNED: use sticky-like behavior via position: fixed, but
+    //    ONLY switch between relative→fixed. The past state uses
+    //    relative (not fixed+hidden) to avoid scroll jumps when the
+    //    element re-enters flow. The container's explicit height
+    //    (set in measureAndSetHeight) ensures scroll room. ──
     const rect = container.getBoundingClientRect();
     const innerHeight = inner.offsetHeight;
     const fadePx = fadePxRef.current;
@@ -88,7 +92,10 @@ export default function ScrollFadeSection({
       state = 'unpinned';
       progress = 0;
     } else if (rect.bottom < innerHeight) {
-      // Container has scrolled past — content should be at its final position
+      // Container has scrolled past — content should be at its final
+      // position. Use RELATIVE (not fixed) so the element flows
+      // naturally with the page. The container's explicit height
+      // means it's already positioned correctly at the bottom.
       state = 'past';
       progress = 1;
     } else {
@@ -105,29 +112,27 @@ export default function ScrollFadeSection({
       scale: 1 - progress * 0.04,
     };
 
-    // Apply pin positioning immediately (no lerp — position must be exact)
+    // Apply pin positioning. Only two states: fixed (pinned) or
+    // relative (unpinned + past). This avoids the three-way switch
+    // that caused scroll jumps at the past→pinned transition.
     if (state === 'pinned') {
       inner.style.position = 'fixed';
       inner.style.top = '0';
       inner.style.left = '0';
       inner.style.width = '100%';
       inner.style.bottom = '';
-    } else if (state === 'past') {
-      // Stay fixed but hidden — do NOT switch to absolute+bottom,
-      // which would reposition the hero at the bottom of the tall
-      // container and cause it to "appear twice".
-      inner.style.position = 'fixed';
-      inner.style.top = '0';
-      inner.style.left = '0';
-      inner.style.width = '100%';
-      inner.style.bottom = '';
-      inner.style.visibility = 'hidden';
+      inner.style.visibility = 'visible';
     } else {
+      // unpinned or past — both use relative positioning
       inner.style.position = 'relative';
       inner.style.top = '';
       inner.style.left = '';
       inner.style.width = '';
       inner.style.bottom = '';
+      // In past state, the element is at the bottom of the tall
+      // container, which is correct — it should be scrolled past.
+      // No need to hide it; opacity is 0 from the fade.
+      inner.style.visibility = progress >= 1 ? 'hidden' : 'visible';
     }
   };
 
