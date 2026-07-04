@@ -119,6 +119,31 @@ function AuthContent() {
       if (res.ok) {
         toast({ title: 'Welcome back!', description: 'You have been signed in.' });
         router.push('/');
+      } else if (res.status === 403 && data.needsVerification) {
+        // Unverified account — show the code input modal
+        setVerificationEmail(data.email);
+        setVerificationCode('');
+        setVerificationStep('pending');
+        if (data.emailSent === false) {
+          // Email failed to send from login route — auto-trigger resend
+          toast({ title: 'Sending verification code...', description: 'Please wait', variant: 'destructive' });
+          try {
+            const resendRes = await fetch('/api/auth/resend-verification', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: data.email }),
+            });
+            if (resendRes.ok) {
+              toast({ title: 'Code Sent!', description: 'A new verification code has been sent to your email.' });
+            } else {
+              toast({ title: 'Verification Required', description: 'Please click Resend Code below.', variant: 'destructive' });
+            }
+          } catch {
+            toast({ title: 'Verification Required', description: 'Please click Resend Code below.', variant: 'destructive' });
+          }
+        } else {
+          toast({ title: 'Verification Required', description: data.error });
+        }
       } else {
         toast({ title: 'Sign In Failed', description: data.error || 'Invalid credentials', variant: 'destructive' });
       }
