@@ -11,6 +11,21 @@ export default function Error({
 }) {
   useEffect(() => {
     console.error('Application error:', error);
+    // Log to server for debugging Edge-specific issues
+    try {
+      fetch('/api/log-error', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: error?.message || 'Unknown error',
+          stack: error?.stack?.substring(0, 2000) || '',
+          digest: error?.digest || '',
+          url: typeof window !== 'undefined' ? window.location.href : '',
+          userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+          timestamp: new Date().toISOString(),
+        }),
+      }).catch(() => {});
+    } catch {}
   }, [error]);
 
   return (
@@ -23,6 +38,11 @@ export default function Error({
         <p className="xf-error-text">
           An unexpected error occurred. Please try again or contact support if the problem persists.
         </p>
+        {error?.message && (
+          <p className="xf-error-text" style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 8, wordBreak: 'break-word' }}>
+            {error.message}
+          </p>
+        )}
         <button onClick={reset} className="xf-error-btn">
           Try again
         </button>
