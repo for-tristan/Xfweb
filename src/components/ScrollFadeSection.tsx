@@ -19,8 +19,6 @@ function lerp(current: number, target: number, factor: number): number {
   return current + (target - current) * factor;
 }
 
-type PinState = 'unpinned' | 'pinned' | 'past';
-
 export default function ScrollFadeSection({
   children,
   pin = false,
@@ -34,24 +32,40 @@ export default function ScrollFadeSection({
 
   const currentRef = useRef({ opacity: 1, scale: 1 });
   const targetRef = useRef({ opacity: 1, scale: 1 });
-  const pinStateRef = useRef<PinState>('unpinned');
   const fadePxRef = useRef(0);
-  // Cached inner height — reading offsetHeight on every scroll frame
-  // forces layout reflow (layout thrashing). Only recalculate on resize.
   const innerHeightRef = useRef(0);
   const rafRef = useRef<number | null>(null);
 
   const fadeVh = parseFloat(fadeDistance) || 80;
 
+  /**
+   * STICKY-BASED PINNING (Firefox-safe).
+   *
+   * The inner element uses CSS `position: sticky; top: 0` which is set ONCE
+   * via inline style and never changed. This means:
+   *   - NO position switching (relative → fixed → relative)
+   *   - NO document height change
+   *   - NO layout shifts
+   *   - Works identically in Chrome, Firefox, Safari, Edge
+   *
+   * Firefox re-renders position:fixed elements asynchronously during scroll,
+   * causing a 1-frame visual jump when switching between relative↔fixed.
+   * Sticky avoids this entirely because the browser handles pinning natively
+   * on the compositor thread.
+   *
+   * The JS only reads scroll position to calculate the opacity/scale fade —
+   * it never touches positioning.
+   */
   const updateTarget = () => {
     const container = containerRef.current;
-    const inner = innerRef.current;
-    if (!container || !inner) return;
+    if (!container) return;
+
+    const rect = container.getBoundingClientRect();
+    const fadePx = fadePxRef.current;
+    const windowH = window.innerHeight;
 
     if (!pin) {
       // ── NON-PINNED: simple scroll-based fade ──
-      const rect = container.getBoundingClientRect();
-      const windowH = window.innerHeight;
       const fadeStart = windowH * 0.8;
       const fadeEnd = -(windowH * 0.3);
       const progress = 1 - (rect.top - fadeEnd) / (fadeStart - fadeEnd);
@@ -64,65 +78,17 @@ export default function ScrollFadeSection({
       return;
     }
 
-    // ── PINNED: position: fixed based pinning ──
-    const rect = container.getBoundingClientRect();
-    const innerHeight = innerHeightRef.current || inner.offsetHeight;
-    const fadePx = fadePxRef.current;
-    const windowH = window.innerHeight;
-
-    let state: PinState;
-    let progress = 0;
-
-    if (rect.top > 0) {
-      state = 'unpinned';
-      progress = 0;
-    } else if (rect.bottom < innerHeight) {
-      state = 'past';
-      progress = 1;
-    } else {
-      state = 'pinned';
-      const scrolledPast = -rect.top;
-      progress = Math.min(1, scrolledPast / fadePx);
-    }
-
-    pinStateRef.current = state;
+    // ── PINNED (sticky): calculate fade progress ──
+    // With sticky, the inner element pins at top:0 naturally. As we scroll,
+    // rect.top goes negative. The fade happens over the first fadePx of
+    // scrolling past the container's natural top.
+    const scrolledPast = Math.max(0, -rect.top);
+    const progress = fadePx > 0 ? Math.min(1, scrolledPast / fadePx) : 0;
 
     targetRef.current = {
       opacity: 1 - progress,
       scale: 1 - progress * 0.04,
     };
-
-    if (state === 'pinned') {
-      inner.style.position = 'fixed';
-      inner.style.top = '0';
-      inner.style.left = '0';
-      inner.style.width = '100%';
-      inner.style.bottom = '';
-      inner.style.visibility = 'visible';
-    } else if (state === 'past') {
-      // Switch to relative so the hero re-enters document flow and scrolls
-      // away naturally. Keeping it fixed+hidden leaves an empty gap equal to
-      // the hero's height that the user scrolls through before the next
-      // section appears — that's the "jump" feeling.
-      // The hero is already opacity 0 + visibility hidden from the fade,
-      // so switching to relative is invisible — it just fills the space
-      // so the next section follows immediately.
-      inner.style.position = 'relative';
-      inner.style.top = '';
-      inner.style.left = '';
-      inner.style.width = '';
-      inner.style.bottom = '';
-      inner.style.visibility = 'hidden';
-      inner.style.opacity = '0';
-      inner.style.transform = 'scale(0.96)';
-    } else {
-      inner.style.position = 'relative';
-      inner.style.top = '';
-      inner.style.left = '';
-      inner.style.width = '';
-      inner.style.bottom = '';
-      inner.style.visibility = 'visible';
-    }
   };
 
   const measureAndSetHeight = () => {
@@ -134,28 +100,12 @@ export default function ScrollFadeSection({
       const windowH = window.innerHeight;
       const fadePx = windowH * (fadeVh / 100);
       fadePxRef.current = fadePx;
-
-      const prevPosition = inner.style.position;
-      const prevTop = inner.style.top;
-      const prevLeft = inner.style.left;
-      const prevWidth = inner.style.width;
-      const prevBottom = inner.style.bottom;
-
-      inner.style.position = 'relative';
-      inner.style.top = '';
-      inner.style.left = '';
-      inner.style.width = '';
-      inner.style.bottom = '';
-
-      const contentHeight = inner.offsetHeight;
-      innerHeightRef.current = contentHeight;
-      container.style.height = `${contentHeight + fadePx}px`;
-
-      inner.style.position = prevPosition;
-      inner.style.top = prevTop;
-      inner.style.left = prevLeft;
-      inner.style.width = prevWidth;
-      inner.style.bottom = prevBottom;
+      // Cache inner height to avoid reading offsetHeight on every scroll frame
+      innerHeightRef.current = inner.offsetHeight;
+      // Container height = content + fade distance.
+      // The sticky inner pins at top:0 for the entire fade distance,
+      // then scrolls away naturally.
+      container.style.height = `${innerHeightRef.current + fadePx}px`;
     } else {
       container.style.height = '';
     }
@@ -180,8 +130,7 @@ export default function ScrollFadeSection({
       if (opacityDone) cur.opacity = tgt.opacity;
       if (scaleDone) cur.scale = tgt.scale;
 
-      const pinState = pinStateRef.current;
-      if (cur.opacity < 0.01 || pinState === 'past') {
+      if (cur.opacity < 0.01) {
         inner.style.visibility = 'hidden';
       } else {
         inner.style.visibility = 'visible';
@@ -250,7 +199,10 @@ export default function ScrollFadeSection({
         style={{
           willChange: 'opacity, transform',
           ...(pin ? {
-            position: 'relative',
+            // STICKY: set once, never changed by JS. The browser handles
+            // pinning natively on the compositor thread — no jumps in Firefox.
+            position: 'sticky',
+            top: 0,
             zIndex,
             background: 'var(--black)',
             minHeight: '100vh',
