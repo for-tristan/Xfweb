@@ -9,11 +9,11 @@ import { Navbar } from '@/components/Navbar';
 import { Logo } from '@/components/Logo';
 import GradualBlur from '@/components/GradualBlur';
 import { SmartImage } from '@/components/SmartImage';
+import { rafThrottle } from '@/lib/throttle';
 
 // Extracted dashboard utilities + sub-components
 // (StatCard, ProgressBar, SectionHeader, WeekChart, formatDuration, etc.)
 import {
-import { rafThrottle } from '@/lib/throttle';
   StatCard,
   ProgressBar,
   SectionHeader,
