@@ -228,6 +228,9 @@ export default function ScrollFadeSection({
 
     let scrollRaf: number | null = null;
 
+    // Single scroll listener handles both native scroll and Lenis.
+    // Lenis dispatches native scroll events, so a separate
+    // 'xf:lenis-scroll' listener is redundant and causes double work.
     const onScroll = () => {
       if (scrollRaf !== null) return;
       scrollRaf = requestAnimationFrame(() => {
@@ -245,19 +248,12 @@ export default function ScrollFadeSection({
       startAnimation();
     };
 
-    const onLenisScroll = () => {
-      updateTarget();
-      startAnimation();
-    };
-
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onResize, { passive: true });
-    window.addEventListener('xf:lenis-scroll', onLenisScroll, { passive: true });
 
     return () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
-      window.removeEventListener('xf:lenis-scroll', onLenisScroll);
       if (scrollRaf !== null) cancelAnimationFrame(scrollRaf);
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };

@@ -11,6 +11,7 @@ import { Logo } from '@/components/Logo';
 import ConfirmModal from '@/components/ConfirmModal';
 import GradualBlur from '@/components/GradualBlur';
 import { SmartImage } from '@/components/SmartImage';
+import { rafThrottle } from '@/lib/throttle';
 
 export default function StudyFocusPage() {
   const { toast } = useToast();
@@ -147,19 +148,19 @@ export default function StudyFocusPage() {
     timerStartRef.current = null;
   };
 
-  const checkReveals = useCallback(() => {
+  const checkReveals = useCallback(rafThrottle(() => {
     document.querySelectorAll('.reveal, .reveal-up, .reveal-scale, .reveal-left, .reveal-right').forEach((el) => {
       const rect = el.getBoundingClientRect();
       const inView = rect.top < window.innerHeight - 60 && rect.bottom > 60;
       if (inView) el.classList.add('visible');
       else el.classList.remove('visible');
     });
-  }, []);
+  }), []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    const checkBottom = () => setAtBottom(window.innerHeight + window.scrollY >= document.body.scrollHeight - 80);
+    const checkBottom = rafThrottle(() => setAtBottom(window.innerHeight + window.scrollY >= document.body.scrollHeight - 80));
     window.addEventListener('scroll', checkReveals);
     window.addEventListener('scroll', checkBottom);
     checkReveals();

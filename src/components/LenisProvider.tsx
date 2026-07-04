@@ -7,6 +7,13 @@ export default function LenisProvider({ children }: { children: React.ReactNode 
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
+    // Skip Lenis on touch devices — native momentum scrolling is smoother
+    // and less battery-intensive than JS-driven smoothing on mobile.
+    // Also skip if user prefers reduced motion.
+    const isTouch = window.matchMedia('(pointer: coarse)').matches;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (isTouch || prefersReducedMotion) return;
+
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -14,6 +21,7 @@ export default function LenisProvider({ children }: { children: React.ReactNode 
       gestureOrientation: 'vertical',
       smoothWheel: true,
       touchMultiplier: 2,
+      autoRaf: true, // Lenis manages its own rAF — stops when idle
       prevent: (node: EventTarget | null) => {
         if (!(node instanceof HTMLElement)) return false;
         return !!(
@@ -41,13 +49,6 @@ export default function LenisProvider({ children }: { children: React.ReactNode 
     lenis.on('scroll', () => {
       window.dispatchEvent(new CustomEvent('xf:lenis-scroll'));
     });
-
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-
-    requestAnimationFrame(raf);
 
     (window as unknown as Record<string, unknown>).__lenis = lenis;
 

@@ -7,6 +7,7 @@ import { usePageFeatures } from '@/lib/usePageFeatures';
 import { SearchModal, AuthModal, AuthGate, ProfileModal } from '@/lib/PageModals';
 import { Navbar } from '@/components/Navbar';
 import { Logo } from '@/components/Logo';
+import { rafThrottle } from '@/lib/throttle';
 
 interface ServiceFeature {
   id: string;
@@ -80,14 +81,14 @@ export default function DynamicServicePage() {
       .finally(() => setFetching(false));
   }, [slug]);
 
-  const checkReveals = useCallback(() => {
+  const checkReveals = useCallback(rafThrottle(() => {
     document.querySelectorAll('.reveal, .reveal-up, .reveal-scale, .reveal-left, .reveal-right').forEach((el) => {
       const rect = el.getBoundingClientRect();
       const inView = rect.top < window.innerHeight - 60 && rect.bottom > 60;
       if (inView) el.classList.add('visible');
       else el.classList.remove('visible');
     });
-  }, []);
+  }), []);
 
   useEffect(() => {
     window.scrollTo(0, 0);

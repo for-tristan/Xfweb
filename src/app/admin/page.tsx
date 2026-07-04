@@ -26,6 +26,7 @@ import type {
 } from '@/components/admin/types';
 import { UnlockStudentPanel } from '@/components/admin/UnlockStudentPanel';
 import { SmartImage } from '@/components/SmartImage';
+import { rafThrottle } from '@/lib/throttle';
 
 // Legacy type aliases for backward compat with inline references in this file
 type User = AdminUser;
@@ -144,7 +145,7 @@ export default function AdminPage() {
     }, { threshold: 0.05 });
     document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
 
-    const checkBottom = () => setAtBottom(window.innerHeight + window.scrollY >= document.body.scrollHeight - 80);
+    const checkBottom = rafThrottle(() => setAtBottom(window.innerHeight + window.scrollY >= document.body.scrollHeight - 80));
     window.addEventListener('scroll', checkBottom);
     checkBottom();
 

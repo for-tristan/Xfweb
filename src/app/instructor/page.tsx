@@ -12,6 +12,7 @@ import { WaveInput } from '@/components/WaveInput';
 import { WaveTextarea } from '@/components/WaveTextarea';
 import GradualBlur from '@/components/GradualBlur';
 import { SmartImage } from '@/components/SmartImage';
+import { rafThrottle } from '@/lib/throttle';
 
 interface InstructorCourse {
   id: string;
@@ -167,7 +168,7 @@ export default function InstructorPage() {
     }, { threshold: 0.05 });
     document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
 
-    const checkBottom = () => setAtBottom(window.innerHeight + window.scrollY >= document.body.scrollHeight - 80);
+    const checkBottom = rafThrottle(() => setAtBottom(window.innerHeight + window.scrollY >= document.body.scrollHeight - 80));
     window.addEventListener('scroll', checkBottom);
     checkBottom();
 

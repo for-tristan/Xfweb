@@ -16,9 +16,22 @@ interface Particle {
 
 export default function ClickSplash() {
   useEffect(() => {
+    // Skip on touch devices — no click particles on mobile/tablet.
     const hasHover = window.matchMedia('(hover: hover)').matches;
     const isCoarse = window.matchMedia('(pointer: coarse)').matches;
     if (!hasHover || isCoarse) return;
+
+    // Skip if user prefers reduced motion.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // First-visit-only: the splash is a fun surprise but becomes
+    // visual noise on repeat visits. localStorage gates it.
+    try {
+      if (localStorage.getItem('xf:splash-seen')) return;
+      localStorage.setItem('xf:splash-seen', '1');
+    } catch {
+      // localStorage may be blocked (private mode) — continue anyway.
+    }
 
     const particles: Particle[] = [];
     let particleContainer: HTMLDivElement | null = null;

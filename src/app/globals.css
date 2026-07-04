@@ -76,6 +76,40 @@
 html {
   max-width: 100%;
   overflow-x: hidden;
+  /* Cross-browser scroll behavior: let the browser handle smooth scroll
+     natively by default. Lenis (if active) overrides this via JS. */
+  scroll-behavior: smooth;
+}
+
+/* Skip heavy GPU effects on low-end devices (4 cores or fewer, or
+   save-data mode). This catches cheap Android phones and old laptops
+   that choke on backdrop-filter + animations. */
+@media (max-resolution: 1dppx) and (min-width: 1024px) {
+  /* Desktop with standard DPI — keep effects */
+}
+@media (prefers-reduced-data: reduce) {
+  /* Already handled in reduced-motion block, but reinforce here */
+  .grain-bg, .click-splash-container, .particle {
+    display: none !important;
+  }
+}
+
+/* content-visibility: auto lets the browser skip rendering offscreen
+   sections entirely. Massive win for long pages (homepage, admin).
+   contain-intrinsic-size prevents layout jumps when sections load. */
+.v-section,
+.v-team-grid > *,
+.v-services-grid > *,
+.v-courses-grid > *,
+.v-faq-item {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
+}
+
+/* contain: layout style paint isolates each section's rendering so
+   a change in one section doesn't trigger reflow in others. */
+.v-section {
+  contain: layout style;
 }
 body.xf-body {
     font-family: 'Inter Tight', sans-serif;

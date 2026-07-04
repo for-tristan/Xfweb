@@ -15,6 +15,7 @@ const TestModal = dynamic(() => import('@/components/TestModal'), { ssr: false }
 const ModuleContent = dynamic(() => import('@/components/ModuleContent'), { ssr: false });
 import ConfirmModal from '@/components/ConfirmModal';
 import GradualBlur from '@/components/GradualBlur';
+import { rafThrottle } from '@/lib/throttle';
 
 interface CourseModule {
   id: string;
@@ -146,14 +147,14 @@ export default function DynamicCoursePage() {
       .finally(() => setFetching(false));
   }, [slug]);
 
-  const checkReveals = useCallback(() => {
+  const checkReveals = useCallback(rafThrottle(() => {
     document.querySelectorAll('.reveal, .reveal-up, .reveal-scale, .reveal-left, .reveal-right').forEach((el) => {
       const rect = el.getBoundingClientRect();
       const inView = rect.top < window.innerHeight - 60 && rect.bottom > 60;
       if (inView) el.classList.add('visible');
       else el.classList.remove('visible');
     });
-  }, []);
+  }), []);
 
   useEffect(() => {
     window.scrollTo(0, 0);

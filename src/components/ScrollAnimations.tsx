@@ -90,14 +90,23 @@ export function StaggerReveal({ children, className = '', staggerDelay = 80, dir
 export function ScrollProgressBar() {
   const barRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
+    let rafId: number | null = null;
     const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-      if (barRef.current) barRef.current.style.width = `${progress}%`;
+      if (rafId !== null) return; // throttle to one rAF per frame
+      rafId = requestAnimationFrame(() => {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+        if (barRef.current) barRef.current.style.width = `${progress}%`;
+        rafId = null;
+      });
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    handleScroll(); // initial
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
   }, []);
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '3px', zIndex: 9999, background: 'transparent' }}>

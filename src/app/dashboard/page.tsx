@@ -13,6 +13,7 @@ import { SmartImage } from '@/components/SmartImage';
 // Extracted dashboard utilities + sub-components
 // (StatCard, ProgressBar, SectionHeader, WeekChart, formatDuration, etc.)
 import {
+import { rafThrottle } from '@/lib/throttle';
   StatCard,
   ProgressBar,
   SectionHeader,
@@ -181,19 +182,19 @@ export default function DashboardPage() {
     );
   };
 
-  const checkReveals = useCallback(() => {
+  const checkReveals = useCallback(rafThrottle(() => {
     document.querySelectorAll('.reveal, .reveal-up, .reveal-scale, .reveal-left, .reveal-right').forEach((el) => {
       const rect = el.getBoundingClientRect();
       const inView = rect.top < window.innerHeight - 60 && rect.bottom > 60;
       if (inView) el.classList.add('visible');
       else el.classList.remove('visible');
     });
-  }, []);
+  }), []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    const checkBottom = () => setAtBottom(window.innerHeight + window.scrollY >= document.body.scrollHeight - 80);
+    const checkBottom = rafThrottle(() => setAtBottom(window.innerHeight + window.scrollY >= document.body.scrollHeight - 80));
     window.addEventListener('scroll', checkReveals);
     window.addEventListener('scroll', checkBottom);
     checkReveals();
