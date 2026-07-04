@@ -100,20 +100,8 @@ export function Navbar({
         height="fit-content"
         borderRadius={999}
         backgroundOpacity={scrolled ? 0.22 : 0.16}
-        // Reduced from blur(14) saturate(1.8) brightness(55) — the
-        // previous combo meant the GPU had to re-rasterize everything
-        // behind the navbar every composite frame (always-on cost even
-        // when idle). blur(8) saturate(1.2) is visually ~95% identical
-        // at a fraction of the cost. brightness was the biggest hog
-        // because it forced a separate pass per pixel.
         blur={8}
-        displace={0}
-        distortionScale={0}
-        redOffset={0}
-        greenOffset={0}
-        blueOffset={0}
         saturation={1.2}
-        brightness={50}
         style={{
           transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
           transform: scrolled ? 'scale(0.97)' : 'scale(1)',
