@@ -76,11 +76,11 @@
 html {
   max-width: 100%;
   overflow-x: hidden;
-  /* Do NOT set scroll-behavior: smooth — it conflicts with Lenis's
-     JS-driven smoothing. When both are active, the browser and Lenis
-     fight over scroll position, causing frame-by-frame jank. Lenis
-     handles smoothing; native scroll is fine when Lenis is disabled
-     (touch devices, reduced motion). */
+  /* Smooth scroll for programmatic navigation (nav link clicks, scroll-to-
+     section buttons). This ONLY affects scrollTo/anchor calls — it does NOT
+     affect mouse wheel/trackpad scrolling (which modern browsers already
+     smooth-scroll natively). Safe to use with position:sticky. */
+  scroll-behavior: smooth;
 }
 
 /* Skip heavy GPU effects on low-end devices (4 cores or fewer, or
