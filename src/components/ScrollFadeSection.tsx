@@ -76,27 +76,6 @@ export default function ScrollFadeSection({
       progress = Math.min(1, scrolledPast / fadePx);
     }
 
-    // Hysteresis: prevent flickering between states when near boundaries.
-    // Only switch state if we've moved past the threshold by at least 2px.
-    // This prevents the pin from rapidly toggling when Lenis's animated
-    // scroll position is near a state boundary.
-    const prevState = pinStateRef.current;
-    if (state !== prevState) {
-      if (state === 'pinned' && prevState === 'unpinned') {
-        // unpinned → pinned: only switch if rect.top is clearly <= 0
-        if (rect.top > -2) return;
-      } else if (state === 'unpinned' && prevState === 'pinned') {
-        // pinned → unpinned: only switch if rect.top is clearly > 0
-        if (rect.top < 2) return;
-      } else if (state === 'past' && prevState === 'pinned') {
-        // pinned → past: only switch if rect.bottom is clearly < innerHeight
-        if (rect.bottom > innerHeight + 2) return;
-      } else if (state === 'pinned' && prevState === 'past') {
-        // past → pinned: only switch if rect.bottom is clearly > innerHeight
-        if (rect.bottom < innerHeight - 2) return;
-      }
-    }
-
     pinStateRef.current = state;
 
     targetRef.current = {
