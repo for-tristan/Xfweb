@@ -76,9 +76,11 @@
 html {
   max-width: 100%;
   overflow-x: hidden;
-  /* Cross-browser scroll behavior: let the browser handle smooth scroll
-     natively by default. Lenis (if active) overrides this via JS. */
-  scroll-behavior: smooth;
+  /* Do NOT set scroll-behavior: smooth — it conflicts with Lenis's
+     JS-driven smoothing. When both are active, the browser and Lenis
+     fight over scroll position, causing frame-by-frame jank. Lenis
+     handles smoothing; native scroll is fine when Lenis is disabled
+     (touch devices, reduced motion). */
 }
 
 /* Skip heavy GPU effects on low-end devices (4 cores or fewer, or
@@ -94,23 +96,17 @@ html {
   }
 }
 
-/* content-visibility: auto lets the browser skip rendering offscreen
-   sections entirely. Massive win for long pages (homepage, admin).
-   contain-intrinsic-size prevents layout jumps when sections load. */
-.v-section,
-.v-team-grid > *,
-.v-services-grid > *,
-.v-courses-grid > *,
-.v-faq-item {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 500px;
-}
-
-/* contain: layout style paint isolates each section's rendering so
-   a change in one section doesn't trigger reflow in others. */
-.v-section {
-  contain: layout style;
-}
+/* NOTE: content-visibility: auto and contain: layout were previously
+   applied to .v-section but caused two serious bugs:
+   1. content-visibility caused scroll position jumps because the
+      contain-intrinsic-size estimate (500px) didn't match actual
+      section heights — felt like "frame by frame" scrolling.
+   2. contain: layout creates a new containing block, which breaks
+      position: fixed inside ScrollFadeSection's pinned hero. The
+      hero's fixed inner element became relative to the section
+      instead of the viewport.
+   Both removed. content-visibility is better suited for very long
+   lists (1000+ items), not 6 full-screen sections. */
 body.xf-body {
     font-family: 'Inter Tight', sans-serif;
     background-color: var(--black);
