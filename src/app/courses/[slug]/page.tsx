@@ -238,14 +238,11 @@ export default function DynamicCoursePage() {
           const data = await res.json();
           if (res.ok) {
             toast({ title: 'Request Submitted!', description: 'Your enrollment request is pending review' });
-            enrollmentsCheckedRef.current = false;
-            fetch('/api/courses/my-enrollments')
+            // Re-fetch enrollment status from the combined endpoint
+            fetch(`/api/courses/${slug}/combined`)
               .then((res) => res.ok ? res.json() : null)
               .then((data) => {
-                if (data?.enrollments) {
-                  const match = data.enrollments.find((e: Enrollment) => e.courseId === slug);
-                  if (match) setEnrollment(match);
-                }
+                if (data?.enrollment) setEnrollment(data.enrollment);
               })
               .catch(() => {});
           } else {
