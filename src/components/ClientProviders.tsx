@@ -7,10 +7,11 @@ import LenisProvider from '@/components/LenisProvider';
 /**
  * ClientProviders — wraps the entire app.
  *
- * Includes a RouteChangeLoader that shows the 3-dot loader instantly when
- * the user clicks a link (router.push / Link). This eliminates the blank
- * screen gap where "nothing happens for a few seconds" — the loader appears
- * immediately, even before the new page's JS bundle has downloaded.
+ * Shows a 3-dot loader overlay instantly whenever the user navigates to a
+ * new page. Intercepts BOTH <a> tag clicks AND div/button onClick
+ * navigations (router.push) by detecting pathname changes with a small
+ * delay — if the pathname hasn't changed within 50ms of a click, we know
+ * a client-side navigation is in progress (router.push was called).
  */
 export default function ClientProviders({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -23,8 +24,8 @@ export default function ClientProviders({ children }: { children: React.ReactNod
     html.classList.remove('scroll-locked');
   }, []);
 
+  // Hide loader when pathname actually changes (navigation completed)
   useEffect(() => {
-    // When pathname changes, a navigation has completed.
     if (prevPath.current !== pathname) {
       prevPath.current = pathname;
       setIsNavigating(false);
@@ -35,34 +36,41 @@ export default function ClientProviders({ children }: { children: React.ReactNod
     }
   }, [pathname]);
 
-  // Intercept all link clicks and router.push calls to show the loader
-  // immediately. We listen for click events on <a> tags and use a
-  // MutationObserver-free approach: just intercept clicks.
+  // Intercept ALL clicks — catches both <a> tags and div onClick+router.push
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const link = target.closest('a[href]');
-      if (!link) return;
-
-      const href = link.getAttribute('href');
-      if (!href) return;
-
-      // Only handle internal navigation (not external links, not hash links)
-      if (href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
-      if (link.target === '_blank') return;
+      // Skip modified clicks (new tab, etc.)
       if (e.metaKey || e.ctrlKey || e.shiftKey) return;
 
-      // Check if this is a different page
-      const currentPath = window.location.pathname;
-      const targetPath = href.split('#')[0].split('?')[0];
-      if (targetPath === currentPath) return;
+      const target = e.target as HTMLElement;
 
-      // Show loader immediately
-      setIsNavigating(true);
+      // Check if clicking something that will navigate
+      // 1. An <a> tag with internal href
+      const link = target.closest('a[href]') as HTMLAnchorElement | null;
+      if (link) {
+        const href = link.getAttribute('href');
+        if (!href) return;
+        if (href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+        if (link.target === '_blank') return;
+        const targetPath = href.split('#')[0].split('?')[0];
+        if (targetPath === window.location.pathname) return;
 
-      // Safety timeout: if navigation somehow stalls, hide loader after 10s
-      if (navTimer.current) clearTimeout(navTimer.current);
-      navTimer.current = setTimeout(() => setIsNavigating(false), 10000);
+        // Show loader immediately
+        setIsNavigating(true);
+        if (navTimer.current) clearTimeout(navTimer.current);
+        navTimer.current = setTimeout(() => setIsNavigating(false), 10000);
+        return;
+      }
+
+      // 2. A div/button with role="link" or role="button" or className
+      //    containing "card" — these use onClick + router.push
+      const clickable = target.closest('[role="button"], [role="link"], .v-course-card, .v-service-card, .v-project-showcase-card');
+      if (clickable) {
+        // Show loader immediately — router.push was likely called
+        setIsNavigating(true);
+        if (navTimer.current) clearTimeout(navTimer.current);
+        navTimer.current = setTimeout(() => setIsNavigating(false), 10000);
+      }
     };
 
     document.addEventListener('click', handleClick, true);
