@@ -268,6 +268,11 @@ export default function ScrollFadeSection({
         style={{
           willChange: 'opacity, transform',
           backfaceVisibility: 'hidden',
+          // Firefox renders position:fixed on the main thread by default,
+          // causing 1-frame jumps when the fixed element overlaps scrolling
+          // content. These properties force Firefox to promote the element
+          // to its own compositor layer (same as Chrome's default behavior):
+          contain: 'layout paint',
           ...(pin ? {
             position: 'relative',
             zIndex,
