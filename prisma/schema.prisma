@@ -17,7 +17,7 @@ model User {
   company   String?
   avatar    String?
   bio       String?
-  role          String  @default("student")  // "student" | "instructor" | "admin"
+  role          String  @default("newcomer")  // "newcomer" | "student" | "instructor" | "admin"
   emailVerified DateTime?
   createdAt     DateTime @default(now())
   updatedAt DateTime @updatedAt

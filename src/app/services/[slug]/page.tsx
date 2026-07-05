@@ -176,8 +176,8 @@ export default function DynamicServicePage() {
         <li><Link href="/">Home</Link></li>
         <li><Link href="/#services">Services</Link></li>
         <li><Link href="/#courses">Programs</Link></li>
-        <li><Link href="/games">Games</Link></li>
-        <li><Link href="/study">Study</Link></li>
+        {user && user.role !== 'newcomer' && <li><Link href="/games">Games</Link></li>}
+        {user && user.role !== 'newcomer' && <li><Link href="/study">Study</Link></li>}
       </ul>
     </div>
     <div className="v-footer-column">
@@ -393,8 +393,8 @@ export default function DynamicServicePage() {
         <li><Link href="/">Home</Link></li>
         <li><Link href="/#services">Services</Link></li>
         <li><Link href="/#courses">Programs</Link></li>
-        <li><Link href="/games">Games</Link></li>
-        <li><Link href="/study">Study</Link></li>
+        {user && user.role !== 'newcomer' && <li><Link href="/games">Games</Link></li>}
+        {user && user.role !== 'newcomer' && <li><Link href="/study">Study</Link></li>}
       </ul>
     </div>
     <div className="v-footer-column">

@@ -10,9 +10,10 @@ import { CONTACT, SOCIAL } from '@/lib/constants';
 
 interface FooterProps {
   scrollToSection: (section: string) => void;
+  user?: { role: string } | null;
 }
 
-export function Footer({ scrollToSection }: FooterProps) {
+export function Footer({ scrollToSection, user }: FooterProps) {
   return (
     <footer className="v-footer">
       <div className="v-footer-grid">
@@ -43,9 +44,9 @@ export function Footer({ scrollToSection }: FooterProps) {
             <li><a href="#home" onClick={(e) => { e.preventDefault(); scrollToSection('home'); }}>Home</a></li>
             <li><a href="#services" onClick={(e) => { e.preventDefault(); scrollToSection('services'); }}>Services</a></li>
             <li><a href="#courses" onClick={(e) => { e.preventDefault(); scrollToSection('courses'); }}>Programs</a></li>
-            <li><a href="/games">Games</a></li>
-            <li><a href="/study">Study</a></li>
-            <li><a href="/dashboard">Dashboard</a></li>
+            {user && user.role !== 'newcomer' && <li><a href="/games">Games</a></li>}
+            {user && user.role !== 'newcomer' && <li><a href="/study">Study</a></li>}
+            {user && user.role !== 'newcomer' && <li><a href="/dashboard">Dashboard</a></li>}
           </ul>
         </div>
 

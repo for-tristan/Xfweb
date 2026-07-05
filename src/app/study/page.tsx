@@ -255,7 +255,20 @@ export default function StudyFocusPage() {
 
       <AuthGate loading={loading} minLoading={minLoading} user={user} onSignIn={() => openAuthModal('signin', 'Sign in to access Study Focus')} onSignUp={() => openAuthModal('signup')} />
 
-      {!(loading || minLoading) && <div className="page-transition-enter">
+      {!(loading || minLoading) && user && user.role === 'newcomer' && (
+        <div style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '120px 24px 80px', textAlign: 'center' }}>
+          <i className="fa-solid fa-lock" style={{ fontSize: 48, color: 'var(--accent)', marginBottom: 24, opacity: 0.5 }} />
+          <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 24, fontWeight: 700, color: 'var(--text-light)', marginBottom: 8 }}>Access Restricted</h2>
+          <p style={{ fontSize: 15, color: 'var(--text-dim)', maxWidth: 400, marginBottom: 24, lineHeight: 1.6 }}>
+            Study Focus is available for students. Enroll in a course to get started!
+          </p>
+          <Link href="/#courses" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <i className="fa-solid fa-graduation-cap" /> Browse Programs
+          </Link>
+        </div>
+      )}
+
+      {!(loading || minLoading) && user && user.role !== 'newcomer' && <div className="page-transition-enter">
         <section style={{ background: 'var(--black)', padding: `${isMobile ? '160px 16px' : '180px 60px'} 250px`, position: 'relative', zIndex: 2 }}>
           <div className="container-max" style={{ maxWidth: 900, margin: '0 auto' }}>
 
@@ -550,8 +563,8 @@ export default function StudyFocusPage() {
         <li><Link href="/">Home</Link></li>
         <li><Link href="/#services">Services</Link></li>
         <li><Link href="/#courses">Programs</Link></li>
-        <li><Link href="/games">Games</Link></li>
-        <li><Link href="/study">Study</Link></li>
+        {user && user.role !== 'newcomer' && <li><Link href="/games">Games</Link></li>}
+        {user && user.role !== 'newcomer' && <li><Link href="/study">Study</Link></li>}
       </ul>
     </div>
     <div className="v-footer-column">

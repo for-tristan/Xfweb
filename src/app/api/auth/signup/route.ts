@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
           username,
           phone: phone || null,
           company: company || null,
-          role: 'student',
+          role: 'newcomer',
         },
       });
 

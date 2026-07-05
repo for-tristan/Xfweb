@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
           { username: { contains: search } },
         ],
       }),
-      ...(role && ['student', 'instructor', 'admin'].includes(role) ? { role: role as 'student' | 'instructor' | 'admin' } : {}),
+      ...(role && ['newcomer', 'student', 'instructor', 'admin'].includes(role) ? { role: role as 'newcomer' | 'student' | 'instructor' | 'admin' } : {}),
     };
 
     const select = {
@@ -96,9 +96,9 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    if (!['student', 'instructor', 'admin'].includes(role)) {
+    if (!['newcomer', 'student', 'instructor', 'admin'].includes(role)) {
       return NextResponse.json(
-        { error: 'Role must be "student", "instructor", or "admin"' },
+        { error: 'Role must be "newcomer", "student", "instructor", or "admin"' },
         { status: 400 }
       );
     }

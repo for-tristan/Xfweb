@@ -102,6 +102,22 @@ export async function PUT(request: NextRequest) {
     });
 
     if (status === 'approved') {
+      // Auto-upgrade newcomer to student when their first enrollment is approved
+      if (updated.user.role === 'newcomer') {
+        await db.user.update({
+          where: { id: updated.userId },
+          data: { role: 'student' },
+        });
+        await db.notification.create({
+          data: {
+            userId: updated.userId,
+            title: 'Welcome to XFoundry!',
+            message: 'Your enrollment has been approved! You now have access to the dashboard, study timer, and code games.',
+            type: 'success',
+          },
+        });
+      }
+
       await db.notification.create({
         data: {
           userId: updated.userId,

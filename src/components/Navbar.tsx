@@ -77,7 +77,8 @@ export function Navbar({
     { label: 'Services', ariaLabel: 'View our services', link: '/#services', onClick: isHome ? () => scrollToSection('services') : undefined },
     { label: 'Programs', ariaLabel: 'View our programs', link: '/#courses', onClick: isHome ? () => scrollToSection('courses') : undefined },
     { label: 'Contact', ariaLabel: 'Get in touch', link: '/#contact', onClick: isHome ? () => scrollToSection('contact') : undefined },
-    ...(user ? [
+    // Only show student pages for non-newcomer users
+    ...(user && user.role !== 'newcomer' ? [
       { label: 'Games', ariaLabel: 'Play games', link: '/games' },
       { label: 'Study', ariaLabel: 'Study zone', link: '/study' },
       { label: 'Dashboard', ariaLabel: 'Your dashboard', link: '/dashboard' },

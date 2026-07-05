@@ -1198,7 +1198,7 @@ export default function Home({
             </SectionReveal>
         </div>
       </section>
-      <Footer scrollToSection={scrollToSection} />
+      <Footer scrollToSection={scrollToSection} user={user} />
 
       </>
       )}
