@@ -128,6 +128,13 @@ export default function Home({
   const [authLoading, setAuthLoading] = useState(true);
   const [minLoading, setMinLoading] = useState(true);
 
+  // Firefox detection — used to switch hero pin from JS-driven fixed
+  // (causes scroll jumps on Firefox) to CSS sticky (compositor-native).
+  const [isFirefox, setIsFirefox] = useState(false);
+  useEffect(() => {
+    setIsFirefox(typeof navigator !== 'undefined' && /Firefox/i.test(navigator.userAgent));
+  }, []);
+
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authTab, setAuthTab] = useState<'signin' | 'signup'>('signin');
   const [authMessage, setAuthMessage] = useState('');
@@ -949,19 +956,38 @@ export default function Home({
           zIndex={50}
         />
       )}
-      {/* HERO — Pure CSS sticky pin. Firefox can't handle JS-driven
-          position:fixed without 1-frame jumps. Sticky is compositor-native. */}
-      <div style={{ position: 'relative', height: '160vh', zIndex: 1 }}>
-        <div style={{
-          position: 'sticky',
-          top: 0,
-          height: '100vh',
-          overflow: 'hidden',
-          background: 'var(--black)',
-          backfaceVisibility: 'hidden',
-          transform: 'translateZ(0)',
-          willChange: 'transform',
-        }}>
+      {/* HERO — Pinned + Fade on Scroll.
+          Firefox uses CSS sticky (compositor-native, no JS = no jumps).
+          Other browsers use ScrollFadeSection (JS-driven fixed pin with
+          opacity/scale fade animation). */}
+      {isFirefox ? (
+        <div style={{ position: 'relative', height: '160vh', zIndex: 1 }}>
+          <div style={{
+            position: 'sticky',
+            top: 0,
+            height: '100vh',
+            overflow: 'hidden',
+            background: 'var(--black)',
+            backfaceVisibility: 'hidden',
+            transform: 'translateZ(0)',
+          }}>
+            <section className="v-hero" id="home">
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', position: 'relative', zIndex: 10 }}>
+                <div style={{ position: 'relative', width: 720, height: 520, maxWidth: '90vw', maxHeight: '60vh' }}>
+                  <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
+                    <VideoTemplate />
+                  </div>
+                </div>
+              </div>
+              <div className="scroll-indicator" style={{ left: 0, right: 0 }}>
+                <span>Scroll</span>
+                <div className="scroll-line"></div>
+              </div>
+            </section>
+          </div>
+        </div>
+      ) : (
+      <ScrollFadeSection pin fadeDistance="60vh" zIndex={1}>
       <section className="v-hero" id="home">
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', position: 'relative', zIndex: 10 }}>
             <div style={{ position: 'relative', width: 720, height: 520, maxWidth: '90vw', maxHeight: '60vh' }}>
@@ -976,8 +1002,8 @@ export default function Home({
           <div className="scroll-line"></div>
         </div>
       </section>
-        </div>
-      </div>
+      </ScrollFadeSection>
+      )}
       <ServicesSection services={servicesDataArr} />
       <ProjectsSection projects={dynamicProjects} />
       <section className="v-section" id="courses">

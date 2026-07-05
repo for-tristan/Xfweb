@@ -78,25 +78,7 @@ export default function ScrollFadeSection({
       progress = Math.min(1, scrolledPast / fadePx);
     }
 
-    const prevState = pinStateRef.current;
     pinStateRef.current = state;
-
-    // Snap opacity on ALL state transitions — don't let the lerp animate
-    // across a position:fixed↔relative switch. This prevents 1-frame jumps
-    // in both directions (scrolling down: pinned→past, scrolling up:
-    // past→pinned, past→unpinned).
-    if (state === 'past') {
-      currentRef.current.opacity = 0;
-      currentRef.current.scale = 0.96;
-    } else if (state === 'unpinned') {
-      currentRef.current.opacity = 1;
-      currentRef.current.scale = 1;
-    } else if (state === 'pinned' && prevState !== 'pinned') {
-      // Only snap when ENTERING pinned from another state.
-      // While already pinned, let the lerp animate the fade normally.
-      currentRef.current.opacity = 1 - progress;
-      currentRef.current.scale = 1 - progress * 0.04;
-    }
 
     targetRef.current = {
       opacity: 1 - progress,
@@ -111,21 +93,15 @@ export default function ScrollFadeSection({
       inner.style.bottom = '';
       inner.style.visibility = 'visible';
     } else if (state === 'past') {
-      // Keep position:fixed (NOT relative) so document flow doesn't change
-      // when transitioning between pinned↔past. The element is invisible
-      // (opacity 0 + visibility hidden) so it doesn't matter visually.
-      // Switching to relative here causes a layout shift = scroll jump
-      // near the next section (Tech Programs).
-      inner.style.position = 'fixed';
-      inner.style.top = '0';
-      inner.style.left = '0';
-      inner.style.width = '100%';
+      inner.style.position = 'relative';
+      inner.style.top = '';
+      inner.style.left = '';
+      inner.style.width = '';
       inner.style.bottom = '';
       inner.style.visibility = 'hidden';
       inner.style.opacity = '0';
       inner.style.transform = 'scale(0.96) translateZ(0)';
     } else {
-      // unpinned — back to relative, fully visible
       inner.style.position = 'relative';
       inner.style.top = '';
       inner.style.left = '';
@@ -268,11 +244,6 @@ export default function ScrollFadeSection({
         style={{
           willChange: 'opacity, transform',
           backfaceVisibility: 'hidden',
-          // Firefox renders position:fixed on the main thread by default,
-          // causing 1-frame jumps when the fixed element overlaps scrolling
-          // content. These properties force Firefox to promote the element
-          // to its own compositor layer (same as Chrome's default behavior):
-          contain: 'layout paint',
           ...(pin ? {
             position: 'relative',
             zIndex,
