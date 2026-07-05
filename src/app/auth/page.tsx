@@ -125,7 +125,10 @@ function AuthContent() {
         // Store user in sessionStorage for Edge fallback (cookies might be blocked)
         try { sessionStorage.setItem('xfoundry_user', JSON.stringify(data.user)); } catch {}
         toast({ title: 'Welcome back!', description: 'You have been signed in.' });
-        router.push('/');
+        // Use hard navigation (not router.push) to force a full page reload.
+        // This ensures HomePageClient mounts fresh and reads sessionStorage
+        // immediately, without any client-side navigation timing issues.
+        window.location.href = '/';
       } else if (res.status === 403 && data.needsVerification) {
         // Unverified account — show the code input modal
         setVerificationEmail(data.email);
