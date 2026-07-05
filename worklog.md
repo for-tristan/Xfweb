@@ -691,3 +691,17 @@ Stage Summary:
 - Commit 7f18a8d created locally
 - Push to origin/main FAILED — git credentials not available in this environment. User needs to push from their side, or set up credentials here.
 - Net effect: Lenis smooth-scroll feels exactly as it did before a47241c. Three real performance fixes (force-dynamic, minLoading timer, prefetch) remain in place.
+
+---
+Task ID: newcomer-nav-links
+Agent: main
+Task: Hide student pages (Games/Study/Dashboard/AI) from navbar for newcomer role users
+
+Work Log:
+- Found root cause: commit 7607c10 (newcomer role) only added `user.role !== 'newcomer'` guard to `staggeredMenuItems` array (mobile menu, line 81-86). The desktop `nav-links-compact` and `nav-links` lists (lines 133-136 and 165-168) still showed all four student links to any logged-in user, including newcomers.
+- src/components/Navbar.tsx: applied `user.role !== 'newcomer'` guard to Games, Study, Dashboard, AI links in BOTH `nav-links-compact` and `nav-links` lists. Pattern matches the existing guard in `staggeredMenuItems`.
+
+Stage Summary:
+- Commit b7835da created locally
+- Newcomer users now see only the public nav links (Home, Services, Programs, Contact) in the desktop navbar pill and full-width list — consistent with what they already saw in the mobile StaggeredMenu.
+- Admin/Instructor links and the public nav links are unaffected.

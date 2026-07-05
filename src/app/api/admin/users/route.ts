@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { deleteAllUserSessions, requireAdmin } from '@/lib/auth';
+import { requireAdmin } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
@@ -131,7 +131,12 @@ export async function PUT(request: NextRequest) {
       select: { id: true, name: true, email: true, role: true, avatar: true, createdAt: true },
     });
 
-    await deleteAllUserSessions(userId);
+    // NOTE: We intentionally do NOT delete the user's sessions here.
+    // getCurrentUser() always reads the role fresh from the DB on each
+    // request, so server-side access control uses the new role immediately.
+    // The affected user's client UI will refresh on next window focus
+    // (see usePageFeatures / HomePageClient focus listeners) — no
+    // forced re-login required.
 
     return NextResponse.json({
       message: `User role updated to ${role}`,

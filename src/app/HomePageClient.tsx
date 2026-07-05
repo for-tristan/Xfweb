@@ -302,6 +302,30 @@ export default function Home({
     })();
   }, [router, toast]);
 
+  // Re-fetch /api/auth/me on window focus so admin role changes propagate
+  // to the homepage UI without requiring logout/login. Throttled to 30s.
+  useEffect(() => {
+    let lastRefresh = Date.now();
+    const onFocus = () => {
+      if (Date.now() - lastRefresh < 30000) return;
+      lastRefresh = Date.now();
+      (async () => {
+        try {
+          const res = await fetch('/api/auth/me');
+          if (res.ok) {
+            const data = await res.json();
+            if (data.user) {
+              setUser(data.user);
+              try { sessionStorage.setItem('xfoundry_user', JSON.stringify(data.user)); } catch {}
+            }
+          }
+        } catch {}
+      })();
+    };
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, []);
+
   const loadEnrollments = useCallback(async () => {
     setEnrollmentsLoading(true);
     try {

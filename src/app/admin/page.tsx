@@ -717,7 +717,7 @@ export default function AdminPage() {
   };
 
   const handleRoleChange = (userId: string, newRole: string) => {
-    const roleLabels: Record<string, string> = { admin: 'admin', instructor: 'instructor', student: 'student' };
+    const roleLabels: Record<string, string> = { admin: 'admin', instructor: 'instructor', student: 'student', newcomer: 'newcomer' };
     const action = `change this user's role to ${roleLabels[newRole] || newRole}`;
     openConfirm('Change Role', `Are you sure you want to ${action}?`, async () => {
       setActionLoading(userId);
@@ -930,7 +930,7 @@ export default function AdminPage() {
                 {users.map((u, idx) => (
                   <div key={u.id} className={`project-card reveal reveal-delay-${Math.min(idx + 1, 5)}`} style={{ padding: '28px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                      <div style={{ width: 44, height: 44, borderRadius: '50%', background: u.avatar ? 'transparent' : (u.role === 'admin' ? 'color-mix(in srgb, var(--accent) 15%, transparent)' : u.role === 'instructor' ? 'color-mix(in srgb, #6b9bf5 15%, transparent)' : 'var(--input-bg)'), border: u.role === 'admin' ? '1px solid color-mix(in srgb, var(--accent) 30%, transparent)' : u.role === 'instructor' ? '1px solid color-mix(in srgb, #6b9bf5 30%, transparent)' : '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, color: u.role === 'admin' ? 'var(--accent)' : u.role === 'instructor' ? '#6b9bf5' : 'var(--text-dim)', overflow: 'hidden', flexShrink: 0 }}>
+                      <div style={{ width: 44, height: 44, borderRadius: '50%', background: u.avatar ? 'transparent' : (u.role === 'admin' ? 'color-mix(in srgb, var(--accent) 15%, transparent)' : u.role === 'instructor' ? 'color-mix(in srgb, #6b9bf5 15%, transparent)' : u.role === 'newcomer' ? 'color-mix(in srgb, #a78bfa 15%, transparent)' : 'var(--input-bg)'), border: u.role === 'admin' ? '1px solid color-mix(in srgb, var(--accent) 30%, transparent)' : u.role === 'instructor' ? '1px solid color-mix(in srgb, #6b9bf5 30%, transparent)' : u.role === 'newcomer' ? '1px solid color-mix(in srgb, #a78bfa 30%, transparent)' : '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, color: u.role === 'admin' ? 'var(--accent)' : u.role === 'instructor' ? '#6b9bf5' : u.role === 'newcomer' ? '#a78bfa' : 'var(--text-dim)', overflow: 'hidden', flexShrink: 0 }}>
                         {u.avatar
                           ? <SmartImage src={u.avatar} alt="" width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                           : u.name.charAt(0).toUpperCase()
@@ -942,7 +942,7 @@ export default function AdminPage() {
                       </div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-                      <span style={{ padding: '5px 16px', borderRadius: 999, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, background: u.role === 'admin' ? 'color-mix(in srgb, var(--accent) 12%, transparent)' : u.role === 'instructor' ? 'color-mix(in srgb, #6b9bf5 12%, transparent)' : 'rgba(148,163,184,0.1)', color: u.role === 'admin' ? 'var(--accent)' : u.role === 'instructor' ? '#6b9bf5' : '#94a3b8', border: u.role === 'admin' ? '1px solid color-mix(in srgb, var(--accent) 25%, transparent)' : u.role === 'instructor' ? '1px solid color-mix(in srgb, #6b9bf5 25%, transparent)' : '1px solid rgba(148,163,184,0.15)' }}>{u.role}</span>
+                      <span style={{ padding: '5px 16px', borderRadius: 999, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, background: u.role === 'admin' ? 'color-mix(in srgb, var(--accent) 12%, transparent)' : u.role === 'instructor' ? 'color-mix(in srgb, #6b9bf5 12%, transparent)' : u.role === 'newcomer' ? 'color-mix(in srgb, #a78bfa 12%, transparent)' : 'rgba(148,163,184,0.1)', color: u.role === 'admin' ? 'var(--accent)' : u.role === 'instructor' ? '#6b9bf5' : u.role === 'newcomer' ? '#a78bfa' : '#94a3b8', border: u.role === 'admin' ? '1px solid color-mix(in srgb, var(--accent) 25%, transparent)' : u.role === 'instructor' ? '1px solid color-mix(in srgb, #6b9bf5 25%, transparent)' : u.role === 'newcomer' ? '1px solid color-mix(in srgb, #a78bfa 25%, transparent)' : '1px solid rgba(148,163,184,0.15)' }}>{u.role}</span>
                       <span style={{ fontSize: 13, color: 'var(--text-dim)', minWidth: 120 }}>{fmt(u.createdAt)}</span>
                       {u.id !== user!.id && (
                         <>
@@ -977,6 +977,17 @@ export default function AdminPage() {
                             >
                               <i className={actionLoading === u.id ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-user'} style={{ marginRight: 6 }}></i>
                               Make Student
+                            </button>
+                          )}
+                          {u.role !== 'newcomer' && (
+                            <button
+                              onClick={() => handleRoleChange(u.id, 'newcomer')}
+                              disabled={actionLoading === u.id}
+                              className="btn"
+                              style={{ padding: '8px 16px', fontSize: 11, background: 'transparent', border: '1px solid color-mix(in srgb, #a78bfa 40%, transparent)', color: '#a78bfa' }}
+                            >
+                              <i className={actionLoading === u.id ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-user-plus'} style={{ marginRight: 6 }}></i>
+                              Make Newcomer
                             </button>
                           )}
                           <button

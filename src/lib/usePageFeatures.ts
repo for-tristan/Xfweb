@@ -196,6 +196,34 @@ export function usePageFeatures() {
     })();
   }, []);
 
+  // Re-fetch /api/auth/me when the window regains focus, so role changes
+  // made by an admin propagate to the user's UI without a manual logout.
+  // getCurrentUser() always reads the role fresh from the DB on the
+  // server, so server-side ACLs are already correct; this just refreshes
+  // the client-side user state so the navbar/buttons update.
+  useEffect(() => {
+    let lastRefresh = Date.now();
+    const onFocus = () => {
+      // Throttle to once per 30s to avoid hammering the API on rapid tab switches
+      if (Date.now() - lastRefresh < 30000) return;
+      lastRefresh = Date.now();
+      (async () => {
+        try {
+          const res = await fetch('/api/auth/me');
+          if (res.ok) {
+            const data = await res.json();
+            if (data.user) {
+              setUser(data.user);
+              try { sessionStorage.setItem('xfoundry_user', JSON.stringify(data.user)); } catch {}
+            }
+          }
+        } catch {}
+      })();
+    };
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, []);
+
   useEffect(() => {
     const effectiveTheme = theme === 'dark' ? 'crimson' : theme;
     document.documentElement.setAttribute('data-theme', effectiveTheme);
