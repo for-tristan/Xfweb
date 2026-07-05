@@ -727,3 +727,49 @@ Stage Summary:
 - Two UX issues resolved:
   1. Admin role changes now apply immediately. Server-side checks use fresh role on next request. Client UI refreshes on window focus (throttled 30s) — no manual logout/login required.
   2. Admin can now set users back to 'newcomer' role via the 'Make Newcomer' button. Newcomer role badge shows in purple throughout the admin user list.
+
+---
+Task ID: mobile-380px-layouts
+Agent: main
+Task: Ensure courses/[slug], services/[slug], study, and dashboard pages are responsive down to 380px viewport width
+
+Work Log:
+- Audited all 4 target pages via parallel subagent exploration — found 23 distinct narrow-mobile issues (hardcoded paddings, missing flexWrap, long-text overflow risks, oversized fonts, SSR flash from isMobile state)
+- Strategy: combine CSS-class overrides (which apply on first paint, fixing SSR flash) with targeted inline-style fixes for real overflow risks
+
+src/app/globals.css:
+- Added new @media (max-width: 480px) block with overrides for: .enroll-card (padding 36→24/18), .enroll-price (font 42→32), .module-item (padding 20/24→16/14), .module-num, .what-learn, .learn-item, .cta-section (padding 60/60→40/16), .module-expanded-content (padding-left 56→16), .page-title (clamp font), .study-timer-display (font 72→56), .study-leaderboard-* (entry gap/padding, name ellipsis, rank/avatar sizes), .dashboard-section (padding 140/24→100/14), .dashboard-hero-card (padding 24→18), .dashboard-inline-stats (gap 24→12), .dashboard-course-row (gap), .dashboard-test-row + .dashboard-test-module-title (truncate long module names) + .dashboard-test-pct (flexShrink:0), .dashboard-stat-value (flexShrink:0)
+- Added new @media (max-width: 380px) block with even tighter overrides for the smallest phones
+
+src/app/courses/[slug]/page.tsx:
+- Hero section padding responsive (120px 16px 32px on mobile)
+- Course title fontSize 24 on mobile, 36 on desktop (was always 36)
+- NotFound h1 fontSize 24 on mobile (was always 32)
+- NotFound button row +flexWrap: 'wrap'
+- Added .module-expanded-content class to expanded module content (CSS drops padding-left from 56 to 16 on mobile)
+
+src/app/services/[slug]/page.tsx:
+- NotFound button row +flexWrap: 'wrap'
+
+src/app/study/page.tsx:
+- Section padding responsive (120px 14px 80px on mobile — was 160px 16px 250px)
+- Timer hero padding 32px 18px on mobile (was 48px 32px)
+- Leaderboard card padding 20 on mobile (was 32)
+- Leaderboard entry gap 10 / padding 12px 12px on mobile (was 14 / 14px 16px)
+- Stats row gap 20 on mobile (was 32)
+- Leaderboard name wrapped in <span> with overflow:hidden + text-overflow:ellipsis + min-width:0 + flex:'0 1 auto'; "You" badge has flexShrink:0 — long names no longer push hours column off-screen
+
+src/app/dashboard/page.tsx:
+- Added .dashboard-section class to outer section
+- Added .dashboard-hero-card class to hero card
+- Hero greeting inner flex now has flexWrap: 'wrap' + minWidth: 0; text wrapper has flex:'1 1 200px' + minWidth:0; h2 has overflow:hidden + text-overflow:ellipsis — long usernames no longer overflow the card
+- Added .dashboard-inline-stats class to inline stats row
+- Added .dashboard-course-row class to enrolled course rows
+- Test result row: added .dashboard-test-row class to row, .dashboard-test-module-title class to module title span (truncates with ellipsis), .dashboard-test-pct class to percentage span (flexShrink:0)
+- Added .dashboard-stat-value class to study stat value span
+
+Stage Summary:
+- Commit 9ed242a pushed to origin/main on Xfweb
+- All 4 target pages (courses/[slug], services/[slug], study, dashboard) now responsive down to 380px viewport width
+- Mix of CSS-class overrides (fix SSR flash) + targeted inline-style fixes for real overflow risks
+- No regressions to desktop layouts — all overrides are in mobile-only media queries or behind isMobile checks

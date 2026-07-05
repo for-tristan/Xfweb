@@ -59,28 +59,32 @@ export default function DynamicServicePage() {
   const [notFound, setNotFound] = useState(false);
 
 
-  // PERF: Fetch service data immediately — doesn't wait for auth.
-  // The service data is CDN-cached (s-maxage=60) so this is fast.
+  // PERF: Fetch single service by slug from dedicated endpoint.
+  // Previously this fetched ALL services from /api/services and filtered
+  // client-side — wasted bandwidth + slower perceived load.
+  // Now mirrors the courses/[slug]/combined pattern: one targeted call.
   useEffect(() => {
     if (!slug) return;
+    let cancelled = false;
     setFetching(true);
     setNotFound(false);
-    fetch('/api/services', { cache: 'force-cache' })
-      .then((res) => res.ok ? res.json() : null)
+    fetch(`/api/services/${slug}`, { cache: 'force-cache' })
+      .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (data?.services) {
-          const match = data.services.find((s: Service) => s.slug === slug);
-          if (match) {
-            setService(match);
-          } else {
-            setNotFound(true);
-          }
+        if (cancelled) return;
+        if (data?.service) {
+          setService(data.service);
         } else {
           setNotFound(true);
         }
       })
-      .catch(() => setNotFound(true))
-      .finally(() => setFetching(false));
+      .catch(() => {
+        if (!cancelled) setNotFound(true);
+      })
+      .finally(() => {
+        if (!cancelled) setFetching(false);
+      });
+    return () => { cancelled = true; };
   }, [slug]);
 
   const checkReveals = useCallback(rafThrottle(() => {
@@ -127,6 +131,16 @@ export default function DynamicServicePage() {
         <ProfileModal open={dashboardOpen} onClose={() => setDashboardOpen(false)} user={user} profileName={profileName} setProfileName={setProfileName} profileUsername={profileUsername} setProfileUsername={setProfileUsername} profilePhone={profilePhone} setProfilePhone={setProfilePhone} profileCompany={profileCompany} setProfileCompany={setProfileCompany} profileSaving={profileSaving} avatarUploading={avatarUploading} onProfileSave={handleProfileSave} onAvatarUpload={handleAvatarUpload} onAvatarUploaded={handleAvatarUploaded} />
 
         {!(loading || minLoading) && <Navbar activePage="services" scrolled={scrolled} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} user={user} scrollToSection={scrollToSection} theme={theme} onToggleTheme={toggleTheme} onChangeTheme={changeTheme} onSearchOpen={() => setSearchOpen(true)} onOpenAuth={openAuthModal} onLogout={handleLogout} notifOpen={notifOpen} setNotifOpen={setNotifOpen} notifications={notifications} unreadCount={unreadCount} loadNotifications={loadNotifications} setNotifications={setNotifications} setUnreadCount={setUnreadCount} dashboardOpen={dashboardOpen} setDashboardOpen={setDashboardOpen} />}
+
+        {/* 3-dot loader — gives visual feedback while service data loads.
+            Without this the user sees navbar + empty space during the fetch. */}
+        {!(loading || minLoading) && (
+          <div className="xf-loader" role="status" aria-label="Loading service">
+            <div className="xf-loader-dot" />
+            <div className="xf-loader-dot" />
+            <div className="xf-loader-dot" />
+          </div>
+        )}
       </>
     );
   }
@@ -210,14 +224,12 @@ export default function DynamicServicePage() {
 
   return (
     <>
-      <title>{service.title} | XFoundry</title>
-      <meta name="description" content={service.description || `${service.title} services by XFoundry. Professional solutions built for scale and impact.`} />
-      <meta property="og:title" content={`${service.title} | XFoundry`} />
-      <meta property="og:description" content={service.description || `${service.title} services by XFoundry.`} />
-      <meta property="og:type" content="website" />
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={`${service.title} | XFoundry`} />
-      <meta name="twitter:description" content={service.description || `${service.title} services by XFoundry.`} />
+      {/* NOTE: <title> and <meta> tags are handled by generateMetadata
+          in layout.tsx — they're set server-side based on the slug,
+          which is the Next.js recommended pattern. Previously these
+          were duplicated here as inline JSX in the body, which is
+          invalid HTML (meta belongs in <head>) and could cause
+          hydration warnings. */}
 
       <AuthGate loading={loading} minLoading={minLoading} user={user} onSignIn={() => openAuthModal('signin', 'Sign in to access this page')} onSignUp={() => openAuthModal('signup')} />
 
