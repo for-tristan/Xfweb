@@ -507,6 +507,11 @@ export default function Home({
   }, [dashboardOpen, user]);
 
   useEffect(() => {
+    // Skip reveal animations on Firefox — the transform: translateY()
+    // causes layout reflows on Firefox's main thread = scroll jumps.
+    // Elements are visible by default (no .reveal class = no transform).
+    if (isFirefox) return;
+
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -520,7 +525,7 @@ export default function Home({
     els.forEach((el) => observer.observe(el));
 
     return () => { observer.disconnect(); };
-  }, [authModalOpen, dashboardOpen, serviceModal]);
+  }, [authModalOpen, dashboardOpen, serviceModal, isFirefox]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

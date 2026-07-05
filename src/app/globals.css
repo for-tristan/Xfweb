@@ -96,17 +96,17 @@ html {
   }
 }
 
-/* NOTE: content-visibility: auto and contain: layout were previously
-   applied to .v-section but caused two serious bugs:
-   1. content-visibility caused scroll position jumps because the
-      contain-intrinsic-size estimate (500px) didn't match actual
-      section heights — felt like "frame by frame" scrolling.
-   2. contain: layout creates a new containing block, which breaks
-      position: fixed inside ScrollFadeSection's pinned hero. The
-      hero's fixed inner element became relative to the section
-      instead of the viewport.
-   Both removed. content-visibility is better suited for very long
-   lists (1000+ items), not 6 full-screen sections. */
+/* Firefox: disable reveal animations entirely to prevent scroll jumps.
+   The transform: translateY() in reveal classes causes main-thread
+   layout reflows on Firefox = scroll jumps. This makes all reveal
+   elements visible immediately (no transform, no opacity change). */
+@supports (-moz-appearance: none) {
+  .reveal, .reveal-up, .reveal-scale, .reveal-left, .reveal-right {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
 body.xf-body {
     font-family: 'Inter Tight', sans-serif;
     background-color: var(--black);
