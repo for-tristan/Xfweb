@@ -146,11 +146,9 @@ export function usePageFeatures() {
 
   useEffect(() => {
     (async () => {
-      // Fallback for Edge/InPrivate: check sessionStorage first. If the
-      // user data is there (stored after login), use it immediately so
-      // the user doesn't appear logged out on the next page navigation.
+      // Fallback for Edge/InPrivate: check sessionStorage AND localStorage first.
       try {
-        const cached = sessionStorage.getItem('xfoundry_user');
+        const cached = sessionStorage.getItem('xfoundry_user') || localStorage.getItem('xfoundry_user');
         if (cached) {
           const cachedUser = JSON.parse(cached);
           setUser(cachedUser);
@@ -171,8 +169,11 @@ export function usePageFeatures() {
             setProfileUsername(data.user.username || '');
             setProfilePhone(data.user.phone || '');
             setProfileCompany(data.user.company || '');
-            // Cache for Edge fallback
-            try { sessionStorage.setItem('xfoundry_user', JSON.stringify(data.user)); } catch {}
+            // Cache for Edge fallback in both storages
+            try {
+              sessionStorage.setItem('xfoundry_user', JSON.stringify(data.user));
+              localStorage.setItem('xfoundry_user', JSON.stringify(data.user));
+            } catch {}
           }
         } else if (res.status === 403) {
           const data = await res.json();
@@ -185,9 +186,9 @@ export function usePageFeatures() {
             toast({ title: 'Verification Required', description: data.error });
           }
         } else if (res.status === 401) {
-          // Cookies not sent (Edge) — but if we have sessionStorage, keep user
+          // Cookies not sent (Edge) — keep user from storage if available
           try {
-            const cached = sessionStorage.getItem('xfoundry_user');
+            const cached = sessionStorage.getItem('xfoundry_user') || localStorage.getItem('xfoundry_user');
             if (!cached) setUser(null);
           } catch { setUser(null); }
         }

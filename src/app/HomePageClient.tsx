@@ -265,9 +265,9 @@ export default function Home({
   }, []);
   useEffect(() => {
     (async () => {
-      // Edge fallback: check sessionStorage first (cookies might be blocked)
+      // Edge fallback: check sessionStorage AND localStorage (cookies might be blocked)
       try {
-        const cached = sessionStorage.getItem('xfoundry_user');
+        const cached = sessionStorage.getItem('xfoundry_user') || localStorage.getItem('xfoundry_user');
         if (cached) {
           setUser(JSON.parse(cached));
         }
@@ -278,7 +278,10 @@ export default function Home({
         if (res.ok) {
           const data = await res.json();
           setUser(data.user);
-          try { sessionStorage.setItem('xfoundry_user', JSON.stringify(data.user)); } catch {}
+          try {
+            sessionStorage.setItem('xfoundry_user', JSON.stringify(data.user));
+            localStorage.setItem('xfoundry_user', JSON.stringify(data.user));
+          } catch {}
         } else if (res.status === 403) {
           const data = await res.json();
           if (data.needsVerification) {
@@ -287,9 +290,9 @@ export default function Home({
             return;
           }
         } else if (res.status === 401) {
-          // Cookies not sent (Edge) — keep sessionStorage user if available
+          // Cookies not sent (Edge) — keep user from storage if available
           try {
-            const cached = sessionStorage.getItem('xfoundry_user');
+            const cached = sessionStorage.getItem('xfoundry_user') || localStorage.getItem('xfoundry_user');
             if (!cached) setUser(null);
           } catch { setUser(null); }
         } else {
@@ -584,7 +587,10 @@ export default function Home({
       const data = await res.json();
       if (res.ok) {
         setUser(data.user);
-        try { sessionStorage.setItem('xfoundry_user', JSON.stringify(data.user)); } catch {}
+        try {
+          sessionStorage.setItem('xfoundry_user', JSON.stringify(data.user));
+          localStorage.setItem('xfoundry_user', JSON.stringify(data.user));
+        } catch {}
         setAuthModalOpen(false); setVerificationStep('idle'); setDqName(data.user.name); setDqEmail(data.user.email); setCqEmail(data.user.email); setProfileName(data.user.name); setProfilePhone(data.user.phone || ''); setProfileCompany(data.user.company || ''); toast({ title: 'Welcome back!', description: `Signed in as ${data.user.name}` }); setLoginEmail(''); setLoginPassword(''); }
       else if (res.status === 403 && data.needsVerification) {
         setVerificationEmail(data.email);
@@ -635,7 +641,10 @@ export default function Home({
 
   const handleLogout = async () => {
     try { await fetch('/api/auth/logout', { method: 'POST' }); } catch {  }
-    try { sessionStorage.removeItem('xfoundry_user'); } catch {}
+    try {
+      sessionStorage.removeItem('xfoundry_user');
+      localStorage.removeItem('xfoundry_user');
+    } catch {}
     setUser(null); setEnrollments([]); setEnrollmentStatus({}); setQuotes([]);
     setDashboardOpen(false);
     setVerificationStep('idle');
