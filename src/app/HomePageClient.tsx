@@ -429,41 +429,47 @@ export default function Home({
     let resizeTimer: ReturnType<typeof setTimeout> | null = null;
     const onResize = () => {
       if (resizeTimer) clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(measureSections, 200);
+      resizeTimer = setTimeout(() => { measureSections(); cachedScrollHeight = 0; }, 200);
     };
     window.addEventListener('resize', onResize, { passive: true });
 
     let rafId: number | null = null;
+    let cachedScrollHeight = 0;
+
     const onScroll = () => {
       if (rafId !== null) return;
       rafId = requestAnimationFrame(() => {
         rafId = null;
         const scrollY = window.scrollY;
-        // Only call setState when the value ACTUALLY changes.
-        // Calling setState with the same value still runs React's
-        // reconciler on a 1700-line component = scroll jank.
         const newScrolled = scrollY > 80;
         if (newScrolled !== scrolledRef.current) {
           scrolledRef.current = newScrolled;
           setScrolled(newScrolled);
         }
 
-        const distFromBottom = document.documentElement.scrollHeight - window.innerHeight - scrollY;
+        // Use cached scrollHeight — reading document.documentElement.scrollHeight
+        // forces a full layout recalculation on Firefox = scroll jump.
+        if (!cachedScrollHeight) cachedScrollHeight = document.documentElement.scrollHeight;
+        const distFromBottom = cachedScrollHeight - window.innerHeight - scrollY;
         const newAtBottom = distFromBottom < 80;
         if (newAtBottom !== atBottomRef.current) {
           atBottomRef.current = newAtBottom;
           setAtBottom(newAtBottom);
         }
 
-        const scrollPos = scrollY + 150;
-        for (const id of SECTION_IDS) {
-          const cached = sectionCache[id];
-          if (cached && scrollPos >= cached.top && scrollPos < cached.top + cached.height) {
-            if (id !== activeNavRef.current) {
-              activeNavRef.current = id;
-              setActiveNav(id);
+        // Skip scroll-spy on Firefox — getBoundingClientRect in measureSections
+        // + the cache lookups cause main-thread layout thrashing.
+        if (!isFirefox) {
+          const scrollPos = scrollY + 150;
+          for (const id of SECTION_IDS) {
+            const cached = sectionCache[id];
+            if (cached && scrollPos >= cached.top && scrollPos < cached.top + cached.height) {
+              if (id !== activeNavRef.current) {
+                activeNavRef.current = id;
+                setActiveNav(id);
+              }
+              break;
             }
-            break;
           }
         }
       });
