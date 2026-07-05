@@ -496,11 +496,6 @@ export default function DynamicCoursePage() {
                 <>{course.title.split(' ').slice(0, Math.ceil(course.title.split(' ').length / 2)).join(' ')} <span className="v-highlight">{course.title.split(' ').slice(Math.ceil(course.title.split(' ').length / 2)).join(' ')}</span></>
               )}
             </h1>
-            <div style={{ display: 'flex', gap: 12, marginTop: 12, flexWrap: 'wrap' }}>
-              <div className="meta-pill"><i className="fa-solid fa-clock" /> {course.duration}</div>
-              <div className="meta-pill"><i className="fa-solid fa-signal" /> {course.level} Level</div>
-              <div className="meta-pill"><i className="fa-solid fa-tag" /> {course.price}</div>
-            </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
             <div className="course-main reveal-up">

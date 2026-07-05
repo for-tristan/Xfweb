@@ -1009,6 +1009,7 @@ export default function Home({
                     <div className="v-course-meta">
                       <span><i className="fa-solid fa-clock"></i> {course.duration}</span>
                       <span><i className="fa-solid fa-users"></i> {course.enrollmentCount != null ? `${course.enrollmentCount} enrolled` : 'Enrolling Now'}</span>
+                      <span><i className="fa-solid fa-tag"></i> {course.price}</span>
                     </div>
                     <div className="v-course-tags">
                       {techTags.map((tag, ti) => <span key={ti} className="v-course-tag">{tag}</span>)}

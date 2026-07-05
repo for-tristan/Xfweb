@@ -237,14 +237,17 @@ export default function DynamicServicePage() {
 
       {!(loading || minLoading) && <div className="page-transition-enter">
 
-      <section style={{ background: 'var(--black)', padding: '160px 60px 40px', position: 'relative', overflow: 'hidden', zIndex: 2 }}>
-        <div className="container-max" style={{ paddingLeft: isMobile ? 16 : undefined, paddingRight: isMobile ? 16 : undefined, maxWidth: 800, margin: '0 auto' }}>
+      <section style={{ background: 'var(--black)', padding: '240px 60px 80px', position: 'relative', overflow: 'hidden', zIndex: 2 }}>
+        <div className="container-max" style={{ paddingLeft: isMobile ? 16 : undefined, paddingRight: isMobile ? 16 : undefined }}>
           <div style={{ marginBottom: 32 }}>
-            <h1 style={{ fontFamily: "var(--font-heading)", fontSize: 36, fontWeight: 800, color: 'var(--text-light)', marginTop: 16 }}>
+            <div className="breadcrumb" style={{ marginBottom: 16 }}>
+              <Link href="/" style={{ color: 'var(--text-dim)' }}>Home</Link> <span>/</span> <Link href="/#services" style={{ color: 'var(--text-dim)' }}>Services</Link> <span>/</span> <span style={{ color: 'var(--text-light)' }}>{service.title}</span>
+            </div>
+            <h1 style={{ fontFamily: "var(--font-heading)", fontSize: 36, fontWeight: 800, color: 'var(--text-light)' }}>
               <span className="v-highlight">{service.title}</span>
             </h1>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
+          <div className="service-layout">
             <div className="service-main reveal-up">
               <h2>What We Deliver</h2>
               {service.description && <p>{service.description}</p>}
@@ -366,7 +369,7 @@ export default function DynamicServicePage() {
       </section>
       </div>}
 
-      {!(loading || minLoading) &&<footer className="v-footer">
+      {!(loading || minLoading) &&<footer className="v-footer" style={{ marginTop: 80 }}>
   <div className="v-footer-grid">
     <div className="v-footer-brand">
       <Link href="/" className="nav-logo" style={{ display: 'inline-block', marginBottom: 20 }}><Logo className="nav-logo-img" style={{ height: 40 }} /></Link>
