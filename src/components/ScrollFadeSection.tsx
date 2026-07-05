@@ -111,15 +111,21 @@ export default function ScrollFadeSection({
       inner.style.bottom = '';
       inner.style.visibility = 'visible';
     } else if (state === 'past') {
-      inner.style.position = 'relative';
-      inner.style.top = '';
-      inner.style.left = '';
-      inner.style.width = '';
+      // Keep position:fixed (NOT relative) so document flow doesn't change
+      // when transitioning between pinned↔past. The element is invisible
+      // (opacity 0 + visibility hidden) so it doesn't matter visually.
+      // Switching to relative here causes a layout shift = scroll jump
+      // near the next section (Tech Programs).
+      inner.style.position = 'fixed';
+      inner.style.top = '0';
+      inner.style.left = '0';
+      inner.style.width = '100%';
       inner.style.bottom = '';
       inner.style.visibility = 'hidden';
       inner.style.opacity = '0';
       inner.style.transform = 'scale(0.96) translateZ(0)';
     } else {
+      // unpinned — back to relative, fully visible
       inner.style.position = 'relative';
       inner.style.top = '';
       inner.style.left = '';
