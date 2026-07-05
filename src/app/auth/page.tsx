@@ -122,10 +122,11 @@ function AuthContent() {
       });
       const data = await res.json();
       if (res.ok) {
-        // Store user in BOTH sessionStorage AND localStorage for Edge fallback
+        // Store user + token in localStorage for Edge fallback (cookies blocked)
         try {
-          sessionStorage.setItem('xfoundry_user', JSON.stringify(data.user));
           localStorage.setItem('xfoundry_user', JSON.stringify(data.user));
+          localStorage.setItem('xfoundry_token', data.token);
+          localStorage.setItem('xfoundry_user_id', data.user.id);
         } catch {}
         toast({ title: 'Welcome back!', description: 'You have been signed in.' });
         window.location.href = '/';

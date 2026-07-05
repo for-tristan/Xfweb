@@ -265,21 +265,31 @@ export default function Home({
   }, []);
   useEffect(() => {
     (async () => {
-      // Edge fallback: check sessionStorage AND localStorage (cookies might be blocked)
+      // Edge fallback: check localStorage for cached user
       try {
-        const cached = sessionStorage.getItem('xfoundry_user') || localStorage.getItem('xfoundry_user');
+        const cached = localStorage.getItem('xfoundry_user');
         if (cached) {
           setUser(JSON.parse(cached));
         }
       } catch {}
 
       try {
-        const res = await fetch('/api/auth/me');
+        // Build headers — include token from localStorage for Edge fallback
+        const headers: Record<string, string> = {};
+        try {
+          const token = localStorage.getItem('xfoundry_token');
+          const userId = localStorage.getItem('xfoundry_user_id');
+          if (token && userId) {
+            headers['x-foundry-token'] = token;
+            headers['x-foundry-user-id'] = userId;
+          }
+        } catch {}
+
+        const res = await fetch('/api/auth/me', { headers });
         if (res.ok) {
           const data = await res.json();
           setUser(data.user);
           try {
-            sessionStorage.setItem('xfoundry_user', JSON.stringify(data.user));
             localStorage.setItem('xfoundry_user', JSON.stringify(data.user));
           } catch {}
         } else if (res.status === 403) {
@@ -290,9 +300,9 @@ export default function Home({
             return;
           }
         } else if (res.status === 401) {
-          // Cookies not sent (Edge) — keep user from storage if available
+          // No valid auth — keep localStorage user if available, otherwise null
           try {
-            const cached = sessionStorage.getItem('xfoundry_user') || localStorage.getItem('xfoundry_user');
+            const cached = localStorage.getItem('xfoundry_user');
             if (!cached) setUser(null);
           } catch { setUser(null); }
         } else {
@@ -588,8 +598,11 @@ export default function Home({
       if (res.ok) {
         setUser(data.user);
         try {
-          sessionStorage.setItem('xfoundry_user', JSON.stringify(data.user));
           localStorage.setItem('xfoundry_user', JSON.stringify(data.user));
+          if (data.token) {
+            localStorage.setItem('xfoundry_token', data.token);
+            localStorage.setItem('xfoundry_user_id', data.user.id);
+          }
         } catch {}
         setAuthModalOpen(false); setVerificationStep('idle'); setDqName(data.user.name); setDqEmail(data.user.email); setCqEmail(data.user.email); setProfileName(data.user.name); setProfilePhone(data.user.phone || ''); setProfileCompany(data.user.company || ''); toast({ title: 'Welcome back!', description: `Signed in as ${data.user.name}` }); setLoginEmail(''); setLoginPassword(''); }
       else if (res.status === 403 && data.needsVerification) {
@@ -642,8 +655,9 @@ export default function Home({
   const handleLogout = async () => {
     try { await fetch('/api/auth/logout', { method: 'POST' }); } catch {  }
     try {
-      sessionStorage.removeItem('xfoundry_user');
       localStorage.removeItem('xfoundry_user');
+      localStorage.removeItem('xfoundry_token');
+      localStorage.removeItem('xfoundry_user_id');
     } catch {}
     setUser(null); setEnrollments([]); setEnrollmentStatus({}); setQuotes([]);
     setDashboardOpen(false);

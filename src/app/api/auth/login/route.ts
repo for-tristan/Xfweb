@@ -89,13 +89,12 @@ export async function POST(request: NextRequest) {
         company: user.company,
         avatar: user.avatar,
       },
+      token, // Return the session token in the response body for Edge fallback
     });
 
     const secure = process.env.NODE_ENV === 'production';
 
-    // Use sameSite: 'lax' — this works for same-site requests (which is
-    // what we have on Vercel). 'none' was tried for Edge but actually
-    // makes things worse (Edge InPrivate blocks 'none' cookies too).
+    // Try to set cookies (will work on Chrome/Firefox/Safari, blocked by Edge strict privacy)
     response.cookies.set('xfoundry_session', token, {
       httpOnly: true,
       secure,
