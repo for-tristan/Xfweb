@@ -80,6 +80,15 @@ export default function ScrollFadeSection({
 
     pinStateRef.current = state;
 
+    // When transitioning to 'past', snap opacity to 0 immediately — don't
+    // let the lerp animate it. This prevents the 1-frame jump that happens
+    // when position switches from fixed→relative while opacity is still
+    // lerping toward 0 (visible when scrolling slowly).
+    if (state === 'past') {
+      currentRef.current.opacity = 0;
+      currentRef.current.scale = 0.96;
+    }
+
     targetRef.current = {
       opacity: 1 - progress,
       scale: 1 - progress * 0.04,
