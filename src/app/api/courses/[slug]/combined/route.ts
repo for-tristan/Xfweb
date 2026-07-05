@@ -30,25 +30,27 @@ export async function GET(
     let certificate: any = null;
 
     if (user) {
-      // Run enrollment + modules in parallel
-      const [enroll, mods] = await Promise.all([
+      // Run enrollment + modules + unlocks in parallel
+      const [enroll, mods, unlocks] = await Promise.all([
         db.enrollment.findFirst({
           where: { userId: user.id, courseId: slug, deletedAt: null },
         }),
         db.courseModule.findMany({
           where: { courseId: course.id },
           orderBy: { moduleOrder: 'asc' },
-          include: {
-            unlocks: {
-              where: { userId: user.id },
-              select: { id: true, userId: true, moduleId: true },
-            },
-          },
+        }),
+        db.moduleUnlock.findMany({
+          where: { userId: user.id },
+          select: { moduleId: true },
         }),
       ]);
 
       enrollment = enroll;
-      modules = mods;
+      const unlockedModuleIds = new Set(unlocks.map(u => u.moduleId));
+      modules = mods.map(m => ({
+        ...m,
+        unlocked: unlockedModuleIds.has(m.id),
+      }));
 
       // Get tests if enrolled
       if (enroll?.status === 'approved' && mods.length > 0) {
@@ -110,7 +112,7 @@ export async function GET(
         description: m.description,
         content: m.content,
         moduleOrder: m.moduleOrder,
-        unlocked: m.unlocks?.length > 0,
+        unlocked: m.unlocked || false,
         hasAccess: enrollment?.status === 'approved',
       })),
       enrollment: enrollment ? {
