@@ -5,6 +5,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import ClientProviders from '@/components/ClientProviders';
 import GrainBackground from '@/components/GrainBackground';
 import ClickSplash from '@/components/ClickSplash';
+import CookieConsentBanner from '@/components/CookieConsentBanner';
 
 export const metadata: Metadata = {
   title: 'X Foundry',
@@ -71,6 +72,7 @@ export default function RootLayout({
               {children}
             </ErrorBoundary>
           </main>
+          <CookieConsentBanner />
           <Toaster />
         </ClientProviders>
       </body>
