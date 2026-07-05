@@ -975,7 +975,7 @@ export default function GamesPage() {
       {renderNavbar()}
 
       {!(loading || minLoading) && <div className="page-transition-enter">
-        <section style={{ background: 'var(--black)', padding: '140px 24px 300px', position: 'relative', zIndex: 2, minHeight: '150vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <section style={{ background: 'var(--black)', padding: '140px 24px 270px', position: 'relative', zIndex: 2, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div className="container-max" style={{ paddingLeft: isMobile ? 16 : undefined, paddingRight: isMobile ? 16 : undefined, width: '100%' }}>
 
             {phase === 'select' && (
