@@ -126,7 +126,7 @@ export default function Home({
 
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [minLoading, setMinLoading] = useState(true);
+  const [minLoading, setMinLoading] = useState(false);
 
   // Firefox detection — used to switch hero pin from JS-driven fixed
   // (causes scroll jumps on Firefox) to CSS sticky (compositor-native).
