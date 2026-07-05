@@ -3492,7 +3492,7 @@ select optgroup {
 .course-main h2 { font-family: 'Inter Tight', sans-serif; font-size: 26px; font-weight: 900; margin-bottom: 18px; letter-spacing: -0.3px; color: var(--text-light); }
 .course-main p { color: var(--text-dim); line-height: 1.85; margin-bottom: 22px; font-size: 15px; }
 .module-list { margin: 32px 0; }
-.module-item { background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px 24px; margin-bottom: 12px; display: flex; align-items: center; gap: 16px; transition: all 0.3s ease; cursor: pointer; }
+.module-item { background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px 24px; margin-bottom: 12px; display: flex; align-items: center; gap: 16px; transition: all 0.3s ease; cursor: pointer; border-radius: 16px; }
 .module-item:hover { border-color: var(--primary-red); transform: translateX(6px); }
 .module-num { width: 40px; height: 40px; background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); display: flex; align-items: center; justify-content: center; font-family: 'Inter Tight', sans-serif; font-weight: 900; font-size: 14px; color: var(--primary-red); flex-shrink: 0; }
 .module-info h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; color: var(--text-light); }
@@ -5057,7 +5057,7 @@ body {
 .v-footer {
   background: var(--card-bg);
   border-top: 1px solid var(--border-color);
-  padding: 60px 40px 0;
+  padding: 32px 40px 0;
 }
 
 .v-hero {
@@ -5832,10 +5832,10 @@ body {
 .v-footer-grid {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: 40px;
+  gap: 24px;
   max-width: 1200px;
   margin: 0 auto 0;
-  padding-bottom: 40px;
+  padding-bottom: 24px;
 }
 .v-footer-brand .logo {
   margin-bottom: 20px;
@@ -5904,7 +5904,7 @@ body {
 .v-footer-bottom {
   border-top: 1px solid var(--border-color);
   background: var(--dark-gray);
-  padding: 28px 40px;
+  padding: 16px 40px;
   text-align: center;
   color: var(--text-dim);
   font-size: 0.8125rem;

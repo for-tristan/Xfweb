@@ -533,7 +533,7 @@ export default function StudyFocusPage() {
         danger
       />
 
-      {!(loading || minLoading) &&<footer className="v-footer" style={{ marginTop: 80 }}>
+      {!(loading || minLoading) &&<footer className="v-footer">
   <div className="v-footer-grid">
     <div className="v-footer-brand">
       <Link href="/" className="nav-logo" style={{ display: 'inline-block', marginBottom: 20 }}><Logo className="nav-logo-img" style={{ height: 40 }} /></Link>

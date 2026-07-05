@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
         response.cookies.set('oauth_state', '', {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
-          sameSite: 'lax',
+          sameSite: process.env.NODE_ENV === 'production' ? 'none' as const : 'lax' as const,
           maxAge: 0,
           path: '/',
         });
@@ -135,7 +135,7 @@ export async function GET(request: NextRequest) {
     response.cookies.set('xfoundry_session', token, {
       httpOnly: true,
       secure,
-      sameSite: 'lax',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' as const : 'lax' as const,
       maxAge: 60 * 60 * 24 * 3,
       path: '/',
     });
@@ -143,7 +143,7 @@ export async function GET(request: NextRequest) {
     response.cookies.set('xfoundry_user_id', user.id, {
       httpOnly: true,
       secure,
-      sameSite: 'lax',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' as const : 'lax' as const,
       maxAge: 60 * 60 * 24 * 3,
       path: '/',
     });
@@ -151,7 +151,7 @@ export async function GET(request: NextRequest) {
     response.cookies.set('oauth_state', '', {
       httpOnly: true,
       secure,
-      sameSite: 'lax',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' as const : 'lax' as const,
       maxAge: 0,
       path: '/',
     });

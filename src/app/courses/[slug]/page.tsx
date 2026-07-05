@@ -489,10 +489,7 @@ export default function DynamicCoursePage() {
       <section style={{ background: 'var(--black)', padding: '160px 60px 40px', position: 'relative', overflow: 'hidden', zIndex: 2 }}>
         <div className="container-max" style={{ paddingLeft: isMobile ? 16 : undefined, paddingRight: isMobile ? 16 : undefined, maxWidth: 800, margin: '0 auto' }}>
           <div style={{ marginBottom: 32 }}>
-            <div className="breadcrumb" style={{ marginBottom: 16 }}>
-              <Link href="/" style={{ color: 'var(--text-dim)' }}>Home</Link> <span>/</span> <Link href="/#courses" style={{ color: 'var(--text-dim)' }}>Programs</Link> <span>/</span> <span style={{ color: 'var(--text-light)' }}>{course.title}</span>
-            </div>
-            <h1 style={{ fontFamily: "var(--font-heading)", fontSize: 36, fontWeight: 800, color: 'var(--text-light)' }}>
+            <h1 style={{ fontFamily: "var(--font-heading)", fontSize: 36, fontWeight: 800, color: 'var(--text-light)', marginTop: 16 }}>
               {course.title.split('&').length > 1 ? (
                 <>{course.title.split('&')[0].trim()}&amp; <span className="v-highlight">{course.title.split('&')[1].trim()}</span></>
               ) : (

@@ -258,100 +258,88 @@ export default function DashboardPage() {
       {renderNavbar('dashboard')}
 
       {!(loading || minLoading) && <div className="page-transition-enter">
-        <section style={{ background: 'var(--black)', padding: '160px 60px 80px', position: 'relative', zIndex: 2 }}>
-          <div className="container-max" style={{ paddingLeft: isMobile ? 16 : undefined, paddingRight: isMobile ? 16 : undefined }}>
+        <section style={{ background: 'var(--black)', padding: '120px 24px 60px', position: 'relative', zIndex: 2 }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto' }}>
 
-            <div className="reveal-up" style={{ marginBottom: isMobile ? 24 : 36, display: 'flex', alignItems: 'center', gap: isMobile ? 12 : 16 }}>
-              <div style={{
-                width: isMobile ? 36 : 44, height: isMobile ? 36 : 44, borderRadius: '50%',
-                background: 'color-mix(in srgb, var(--accent) 8%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: 'var(--accent)', fontSize: 16, fontWeight: 700,
-                overflow: 'hidden', flexShrink: 0,
-              }}>
-                {user?.avatar
-                  ? <SmartImage src={user.avatar} alt="" width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  : user?.name.charAt(0).toUpperCase()
-                }
+            {/* Header row — avatar + title + quick stats inline */}
+            <div className="reveal-up" style={{ marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{
+                  width: 40, height: 40, borderRadius: '50%',
+                  background: 'color-mix(in srgb, var(--accent) 8%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  overflow: 'hidden', flexShrink: 0,
+                }}>
+                  {user?.avatar
+                    ? <SmartImage src={user.avatar} alt="" width={40} height={40} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    : <span style={{ color: 'var(--accent)', fontSize: 16, fontWeight: 700 }}>{user?.name.charAt(0).toUpperCase()}</span>
+                  }
+                </div>
+                <div>
+                  <h2 style={{ fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: isMobile ? 14 : 16, color: 'var(--text-light)', margin: 0, letterSpacing: 0.3 }}>
+                    {user?.name.split(' ')[0]}
+                  </h2>
+                  <p style={{ fontSize: 11, color: 'var(--text-dim)', margin: '2px 0 0' }}>
+                    {user?.email}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h2 style={{
-                  fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: isMobile ? 15 : 18,
-                  color: 'var(--text-light)', margin: 0, letterSpacing: 0.5,
-                }}>
-                  Welcome back, {user?.name.split(' ')[0]}
-                </h2>
-                <p style={{
-                  fontSize: 12, color: 'var(--text-dim)', margin: '2px 0 0',
-                  fontFamily: "var(--font-body)",
-                }}>
-                  {user?.email}
-                </p>
+              {/* Inline mini stats */}
+              <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+                {[
+                  { label: 'Enrolled', value: dataLoading ? '—' : approvedEnrollments.length, color: 'var(--accent)' },
+                  { label: 'Avg', value: dataLoading ? '—' : `${avgProgress}%`, color: 'var(--accent-purple)' },
+                  { label: 'Tests', value: dataLoading ? '—' : `${testsPassed}/${testResults.length}`, color: 'var(--success-color)' },
+                  { label: 'This week', value: dataLoading ? '—' : formatDuration(studyStats?.weekSeconds || 0), color: 'var(--warning-color)' },
+                ].map((s, i) => (
+                  <div key={i} style={{ textAlign: isMobile ? 'left' : 'right' }}>
+                    <div style={{ fontSize: 10, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.3, fontWeight: 600, marginBottom: 2 }}>
+                      {s.label}
+                    </div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: s.color, fontFamily: 'var(--font-heading)' }}>
+                      {s.value}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
+
+            {/* Bento grid — 3 columns */}
             <div className="reveal-up reveal-delay-1" style={{
               display: 'grid',
-              gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 8 : 12, marginBottom: isMobile ? 24 : 36,
-            }}>
-              <StatCard
-                label="Enrolled"
-                value={dataLoading ? '...' : approvedEnrollments.length}
-                icon="fa-book-open"
-                color="var(--accent)"
-                sub={`${enrollments.length} total`}
-                compact={isMobile}
-              />
-              <StatCard
-                label="Avg Progress"
-                value={dataLoading ? '...' : `${avgProgress}%`}
-                icon="fa-chart-pie"
-                color="var(--accent-purple)"
-                sub={`${progress.length} course${progress.length !== 1 ? 's' : ''}`}
-                compact={isMobile}
-              />
-              <StatCard
-                label="Tests Passed"
-                value={dataLoading ? '...' : testsPassed}
-                icon="fa-check-double"
-                color="var(--success-color)"
-                sub={`of ${testResults.length} taken`}
-                compact={isMobile}
-              />
-              <StatCard
-                label="Study Time"
-                value={dataLoading ? '...' : formatDuration(studyStats?.weekSeconds || 0)}
-                icon="fa-clock"
-                color="var(--warning-color)"
-                sub="this week"
-                compact={isMobile}
-              />
-            </div>
-            <div style={{
-              display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 16 : 20, marginBottom: isMobile ? 24 : 36,
+              gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr',
+              gap: 16,
             }}>
 
-              <div className="reveal-up reveal-delay-2" style={{
+              {/* Enrolled courses — spans 2 columns */}
+              <div style={{
+                gridColumn: isMobile ? 'auto' : 'span 2',
                 background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
                 backdropFilter: 'blur(20px) saturate(1.6)',
                 WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
                 border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
-                borderRadius: 12, padding: isMobile ? '18px 14px' : '24px 22px',
+                borderRadius: 16, padding: 20,
               }}>
-                <SectionHeader icon="fa-book-open" title="ENROLLED COURSES" />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, fontFamily: 'var(--font-body)' }}>
+                    <i className="fa-solid fa-book-open" style={{ marginRight: 6, color: 'var(--accent)' }} />Courses
+                  </div>
+                  <Link href="/#courses" style={{ fontSize: 11, color: 'var(--accent)', textDecoration: 'none', fontWeight: 600 }}>
+                    Browse →
+                  </Link>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {dataLoading ? (
                     <>
-                      <Skeleton w="100%" h="60px" />
-                      <Skeleton w="100%" h="60px" />
+                      <div style={{ height: 48, borderRadius: 8, background: 'var(--input-bg)' }} />
+                      <div style={{ height: 48, borderRadius: 8, background: 'var(--input-bg)' }} />
                     </>
                   ) : approvedEnrollments.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '32px 16px' }}>
-                      <i className="fa-solid fa-book-open" style={{ fontSize: 28, color: 'var(--text-dim)', opacity: 0.2, display: 'block', marginBottom: 12 }} />
-                      <p style={{ fontSize: 13, color: 'var(--text-dim)', margin: 0 }}>
-                        No active courses yet.
-                      </p>
-                      <Link href="/#courses" style={{ fontSize: 12, color: 'var(--accent)', textDecoration: 'none', fontWeight: 700, marginTop: 8, display: 'inline-block' }}>
-                        Browse Programs <i className="fa-solid fa-arrow-right" style={{ fontSize: 10, marginLeft: 4 }} />
+                    <div style={{ textAlign: 'center', padding: '24px 16px' }}>
+                      <i className="fa-solid fa-book-open" style={{ fontSize: 24, color: 'var(--text-dim)', opacity: 0.2, display: 'block', marginBottom: 8 }} />
+                      <p style={{ fontSize: 12, color: 'var(--text-dim)', margin: 0 }}>No active courses yet</p>
+                      <Link href="/#courses" style={{ fontSize: 11, color: 'var(--accent)', textDecoration: 'none', fontWeight: 600, marginTop: 6, display: 'inline-block' }}>
+                        Browse Programs →
                       </Link>
                     </div>
                   ) : approvedEnrollments.map((e) => {
@@ -360,48 +348,34 @@ export default function DashboardPage() {
                     const isComplete = pct === 100;
                     return (
                       <Link key={e.id} href={`/courses/${e.courseId}`} style={{
-                        display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px',
+                        display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px',
                         background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)',
                         backdropFilter: 'blur(12px) saturate(1.4)',
                         WebkitBackdropFilter: 'blur(12px) saturate(1.4)',
-                        border: isComplete
-                          ? '1px solid rgba(34,197,94,0.2)'
-                          : '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
-                        borderRadius: 8, textDecoration: 'none', color: 'inherit',
+                        border: isComplete ? '1px solid rgba(34,197,94,0.2)' : '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
+                        borderRadius: 10, textDecoration: 'none', color: 'inherit',
                         transition: 'border-color 0.2s, background 0.2s',
                       }}
                         onMouseEnter={(ev) => { ev.currentTarget.style.borderColor = 'color-mix(in srgb, var(--accent) 25%, transparent)'; ev.currentTarget.style.background = 'color-mix(in srgb, var(--accent) 3%, transparent)'; }}
                         onMouseLeave={(ev) => { ev.currentTarget.style.borderColor = isComplete ? 'rgba(34,197,94,0.2)' : 'color-mix(in srgb, var(--text-light) 10%, transparent)'; ev.currentTarget.style.background = 'color-mix(in srgb, var(--card-bg) 50%, transparent)'; }}
                       >
                         <div style={{
-                          width: 36, height: 36, borderRadius: 8,
+                          width: 32, height: 32, borderRadius: 8,
                           background: isComplete ? 'rgba(34,197,94,0.1)' : 'color-mix(in srgb, var(--accent) 8%, transparent)',
                           border: isComplete ? '1px solid rgba(34,197,94,0.2)' : '1px solid color-mix(in srgb, var(--accent) 15%, transparent)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          flexShrink: 0,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                         }}>
-                          <i className={`fas ${isComplete ? 'fa-check' : 'fa-book'}`}
-                            style={{ fontSize: 13, color: isComplete ? 'var(--success-color)' : 'var(--accent)' }}
-                          />
+                          <i className={`fas ${isComplete ? 'fa-check' : 'fa-book'}`} style={{ fontSize: 12, color: isComplete ? 'var(--success-color)' : 'var(--accent)' }} />
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                            <span style={{
-                              fontSize: 13, fontWeight: 700, color: 'var(--text-light)',
-                              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                            }}>
-                              {e.courseName}
-                            </span>
-                            {statusBadge(e.status)}
+                          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-light)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: 4 }}>
+                            {e.courseName}
                           </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                             <div style={{ flex: 1 }}>
-                              <ProgressBar pct={pct} height={4} />
+                              <ProgressBar pct={pct} height={3} />
                             </div>
-                            <span style={{
-                              fontSize: 10, fontWeight: 700, color: pct === 100 ? 'var(--success-color)' : 'var(--text-dim)',
-                              fontFamily: "var(--font-body)", minWidth: 32, textAlign: 'right',
-                            }}>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: pct === 100 ? 'var(--success-color)' : 'var(--text-dim)', minWidth: 28, textAlign: 'right' }}>
                               {pct}%
                             </span>
                           </div>
@@ -410,13 +384,12 @@ export default function DashboardPage() {
                           <a
                             href={`/api/courses/certificate?courseId=${e.courseId}&format=pdf`}
                             target="_blank" rel="noopener noreferrer"
-                            onClick={(ev) => ev.stopPropagation() }
+                            onClick={(ev) => ev.stopPropagation()}
                             style={{
-                              width: 30, height: 30, borderRadius: 8,
+                              width: 28, height: 28, borderRadius: 6,
                               background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)',
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              flexShrink: 0, textDecoration: 'none',
-                              transition: 'background 0.2s',
+                              flexShrink: 0, textDecoration: 'none', transition: 'background 0.2s',
                             }}
                             title="Download Certificate"
                             onMouseEnter={(ev) => { ev.currentTarget.style.background = 'rgba(34,197,94,0.2)'; }}
@@ -431,26 +404,27 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <div className="reveal-up reveal-delay-3" style={{
+              {/* Test results — 1 column, tall */}
+              <div style={{
                 background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
                 backdropFilter: 'blur(20px) saturate(1.6)',
                 WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
                 border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
-                borderRadius: 12, padding: isMobile ? '18px 14px' : '24px 22px',
+                borderRadius: 16, padding: 20,
               }}>
-                <SectionHeader icon="fa-clipboard-check" title="TEST RESULTS" color="var(--success-color)" />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 16, fontFamily: 'var(--font-body)' }}>
+                  <i className="fa-solid fa-clipboard-check" style={{ marginRight: 6, color: 'var(--success-color)' }} />Tests
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {dataLoading ? (
                     <>
-                      <Skeleton w="100%" h="68px" />
-                      <Skeleton w="100%" h="68px" />
+                      <div style={{ height: 48, borderRadius: 8, background: 'var(--input-bg)' }} />
+                      <div style={{ height: 48, borderRadius: 8, background: 'var(--input-bg)' }} />
                     </>
                   ) : testResults.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '32px 16px' }}>
-                      <i className="fa-solid fa-clipboard-check" style={{ fontSize: 28, color: 'var(--text-dim)', opacity: 0.2, display: 'block', marginBottom: 12 }} />
-                      <p style={{ fontSize: 13, color: 'var(--text-dim)', margin: 0 }}>
-                        No test results yet.
-                      </p>
+                    <div style={{ textAlign: 'center', padding: '24px 16px' }}>
+                      <i className="fa-solid fa-clipboard-check" style={{ fontSize: 24, color: 'var(--text-dim)', opacity: 0.2, display: 'block', marginBottom: 8 }} />
+                      <p style={{ fontSize: 12, color: 'var(--text-dim)', margin: 0 }}>No test results yet</p>
                     </div>
                   ) : testResults.slice(0, 5).map((t) => {
                     const pct = t.totalPoints > 0 ? Math.round((t.score / t.totalPoints) * 100) : 0;
@@ -458,47 +432,35 @@ export default function DashboardPage() {
                     const timeStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                     return (
                       <div key={t.id} style={{
-                        padding: '12px 14px',
+                        padding: '8px 10px',
                         background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)',
                         backdropFilter: 'blur(12px) saturate(1.4)',
                         WebkitBackdropFilter: 'blur(12px) saturate(1.4)',
                         border: `1px solid ${t.passed ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)'}`,
                         borderRadius: 8,
                       }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                          <span style={{
-                            fontSize: 13, fontWeight: 700, color: 'var(--text-light)',
-                            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1, marginRight: 8,
-                          }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-light)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1, marginRight: 6 }}>
                             {t.testTitle}
                           </span>
                           <span style={{
-                            padding: '2px 8px', borderRadius: 999, fontSize: 8, fontWeight: 600,
-                            textTransform: 'uppercase', letterSpacing: 0.5,
+                            padding: '1px 6px', borderRadius: 999, fontSize: 8, fontWeight: 600,
+                            textTransform: 'uppercase', letterSpacing: 0.3,
                             background: t.passed ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)',
                             color: t.passed ? 'var(--success-color)' : 'var(--error-color)',
                             border: `1px solid ${t.passed ? 'rgba(34,197,94,0.25)' : 'rgba(239,68,68,0.25)'}`,
                             flexShrink: 0,
                           }}>
-                            {t.passed ? 'Passed' : 'Failed'}
+                            {t.passed ? 'Pass' : 'Fail'}
                           </span>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>
-                            {t.moduleTitle} &middot; {timeStr}
+                          <span style={{ fontSize: 9, color: 'var(--text-dim)' }}>
+                            {t.moduleTitle} · {timeStr}
                           </span>
-                          <div style={{ display: 'flex', alignItems: 'baseline', gap: 3 }}>
-                            <span style={{
-                              fontFamily: "var(--font-heading)", fontSize: 15, fontWeight: 700,
-                              color: t.passed ? 'var(--success-color)' : 'var(--error-color)',
-                            }}>
-                              {pct}
-                            </span>
-                            <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>%</span>
-                            <span style={{ fontSize: 9, color: 'var(--text-dim)', marginLeft: 6, opacity: 0.6 }}>
-                              ({t.score}/{t.totalPoints})
-                            </span>
-                          </div>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: t.passed ? 'var(--success-color)' : 'var(--error-color)' }}>
+                            {pct}%
+                          </span>
                         </div>
                       </div>
                     );
@@ -506,31 +468,28 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
-            <div className="reveal-up reveal-delay-4" style={{
+
+            {/* Study activity — full width below */}
+            <div className="reveal-up reveal-delay-2" style={{
               background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
               backdropFilter: 'blur(20px) saturate(1.6)',
               WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
               border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
-              borderRadius: 12, padding: isMobile ? '18px 14px' : '24px 22px',
+              borderRadius: 16, padding: 20, marginTop: 16,
             }}>
-              <SectionHeader icon="fa-fire" title="STUDY ACTIVITY" color="var(--warning-color)" />
-
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, fontFamily: 'var(--font-body)' }}>
+                  <i className="fa-solid fa-fire" style={{ marginRight: 6, color: 'var(--warning-color)' }} />Study Activity
+                </div>
+              </div>
               {dataLoading ? (
-                <Skeleton w="100%" h="140px" />
+                <div style={{ height: 120, borderRadius: 8, background: 'var(--input-bg)' }} />
               ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 280px', gap: isMobile ? 20 : 28 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 240px', gap: 20 }}>
                   <div>
-                    <div style={{
-                      fontSize: 10, fontWeight: 700, color: 'var(--text-dim)',
-                      textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 16,
-                      fontFamily: "var(--font-body)",
-                    }}>
-                      This Week
-                    </div>
                     <WeekChart sessions={studyStats?.sessions || []} />
                   </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {[
                       { label: 'Today', value: formatDuration(studyStats?.todaySeconds || 0), icon: 'fa-sun', color: 'var(--warning-color)' },
                       { label: 'This Week', value: formatDuration(studyStats?.weekSeconds || 0), icon: 'fa-calendar-week', color: 'var(--accent)' },
@@ -538,7 +497,7 @@ export default function DashboardPage() {
                       { label: 'All Time', value: formatDuration(studyStats?.allTimeSeconds || 0), icon: 'fa-infinity', color: 'var(--accent-purple)' },
                     ].map((s, i) => (
                       <div key={i} style={{
-                        display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px',
+                        display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px',
                         background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)',
                         backdropFilter: 'blur(12px) saturate(1.4)',
                         WebkitBackdropFilter: 'blur(12px) saturate(1.4)',
@@ -546,25 +505,22 @@ export default function DashboardPage() {
                         borderRadius: 8,
                       }}>
                         <div style={{
-                          width: 28, height: 28, borderRadius: 8,
+                          width: 24, height: 24, borderRadius: 6,
                           background: `color-mix(in srgb, ${s.color} 7%, transparent)`, display: 'flex', alignItems: 'center', justifyContent: 'center',
                         }}>
-                          <i className={`fas ${s.icon}`} style={{ fontSize: 10, color: s.color }} />
+                          <i className={`fas ${s.icon}`} style={{ fontSize: 9, color: s.color }} />
                         </div>
                         <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 9, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 600 }}>
+                          <div style={{ fontSize: 9, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.3, fontWeight: 600 }}>
                             {s.label}
                           </div>
                           {s.sub && (
-                            <div style={{ fontSize: 9, color: 'var(--text-dim)', opacity: 0.6, marginTop: 1 }}>
+                            <div style={{ fontSize: 8, color: 'var(--text-dim)', opacity: 0.6, marginTop: 1 }}>
                               {s.sub}
                             </div>
                           )}
                         </div>
-                        <span style={{
-                          fontFamily: "var(--font-heading)", fontSize: 14, fontWeight: 700,
-                          color: 'var(--text-light)',
-                        }}>
+                        <span style={{ fontFamily: 'var(--font-heading)', fontSize: 13, fontWeight: 700, color: 'var(--text-light)' }}>
                           {s.value}
                         </span>
                       </div>
