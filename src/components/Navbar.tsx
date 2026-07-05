@@ -130,10 +130,10 @@ export function Navbar({
           ) : (
             <li><Link href="/#contact" className={isActive('contact') ? 'active' : ''}>Contact</Link></li>
           )}
-          {user && <li><Link href="/games" prefetch className={isActive('games') ? 'active' : ''}>Games</Link></li>}
-          {user && <li><Link href="/study" prefetch className={isActive('study') ? 'active' : ''}>Study</Link></li>}
-          {user && <li><Link href="/dashboard" prefetch className={isActive('dashboard') ? 'active' : ''}>Dashboard</Link></li>}
-          {user && <li><Link href="/chat" prefetch className={`nav-ai-link${isActive('chat') ? ' active' : ''}`}>AI</Link></li>}
+          {user && user.role !== 'newcomer' && <li><Link href="/games" prefetch className={isActive('games') ? 'active' : ''}>Games</Link></li>}
+          {user && user.role !== 'newcomer' && <li><Link href="/study" prefetch className={isActive('study') ? 'active' : ''}>Study</Link></li>}
+          {user && user.role !== 'newcomer' && <li><Link href="/dashboard" prefetch className={isActive('dashboard') ? 'active' : ''}>Dashboard</Link></li>}
+          {user && user.role !== 'newcomer' && <li><Link href="/chat" prefetch className={`nav-ai-link${isActive('chat') ? ' active' : ''}`}>AI</Link></li>}
           {user && user.role === 'admin' && (
             <li><Link href="/admin" prefetch className={isActive('admin') ? 'active' : ''} style={{ color: 'var(--primary-red)' }}>Admin</Link></li>
           )}
@@ -162,10 +162,10 @@ export function Navbar({
           ) : (
             <li><Link href="/#contact" className={isActive('contact') ? 'active' : ''}>Contact</Link></li>
           )}
-          {user && <li><Link href="/games" prefetch className={isActive('games') ? 'active' : ''}>Games</Link></li>}
-          {user && <li><Link href="/study" prefetch className={isActive('study') ? 'active' : ''}>Study</Link></li>}
-          {user && <li><Link href="/dashboard" prefetch className={isActive('dashboard') ? 'active' : ''}>Dashboard</Link></li>}
-          {user && <li><Link href="/chat" prefetch className={`nav-ai-link${isActive('chat') ? ' active' : ''}`}>AI</Link></li>}
+          {user && user.role !== 'newcomer' && <li><Link href="/games" prefetch className={isActive('games') ? 'active' : ''}>Games</Link></li>}
+          {user && user.role !== 'newcomer' && <li><Link href="/study" prefetch className={isActive('study') ? 'active' : ''}>Study</Link></li>}
+          {user && user.role !== 'newcomer' && <li><Link href="/dashboard" prefetch className={isActive('dashboard') ? 'active' : ''}>Dashboard</Link></li>}
+          {user && user.role !== 'newcomer' && <li><Link href="/chat" prefetch className={`nav-ai-link${isActive('chat') ? ' active' : ''}`}>AI</Link></li>}
           {user && user.role === 'admin' && (
             <li><Link href="/admin" prefetch className={isActive('admin') ? 'active' : ''} style={{ color: 'var(--primary-red)' }}>Admin</Link></li>
           )}
