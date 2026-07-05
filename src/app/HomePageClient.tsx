@@ -970,13 +970,16 @@ export default function Home({
       <ProjectsSection projects={dynamicProjects} />
       <section className="v-section" id="courses">
 
-        <div className="v-section-header">
-          <h2 className="v-section-title"><BlurText text="Tech" tag="span" stagger={0.02} /> <span className="v-highlight">Programs</span></h2>
-          <p className="v-section-desc" style={{ marginTop: 16 }}>
-            Master technologies with our expert-led programs.
-          </p>
-        </div>
+        <SectionReveal direction="up" delay={0}>
+          <div className="v-section-header">
+            <h2 className="v-section-title"><BlurText text="Tech" tag="span" stagger={0.02} /> <span className="v-highlight">Programs</span></h2>
+            <p className="v-section-desc" style={{ marginTop: 16 }}>
+              Master technologies with our expert-led programs.
+            </p>
+          </div>
+        </SectionReveal>
 
+        <StaggerReveal direction="up" staggerDelay={80}>
         <div className="v-courses-grid">
           {availableCourses.length > 0 ? availableCourses.map((course, idx) => {
             const techTags = course.features.slice(0, 4);
@@ -1026,6 +1029,7 @@ export default function Home({
             <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-dim)', gridColumn: '1 / -1' }}>No courses available yet.</div>
           )}
         </div>
+        </StaggerReveal>
       </section>
       <FaqSection />
       <TeamSection team={dynamicTeam} />
