@@ -384,9 +384,9 @@ export default function DynamicCoursePage() {
 
         {!(loading || minLoading) && <section style={{ minHeight: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: 120 }}>
           <div style={{ textAlign: 'center', padding: '0 20px' }}>
-            <h1 style={{ fontFamily: "var(--font-heading)", fontSize: 32, color: 'var(--text-light)', marginBottom: 12 }}>Course Not Found</h1>
+            <h1 style={{ fontFamily: "var(--font-heading)", fontSize: isMobile ? 24 : 32, color: 'var(--text-light)', marginBottom: 12 }}>Course Not Found</h1>
             <p className="page-subtitle" style={{ color: 'var(--text-dim)', marginBottom: 24 }}>The course you&apos;re looking for doesn&apos;t exist or has been removed.</p>
-            <div style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>
+            <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link href="/#courses" onClick={(e) => { e.preventDefault(); router.push('/'); setTimeout(() => document.getElementById('courses')?.scrollIntoView({ behavior: 'smooth' }), 300); }} className="btn btn-primary"><i className="fa-solid fa-arrow-left" /> View All Programs</Link>
               <Link href="/" className="btn btn-secondary"><i className="fa-solid fa-home" /> Go Home</Link>
             </div>
@@ -473,10 +473,10 @@ export default function DynamicCoursePage() {
 
       {!(loading || minLoading) && <div className="page-transition-enter">
 
-      <section style={{ background: 'var(--black)', padding: '160px 60px 40px', position: 'relative', overflow: 'hidden', zIndex: 2 }}>
-        <div className="container-max" style={{ paddingLeft: isMobile ? 16 : undefined, paddingRight: isMobile ? 16 : undefined, maxWidth: 800, margin: '0 auto' }}>
+      <section style={{ background: 'var(--black)', padding: `${isMobile ? '120px 16px 32px' : '160px 60px 40px'}`, position: 'relative', overflow: 'hidden', zIndex: 2 }}>
+        <div className="container-max" style={{ paddingLeft: isMobile ? 0 : undefined, paddingRight: isMobile ? 0 : undefined, maxWidth: 800, margin: '0 auto' }}>
           <div style={{ marginBottom: 32 }}>
-            <h1 style={{ fontFamily: "var(--font-heading)", fontSize: 36, fontWeight: 800, color: 'var(--text-light)', marginTop: 16 }}>
+            <h1 style={{ fontFamily: "var(--font-heading)", fontSize: isMobile ? 24 : 36, fontWeight: 800, color: 'var(--text-light)', marginTop: 16 }}>
               {course.title.split('&').length > 1 ? (
                 <>{course.title.split('&')[0].trim()}&amp; <span className="v-highlight">{course.title.split('&')[1].trim()}</span></>
               ) : (
@@ -521,7 +521,7 @@ export default function DynamicCoursePage() {
                     {mod.unlocked && expandedModule === mod.id && (() => {
                       const moduleTests = studentTests.filter(t => t.moduleId === mod.id);
                       return (
-                        <div onClick={(e) => e.stopPropagation()} style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--border-color)', paddingLeft: 56 }}>
+                        <div className="module-expanded-content" onClick={(e) => e.stopPropagation()} style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--border-color)', paddingLeft: 56 }}>
                           <ModuleContent content={mod.content} />
                           {moduleTests.length > 0 && (
                             <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--border-color)' }}>

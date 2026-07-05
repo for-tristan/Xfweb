@@ -152,7 +152,7 @@ export default function DynamicServicePage() {
           <div style={{ textAlign: 'center', padding: '0 20px' }}>
             <h1 className="page-title" style={{ fontFamily: "var(--font-heading)", fontSize: 32, color: 'var(--text-light)', marginBottom: 12 }}>Service Not Found</h1>
             <p className="page-subtitle" style={{ color: 'var(--text-dim)', marginBottom: 24 }}>The service you&apos;re looking for doesn&apos;t exist or has been removed.</p>
-            <div style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>
+            <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link href="/#services" onClick={(e) => { e.preventDefault(); router.push('/'); setTimeout(() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' }), 300); }} className="btn btn-primary"><i className="fa-solid fa-arrow-left" /> View All Services</Link>
               <Link href="/" className="btn btn-secondary"><i className="fa-solid fa-home" /> Go Home</Link>
             </div>

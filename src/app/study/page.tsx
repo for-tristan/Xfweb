@@ -269,7 +269,7 @@ export default function StudyFocusPage() {
       )}
 
       {!(loading || minLoading) && user && user.role !== 'newcomer' && <div className="page-transition-enter">
-        <section style={{ background: 'var(--black)', padding: `${isMobile ? '160px 16px' : '180px 60px'} 250px`, position: 'relative', zIndex: 2 }}>
+        <section className="study-section" style={{ background: 'var(--black)', padding: `${isMobile ? '120px 14px 80px' : '180px 60px 250px'}`, position: 'relative', zIndex: 2 }}>
           <div className="container-max" style={{ maxWidth: 900, margin: '0 auto' }}>
 
             {/* Timer hero — full width, centered */}
@@ -279,7 +279,7 @@ export default function StudyFocusPage() {
               WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
               border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
               borderRadius: 16,
-              padding: '48px 32px',
+              padding: isMobile ? '32px 18px' : '48px 32px',
               position: 'relative', overflow: 'hidden',
               textAlign: 'center',
             }}>
@@ -384,7 +384,7 @@ export default function StudyFocusPage() {
                 </div>
 
                 {/* Stats — horizontal, inline */}
-                <div style={{ display: 'flex', gap: 32, justifyContent: 'center', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: isMobile ? 20 : 32, justifyContent: 'center', flexWrap: 'wrap' }}>
                   <div style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4, fontFamily: "var(--font-body)" }}>
                       <i className="fa-solid fa-calendar-day" style={{ marginRight: 6, color: 'var(--accent)' }} />Today
@@ -413,7 +413,7 @@ export default function StudyFocusPage() {
               WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
               border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
               borderRadius: 16,
-              padding: 32, marginTop: 24, position: 'relative',
+              padding: isMobile ? 20 : 32, marginTop: 24, position: 'relative',
             }}>
               <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, transparent, var(--accent), transparent)' }} />
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
@@ -458,7 +458,7 @@ export default function StudyFocusPage() {
                             key={entry.userId}
                             className="study-leaderboard-entry"
                             style={{
-                              display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px',
+                              display: 'flex', alignItems: 'center', gap: isMobile ? 10 : 14, padding: isMobile ? '12px 12px' : '14px 16px',
                               borderRadius: 12,
                               border: `0.5px solid ${isMe ? 'color-mix(in srgb, var(--accent) 25%, transparent)' : rankBorder}`,
                               background: isMe ? 'color-mix(in srgb, var(--accent) 6%, transparent)' : rankBg,
@@ -500,10 +500,10 @@ export default function StudyFocusPage() {
                               <div className="study-leaderboard-name" style={{
                                 fontSize: 14, fontWeight: 700,
                                 color: isMe ? 'var(--accent)' : 'var(--text-light)',
-                                fontFamily: "var(--font-body)", display: 'flex', alignItems: 'center', gap: 6,
+                                fontFamily: "var(--font-body)", display: 'flex', alignItems: 'center', gap: 6, minWidth: 0,
                               }}>
-                                {entry.name}
-                                {isMe && <span style={{ fontSize: 9, fontWeight: 700, background: 'color-mix(in srgb, var(--accent) 15%, transparent)', color: 'var(--accent)', padding: '2px 6px', borderRadius: 999, textTransform: 'uppercase', letterSpacing: 0.5 }}>You</span>}
+                                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, flex: '0 1 auto' }}>{entry.name}</span>
+                                {isMe && <span style={{ fontSize: 9, fontWeight: 700, background: 'color-mix(in srgb, var(--accent) 15%, transparent)', color: 'var(--accent)', padding: '2px 6px', borderRadius: 999, textTransform: 'uppercase', letterSpacing: 0.5, flexShrink: 0 }}>You</span>}
                               </div>
                               <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 2, fontFamily: "var(--font-body)" }}>
                                 <i className="fa-solid fa-clock" style={{ marginRight: 4, fontSize: 9 }} />{entry.sessionsCount} {entry.sessionsCount === 1 ? 'session' : 'sessions'}

@@ -3567,6 +3567,65 @@ select optgroup {
     .services-grid { grid-template-columns: 1fr !important; }
 }
 
+/* ============================================================
+   Narrow-mobile responsive overrides (<= 480px) for course
+   detail, service detail, study, and dashboard pages.
+
+   These complement the inline isMobile checks in the page
+   components — the CSS rules here take effect on first paint
+   (no SSR flash), while the inline checks handle layout
+   decisions that depend on JS state.
+   ============================================================ */
+@media (max-width: 480px) {
+    /* Course detail page */
+    .enroll-card { padding: 24px 18px !important; }
+    .enroll-price { font-size: 32px !important; }
+    .module-item { padding: 16px 14px !important; gap: 12px !important; }
+    .module-num { width: 36px !important; height: 36px !important; font-size: 14px !important; }
+    .what-learn { gap: 10px !important; }
+    .learn-item { padding: 12px 14px !important; }
+    .cta-section { padding: 40px 16px !important; }
+    .cta-content p { max-width: 100% !important; padding: 0 8px !important; }
+
+    /* Course detail: expanded-module content uses inline paddingLeft: 56
+       which squeezes content to ~244px at 380px. Override via class. */
+    .module-expanded-content { padding-left: 16px !important; }
+
+    /* Service detail page */
+    .page-title { font-size: clamp(24px, 7vw, 36px) !important; }
+
+    /* Study page */
+    .study-timer-display { font-size: 56px !important; }
+    .study-leaderboard-entry { gap: 8px !important; padding: 10px 10px !important; }
+    .study-leaderboard-rank { width: 24px !important; height: 24px !important; font-size: 10px !important; }
+    .study-leaderboard-avatar { width: 30px !important; height: 30px !important; font-size: 11px !important; }
+    .study-leaderboard-name { font-size: 12px !important; min-width: 0 !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+    .study-leaderboard-hours { font-size: 13px !important; flex-shrink: 0 !important; }
+
+    /* Dashboard page */
+    .dashboard-section { padding: 100px 14px 60px !important; }
+    .dashboard-hero-card { padding: 18px !important; }
+    .dashboard-inline-stats { gap: 12px !important; }
+    .dashboard-course-row { gap: 10px !important; }
+    .dashboard-test-row { gap: 8px !important; }
+    .dashboard-test-module-title { flex: 1 !important; min-width: 0 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; margin-right: 8px !important; }
+    .dashboard-test-pct { flex-shrink: 0 !important; }
+    .dashboard-stat-value { flex-shrink: 0 !important; }
+}
+
+@media (max-width: 380px) {
+    /* Extra-tight phones: 360px / 380px viewports */
+    .enroll-card { padding: 20px 14px !important; }
+    .module-item { padding: 14px 10px !important; gap: 10px !important; }
+    .cta-section { padding: 32px 12px !important; }
+    .study-timer-display { font-size: 48px !important; }
+    .dashboard-section { padding: 90px 12px 50px !important; }
+    .dashboard-hero-card { padding: 16px 14px !important; }
+    .dashboard-inline-stats { gap: 8px !important; }
+    .v-footer-grid { gap: 32px !important; }
+}
+
+
 
 @keyframes pageFadeIn {
   from { opacity: 0; transform: translateY(12px); }

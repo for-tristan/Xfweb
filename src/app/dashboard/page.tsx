@@ -271,11 +271,11 @@ export default function DashboardPage() {
       )}
 
       {!(loading || minLoading) && user && user.role !== 'newcomer' && <div className="page-transition-enter">
-        <section style={{ background: 'var(--black)', padding: '140px 24px 80px', position: 'relative', zIndex: 2 }}>
+        <section className="dashboard-section" style={{ background: 'var(--black)', padding: '140px 24px 80px', position: 'relative', zIndex: 2 }}>
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
 
             {/* Hero greeting — large, prominent */}
-            <div className="reveal-up" style={{
+            <div className="reveal-up dashboard-hero-card" style={{
               background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
               backdropFilter: 'blur(20px) saturate(1.6)',
               WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
@@ -285,7 +285,7 @@ export default function DashboardPage() {
             }}>
               <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, transparent, var(--accent), transparent)' }} />
               <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', minWidth: 0 }}>
                   <div style={{
                     width: 52, height: 52, borderRadius: '50%',
                     background: 'color-mix(in srgb, var(--accent) 8%, transparent)', border: '2px solid color-mix(in srgb, var(--accent) 25%, transparent)',
@@ -297,8 +297,8 @@ export default function DashboardPage() {
                       : <span style={{ color: 'var(--accent)', fontSize: 20, fontWeight: 700 }}>{user?.name.charAt(0).toUpperCase()}</span>
                     }
                   </div>
-                  <div>
-                    <h2 style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: isMobile ? 18 : 24, color: 'var(--text-light)', margin: 0, letterSpacing: -0.3 }}>
+                  <div style={{ minWidth: 0, flex: '1 1 200px' }}>
+                    <h2 style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: isMobile ? 18 : 24, color: 'var(--text-light)', margin: 0, letterSpacing: -0.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       Welcome back, {user?.name.split(' ')[0]}
                     </h2>
                     <p style={{ fontSize: 13, color: 'var(--text-dim)', margin: '4px 0 0' }}>
@@ -307,7 +307,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 {/* Inline stats — right side of hero */}
-                <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+                <div className="dashboard-inline-stats" style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
                   {[
                     { label: 'Enrolled', value: dataLoading ? '—' : approvedEnrollments.length, color: 'var(--accent)' },
                     { label: 'Progress', value: dataLoading ? '—' : `${avgProgress}%`, color: 'var(--accent-purple)' },
@@ -366,7 +366,7 @@ export default function DashboardPage() {
                     const pct = prog?.completionPercentage || 0;
                     const isComplete = pct === 100;
                     return (
-                      <Link key={e.id} href={`/courses/${e.courseId}`} style={{
+                      <Link key={e.id} href={`/courses/${e.courseId}`} className="dashboard-course-row" style={{
                         display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px',
                         background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)',
                         backdropFilter: 'blur(12px) saturate(1.4)',
@@ -456,9 +456,9 @@ export default function DashboardPage() {
                             {t.passed ? 'Passed' : 'Failed'}
                           </span>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>{t.moduleTitle} · {timeStr}</span>
-                          <span style={{ fontFamily: 'var(--font-heading)', fontSize: 14, fontWeight: 700, color: t.passed ? 'var(--success-color)' : 'var(--error-color)' }}>
+                        <div className="dashboard-test-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span className="dashboard-test-module-title" style={{ fontSize: 10, color: 'var(--text-dim)' }}>{t.moduleTitle} · {timeStr}</span>
+                          <span className="dashboard-test-pct" style={{ fontFamily: 'var(--font-heading)', fontSize: 14, fontWeight: 700, color: t.passed ? 'var(--success-color)' : 'var(--error-color)' }}>
                             {pct}%
                           </span>
                         </div>
@@ -514,7 +514,7 @@ export default function DashboardPage() {
                           <div style={{ fontSize: 9, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 600 }}>{s.label}</div>
                           {s.sub && <div style={{ fontSize: 9, color: 'var(--text-dim)', opacity: 0.6, marginTop: 1 }}>{s.sub}</div>}
                         </div>
-                        <span style={{ fontFamily: 'var(--font-heading)', fontSize: 14, fontWeight: 700, color: 'var(--text-light)' }}>{s.value}</span>
+                        <span className="dashboard-stat-value" style={{ fontFamily: 'var(--font-heading)', fontSize: 14, fontWeight: 700, color: 'var(--text-light)' }}>{s.value}</span>
                       </div>
                     ))}
                   </div>

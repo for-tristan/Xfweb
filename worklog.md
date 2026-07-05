@@ -705,3 +705,25 @@ Stage Summary:
 - Commit b7835da created locally
 - Newcomer users now see only the public nav links (Home, Services, Programs, Contact) in the desktop navbar pill and full-width list — consistent with what they already saw in the mobile StaggeredMenu.
 - Admin/Instructor links and the public nav links are unaffected.
+
+---
+Task ID: live-role-change
+Agent: main
+Task: Make admin role changes apply immediately (no logout/login required) + add Make Newcomer button to admin UI
+
+Work Log:
+- src/app/api/admin/users/route.ts (PUT): removed `deleteAllUserSessions(userId)` call after role update. Removed unused `deleteAllUserSessions` from imports. Added a comment explaining why sessions are preserved (getCurrentUser reads role fresh from DB on each request → server-side ACLs use the new role immediately).
+- src/lib/usePageFeatures.ts: added useEffect that registers a `focus` listener on window. On focus, re-fetches /api/auth/me (throttled to once per 30s) and updates React user state + sessionStorage cache. Allows affected user's navbar/buttons to refresh to the new role when they tab back to the app.
+- src/app/HomePageClient.tsx: same focus-listener pattern added (homepage has its own auth-fetch logic separate from usePageFeatures).
+- src/app/admin/page.tsx:
+  * Added 'Make Newcomer' button (purple #a78bfa styling, fa-user-plus icon)
+  * Added `newcomer` branch to role badge styling (line 945) — purple background/border/text matching the new button
+  * Added `newcomer` branch to avatar circle styling (line 933)
+  * Added `newcomer: 'newcomer'` to roleLabels map used by the confirm dialog
+- tsc unavailable in sandbox (no node_modules) but changes are minimal and use only already-imported React hooks.
+
+Stage Summary:
+- Commit 37c8c92 pushed to origin/main on Xfweb
+- Two UX issues resolved:
+  1. Admin role changes now apply immediately. Server-side checks use fresh role on next request. Client UI refreshes on window focus (throttled 30s) — no manual logout/login required.
+  2. Admin can now set users back to 'newcomer' role via the 'Make Newcomer' button. Newcomer role badge shows in purple throughout the admin user list.
