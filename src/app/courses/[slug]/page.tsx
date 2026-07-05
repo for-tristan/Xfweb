@@ -128,24 +128,57 @@ export default function DynamicCoursePage() {
   };
 
 
+  // PERF: Single combined API call gets course + modules + enrollment +
+  // tests + certificate all at once. Previously this was 5 separate
+  // API calls (6 with /api/auth/me), each doing its own getCurrentUser()
+  // DB queries. Now it's 1 call.
   useEffect(() => {
     if (!slug) return;
     setFetching(true);
     setNotFound(false);
-    fetch(`/api/courses/${slug}`)
-      .then((res) => {
-        if (res.ok) return res.json();
-        throw new Error('Not found');
-      })
-      .then((data) => {
+
+    (async () => {
+      try {
+        const res = await fetch(`/api/courses/${slug}/combined`);
+        if (!res.ok) {
+          if (res.status === 404) setNotFound(true);
+          return;
+        }
+        const data = await res.json();
+
         if (data?.course) {
           setCourse(data.course);
+          if (data.modules) {
+            setCourseModules(data.modules);
+          }
+          if (data.enrollment) {
+            setEnrollment(data.enrollment);
+          }
+          if (data.tests) {
+            const results: StudentTest[] = data.tests.map((t: any) => ({
+              id: t.id, title: t.title, description: t.description || '',
+              timeLimit: t.timeLimit, passingScore: t.passingScore,
+              questionCount: t.questionCount || 0, moduleId: t.moduleId,
+              moduleTitle: '', moduleOrder: 0,
+              questions: t.questions || [],
+              hasCompleted: !!t.hasCompleted,
+              attempt: t.attempt || null,
+            }));
+            setStudentTests(results);
+          }
+          if (data.certificate) {
+            setCertificate(data.certificate);
+          }
         } else {
           setNotFound(true);
         }
-      })
-      .catch(() => setNotFound(true))
-      .finally(() => setFetching(false));
+      } catch {
+        setNotFound(true);
+      } finally {
+        setFetching(false);
+        setModulesLoading(false);
+      }
+    })();
   }, [slug]);
 
   const checkReveals = useCallback(rafThrottle(() => {
@@ -173,72 +206,6 @@ export default function DynamicCoursePage() {
       return () => clearTimeout(t);
     }
   }, [loading, minLoading, checkReveals]);
-
-  const enrollmentsCheckedRef = useRef(false);
-
-  // PERF: Combined all 4 user-dependent fetches into a single useEffect
-  // with Promise.all so they run in parallel instead of sequentially.
-  useEffect(() => {
-    if (!user || !slug || enrollmentsCheckedRef.current) return;
-    enrollmentsCheckedRef.current = true;
-    setModulesLoading(true);
-
-    (async () => {
-      const [enrollRes, modulesRes, testsRes, certRes] = await Promise.all([
-        fetch('/api/courses/my-enrollments').catch(() => null),
-        fetch(`/api/courses/modules?courseId=${slug}`).catch(() => null),
-        fetch('/api/courses/tests').catch(() => null),
-        fetch(`/api/courses/certificate?courseId=${slug}`).catch(() => null),
-      ]);
-
-      // Process enrollments
-      if (enrollRes?.ok) {
-        try {
-          const data = await enrollRes.json();
-          if (data?.enrollments) {
-            const match = data.enrollments.find((e: Enrollment) => e.courseId === slug);
-            if (match) setEnrollment(match);
-          }
-        } catch {}
-      }
-
-      // Process modules
-      if (modulesRes?.ok) {
-        try {
-          const data = await modulesRes.json();
-          if (data?.modules) {
-            setCourseModules(data.modules);
-          }
-        } catch {}
-      }
-      setModulesLoading(false);
-
-      // Process tests
-      if (testsRes?.ok) {
-        try {
-          const data = await testsRes.json();
-          const results: StudentTest[] = (data?.tests || []).map((t: any) => ({
-            id: t.id, title: t.title, description: t.description || '', timeLimit: t.timeLimit,
-            passingScore: t.passingScore, questionCount: t.questionCount || 0,
-            moduleId: t.moduleId, moduleTitle: t.moduleTitle, moduleOrder: t.moduleOrder || 0,
-            questions: t.questions || [], hasCompleted: !!t.attempt?.submittedAt,
-            attempt: t.attempt?.submittedAt ? { score: t.attempt.score, totalPoints: t.attempt.totalPoints, passed: t.attempt.passed, submittedAt: t.attempt.submittedAt } : null,
-          }));
-          setStudentTests(results);
-        } catch {}
-      }
-
-      // Process certificate
-      if (certRes?.ok) {
-        try {
-          const data = await certRes.json();
-          if (data?.hasCertificate) {
-            setCertificate({ certificateId: data.certificateId, courseName: data.courseName, completionDate: data.completionDate });
-          }
-        } catch {}
-      }
-    })();
-  }, [user, slug]);
 
   const toggleModule = (modId: string) => {
     setExpandedModule(prev => prev === modId ? null : modId);

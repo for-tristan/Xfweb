@@ -1,6 +1,7 @@
 import { createHash, randomBytes, scryptSync, timingSafeEqual } from 'crypto';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { cache } from 'react';
 import { db } from '@/lib/db';
 
 const SESSION_SECRET = process.env.SESSION_SECRET;
@@ -82,7 +83,10 @@ export async function verifySessionToken(userId: string, token: string): Promise
   return true;
 }
 
-export async function getCurrentUser(): Promise<{
+// PERF: cache() ensures getCurrentUser() only hits the DB ONCE per request,
+// even if multiple API routes or server components call it. Without this,
+// each call does 2 DB queries (session lookup + user lookup).
+export const getCurrentUser = cache(async (): Promise<{
   id: string;
   name: string;
   email: string;
@@ -122,7 +126,7 @@ export async function getCurrentUser(): Promise<{
   } catch {
     return null;
   }
-}
+});
 
 
 export async function createSession(userId: string): Promise<string> {
