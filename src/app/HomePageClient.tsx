@@ -126,7 +126,7 @@ export default function Home({
 
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [minLoading, setMinLoading] = useState(false);
+  const [minLoading, setMinLoading] = useState(true);
 
   // Firefox detection — used to switch hero pin from JS-driven fixed
   // (causes scroll jumps on Firefox) to CSS sticky (compositor-native).
@@ -265,33 +265,20 @@ export default function Home({
   }, []);
   useEffect(() => {
     (async () => {
-      // Edge fallback: check localStorage for cached user
+      // Edge fallback: check sessionStorage first (cookies might be blocked)
       try {
-        const cached = localStorage.getItem('xfoundry_user');
+        const cached = sessionStorage.getItem('xfoundry_user');
         if (cached) {
           setUser(JSON.parse(cached));
         }
       } catch {}
 
       try {
-        // Build headers — include token from localStorage for Edge fallback
-        const headers: Record<string, string> = {};
-        try {
-          const token = localStorage.getItem('xfoundry_token');
-          const userId = localStorage.getItem('xfoundry_user_id');
-          if (token && userId) {
-            headers['x-foundry-token'] = token;
-            headers['x-foundry-user-id'] = userId;
-          }
-        } catch {}
-
-        const res = await fetch('/api/auth/me', { headers });
+        const res = await fetch('/api/auth/me');
         if (res.ok) {
           const data = await res.json();
           setUser(data.user);
-          try {
-            localStorage.setItem('xfoundry_user', JSON.stringify(data.user));
-          } catch {}
+          try { sessionStorage.setItem('xfoundry_user', JSON.stringify(data.user)); } catch {}
         } else if (res.status === 403) {
           const data = await res.json();
           if (data.needsVerification) {
@@ -300,9 +287,9 @@ export default function Home({
             return;
           }
         } else if (res.status === 401) {
-          // No valid auth — keep localStorage user if available, otherwise null
+          // Cookies not sent (Edge) — keep sessionStorage user if available
           try {
-            const cached = localStorage.getItem('xfoundry_user');
+            const cached = sessionStorage.getItem('xfoundry_user');
             if (!cached) setUser(null);
           } catch { setUser(null); }
         } else {
@@ -597,14 +584,16 @@ export default function Home({
       const data = await res.json();
       if (res.ok) {
         setUser(data.user);
-        try {
-          localStorage.setItem('xfoundry_user', JSON.stringify(data.user));
-          if (data.token) {
-            localStorage.setItem('xfoundry_token', data.token);
-            localStorage.setItem('xfoundry_user_id', data.user.id);
-          }
-        } catch {}
-        setAuthModalOpen(false); setVerificationStep('idle'); setDqName(data.user.name); setDqEmail(data.user.email); setCqEmail(data.user.email); setProfileName(data.user.name); setProfilePhone(data.user.phone || ''); setProfileCompany(data.user.company || ''); toast({ title: 'Welcome back!', description: `Signed in as ${data.user.name}` }); setLoginEmail(''); setLoginPassword(''); }
+        // Check if storage is blocked (Edge "on-device site data" = Don't allow)
+        let storageBlocked = false;
+        try { localStorage.setItem('__xf_test', '1'); localStorage.removeItem('__xf_test'); } catch { storageBlocked = true; }
+        setAuthModalOpen(false); setVerificationStep('idle'); setDqName(data.user.name); setDqEmail(data.user.email); setCqEmail(data.user.email); setProfileName(data.user.name); setProfilePhone(data.user.phone || ''); setProfileCompany(data.user.company || '');
+        if (storageBlocked) {
+          toast({ title: 'Signed in, but storage is blocked', description: 'Enable "On-device site data" in Edge Settings → Cookies and site permissions, then sign in again to stay logged in.', variant: 'destructive', duration: 10000 });
+        } else {
+          toast({ title: 'Welcome back!', description: `Signed in as ${data.user.name}` });
+        }
+        setLoginEmail(''); setLoginPassword(''); }
       else if (res.status === 403 && data.needsVerification) {
         setVerificationEmail(data.email);
         setVerificationCode('');
@@ -654,11 +643,7 @@ export default function Home({
 
   const handleLogout = async () => {
     try { await fetch('/api/auth/logout', { method: 'POST' }); } catch {  }
-    try {
-      localStorage.removeItem('xfoundry_user');
-      localStorage.removeItem('xfoundry_token');
-      localStorage.removeItem('xfoundry_user_id');
-    } catch {}
+    try { sessionStorage.removeItem('xfoundry_user'); } catch {}
     setUser(null); setEnrollments([]); setEnrollmentStatus({}); setQuotes([]);
     setDashboardOpen(false);
     setVerificationStep('idle');

@@ -122,14 +122,26 @@ function AuthContent() {
       });
       const data = await res.json();
       if (res.ok) {
-        // Store user + token in localStorage for Edge fallback (cookies blocked)
+        // Check if cookies/storage are blocked (Edge "on-device site data" = Don't allow)
+        let storageBlocked = false;
         try {
-          localStorage.setItem('xfoundry_user', JSON.stringify(data.user));
-          localStorage.setItem('xfoundry_token', data.token);
-          localStorage.setItem('xfoundry_user_id', data.user.id);
-        } catch {}
-        toast({ title: 'Welcome back!', description: 'You have been signed in.' });
-        window.location.href = '/';
+          localStorage.setItem('__xf_test', '1');
+          localStorage.removeItem('__xf_test');
+        } catch {
+          storageBlocked = true;
+        }
+
+        if (storageBlocked) {
+          toast({
+            title: 'Sign-in successful, but storage is blocked',
+            description: 'Your browser is blocking cookies/site data. Please enable "On-device site data" in Edge Settings → Cookies and site permissions → Manage and delete cookies and site data, then sign in again.',
+            variant: 'destructive',
+            duration: 10000,
+          });
+        } else {
+          toast({ title: 'Welcome back!', description: 'You have been signed in.' });
+        }
+        router.push('/');
       } else if (res.status === 403 && data.needsVerification) {
         // Unverified account — show the code input modal
         setVerificationEmail(data.email);
