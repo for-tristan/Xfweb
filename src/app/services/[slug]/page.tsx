@@ -59,11 +59,13 @@ export default function DynamicServicePage() {
   const [notFound, setNotFound] = useState(false);
 
 
+  // PERF: Fetch service data immediately — doesn't wait for auth.
+  // The service data is CDN-cached (s-maxage=60) so this is fast.
   useEffect(() => {
     if (!slug) return;
     setFetching(true);
     setNotFound(false);
-    fetch('/api/services')
+    fetch('/api/services', { cache: 'force-cache' })
       .then((res) => res.ok ? res.json() : null)
       .then((data) => {
         if (data?.services) {

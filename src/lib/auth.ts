@@ -86,7 +86,7 @@ export async function verifySessionToken(userId: string, token: string): Promise
 // PERF: cache() ensures getCurrentUser() only hits the DB ONCE per request,
 // even if multiple API routes or server components call it. Without this,
 // each call does 2 DB queries (session lookup + user lookup).
-export const getCurrentUser = cache(async (): Promise<{
+type CurrentUser = {
   id: string;
   name: string;
   email: string;
@@ -96,7 +96,9 @@ export const getCurrentUser = cache(async (): Promise<{
   phone: string | null;
   company: string | null;
   avatar: string | null;
-} | null> {
+};
+
+export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   const cookieStore = await cookies();
   const userId = cookieStore.get('xfoundry_user_id')?.value;
   const sessionToken = cookieStore.get('xfoundry_session')?.value;
