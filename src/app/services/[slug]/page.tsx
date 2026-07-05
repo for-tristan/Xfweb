@@ -237,7 +237,7 @@ export default function DynamicServicePage() {
 
       {!(loading || minLoading) && <div className="page-transition-enter">
 
-      {/* Split hero — left: title + desc, right: quick actions */}
+      {/* Split hero — left: title + desc, right: showcase preview */}
       <section className="reveal-up" style={{ background: 'var(--black)', padding: '160px 24px 40px', position: 'relative', overflow: 'hidden', zIndex: 2 }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.5fr 1fr', gap: 40, alignItems: 'center' }}>
           <div>
@@ -250,32 +250,55 @@ export default function DynamicServicePage() {
               </p>
             )}
           </div>
-          <div style={{
+          {/* Browser mockup showcase */}
+          <div className="reveal-up reveal-delay-1" style={{
             background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
             backdropFilter: 'blur(20px) saturate(1.6)',
             WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
             border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
-            borderRadius: 16, padding: 28,
+            borderRadius: 16, overflow: 'hidden',
+            position: 'relative',
           }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 20, fontFamily: 'var(--font-body)' }}>
-              Get started
+            {/* Browser chrome */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '10px 14px',
+              background: 'color-mix(in srgb, var(--text-light) 5%, transparent)',
+              borderBottom: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
+            }}>
+              <div style={{ width: 10, height: 10, borderRadius: '50%', background: 'var(--error-color)', opacity: 0.6 }} />
+              <div style={{ width: 10, height: 10, borderRadius: '50%', background: 'var(--warning-color)', opacity: 0.6 }} />
+              <div style={{ width: 10, height: 10, borderRadius: '50%', background: 'var(--success-color)', opacity: 0.6 }} />
+              <div style={{ flex: 1, marginLeft: 8, padding: '3px 10px', borderRadius: 6, background: 'color-mix(in srgb, var(--text-light) 5%, transparent)', fontSize: 10, color: 'var(--text-dim)', fontFamily: 'var(--font-body)' }}>
+                xfoundryy.vercel.app
+              </div>
             </div>
-            <Link
-              href="/#contact"
-              onClick={(e) => { e.preventDefault(); router.push('/'); const check = setInterval(() => { const el = document.getElementById('contact'); if (el) { clearInterval(check); el.scrollIntoView({ behavior: 'smooth' }); } }, 500); setTimeout(() => clearInterval(check), 5000); }}
-              className="btn btn-primary"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%', marginBottom: 10, padding: '14px 20px', borderRadius: 12 }}
-            >
-              <i className="fa-solid fa-paper-plane" /> Request a Service
-            </Link>
-            <Link
-              href="/#projects"
-              onClick={(e) => { e.preventDefault(); router.push('/'); const check = setInterval(() => { const el = document.getElementById('projects'); if (el) { clearInterval(check); el.scrollIntoView({ behavior: 'smooth' }); } }, 500); setTimeout(() => clearInterval(check), 5000); }}
-              className="btn btn-secondary"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%', padding: '14px 20px', borderRadius: 12 }}
-            >
-              <i className="fa-solid fa-eye" /> View Projects
-            </Link>
+            {/* Browser content — animated preview */}
+            <div style={{ padding: 24, minHeight: 200 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {/* Fake navbar */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ width: 80, height: 8, borderRadius: 4, background: 'color-mix(in srgb, var(--accent) 30%, transparent)' }} />
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <div style={{ width: 30, height: 6, borderRadius: 3, background: 'color-mix(in srgb, var(--text-light) 15%, transparent)' }} />
+                    <div style={{ width: 30, height: 6, borderRadius: 3, background: 'color-mix(in srgb, var(--text-light) 15%, transparent)' }} />
+                    <div style={{ width: 30, height: 6, borderRadius: 3, background: 'color-mix(in srgb, var(--text-light) 15%, transparent)' }} />
+                  </div>
+                </div>
+                {/* Fake hero */}
+                <div style={{ marginTop: 8 }}>
+                  <div style={{ width: '70%', height: 14, borderRadius: 4, background: 'color-mix(in srgb, var(--accent) 25%, transparent)', marginBottom: 8 }} />
+                  <div style={{ width: '90%', height: 6, borderRadius: 3, background: 'color-mix(in srgb, var(--text-light) 10%, transparent)', marginBottom: 4 }} />
+                  <div style={{ width: '60%', height: 6, borderRadius: 3, background: 'color-mix(in srgb, var(--text-light) 10%, transparent)' }} />
+                </div>
+                {/* Fake cards */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginTop: 8 }}>
+                  <div style={{ height: 50, borderRadius: 8, background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)', border: '0.5px solid color-mix(in srgb, var(--text-light) 8%, transparent)' }} />
+                  <div style={{ height: 50, borderRadius: 8, background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)', border: '0.5px solid color-mix(in srgb, var(--text-light) 8%, transparent)' }} />
+                  <div style={{ height: 50, borderRadius: 8, background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)', border: '0.5px solid color-mix(in srgb, var(--text-light) 8%, transparent)' }} />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

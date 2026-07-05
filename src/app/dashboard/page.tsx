@@ -509,6 +509,92 @@ export default function DashboardPage() {
               )}
             </div>
 
+            {/* Quick actions + Pending enrollments — side by side */}
+            <div className="reveal-up reveal-delay-3" style={{
+              display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, marginBottom: 20,
+            }}>
+              {/* Quick links */}
+              <div style={{
+                background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
+                backdropFilter: 'blur(20px) saturate(1.6)',
+                WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
+                border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
+                borderRadius: 16, padding: isMobile ? 18 : 24,
+              }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 16, fontFamily: 'var(--font-body)' }}>
+                  <i className="fa-solid fa-bolt" style={{ marginRight: 6, color: 'var(--accent)' }} />Quick Links
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  <Link href="/#courses" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)', border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', borderRadius: 10, textDecoration: 'none', color: 'inherit', transition: 'border-color 0.2s' }}
+                    onMouseEnter={(e) => e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--accent) 25%, transparent)'}
+                    onMouseLeave={(e) => e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--text-light) 10%, transparent)'}>
+                    <i className="fa-solid fa-graduation-cap" style={{ fontSize: 14, color: 'var(--accent)' }} />
+                    <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-light)' }}>Browse Courses</span>
+                  </Link>
+                  <Link href="/study" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)', border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', borderRadius: 10, textDecoration: 'none', color: 'inherit', transition: 'border-color 0.2s' }}
+                    onMouseEnter={(e) => e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--accent) 25%, transparent)'}
+                    onMouseLeave={(e) => e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--text-light) 10%, transparent)'}>
+                    <i className="fa-solid fa-stopwatch" style={{ fontSize: 14, color: 'var(--warning-color)' }} />
+                    <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-light)' }}>Study Timer</span>
+                  </Link>
+                  <Link href="/games" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)', border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', borderRadius: 10, textDecoration: 'none', color: 'inherit', transition: 'border-color 0.2s' }}
+                    onMouseEnter={(e) => e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--accent) 25%, transparent)'}
+                    onMouseLeave={(e) => e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--text-light) 10%, transparent)'}>
+                    <i className="fa-solid fa-gamepad" style={{ fontSize: 14, color: 'var(--success-color)' }} />
+                    <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-light)' }}>Code Games</span>
+                  </Link>
+                  <Link href="/chat" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)', border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', borderRadius: 10, textDecoration: 'none', color: 'inherit', transition: 'border-color 0.2s' }}
+                    onMouseEnter={(e) => e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--accent) 25%, transparent)'}
+                    onMouseLeave={(e) => e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--text-light) 10%, transparent)'}>
+                    <i className="fa-solid fa-robot" style={{ fontSize: 14, color: 'var(--accent-purple)' }} />
+                    <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-light)' }}>XF AI Chat</span>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Pending enrollments */}
+              <div style={{
+                background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
+                backdropFilter: 'blur(20px) saturate(1.6)',
+                WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
+                border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
+                borderRadius: 16, padding: isMobile ? 18 : 24,
+              }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 16, fontFamily: 'var(--font-body)' }}>
+                  <i className="fa-solid fa-clock" style={{ marginRight: 6, color: 'var(--warning-color)' }} />Pending Requests
+                </div>
+                {dataLoading ? (
+                  <Skeleton w="100%" h="40px" />
+                ) : enrollments.filter(e => e.status === 'pending').length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '20px 16px' }}>
+                    <i className="fa-solid fa-check-circle" style={{ fontSize: 24, color: 'var(--success-color)', opacity: 0.3, display: 'block', marginBottom: 8 }} />
+                    <p style={{ fontSize: 12, color: 'var(--text-dim)', margin: 0 }}>No pending requests</p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {enrollments.filter(e => e.status === 'pending').slice(0, 3).map((e) => (
+                      <div key={e.id} style={{
+                        display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
+                        background: 'color-mix(in srgb, var(--warning-color) 5%, transparent)',
+                        border: '0.5px solid color-mix(in srgb, var(--warning-color) 15%, transparent)',
+                        borderRadius: 10,
+                      }}>
+                        <i className="fa-solid fa-hourglass-half" style={{ fontSize: 11, color: 'var(--warning-color)', flexShrink: 0 }} />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-light)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {e.courseName}
+                          </div>
+                          <div style={{ fontSize: 10, color: 'var(--text-dim)', marginTop: 2 }}>
+                            Enrolled {new Date(e.enrolledAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
           </div>
         </section>
       </div>}

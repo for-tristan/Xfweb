@@ -256,7 +256,7 @@ export default function StudyFocusPage() {
       <AuthGate loading={loading} minLoading={minLoading} user={user} onSignIn={() => openAuthModal('signin', 'Sign in to access Study Focus')} onSignUp={() => openAuthModal('signup')} />
 
       {!(loading || minLoading) && <div className="page-transition-enter">
-        <section style={{ background: 'var(--black)', padding: `${isMobile ? '160px 16px' : '180px 60px'} 80px`, position: 'relative', zIndex: 2 }}>
+        <section style={{ background: 'var(--black)', padding: `${isMobile ? '160px 16px' : '180px 60px'} 200px`, position: 'relative', zIndex: 2 }}>
           <div className="container-max" style={{ maxWidth: 900, margin: '0 auto' }}>
 
             {/* Timer hero — full width, centered */}
