@@ -949,8 +949,19 @@ export default function Home({
           zIndex={50}
         />
       )}
-      {/* HERO — Pinned + Fade on Scroll */}
-      <ScrollFadeSection pin fadeDistance="60vh" zIndex={1}>
+      {/* HERO — Pure CSS sticky pin. Firefox can't handle JS-driven
+          position:fixed without 1-frame jumps. Sticky is compositor-native. */}
+      <div style={{ position: 'relative', height: '160vh', zIndex: 1 }}>
+        <div style={{
+          position: 'sticky',
+          top: 0,
+          height: '100vh',
+          overflow: 'hidden',
+          background: 'var(--black)',
+          backfaceVisibility: 'hidden',
+          transform: 'translateZ(0)',
+          willChange: 'transform',
+        }}>
       <section className="v-hero" id="home">
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', position: 'relative', zIndex: 10 }}>
             <div style={{ position: 'relative', width: 720, height: 520, maxWidth: '90vw', maxHeight: '60vh' }}>
@@ -965,7 +976,8 @@ export default function Home({
           <div className="scroll-line"></div>
         </div>
       </section>
-      </ScrollFadeSection>
+        </div>
+      </div>
       <ServicesSection services={servicesDataArr} />
       <ProjectsSection projects={dynamicProjects} />
       <section className="v-section" id="courses">
