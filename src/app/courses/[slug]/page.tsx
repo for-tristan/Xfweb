@@ -176,45 +176,68 @@ export default function DynamicCoursePage() {
 
   const enrollmentsCheckedRef = useRef(false);
 
+  // PERF: Combined all 4 user-dependent fetches into a single useEffect
+  // with Promise.all so they run in parallel instead of sequentially.
   useEffect(() => {
     if (!user || !slug || enrollmentsCheckedRef.current) return;
     enrollmentsCheckedRef.current = true;
-    fetch('/api/courses/my-enrollments')
-      .then((res) => res.ok ? res.json() : null)
-      .then((data) => {
-        if (data?.enrollments) {
-          const match = data.enrollments.find((e: Enrollment) => e.courseId === slug);
-          if (match) setEnrollment(match);
-        }
-      })
-      .catch(() => {});
-  }, [user, slug]);
-
-  useEffect(() => {
-    if (!user || !slug) return;
     setModulesLoading(true);
-    fetchStudentTests();
-    fetch(`/api/courses/modules?courseId=${slug}`)
-      .then((res) => res.ok ? res.json() : null)
-      .then((data) => {
-        if (data?.modules) {
-          setCourseModules(data.modules);
-        }
-      })
-      .catch(() => {})
-      .finally(() => setModulesLoading(false));
-  }, [user, slug]);
 
-  useEffect(() => {
-    if (!user || !slug) return;
-    fetch(`/api/courses/certificate?courseId=${slug}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.hasCertificate) {
-          setCertificate({ certificateId: data.certificateId, courseName: data.courseName, completionDate: data.completionDate });
-        }
-      })
-      .catch(() => {});
+    (async () => {
+      const [enrollRes, modulesRes, testsRes, certRes] = await Promise.all([
+        fetch('/api/courses/my-enrollments').catch(() => null),
+        fetch(`/api/courses/modules?courseId=${slug}`).catch(() => null),
+        fetch('/api/courses/tests').catch(() => null),
+        fetch(`/api/courses/certificate?courseId=${slug}`).catch(() => null),
+      ]);
+
+      // Process enrollments
+      if (enrollRes?.ok) {
+        try {
+          const data = await enrollRes.json();
+          if (data?.enrollments) {
+            const match = data.enrollments.find((e: Enrollment) => e.courseId === slug);
+            if (match) setEnrollment(match);
+          }
+        } catch {}
+      }
+
+      // Process modules
+      if (modulesRes?.ok) {
+        try {
+          const data = await modulesRes.json();
+          if (data?.modules) {
+            setCourseModules(data.modules);
+          }
+        } catch {}
+      }
+      setModulesLoading(false);
+
+      // Process tests
+      if (testsRes?.ok) {
+        try {
+          const data = await testsRes.json();
+          const results: StudentTest[] = (data?.tests || []).map((t: any) => ({
+            id: t.id, title: t.title, description: t.description || '', timeLimit: t.timeLimit,
+            passingScore: t.passingScore, questionCount: t.questionCount || 0,
+            moduleId: t.moduleId, moduleTitle: t.moduleTitle, moduleOrder: t.moduleOrder || 0,
+            questions: t.questions || [], hasCompleted: !!t.attempt?.submittedAt,
+            attempt: t.attempt?.submittedAt ? { score: t.attempt.score, totalPoints: t.attempt.totalPoints, passed: t.attempt.passed, submittedAt: t.attempt.submittedAt } : null,
+          }));
+          setStudentTests(results);
+        } catch {}
+      }
+
+      // Process certificate
+      if (certRes?.ok) {
+        try {
+          const data = await certRes.json();
+          if (data?.hasCertificate) {
+            setCertificate({ certificateId: data.certificateId, courseName: data.courseName, completionDate: data.completionDate });
+          }
+        } catch {}
+      }
+    })();
   }, [user, slug]);
 
   const toggleModule = (modId: string) => {

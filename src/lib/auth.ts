@@ -73,11 +73,11 @@ export async function verifySessionToken(userId: string, token: string): Promise
     return false;
   }
 
-  const newExpiresAt = new Date(Date.now() + SESSION_MAX_AGE_MS);
-  await db.session.update({
-    where: { token },
-    data: { expiresAt: newExpiresAt },
-  }).catch(() => {});
+  // PERF: Removed the session expiry update on every request.
+  // This was causing a DB write on every single page load, slowing down
+  // navigation. The session still expires after 3 days of inactivity —
+  // we just don't extend it on every page view anymore. If needed, we
+  // can re-enable this with a throttle (only update if >1h since last update).
 
   return true;
 }
