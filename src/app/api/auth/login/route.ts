@@ -93,15 +93,13 @@ export async function POST(request: NextRequest) {
 
     const secure = process.env.NODE_ENV === 'production';
 
-    // Edge with strict privacy settings blocks sameSite:'lax' cookies in
-    // some cross-origin scenarios. Use sameSite:'none' in production (requires
-    // secure:true) so Edge accepts the cookie. In dev, lax is fine.
-    const sameSite = secure ? 'none' as const : 'lax' as const;
-
+    // Use sameSite: 'lax' — this works for same-site requests (which is
+    // what we have on Vercel). 'none' was tried for Edge but actually
+    // makes things worse (Edge InPrivate blocks 'none' cookies too).
     response.cookies.set('xfoundry_session', token, {
       httpOnly: true,
       secure,
-      sameSite,
+      sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 3,
       path: '/',
     });
@@ -109,7 +107,7 @@ export async function POST(request: NextRequest) {
     response.cookies.set('xfoundry_user_id', user.id, {
       httpOnly: true,
       secure,
-      sameSite,
+      sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 3,
       path: '/',
     });

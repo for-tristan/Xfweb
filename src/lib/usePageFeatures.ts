@@ -146,6 +146,21 @@ export function usePageFeatures() {
 
   useEffect(() => {
     (async () => {
+      // Fallback for Edge/InPrivate: check sessionStorage first. If the
+      // user data is there (stored after login), use it immediately so
+      // the user doesn't appear logged out on the next page navigation.
+      try {
+        const cached = sessionStorage.getItem('xfoundry_user');
+        if (cached) {
+          const cachedUser = JSON.parse(cached);
+          setUser(cachedUser);
+          setProfileName(cachedUser.name || '');
+          setProfileUsername(cachedUser.username || '');
+          setProfilePhone(cachedUser.phone || '');
+          setProfileCompany(cachedUser.company || '');
+        }
+      } catch {}
+
       try {
         const res = await fetch('/api/auth/me');
         if (res.ok) {
@@ -156,6 +171,8 @@ export function usePageFeatures() {
             setProfileUsername(data.user.username || '');
             setProfilePhone(data.user.phone || '');
             setProfileCompany(data.user.company || '');
+            // Cache for Edge fallback
+            try { sessionStorage.setItem('xfoundry_user', JSON.stringify(data.user)); } catch {}
           }
         } else if (res.status === 403) {
           const data = await res.json();
@@ -167,6 +184,12 @@ export function usePageFeatures() {
             setAuthModalOpen(true);
             toast({ title: 'Verification Required', description: data.error });
           }
+        } else if (res.status === 401) {
+          // Cookies not sent (Edge) — but if we have sessionStorage, keep user
+          try {
+            const cached = sessionStorage.getItem('xfoundry_user');
+            if (!cached) setUser(null);
+          } catch { setUser(null); }
         }
       } catch {  }
       setLoading(false);
@@ -229,6 +252,8 @@ export function usePageFeatures() {
         setProfileUsername(data.user.username || '');
         setProfilePhone(data.user.phone || '');
         setProfileCompany(data.user.company || '');
+        // Cache for Edge fallback (cookies might not persist)
+        try { sessionStorage.setItem('xfoundry_user', JSON.stringify(data.user)); } catch {}
         setAuthModalOpen(false);
         setVerificationStep('idle');
         toast({ title: 'Welcome back!', description: `Signed in as ${data.user.name}` });
@@ -286,6 +311,7 @@ export function usePageFeatures() {
 
   const handleLogout = useCallback(async () => {
     try { await fetch('/api/auth/logout', { method: 'POST' }); } catch {  }
+    try { sessionStorage.removeItem('xfoundry_user'); } catch {}
     setUser(null);
     setDashboardOpen(false);
     setNotifOpen(false);

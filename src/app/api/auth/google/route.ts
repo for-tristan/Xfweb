@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
   response.cookies.set('oauth_state', state, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' as const : 'lax' as const,
+    sameSite: 'lax',
     maxAge: 60 * 10,
     path: '/',
   });
