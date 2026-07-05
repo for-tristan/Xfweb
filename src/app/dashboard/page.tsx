@@ -258,87 +258,82 @@ export default function DashboardPage() {
       {renderNavbar('dashboard')}
 
       {!(loading || minLoading) && <div className="page-transition-enter">
-        <section style={{ background: 'var(--black)', padding: '240px 60px 160px', position: 'relative', zIndex: 2 }}>
-          <div className="container-max" style={{ paddingLeft: isMobile ? 16 : undefined, paddingRight: isMobile ? 16 : undefined }}>
+        <section style={{ background: 'var(--black)', padding: '140px 24px 80px', position: 'relative', zIndex: 2 }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto' }}>
 
-            <div className="reveal-up" style={{ marginBottom: isMobile ? 24 : 36, display: 'flex', alignItems: 'center', gap: isMobile ? 12 : 16 }}>
-              <div style={{
-                width: isMobile ? 36 : 44, height: isMobile ? 36 : 44, borderRadius: '50%',
-                background: 'color-mix(in srgb, var(--accent) 8%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: 'var(--accent)', fontSize: 16, fontWeight: 700,
-                overflow: 'hidden', flexShrink: 0,
-              }}>
-                {user?.avatar
-                  ? <SmartImage src={user.avatar} alt="" width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  : user?.name.charAt(0).toUpperCase()
-                }
-              </div>
-              <div>
-                <h2 style={{
-                  fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: isMobile ? 15 : 18,
-                  color: 'var(--text-light)', margin: 0, letterSpacing: 0.5,
-                }}>
-                  Welcome back, {user?.name.split(' ')[0]}
-                </h2>
-                <p style={{
-                  fontSize: 12, color: 'var(--text-dim)', margin: '2px 0 0',
-                  fontFamily: "var(--font-body)",
-                }}>
-                  {user?.email}
-                </p>
+            {/* Hero greeting — large, prominent */}
+            <div className="reveal-up" style={{
+              background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
+              backdropFilter: 'blur(20px) saturate(1.6)',
+              WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
+              border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
+              borderRadius: 20, padding: isMobile ? 24 : 36, marginBottom: 20,
+              position: 'relative', overflow: 'hidden',
+            }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, transparent, var(--accent), transparent)' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                  <div style={{
+                    width: 52, height: 52, borderRadius: '50%',
+                    background: 'color-mix(in srgb, var(--accent) 8%, transparent)', border: '2px solid color-mix(in srgb, var(--accent) 25%, transparent)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    overflow: 'hidden', flexShrink: 0,
+                  }}>
+                    {user?.avatar
+                      ? <SmartImage src={user.avatar} alt="" width={52} height={52} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      : <span style={{ color: 'var(--accent)', fontSize: 20, fontWeight: 700 }}>{user?.name.charAt(0).toUpperCase()}</span>
+                    }
+                  </div>
+                  <div>
+                    <h2 style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: isMobile ? 18 : 24, color: 'var(--text-light)', margin: 0, letterSpacing: -0.3 }}>
+                      Welcome back, {user?.name.split(' ')[0]}
+                    </h2>
+                    <p style={{ fontSize: 13, color: 'var(--text-dim)', margin: '4px 0 0' }}>
+                      {user?.email}
+                    </p>
+                  </div>
+                </div>
+                {/* Inline stats — right side of hero */}
+                <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+                  {[
+                    { label: 'Enrolled', value: dataLoading ? '—' : approvedEnrollments.length, color: 'var(--accent)' },
+                    { label: 'Progress', value: dataLoading ? '—' : `${avgProgress}%`, color: 'var(--accent-purple)' },
+                    { label: 'Tests', value: dataLoading ? '—' : `${testsPassed}/${testResults.length}`, color: 'var(--success-color)' },
+                    { label: 'Study', value: dataLoading ? '—' : formatDuration(studyStats?.weekSeconds || 0), color: 'var(--warning-color)' },
+                  ].map((s, i) => (
+                    <div key={i} style={{ textAlign: 'center' }}>
+                      <div style={{ fontFamily: 'var(--font-heading)', fontSize: isMobile ? 18 : 22, fontWeight: 700, color: s.color, lineHeight: 1 }}>
+                        {s.value}
+                      </div>
+                      <div style={{ fontSize: 10, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 4, fontWeight: 600 }}>
+                        {s.label}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
+
+            {/* Asymmetric grid — courses (wide) + tests (narrow) side by side */}
             <div className="reveal-up reveal-delay-1" style={{
-              display: 'grid',
-              gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
-              gap: isMobile ? 8 : 12, marginBottom: isMobile ? 24 : 36,
+              display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.8fr 1fr', gap: 20, marginBottom: 20,
             }}>
-              <StatCard
-                label="Enrolled"
-                value={dataLoading ? '...' : approvedEnrollments.length}
-                icon="fa-book-open"
-                color="var(--accent)"
-                sub={`${enrollments.length} total`}
-                compact={isMobile}
-              />
-              <StatCard
-                label="Avg Progress"
-                value={dataLoading ? '...' : `${avgProgress}%`}
-                icon="fa-chart-pie"
-                color="var(--accent-purple)"
-                sub={`${progress.length} course${progress.length !== 1 ? 's' : ''}`}
-                compact={isMobile}
-              />
-              <StatCard
-                label="Tests Passed"
-                value={dataLoading ? '...' : testsPassed}
-                icon="fa-check-double"
-                color="var(--success-color)"
-                sub={`of ${testResults.length} taken`}
-                compact={isMobile}
-              />
-              <StatCard
-                label="Study Time"
-                value={dataLoading ? '...' : formatDuration(studyStats?.weekSeconds || 0)}
-                icon="fa-clock"
-                color="var(--warning-color)"
-                sub="this week"
-                compact={isMobile}
-              />
-            </div>
-            <div style={{
-              display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '3fr 2fr', gap: isMobile ? 16 : 20, marginBottom: isMobile ? 24 : 36,
-            }}>
-
-              <div className="reveal-up reveal-delay-2" style={{
+              {/* Enrolled courses — wide card */}
+              <div style={{
                 background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
                 backdropFilter: 'blur(20px) saturate(1.6)',
                 WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
                 border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
-                borderRadius: 12, padding: isMobile ? '18px 14px' : '24px 22px',
+                borderRadius: 16, padding: isMobile ? 18 : 24,
               }}>
-                <SectionHeader icon="fa-book-open" title="ENROLLED COURSES" />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, fontFamily: 'var(--font-body)' }}>
+                    <i className="fa-solid fa-book-open" style={{ marginRight: 6, color: 'var(--accent)' }} />Enrolled Courses
+                  </div>
+                  <Link href="/#courses" style={{ fontSize: 11, color: 'var(--accent)', textDecoration: 'none', fontWeight: 600 }}>
+                    Browse <i className="fa-solid fa-arrow-right" style={{ fontSize: 9 }} />
+                  </Link>
+                </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {dataLoading ? (
                     <>
@@ -348,9 +343,7 @@ export default function DashboardPage() {
                   ) : approvedEnrollments.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '32px 16px' }}>
                       <i className="fa-solid fa-book-open" style={{ fontSize: 28, color: 'var(--text-dim)', opacity: 0.2, display: 'block', marginBottom: 12 }} />
-                      <p style={{ fontSize: 13, color: 'var(--text-dim)', margin: 0 }}>
-                        No active courses yet.
-                      </p>
+                      <p style={{ fontSize: 13, color: 'var(--text-dim)', margin: 0 }}>No active courses yet.</p>
                       <Link href="/#courses" style={{ fontSize: 12, color: 'var(--accent)', textDecoration: 'none', fontWeight: 700, marginTop: 8, display: 'inline-block' }}>
                         Browse Programs <i className="fa-solid fa-arrow-right" style={{ fontSize: 10, marginLeft: 4 }} />
                       </Link>
@@ -365,32 +358,24 @@ export default function DashboardPage() {
                         background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)',
                         backdropFilter: 'blur(12px) saturate(1.4)',
                         WebkitBackdropFilter: 'blur(12px) saturate(1.4)',
-                        border: isComplete
-                          ? '1px solid rgba(34,197,94,0.2)'
-                          : '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
-                        borderRadius: 8, textDecoration: 'none', color: 'inherit',
+                        border: isComplete ? '1px solid rgba(34,197,94,0.2)' : '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
+                        borderRadius: 12, textDecoration: 'none', color: 'inherit',
                         transition: 'border-color 0.2s, background 0.2s',
                       }}
                         onMouseEnter={(ev) => { ev.currentTarget.style.borderColor = 'color-mix(in srgb, var(--accent) 25%, transparent)'; ev.currentTarget.style.background = 'color-mix(in srgb, var(--accent) 3%, transparent)'; }}
                         onMouseLeave={(ev) => { ev.currentTarget.style.borderColor = isComplete ? 'rgba(34,197,94,0.2)' : 'color-mix(in srgb, var(--text-light) 10%, transparent)'; ev.currentTarget.style.background = 'color-mix(in srgb, var(--card-bg) 50%, transparent)'; }}
                       >
                         <div style={{
-                          width: 36, height: 36, borderRadius: 8,
+                          width: 36, height: 36, borderRadius: 10,
                           background: isComplete ? 'rgba(34,197,94,0.1)' : 'color-mix(in srgb, var(--accent) 8%, transparent)',
                           border: isComplete ? '1px solid rgba(34,197,94,0.2)' : '1px solid color-mix(in srgb, var(--accent) 15%, transparent)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          flexShrink: 0,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                         }}>
-                          <i className={`fas ${isComplete ? 'fa-check' : 'fa-book'}`}
-                            style={{ fontSize: 13, color: isComplete ? 'var(--success-color)' : 'var(--accent)' }}
-                          />
+                          <i className={`fas ${isComplete ? 'fa-check' : 'fa-book'}`} style={{ fontSize: 13, color: isComplete ? 'var(--success-color)' : 'var(--accent)' }} />
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                            <span style={{
-                              fontSize: 13, fontWeight: 700, color: 'var(--text-light)',
-                              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                            }}>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-light)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                               {e.courseName}
                             </span>
                             {statusBadge(e.status)}
@@ -399,30 +384,13 @@ export default function DashboardPage() {
                             <div style={{ flex: 1 }}>
                               <ProgressBar pct={pct} height={4} />
                             </div>
-                            <span style={{
-                              fontSize: 10, fontWeight: 700, color: pct === 100 ? 'var(--success-color)' : 'var(--text-dim)',
-                              fontFamily: "var(--font-body)", minWidth: 32, textAlign: 'right',
-                            }}>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: pct === 100 ? 'var(--success-color)' : 'var(--text-dim)', minWidth: 32, textAlign: 'right' }}>
                               {pct}%
                             </span>
                           </div>
                         </div>
                         {isComplete && (
-                          <a
-                            href={`/api/courses/certificate?courseId=${e.courseId}&format=pdf`}
-                            target="_blank" rel="noopener noreferrer"
-                            onClick={(ev) => ev.stopPropagation() }
-                            style={{
-                              width: 30, height: 30, borderRadius: 8,
-                              background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)',
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              flexShrink: 0, textDecoration: 'none',
-                              transition: 'background 0.2s',
-                            }}
-                            title="Download Certificate"
-                            onMouseEnter={(ev) => { ev.currentTarget.style.background = 'rgba(34,197,94,0.2)'; }}
-                            onMouseLeave={(ev) => { ev.currentTarget.style.background = 'rgba(34,197,94,0.1)'; }}
-                          >
+                          <a href={`/api/courses/certificate?courseId=${e.courseId}&format=pdf`} target="_blank" rel="noopener noreferrer" onClick={(ev) => ev.stopPropagation()} style={{ width: 30, height: 30, borderRadius: 8, background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, textDecoration: 'none', transition: 'background 0.2s' }} title="Download Certificate" onMouseEnter={(ev) => { ev.currentTarget.style.background = 'rgba(34,197,94,0.2)'; }} onMouseLeave={(ev) => { ev.currentTarget.style.background = 'rgba(34,197,94,0.1)'; }}>
                             <i className="fa-solid fa-download" style={{ fontSize: 10, color: 'var(--success-color)' }} />
                           </a>
                         )}
@@ -432,14 +400,17 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <div className="reveal-up reveal-delay-3" style={{
+              {/* Test results — narrow card */}
+              <div style={{
                 background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
                 backdropFilter: 'blur(20px) saturate(1.6)',
                 WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
                 border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
-                borderRadius: 12, padding: isMobile ? '18px 14px' : '24px 22px',
+                borderRadius: 16, padding: isMobile ? 18 : 24,
               }}>
-                <SectionHeader icon="fa-clipboard-check" title="TEST RESULTS" color="var(--success-color)" />
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 16, fontFamily: 'var(--font-body)' }}>
+                  <i className="fa-solid fa-clipboard-check" style={{ marginRight: 6, color: 'var(--success-color)' }} />Test Results
+                </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {dataLoading ? (
                     <>
@@ -449,9 +420,7 @@ export default function DashboardPage() {
                   ) : testResults.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '32px 16px' }}>
                       <i className="fa-solid fa-clipboard-check" style={{ fontSize: 28, color: 'var(--text-dim)', opacity: 0.2, display: 'block', marginBottom: 12 }} />
-                      <p style={{ fontSize: 13, color: 'var(--text-dim)', margin: 0 }}>
-                        No test results yet.
-                      </p>
+                      <p style={{ fontSize: 13, color: 'var(--text-dim)', margin: 0 }}>No test results yet.</p>
                     </div>
                   ) : testResults.slice(0, 5).map((t) => {
                     const pct = t.totalPoints > 0 ? Math.round((t.score / t.totalPoints) * 100) : 0;
@@ -464,42 +433,21 @@ export default function DashboardPage() {
                         backdropFilter: 'blur(12px) saturate(1.4)',
                         WebkitBackdropFilter: 'blur(12px) saturate(1.4)',
                         border: `1px solid ${t.passed ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)'}`,
-                        borderRadius: 8,
+                        borderRadius: 10,
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                          <span style={{
-                            fontSize: 13, fontWeight: 700, color: 'var(--text-light)',
-                            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1, marginRight: 8,
-                          }}>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-light)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1, marginRight: 8 }}>
                             {t.testTitle}
                           </span>
-                          <span style={{
-                            padding: '2px 8px', borderRadius: 999, fontSize: 8, fontWeight: 600,
-                            textTransform: 'uppercase', letterSpacing: 0.5,
-                            background: t.passed ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)',
-                            color: t.passed ? 'var(--success-color)' : 'var(--error-color)',
-                            border: `1px solid ${t.passed ? 'rgba(34,197,94,0.25)' : 'rgba(239,68,68,0.25)'}`,
-                            flexShrink: 0,
-                          }}>
+                          <span style={{ padding: '2px 8px', borderRadius: 999, fontSize: 8, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, background: t.passed ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)', color: t.passed ? 'var(--success-color)' : 'var(--error-color)', border: `1px solid ${t.passed ? 'rgba(34,197,94,0.25)' : 'rgba(239,68,68,0.25)'}`, flexShrink: 0 }}>
                             {t.passed ? 'Passed' : 'Failed'}
                           </span>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>
-                            {t.moduleTitle} &middot; {timeStr}
+                          <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>{t.moduleTitle} · {timeStr}</span>
+                          <span style={{ fontFamily: 'var(--font-heading)', fontSize: 14, fontWeight: 700, color: t.passed ? 'var(--success-color)' : 'var(--error-color)' }}>
+                            {pct}%
                           </span>
-                          <div style={{ display: 'flex', alignItems: 'baseline', gap: 3 }}>
-                            <span style={{
-                              fontFamily: "var(--font-heading)", fontSize: 15, fontWeight: 700,
-                              color: t.passed ? 'var(--success-color)' : 'var(--error-color)',
-                            }}>
-                              {pct}
-                            </span>
-                            <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>%</span>
-                            <span style={{ fontSize: 9, color: 'var(--text-dim)', marginLeft: 6, opacity: 0.6 }}>
-                              ({t.score}/{t.totalPoints})
-                            </span>
-                          </div>
                         </div>
                       </div>
                     );
@@ -507,30 +455,30 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
-            <div className="reveal-up reveal-delay-4" style={{
+
+            {/* Study activity — full width, different internal layout */}
+            <div className="reveal-up reveal-delay-2" style={{
               background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
               backdropFilter: 'blur(20px) saturate(1.6)',
               WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
               border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
-              borderRadius: 12, padding: isMobile ? '18px 14px' : '24px 22px',
+              borderRadius: 16, padding: isMobile ? 18 : 24,
             }}>
-              <SectionHeader icon="fa-fire" title="STUDY ACTIVITY" color="var(--warning-color)" />
-
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, fontFamily: 'var(--font-body)' }}>
+                  <i className="fa-solid fa-fire" style={{ marginRight: 6, color: 'var(--warning-color)' }} />Study Activity
+                </div>
+              </div>
               {dataLoading ? (
                 <Skeleton w="100%" h="140px" />
               ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 280px', gap: isMobile ? 20 : 28 }}>
                   <div>
-                    <div style={{
-                      fontSize: 10, fontWeight: 700, color: 'var(--text-dim)',
-                      textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 16,
-                      fontFamily: "var(--font-body)",
-                    }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 16, fontFamily: 'var(--font-body)' }}>
                       This Week
                     </div>
                     <WeekChart sessions={studyStats?.sessions || []} />
                   </div>
-
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {[
                       { label: 'Today', value: formatDuration(studyStats?.todaySeconds || 0), icon: 'fa-sun', color: 'var(--warning-color)' },
@@ -544,30 +492,16 @@ export default function DashboardPage() {
                         backdropFilter: 'blur(12px) saturate(1.4)',
                         WebkitBackdropFilter: 'blur(12px) saturate(1.4)',
                         border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
-                        borderRadius: 8,
+                        borderRadius: 10,
                       }}>
-                        <div style={{
-                          width: 28, height: 28, borderRadius: 8,
-                          background: `color-mix(in srgb, ${s.color} 7%, transparent)`, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        }}>
+                        <div style={{ width: 28, height: 28, borderRadius: 8, background: `color-mix(in srgb, ${s.color} 7%, transparent)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <i className={`fas ${s.icon}`} style={{ fontSize: 10, color: s.color }} />
                         </div>
                         <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 9, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 600 }}>
-                            {s.label}
-                          </div>
-                          {s.sub && (
-                            <div style={{ fontSize: 9, color: 'var(--text-dim)', opacity: 0.6, marginTop: 1 }}>
-                              {s.sub}
-                            </div>
-                          )}
+                          <div style={{ fontSize: 9, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 600 }}>{s.label}</div>
+                          {s.sub && <div style={{ fontSize: 9, color: 'var(--text-dim)', opacity: 0.6, marginTop: 1 }}>{s.sub}</div>}
                         </div>
-                        <span style={{
-                          fontFamily: "var(--font-heading)", fontSize: 14, fontWeight: 700,
-                          color: 'var(--text-light)',
-                        }}>
-                          {s.value}
-                        </span>
+                        <span style={{ fontFamily: 'var(--font-heading)', fontSize: 14, fontWeight: 700, color: 'var(--text-light)' }}>{s.value}</span>
                       </div>
                     ))}
                   </div>

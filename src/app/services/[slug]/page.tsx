@@ -237,91 +237,96 @@ export default function DynamicServicePage() {
 
       {!(loading || minLoading) && <div className="page-transition-enter">
 
-      <section style={{ background: 'var(--black)', padding: '240px 60px 80px', position: 'relative', overflow: 'hidden', zIndex: 2 }}>
-        <div className="container-max" style={{ paddingLeft: isMobile ? 16 : undefined, paddingRight: isMobile ? 16 : undefined }}>
-          <div style={{ marginBottom: 32 }}>
-            <div className="breadcrumb" style={{ marginBottom: 16 }}>
-              <Link href="/" style={{ color: 'var(--text-dim)' }}>Home</Link> <span>/</span> <Link href="/#services" style={{ color: 'var(--text-dim)' }}>Services</Link> <span>/</span> <span style={{ color: 'var(--text-light)' }}>{service.title}</span>
-            </div>
-            <h1 style={{ fontFamily: "var(--font-heading)", fontSize: 36, fontWeight: 800, color: 'var(--text-light)' }}>
+      {/* Split hero — left: title + desc, right: quick actions */}
+      <section className="reveal-up" style={{ background: 'var(--black)', padding: '160px 24px 40px', position: 'relative', overflow: 'hidden', zIndex: 2 }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.5fr 1fr', gap: 40, alignItems: 'center' }}>
+          <div>
+            <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: isMobile ? 32 : 44, fontWeight: 800, color: 'var(--text-light)', letterSpacing: -1, lineHeight: 1.1, marginBottom: 16 }}>
               <span className="v-highlight">{service.title}</span>
             </h1>
+            {service.description && (
+              <p style={{ fontSize: isMobile ? 15 : 17, lineHeight: 1.6, color: 'var(--text-dim)', maxWidth: 480 }}>
+                {service.description}
+              </p>
+            )}
           </div>
-          <div className="service-layout">
-            <div className="service-main reveal-up">
-              <h2>What We Deliver</h2>
-              {service.description && <p>{service.description}</p>}
-
-              {service.features && service.features.length > 0 && (
-                <>
-                  <h2 style={{ marginTop: 40 }}>Service Features</h2>
-                  <ul className="feature-list">
-                    {service.features.map((feature) => (
-                      <li key={feature.id}>
-                        {feature.icon && <i className={feature.icon} />}
-                        {' '}
-                        {!feature.icon && <i className="fa-solid fa-check-circle" />}
-                        {' '}
-                        <strong>{feature.title}</strong>
-                        {feature.description ? ` — ${feature.description}` : ''}
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
+          <div style={{
+            background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
+            backdropFilter: 'blur(20px) saturate(1.6)',
+            WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
+            border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
+            borderRadius: 16, padding: 28,
+          }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 20, fontFamily: 'var(--font-body)' }}>
+              Get started
             </div>
-
-            <aside className="sidebar reveal-up reveal-delay-1">
-              <div className="sidebar-card">
-                <h3>Quick Actions</h3>
-                <Link
-                  href="/#contact"
-                  onClick={(e) => {
-  e.preventDefault();
-  router.push('/');
-  const check = setInterval(() => {
-    const el = document.getElementById('contact');
-    if (el) {
-      clearInterval(check);
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, 500);
-  setTimeout(() => clearInterval(check), 5000);
-
-                  }}
-                  className="v-quick-action-link"
-                >
-                  <i className="fa-solid fa-paper-plane" />
-                  <span>Request a Service</span>
-                  <i className="fa-solid fa-arrow-right" />
-                </Link>
-                <Link
-                  href="/#projects"
-                  onClick={(e) => {
-  e.preventDefault();
-  router.push('/');
-  const check = setInterval(() => {
-    const el = document.getElementById('projects');
-    if (el) {
-      clearInterval(check);
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, 500);
-  setTimeout(() => clearInterval(check), 5000);
-
-                  }}
-                  className="v-quick-action-link"
-                >
-                  <i className="fa-solid fa-eye" />
-                  <span>View Projects</span>
-                  <i className="fa-solid fa-arrow-right" />
-                </Link>
-              </div>
-            </aside>
+            <Link
+              href="/#contact"
+              onClick={(e) => { e.preventDefault(); router.push('/'); const check = setInterval(() => { const el = document.getElementById('contact'); if (el) { clearInterval(check); el.scrollIntoView({ behavior: 'smooth' }); } }, 500); setTimeout(() => clearInterval(check), 5000); }}
+              className="btn btn-primary"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%', marginBottom: 10, padding: '14px 20px', borderRadius: 12 }}
+            >
+              <i className="fa-solid fa-paper-plane" /> Request a Service
+            </Link>
+            <Link
+              href="/#projects"
+              onClick={(e) => { e.preventDefault(); router.push('/'); const check = setInterval(() => { const el = document.getElementById('projects'); if (el) { clearInterval(check); el.scrollIntoView({ behavior: 'smooth' }); } }, 500); setTimeout(() => clearInterval(check), 5000); }}
+              className="btn btn-secondary"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%', padding: '14px 20px', borderRadius: 12 }}
+            >
+              <i className="fa-solid fa-eye" /> View Projects
+            </Link>
           </div>
         </div>
       </section>
 
+      {/* Feature cards — masonry-style grid */}
+      {service.features && service.features.length > 0 && (
+        <section className="reveal-up reveal-delay-1" style={{ background: 'var(--black)', padding: '40px 24px 80px' }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+            <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 800, color: 'var(--text-light)', marginBottom: 24, letterSpacing: -0.5 }}>
+              What we deliver
+            </h2>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 16 }}>
+              {service.features.map((feature, idx) => (
+                <div
+                  key={feature.id}
+                  className="reveal-up"
+                  style={{
+                    background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
+                    backdropFilter: 'blur(20px) saturate(1.6)',
+                    WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
+                    border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
+                    borderRadius: 16, padding: 24,
+                    transitionDelay: `${idx * 50}ms`,
+                    display: 'flex', flexDirection: 'column', gap: 12,
+                  }}
+                >
+                  <div style={{
+                    width: 44, height: 44, borderRadius: 12,
+                    background: 'color-mix(in srgb, var(--accent) 8%, transparent)',
+                    border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: 'var(--accent)', fontSize: 18,
+                  }}>
+                    <i className={feature.icon || 'fa-solid fa-check'} />
+                  </div>
+                  <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-light)', margin: 0 }}>
+                    {feature.title}
+                  </h3>
+                  {feature.description && (
+                    <p style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6, margin: 0 }}>
+                      {feature.description}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* CTA — centered */}
       <section className="cta-section">
         <div className="cta-content reveal-up">
           <h2>Have a Project in Mind?</h2>
@@ -329,37 +334,14 @@ export default function DynamicServicePage() {
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link
               href="/#contact"
-              onClick={(e) => {
-  e.preventDefault();
-  router.push('/');
-  const check = setInterval(() => {
-    const el = document.getElementById('contact');
-    if (el) {
-      clearInterval(check);
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, 500);
-  setTimeout(() => clearInterval(check), 5000);
-
-              }}
+              onClick={(e) => { e.preventDefault(); router.push('/'); const check = setInterval(() => { const el = document.getElementById('contact'); if (el) { clearInterval(check); el.scrollIntoView({ behavior: 'smooth' }); } }, 500); setTimeout(() => clearInterval(check), 5000); }}
               className="btn btn-primary"
             >
               <i className="fa-solid fa-paper-plane" /> Get a Quote
             </Link>
             <Link
               href="/#projects"
-               onClick={(e) => {
-  e.preventDefault();
-  router.push('/');
-  const check = setInterval(() => {
-    const el = document.getElementById('projects');
-    if (el) {
-      clearInterval(check);
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, 500);
-  setTimeout(() => clearInterval(check), 5000);
-              }}
+              onClick={(e) => { e.preventDefault(); router.push('/'); const check = setInterval(() => { const el = document.getElementById('projects'); if (el) { clearInterval(check); el.scrollIntoView({ behavior: 'smooth' }); } }, 500); setTimeout(() => clearInterval(check), 5000); }}
               className="btn btn-secondary"
             >
               <i className="fa-solid fa-eye" /> View Projects
