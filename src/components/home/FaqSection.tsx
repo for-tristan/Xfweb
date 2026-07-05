@@ -19,7 +19,7 @@ const FAQ_ITEMS = [
     a: 'Yes! For now since we are in our pre-production phase, all courses are completely free of charge.',
   },
   {
-    q: 'What technologies do you work with?',
+    q: 'What technologies do We work with?',
     a: 'We specialize in various technologies including python, java, Frontend Development, and Backend Development, Software Engineering, and more.',
   },
   {

@@ -66,11 +66,11 @@ function AuthContent() {
 
   useEffect(() => {
     try {
-      const t = localStorage.getItem('x-foundry-theme') || 'oled';
+      const t = localStorage.getItem('x-foundry-theme') || 'light';
       document.documentElement.setAttribute('data-theme', t);
     } catch {
       // localStorage blocked (Edge strict privacy, Safari private mode)
-      document.documentElement.setAttribute('data-theme', 'oled');
+      document.documentElement.setAttribute('data-theme', 'light');
     }
   }, []);
 

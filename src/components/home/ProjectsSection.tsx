@@ -43,7 +43,7 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
         <p>{project.description}</p>
         {project.projectUrl ? (
           <a href={project.projectUrl} target="_blank" rel="noopener noreferrer" className="v-project-link">
-            View Case Study →
+            View Project →
           </a>
         ) : null}
       </div>

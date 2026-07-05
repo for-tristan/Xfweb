@@ -67,7 +67,9 @@ export default function ScrollFadeSection({
     if (rect.top > 0) {
       state = 'unpinned';
       progress = 0;
-    } else if (rect.bottom < innerHeight) {
+    } else if (rect.bottom < innerHeight + 4) {
+      // +4px hysteresis: only switch to 'past' when clearly scrolled past,
+      // prevents flicker between pinned/past near the boundary.
       state = 'past';
       progress = 1;
     } else {

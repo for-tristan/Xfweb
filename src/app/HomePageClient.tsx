@@ -475,7 +475,7 @@ export default function Home({
 
   const [theme, setTheme] = useState<string>(() => {
     if (typeof window === 'undefined') return 'light';
-    const saved = safeGetItem('x-foundry-theme') || 'oled';
+    const saved = safeGetItem('x-foundry-theme') || 'light';
     if (saved === 'dark' || saved === 'vaulta') return 'light';
     return saved;
   });

@@ -83,7 +83,7 @@ export function usePageFeatures() {
 
   const [theme, setTheme] = useState<string>(() => {
     if (typeof window === 'undefined') return 'light';
-    return safeGetItem('x-foundry-theme') || 'oled';
+    return safeGetItem('x-foundry-theme') || 'light';
   });
 
   const [scrolled, setScrolled] = useState(false);

@@ -399,7 +399,7 @@ export default function DynamicCoursePage() {
       <Link href="/" className="nav-logo" style={{ display: 'inline-block', marginBottom: 20 }}><Logo className="nav-logo-img" style={{ height: 40 }} /></Link>
       <p>Pioneering the future of technology through innovation, research, and education. Building solutions that transform industries and empower human potential.</p>
       <div className="v-footer-socials">
-        <a href="https://www.linkedin.com/in/marwan-montaser-067054387/" target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-linkedin-in" /></a>
+        <a href="https://www.linkedin.com/company/126753897/?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base%3BjRSUxcNJRbuVe74c5IsdTA%3D%3D" target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-linkedin-in" /></a>
         <a href="https://github.com/for-tristan" target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-github" /></a>
         <a href="https://discord.gg/TVRxJg3rcN" target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-discord" /></a>
       </div>
@@ -428,7 +428,7 @@ export default function DynamicCoursePage() {
       <h4>Contact</h4>
       <ul className="v-footer-links">
         <li><a href="mailto:xfoundationcom@gmail.com">xfoundationcom@gmail.com</a></li>
-        <li><a href="tel:+201234567890">+201234567890</a></li>
+        <li><a href="tel:+201040394896">+201040394896</a></li>
       </ul>
     </div>
   </div>
@@ -689,7 +689,7 @@ export default function DynamicCoursePage() {
       <Link href="/" className="nav-logo" style={{ display: 'inline-block', marginBottom: 20 }}><Logo className="nav-logo-img" style={{ height: 40 }} /></Link>
       <p>Pioneering the future of technology through innovation, research, and education. Building solutions that transform industries and empower human potential.</p>
       <div className="v-footer-socials">
-        <a href="https://www.linkedin.com/in/marwan-montaser-067054387/" target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-linkedin-in" /></a>
+        <a href="https://www.linkedin.com/company/126753897/?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base%3BjRSUxcNJRbuVe74c5IsdTA%3D%3D" target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-linkedin-in" /></a>
         <a href="https://github.com/for-tristan" target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-github" /></a>
         <a href="https://discord.gg/TVRxJg3rcN" target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-discord" /></a>
       </div>
@@ -718,7 +718,7 @@ export default function DynamicCoursePage() {
       <h4>Contact</h4>
       <ul className="v-footer-links">
         <li><a href="mailto:xfoundationcom@gmail.com">xfoundationcom@gmail.com</a></li>
-        <li><a href="tel:+201234567890">+201234567890</a></li>
+        <li><a href="tel:+201040394896">+201040394896</a></li>
       </ul>
     </div>
   </div>

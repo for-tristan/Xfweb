@@ -14,12 +14,12 @@ export const SITE = {
 
 export const CONTACT = {
   email: 'xfoundationcom@gmail.com',
-  phone: '+201234567890',
+  phone: '+201040394896',
   businessHours: 'Sun - Thu: 9:00 AM - 6:00 PM EET',
 } as const;
 
 export const SOCIAL = {
-  linkedin: 'https://www.linkedin.com/in/marwan-montaser-067054387/',
+  linkedin: 'https://www.linkedin.com/company/126753897/?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base%3BjRSUxcNJRbuVe74c5IsdTA%3D%3D',
   github: 'https://github.com/for-tristan',
   discord: 'https://discord.gg/TVRxJg3rcN',
 } as const;
