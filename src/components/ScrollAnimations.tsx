@@ -1,10 +1,15 @@
 'use client';
 import { useEffect, useRef, useCallback, ReactNode } from 'react';
 
+// Firefox detection — skip ALL scroll-based reveal animations on Firefox
+// to prevent scroll jumps. Firefox's compositor can't handle the
+// IntersectionObserver + transform combination without main-thread reflow.
+const isFirefox = typeof navigator !== 'undefined' && /Firefox/i.test(navigator.userAgent);
 
 function useRevealOnScroll(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
+    if (isFirefox) return; // Skip on Firefox
     const el = ref.current;
     if (!el) return;
     const obs = new IntersectionObserver(
@@ -31,6 +36,7 @@ export function SectionReveal({ children, direction = 'up', delay = 0, className
 }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
+    if (isFirefox) return; // Skip on Firefox — no reveal class, no observer
     const el = ref.current;
     if (!el) return;
     const dirClass = direction === 'down' ? 'reveal-up' : `reveal-${direction}`;
@@ -61,6 +67,7 @@ export function StaggerReveal({ children, className = '', staggerDelay = 80, dir
 }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
+    if (isFirefox) return; // Skip on Firefox — no reveal class, no observer
     const el = ref.current;
     if (!el) return;
     const dirClass = direction === 'left' ? 'reveal-left' : direction === 'scale' ? 'reveal-scale' : 'reveal-up';

@@ -972,7 +972,9 @@ export default function Home({
         <div className="xf-loader"><div className="xf-loader-dot" /><div className="xf-loader-dot" /><div className="xf-loader-dot" /></div>
       ) : (
       <>
-      <ScrollProgressBar />
+      {/* ScrollProgressBar skipped on Firefox — its scroll listener reads
+          layout properties that cause main-thread reflow = scroll jumps */}
+      {!isFirefox && <ScrollProgressBar />}
       {!atBottom && (
         <GradualBlur
           target="page"
