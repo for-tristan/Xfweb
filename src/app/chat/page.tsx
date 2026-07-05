@@ -891,10 +891,10 @@ function ChatContent() {
         }
 
         .zai-suggestions-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 10px;
-          max-width: 560px;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          max-width: 480px;
           width: 100%;
         }
         .zai-suggest-card {

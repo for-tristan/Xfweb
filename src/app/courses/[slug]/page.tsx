@@ -486,8 +486,8 @@ export default function DynamicCoursePage() {
 
       {!(loading || minLoading) && <div className="page-transition-enter">
 
-      <section style={{ background: 'var(--black)', padding: '240px 60px 80px', position: 'relative', overflow: 'hidden', zIndex: 2 }}>
-        <div className="container-max" style={{ paddingLeft: isMobile ? 16 : undefined, paddingRight: isMobile ? 16 : undefined }}>
+      <section style={{ background: 'var(--black)', padding: '160px 60px 40px', position: 'relative', overflow: 'hidden', zIndex: 2 }}>
+        <div className="container-max" style={{ paddingLeft: isMobile ? 16 : undefined, paddingRight: isMobile ? 16 : undefined, maxWidth: 800, margin: '0 auto' }}>
           <div style={{ marginBottom: 32 }}>
             <div className="breadcrumb" style={{ marginBottom: 16 }}>
               <Link href="/" style={{ color: 'var(--text-dim)' }}>Home</Link> <span>/</span> <Link href="/#courses" style={{ color: 'var(--text-dim)' }}>Programs</Link> <span>/</span> <span style={{ color: 'var(--text-light)' }}>{course.title}</span>
@@ -505,7 +505,7 @@ export default function DynamicCoursePage() {
               <div className="meta-pill"><i className="fa-solid fa-tag" /> {course.price}</div>
             </div>
           </div>
-          <div className="course-layout">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
             <div className="course-main reveal-up">
               <h2>About This Course</h2>
               <p>{course.description}</p>

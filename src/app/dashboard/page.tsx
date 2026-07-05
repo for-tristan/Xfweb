@@ -258,7 +258,7 @@ export default function DashboardPage() {
       {renderNavbar('dashboard')}
 
       {!(loading || minLoading) && <div className="page-transition-enter">
-        <section style={{ background: 'var(--black)', padding: '240px 60px 160px', position: 'relative', zIndex: 2 }}>
+        <section style={{ background: 'var(--black)', padding: '160px 60px 80px', position: 'relative', zIndex: 2 }}>
           <div className="container-max" style={{ paddingLeft: isMobile ? 16 : undefined, paddingRight: isMobile ? 16 : undefined }}>
 
             <div className="reveal-up" style={{ marginBottom: isMobile ? 24 : 36, display: 'flex', alignItems: 'center', gap: isMobile ? 12 : 16 }}>
@@ -291,8 +291,7 @@ export default function DashboardPage() {
             </div>
             <div className="reveal-up reveal-delay-1" style={{
               display: 'grid',
-              gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
-              gap: isMobile ? 8 : 12, marginBottom: isMobile ? 24 : 36,
+              gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 8 : 12, marginBottom: isMobile ? 24 : 36,
             }}>
               <StatCard
                 label="Enrolled"
@@ -328,7 +327,7 @@ export default function DashboardPage() {
               />
             </div>
             <div style={{
-              display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '3fr 2fr', gap: isMobile ? 16 : 20, marginBottom: isMobile ? 24 : 36,
+              display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 16 : 20, marginBottom: isMobile ? 24 : 36,
             }}>
 
               <div className="reveal-up reveal-delay-2" style={{

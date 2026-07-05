@@ -256,170 +256,161 @@ export default function StudyFocusPage() {
       <AuthGate loading={loading} minLoading={minLoading} user={user} onSignIn={() => openAuthModal('signin', 'Sign in to access Study Focus')} onSignUp={() => openAuthModal('signup')} />
 
       {!(loading || minLoading) && <div className="page-transition-enter">
-        <section style={{ background: 'var(--black)', padding: `${isMobile ? '200px 16px' : '240px 60px'} 160px`, position: 'relative', zIndex: 2 }}>
-          <div className="container-max">
-            <div className="study-focus-grid">
-              <div className="reveal-up reveal-delay-1 study-card" style={{
-                background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
-                backdropFilter: 'blur(20px) saturate(1.6)',
-                WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
-                border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
-                borderRadius: 12,
-                padding: 24, position: 'relative', overflow: 'hidden',
-                display: 'flex', flexDirection: 'column', minHeight: 480,
-              }}>
-                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: timerRunning ? 'var(--accent)' : 'transparent', transition: 'background 0.3s' }} />
-                <h3 style={{ fontFamily: "var(--font-heading)", fontSize: 18, fontWeight: 700, color: 'var(--text-light)', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <i className="fa-solid fa-crosshairs" style={{ color: 'var(--accent)', fontSize: 16 }} />
-                  Study Focus
-                </h3>
+        <section style={{ background: 'var(--black)', padding: `${isMobile ? '160px 16px' : '180px 60px'} 80px`, position: 'relative', zIndex: 2 }}>
+          <div className="container-max" style={{ maxWidth: 900, margin: '0 auto' }}>
 
-                {!user && (
-                  <div style={{ padding: '16px 20px', background: 'color-mix(in srgb, var(--accent) 5%, transparent)', border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', borderRadius: 8, fontSize: 13, color: 'var(--text-dim)', textAlign: 'center', fontFamily: "var(--font-body)", marginBottom: 24 }}>
-                    <i className="fa-solid fa-lock" style={{ marginRight: 8, color: 'var(--accent)' }} />
-                    <span style={{ cursor: 'pointer', color: 'var(--accent)', fontWeight: 600 }} onClick={() => openAuthModal('signin', 'Sign in to start tracking study sessions')}>Sign in</span>
-                    {' '}to start tracking your study time
+            {/* Timer hero — full width, centered */}
+            <div className="reveal-up reveal-delay-1" style={{
+              background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
+              backdropFilter: 'blur(20px) saturate(1.6)',
+              WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
+              border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
+              borderRadius: 16,
+              padding: '48px 32px',
+              position: 'relative', overflow: 'hidden',
+              textAlign: 'center',
+            }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: timerRunning ? 'var(--accent)' : 'transparent', transition: 'background 0.3s' }} />
+
+              {!user && (
+                <div style={{ padding: '12px 20px', background: 'color-mix(in srgb, var(--accent) 5%, transparent)', border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)', borderRadius: 8, fontSize: 13, color: 'var(--text-dim)', textAlign: 'center', fontFamily: "var(--font-body)", marginBottom: 24, display: 'inline-block' }}>
+                  <i className="fa-solid fa-lock" style={{ marginRight: 8, color: 'var(--accent)' }} />
+                  <span style={{ cursor: 'pointer', color: 'var(--accent)', fontWeight: 600 }} onClick={() => openAuthModal('signin', 'Sign in to start tracking study sessions')}>Sign in</span>
+                  {' '}to start tracking your study time
+                </div>
+              )}
+
+              <div style={{ position: 'relative', padding: '20px 0' }}>
+                {timerRunning && (
+                  <div style={{
+                    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'radial-gradient(ellipse at center, color-mix(in srgb, var(--accent) 4%, transparent) 0%, transparent 70%)',
+                    pointerEvents: 'none',
+                  }} />
+                )}
+                <div className="study-timer-display" style={{
+                  fontFamily: "var(--font-heading)", fontSize: isMobile ? 48 : 72, fontWeight: 600,
+                  color: timerRunning ? 'var(--accent)' : 'var(--text-light)',
+                  letterSpacing: 0.5, lineHeight: 1, transition: 'color 0.3s',
+                  textShadow: timerRunning ? '0 0 60px color-mix(in srgb, var(--accent) 30%, transparent)' : 'none',
+                  position: 'relative',
+                }}>
+                  {formatTimer(timerSeconds)}
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 16, fontWeight: 600, letterSpacing: 0.5, textTransform: 'uppercase', fontFamily: "var(--font-body)" }}>
+                  {timerRunning ? 'Session in progress...' : 'Ready to focus'}
+                </div>
+                {timerRunning && (
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 20 }}>
+                    {[0, 1, 2].map((i) => (
+                      <div key={i} style={{
+                        width: 8, height: 8, borderRadius: '50%', background: 'var(--accent)',
+                        animation: `pulse 1.5s ease-in-out ${i * 0.3}s infinite`,
+                      }} />
+                    ))}
                   </div>
                 )}
-                <div className="study-timer-padding" style={{
-                  textAlign: 'center', padding: '20px 0',
-                  position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  {timerRunning && (
-                    <div style={{
-                      position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                      background: 'radial-gradient(ellipse at center, color-mix(in srgb, var(--accent) 4%, transparent) 0%, transparent 70%)',
-                      pointerEvents: 'none',
-                    }} />
-                  )}
-                  <div className="study-timer-display" style={{
-                    fontFamily: "var(--font-heading)", fontSize: isMobile ? 32 : 56, fontWeight: 600,
-                    color: timerRunning ? 'var(--accent)' : 'var(--text-light)',
-                    letterSpacing: 0.5, lineHeight: 1, transition: 'color 0.3s',
-                    textShadow: timerRunning ? '0 0 60px color-mix(in srgb, var(--accent) 30%, transparent)' : 'none',
-                    position: 'relative',
-                  }}>
-                    {formatTimer(timerSeconds)}
-                  </div>
-                  <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 16, fontWeight: 600, letterSpacing: 0.5, textTransform: 'uppercase', fontFamily: "var(--font-body)" }}>
-                    {timerRunning ? 'Session in progress...' : 'Ready to focus'}
-                  </div>
-                  {timerRunning && (
-                    <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 20 }}>
-                      {[0, 1, 2].map((i) => (
-                        <div key={i} style={{
-                          width: 8, height: 8, borderRadius: '50%', background: 'var(--accent)',
-                          animation: `pulse 1.5s ease-in-out ${i * 0.3}s infinite`,
-                        }} />
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div style={{ marginTop: 'auto', paddingTop: 16, borderTop: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)' }}>
-                  <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
-                    {!timerRunning ? (
+              </div>
+
+              {/* Buttons + stats — horizontal strip */}
+              <div style={{ marginTop: 32, paddingTop: 24, borderTop: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)' }}>
+                <div style={{ display: 'flex', gap: 12, marginBottom: 20, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  {!timerRunning ? (
+                    <button
+                      onClick={handleStart}
+                      disabled={!user}
+                      style={{
+                        padding: '12px 32px', borderRadius: 10, border: '0.5px solid color-mix(in srgb, var(--accent) 25%, transparent)',
+                        background: user ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'color-mix(in srgb, var(--accent) 5%, transparent)',
+                        backdropFilter: 'blur(12px) saturate(1.4)',
+                        WebkitBackdropFilter: 'blur(12px) saturate(1.4)',
+                        color: user ? 'var(--accent)' : 'var(--text-dim)',
+                        fontSize: 14, fontWeight: 700, cursor: user ? 'pointer' : 'not-allowed',
+                        fontFamily: "var(--font-heading)", letterSpacing: 0.02, transition: 'all 0.2s',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                      }}
+                      onMouseEnter={(e) => { if (user) e.currentTarget.style.background = 'color-mix(in srgb, var(--accent) 20%, transparent)'; }}
+                      onMouseLeave={(e) => { if (user) e.currentTarget.style.background = 'color-mix(in srgb, var(--accent) 10%, transparent)'; }}
+                    >
+                      <i className="fa-solid fa-play" style={{ fontSize: 12 }} />
+                      Start Session
+                    </button>
+                  ) : (
+                    <>
                       <button
-                        onClick={handleStart}
-                        disabled={!user}
+                        onClick={handleStop}
                         style={{
-                          flex: 1, padding: '12px 20px', borderRadius: 10, border: '0.5px solid color-mix(in srgb, var(--accent) 25%, transparent)',
-                          background: user ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'color-mix(in srgb, var(--accent) 5%, transparent)',
-                          backdropFilter: 'blur(12px) saturate(1.4)',
-                          WebkitBackdropFilter: 'blur(12px) saturate(1.4)',
-                          color: user ? 'var(--accent)' : 'var(--text-dim)',
-                          fontSize: 14, fontWeight: 700, cursor: user ? 'pointer' : 'not-allowed',
+                          padding: '12px 32px', borderRadius: 10, border: '0.5px solid color-mix(in srgb, var(--accent) 25%, transparent)',
+                          background: 'var(--accent)', color: 'var(--text-light)',
+                          fontSize: 14, fontWeight: 700, cursor: 'pointer',
                           fontFamily: "var(--font-heading)", letterSpacing: 0.02, transition: 'all 0.2s',
                           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
                         }}
-                        onMouseEnter={(e) => { if (user) e.currentTarget.style.background = 'color-mix(in srgb, var(--accent) 20%, transparent)'; }}
-                        onMouseLeave={(e) => { if (user) e.currentTarget.style.background = 'color-mix(in srgb, var(--accent) 10%, transparent)'; }}
                       >
-                        <i className="fa-solid fa-play" style={{ fontSize: 12 }} />
-                        Start Session
+                        <i className="fa-solid fa-stop" style={{ fontSize: 12 }} />
+                        Stop &amp; Save
                       </button>
-                    ) : (
-                      <>
-                        <button
-                          onClick={handleStop}
-                          style={{
-                            flex: 1, padding: '12px 20px', borderRadius: 10, border: '0.5px solid color-mix(in srgb, var(--accent) 25%, transparent)',
-                            background: 'var(--accent)', color: 'var(--text-light)',
-                            fontSize: 14, fontWeight: 700, cursor: 'pointer',
-                            fontFamily: "var(--font-heading)", letterSpacing: 0.02, transition: 'all 0.2s',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                          }}
-                        >
-                          <i className="fa-solid fa-stop" style={{ fontSize: 12 }} />
-                          Stop &amp; Save
-                        </button>
-                        <button
-                          onClick={handleReset}
-                          style={{
-                            padding: '12px 16px', borderRadius: 10,
-                            border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
-                            background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)',
-                            backdropFilter: 'blur(12px) saturate(1.4)',
-                            WebkitBackdropFilter: 'blur(12px) saturate(1.4)',
-                            color: 'var(--text-dim)',
-                            fontSize: 14, fontWeight: 600, cursor: 'pointer',
-                            fontFamily: "var(--font-heading)", letterSpacing: 0.02, transition: 'all 0.2s',
-                          }}
-                          title="Reset Timer"
-                        >
-                          <i className="fa-solid fa-redo" />
-                        </button>
-                      </>
-                    )}
-                  </div>
+                      <button
+                        onClick={handleReset}
+                        style={{
+                          padding: '12px 20px', borderRadius: 10,
+                          border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
+                          background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)',
+                          backdropFilter: 'blur(12px) saturate(1.4)',
+                          WebkitBackdropFilter: 'blur(12px) saturate(1.4)',
+                          color: 'var(--text-dim)',
+                          fontSize: 14, fontWeight: 600, cursor: 'pointer',
+                          fontFamily: "var(--font-heading)", letterSpacing: 0.02, transition: 'all 0.2s',
+                        }}
+                        title="Reset Timer"
+                      >
+                        <i className="fa-solid fa-redo" />
+                      </button>
+                    </>
+                  )}
+                </div>
 
-                  <div className="study-stats-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                    <div className="study-stats-box" style={{
-                      background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)',
-                      backdropFilter: 'blur(12px) saturate(1.4)',
-                      WebkitBackdropFilter: 'blur(12px) saturate(1.4)',
-                      border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
-                      borderRadius: 12, padding: 16,
-                    }}>
-                      <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8, fontFamily: "var(--font-body)" }}>
-                        <i className="fa-solid fa-calendar-day" style={{ marginRight: 6, color: 'var(--accent)' }} />Today
-                      </div>
-                      <div className="study-stats-value" style={{ fontFamily: "var(--font-heading)", fontSize: 20, fontWeight: 700, color: 'var(--text-light)' }}>
-                        {statsLoading ? <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 14 }} /> : formatHours(todaySeconds)}
-                      </div>
+                {/* Stats — horizontal, inline */}
+                <div style={{ display: 'flex', gap: 32, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4, fontFamily: "var(--font-body)" }}>
+                      <i className="fa-solid fa-calendar-day" style={{ marginRight: 6, color: 'var(--accent)' }} />Today
                     </div>
-                    <div className="study-stats-box" style={{
-                      background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)',
-                      backdropFilter: 'blur(12px) saturate(1.4)',
-                      WebkitBackdropFilter: 'blur(12px) saturate(1.4)',
-                      border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
-                      borderRadius: 12, padding: 16,
-                    }}>
-                      <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8, fontFamily: "var(--font-body)" }}>
-                        <i className="fa-solid fa-calendar-week" style={{ marginRight: 6, color: 'var(--accent)' }} />This Week
-                      </div>
-                      <div className="study-stats-value" style={{ fontFamily: "var(--font-heading)", fontSize: 20, fontWeight: 700, color: 'var(--text-light)' }}>
-                        {statsLoading ? <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 14 }} /> : formatHours(weekSeconds)}
-                      </div>
+                    <div className="study-stats-value" style={{ fontFamily: "var(--font-heading)", fontSize: 22, fontWeight: 700, color: 'var(--text-light)' }}>
+                      {statsLoading ? <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 14 }} /> : formatHours(todaySeconds)}
+                    </div>
+                  </div>
+                  <div style={{ width: 1, background: 'color-mix(in srgb, var(--text-light) 10%, transparent)' }} />
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4, fontFamily: "var(--font-body)" }}>
+                      <i className="fa-solid fa-calendar-week" style={{ marginRight: 6, color: 'var(--accent)' }} />This Week
+                    </div>
+                    <div className="study-stats-value" style={{ fontFamily: "var(--font-heading)", fontSize: 22, fontWeight: 700, color: 'var(--text-light)' }}>
+                      {statsLoading ? <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 14 }} /> : formatHours(weekSeconds)}
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="reveal-up reveal-delay-2 study-card" style={{
-                background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
-                backdropFilter: 'blur(20px) saturate(1.6)',
-                WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
-                border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
-                borderRadius: 12,
-                padding: 32, position: 'relative', display: 'flex', flexDirection: 'column',
-              }}>
-                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, transparent, var(--accent), transparent)' }} />
-                <h3 style={{ fontFamily: "var(--font-heading)", fontSize: 18, fontWeight: 700, color: 'var(--text-light)', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 10 }}>
+            </div>
 
+            {/* Leaderboard — full width below, separate section */}
+            <div className="reveal-up reveal-delay-2" style={{
+              background: 'color-mix(in srgb, var(--card-bg) 60%, transparent)',
+              backdropFilter: 'blur(20px) saturate(1.6)',
+              WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
+              border: '0.5px solid color-mix(in srgb, var(--text-light) 10%, transparent)',
+              borderRadius: 16,
+              padding: 32, marginTop: 24, position: 'relative',
+            }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, transparent, var(--accent), transparent)' }} />
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                <h3 style={{ fontFamily: "var(--font-heading)", fontSize: 18, fontWeight: 700, color: 'var(--text-light)', display: 'flex', alignItems: 'center', gap: 10 }}>
                   Study LeaderBoard
                 </h3>
-                <p style={{ fontSize: 12, color: 'var(--text-dim)', marginBottom: 24, fontFamily: "var(--font-body)" }}>Top learners in the last 30 days</p>
+              </div>
+              <p style={{ fontSize: 12, color: 'var(--text-dim)', marginBottom: 24, fontFamily: "var(--font-body)" }}>Top learners in the last 30 days</p>
 
-                <div className="study-leaderboard-scroll" data-lenis-prevent style={{ flex: 1, maxHeight: 520, overflowY: 'auto', WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}>
+              <div className="study-leaderboard-scroll" data-lenis-prevent style={{ maxHeight: 520, overflowY: 'auto', WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}>
                   {leaderboardLoading ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', justifyContent: 'center', padding: '40px 0' }}>
                       <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 24, color: 'var(--accent)' }} />
@@ -520,7 +511,6 @@ export default function StudyFocusPage() {
                       })}
                     </div>
                   )}
-                </div>
               </div>
 
             </div>
