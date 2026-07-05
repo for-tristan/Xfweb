@@ -11,7 +11,7 @@ import type { User } from './usePageFeatures';
 import { SmartImage } from '@/components/SmartImage';
 
 
-function VaultaLoader() {
+export function VaultaLoader() {
   // Minimal themed loading overlay. Uses --black (the page background var
   // that's defined for every theme) so the overlay is actually opaque
   // instead of showing content through it.
