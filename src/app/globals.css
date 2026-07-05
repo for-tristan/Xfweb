@@ -105,6 +105,14 @@ html {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
+    will-change: auto !important;
+  }
+  /* BlurText also causes transform animation on Firefox */
+  .blur-text, .blur-char {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    will-change: auto !important;
   }
 }
 body.xf-body {
@@ -5920,11 +5928,10 @@ body {
   position: relative;
   overflow: hidden;
   background: var(--black);
-  /* Skip rendering/paint work for sections that are offscreen — major
-     scroll-jank win on long pages. The browser still reserves layout
-     space using `contain-intrinsic-size` so the scrollbar stays stable. */
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 700px;
+  /* content-visibility: auto REMOVED — causes scroll jumps on Firefox
+     (Bugzilla 1815002, 1790176). Firefox swaps the contain-intrinsic-size
+     placeholder for actual height mid-scroll = visible jump. Chrome
+     handles this fine but Firefox doesn't. Not worth the tradeoff. */
 }
 .v-section-header {
   text-align: center;

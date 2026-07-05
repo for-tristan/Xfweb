@@ -122,6 +122,8 @@ function AuthContent() {
       });
       const data = await res.json();
       if (res.ok) {
+        // Store user in sessionStorage for Edge fallback (cookies might be blocked)
+        try { sessionStorage.setItem('xfoundry_user', JSON.stringify(data.user)); } catch {}
         toast({ title: 'Welcome back!', description: 'You have been signed in.' });
         router.push('/');
       } else if (res.status === 403 && data.needsVerification) {
