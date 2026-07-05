@@ -61,18 +61,18 @@ export async function GET(
             include: { questions: { orderBy: { questionOrder: 'asc' } } },
           }),
           db.testAttempt.findMany({
-            where: { testid: { in: moduleIds }, userid: user.id },
+            where: { testId: { in: moduleIds }, userId: user.id },
           }).catch(() => []),
           db.testUnlock.findMany({
-            where: { testid: { in: moduleIds }, userid: user.id },
+            where: { testId: { in: moduleIds }, userId: user.id },
           }).catch(() => []),
           db.certificate.findUnique({
             where: { userId_courseId: { userId: user.id, courseId: slug } },
           }).catch(() => null),
         ]);
 
-        const attemptMap = new Map(testAttempts.map((a: any) => [a.testid, a]));
-        const unlockMap = new Map(testUnlocks.map((u: any) => [u.testid, u]));
+        const attemptMap = new Map(testAttempts.map((a: any) => [a.testId, a]));
+        const unlockMap = new Map(testUnlocks.map((u: any) => [u.testId, u]));
 
         tests = moduleTests.map((t: any) => {
           const attempt = attemptMap.get(t.id);
@@ -80,17 +80,17 @@ export async function GET(
             id: t.id,
             title: t.title,
             description: t.description,
-            timeLimit: t.timelimit,
-            passingScore: t.passingscore,
-            moduleId: t.moduleid,
+            timeLimit: t.timeLimit,
+            passingScore: t.passingScore,
+            moduleId: t.moduleId,
             questionCount: t.questions?.length || 0,
             questions: t.questions || [],
-            hasCompleted: !!attempt?.submittedat,
-            attempt: attempt?.submittedat ? {
+            hasCompleted: !!attempt?.submittedAt,
+            attempt: attempt?.submittedAt ? {
               score: attempt.score,
-              totalPoints: attempt.totalpoints,
+              totalPoints: attempt.totalPoints,
               passed: attempt.passed,
-              submittedAt: attempt.submittedat,
+              submittedAt: attempt.submittedAt,
             } : null,
             unlocked: unlockMap.has(t.id) || attempt !== undefined,
           };
