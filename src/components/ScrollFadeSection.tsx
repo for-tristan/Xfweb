@@ -78,15 +78,24 @@ export default function ScrollFadeSection({
       progress = Math.min(1, scrolledPast / fadePx);
     }
 
+    const prevState = pinStateRef.current;
     pinStateRef.current = state;
 
-    // When transitioning to 'past', snap opacity to 0 immediately — don't
-    // let the lerp animate it. This prevents the 1-frame jump that happens
-    // when position switches from fixed→relative while opacity is still
-    // lerping toward 0 (visible when scrolling slowly).
+    // Snap opacity on ALL state transitions — don't let the lerp animate
+    // across a position:fixed↔relative switch. This prevents 1-frame jumps
+    // in both directions (scrolling down: pinned→past, scrolling up:
+    // past→pinned, past→unpinned).
     if (state === 'past') {
       currentRef.current.opacity = 0;
       currentRef.current.scale = 0.96;
+    } else if (state === 'unpinned') {
+      currentRef.current.opacity = 1;
+      currentRef.current.scale = 1;
+    } else if (state === 'pinned' && prevState !== 'pinned') {
+      // Only snap when ENTERING pinned from another state.
+      // While already pinned, let the lerp animate the fade normally.
+      currentRef.current.opacity = 1 - progress;
+      currentRef.current.scale = 1 - progress * 0.04;
     }
 
     targetRef.current = {
