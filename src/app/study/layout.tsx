@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     url: 'https://xfoundryy.vercel.app/study',
     images: [
       {
-        url: 'https://xfoundryy.vercel.app/og.png',
+        url: 'https://xfoundryy.vercel.app/og.png?v=20260707',
         width: 1200,
         height: 630,
         alt: 'Study Sessions — XFoundry',
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Study Sessions — XFoundry',
     description: 'Track your focused study sessions, build streaks, and climb the leaderboard. Timer-based deep work with weekly stats.',
-    images: ['https://xfoundryy.vercel.app/og.png'],
+    images: ['https://xfoundryy.vercel.app/og.png?v=20260707'],
   },
 };
 

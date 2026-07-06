@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     description: 'The best way to predict the future is to create it.',
     images: [
       {
-        url: 'https://xfoundryy.vercel.app/og.png',
+        url: 'https://xfoundryy.vercel.app/og.png?v=20260707',
         width: 1200,
         height: 630,
         alt: 'XFoundry — Building The Future',
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'XFoundry',
     description: 'The best way to predict the future is to create it.',
-    images: ['https://xfoundryy.vercel.app/og.png'],
+    images: ['https://xfoundryy.vercel.app/og.png?v=20260707'],
   },
   robots: { index: true, follow: true },
 };
