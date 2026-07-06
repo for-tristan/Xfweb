@@ -805,3 +805,44 @@ Stage Summary:
 - services/[slug] now matches courses/[slug] performance pattern: dedicated endpoint + 3-dot loader + clean metadata handling
 - Both pages now have visible loader during fetch state instead of empty space
 - No more invalid HTML / hydration risk from inline meta tags
+
+---
+Task ID: og-image-link-previews
+Agent: main
+Task: Add OG image so links show a preview banner when shared on WhatsApp/Discord/Slack/Twitter/etc.
+
+Work Log:
+- Root cause: no og:image meta tag set anywhere in app metadata. Open Graph image is what messaging/social platforms fetch to display a preview banner. Without it, links appear as plain text — looks "fishy" per user feedback.
+
+scripts/generate-og-banner.py (NEW):
+- Python+PIL script that generates a 1200x630 PNG (standard OG dimensions, 1.91:1 aspect)
+- Uses crimson theme colors: dark bg (#070707), crimson accent (#dc143c)
+- Renders: XFoundry logo (centered, 110px), "XFoundry" title (96px bold), tagline "The best way to predict the future is to create it." (32px), domain pill at bottom
+- Soft radial glow behind title for depth, top + bottom accent gradient bars
+- Output: public/og.png (80KB, 1200x630, RGB PNG)
+
+src/app/layout.tsx (root):
+- Added openGraph.images array with absolute URL https://xfoundryy.vercel.app/og.png (1200x630, alt text)
+- Added twitter.images array with same URL
+- This covers the homepage + all routes that don't override their own openGraph (courses, services, admin, instructor, chat, auth)
+
+src/app/courses/[slug]/layout.tsx:
+- Added images to openGraph + twitter with absolute URL
+
+src/app/services/[slug]/layout.tsx:
+- Same
+
+src/app/study/layout.tsx:
+- Same
+
+src/app/dashboard/layout.tsx:
+- Same (even though auth-gated, metadata is still set so any preview attempt shows the banner)
+
+src/app/games/layout.tsx:
+- Same
+
+Stage Summary:
+- Commit 55c3b80 pushed to origin/main on Xfweb
+- All 6 layout files with openGraph now have og:image set with absolute URL
+- Routes that don't define their own openGraph inherit the root layout's og:image via Next.js metadata merging
+- After Vercel redeploys, sharing any XFoundry link on WhatsApp/Discord/Slack/Twitter/iMessage will show a branded preview banner with logo, title, tagline, and domain
