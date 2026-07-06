@@ -773,3 +773,35 @@ Stage Summary:
 - All 4 target pages (courses/[slug], services/[slug], study, dashboard) now responsive down to 380px viewport width
 - Mix of CSS-class overrides (fix SSR flash) + targeted inline-style fixes for real overflow risks
 - No regressions to desktop layouts — all overrides are in mobile-only media queries or behind isMobile checks
+
+---
+Task ID: services-slug-optimization
+Agent: main
+Task: Apply the courses/[slug] optimization pattern to services/[slug] — was still "buggy" after the earlier courses focus
+
+Work Log:
+- Investigated services/[slug] page and found 3 distinct bugs:
+  1. Inefficient data fetching (fetched ALL services, filtered client-side)
+  2. No visual feedback during fetching state (navbar + empty space)
+  3. Duplicate <title>/<meta> tags in client component body (invalid HTML, redundant with layout's generateMetadata)
+
+src/app/api/services/[slug]/route.ts (NEW):
+- Created dedicated single-service endpoint mirroring /api/courses/[slug]/combined pattern
+- Uses unstable_cache with cache tag 'public-services' (same tag as /api/services, so admin mutations bust both)
+- Single DB query: db.service.findFirst({ where: { slug, status: 'active' }, include: { features: ... } })
+- Returns 404 if not found, otherwise { service } JSON with CDN cache headers (s-maxage=60, stale-while-revalidate=300)
+
+src/app/services/[slug]/page.tsx:
+- Replaced fetch('/api/services') + client-side filter with fetch('/api/services/${slug}')
+- Added cancellation guard (let cancelled = false; return () => { cancelled = true }) so rapid slug changes don't cause stale-fetch race conditions
+- Added 3-dot .xf-loader inside the fetching branch — gives visual feedback while data loads (was navbar + empty space before)
+- Removed inline <title>, <meta name="description">, og:*, twitter:* JSX from page body — layout.tsx's generateMetadata() already handles all metadata server-side (the Next.js recommended pattern). The inline tags were invalid HTML (meta in body) and could cause hydration warnings.
+
+src/app/courses/[slug]/page.tsx:
+- Added same 3-dot .xf-loader inside the fetching branch for parity (was also navbar + empty space before)
+
+Stage Summary:
+- Commit 13dc337 pushed to origin/main on Xfweb
+- services/[slug] now matches courses/[slug] performance pattern: dedicated endpoint + 3-dot loader + clean metadata handling
+- Both pages now have visible loader during fetch state instead of empty space
+- No more invalid HTML / hydration risk from inline meta tags

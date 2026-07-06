@@ -41,11 +41,20 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       description,
       siteName: 'XFoundry',
       url: `https://xfoundryy.vercel.app/courses/${slug}`,
+      images: [
+        {
+          url: 'https://xfoundryy.vercel.app/og.png',
+          width: 1200,
+          height: 630,
+          alt: `${title} — XFoundry`,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: ['https://xfoundryy.vercel.app/og.png'],
     },
     keywords: course
       ? [course.title, course.level, 'course', 'XFoundry', 'software development']

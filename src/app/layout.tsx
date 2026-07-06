@@ -24,11 +24,20 @@ export const metadata: Metadata = {
     siteName: 'XFoundry',
     title: 'XFoundry - Building The Future',
     description: 'The best way to predict the future is to create it.',
+    images: [
+      {
+        url: 'https://xfoundryy.vercel.app/og.png',
+        width: 1200,
+        height: 630,
+        alt: 'XFoundry — Building The Future',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'XFoundry - Building The Future',
     description: 'The best way to predict the future is to create it.',
+    images: ['https://xfoundryy.vercel.app/og.png'],
   },
   robots: { index: true, follow: true },
 };
