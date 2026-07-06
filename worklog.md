@@ -881,3 +881,28 @@ Stage Summary:
 - Commit c2dc701 pushed to origin/main on Xfweb
 - OG banner is now restrained and editorial — single accent, clean typography, lots of negative space
 - All metadata references (root layout + 5 sub-layouts) still point to /og.png, so no other changes needed
+
+---
+Task ID: og-cache-bust
+Agent: main
+Task: Fix stale OG preview for trailing-slash URL (https://xfoundryy.vercel.app/)
+
+Work Log:
+- User reported that https://xfoundryy.vercel.app/ (trailing slash) still showed the old AI-slop OG image, while https://xfoundryy.vercel.app (no slash) showed the current one.
+- Root cause: WhatsApp/Discord/Slack treat URLs with and without trailing slashes as DIFFERENT URLs and cache their previews separately. The trailing-slash version was shared earlier and got cached with the old image.
+
+Fix: Added ?v=20260707 cache-busting query param to all 12 OG image URL references across 6 layout files:
+- src/app/layout.tsx (root) — 2 refs (openGraph.images + twitter.images)
+- src/app/courses/[slug]/layout.tsx — 2 refs
+- src/app/services/[slug]/layout.tsx — 2 refs
+- src/app/study/layout.tsx — 2 refs
+- src/app/dashboard/layout.tsx — 2 refs
+- src/app/games/layout.tsx — 2 refs
+
+When scrapers re-fetch the page HTML, they'll see og.png?v=20260707 instead of og.png — a new URL that bypasses their image cache for the old URL.
+
+Note for future OG image changes: bump the version query param (e.g. ?v=20260801) to force another fresh fetch across all platforms.
+
+Stage Summary:
+- Commit b6a708b pushed to origin/main on Xfweb (after rebasing on remote — there was a remote commit that needed integration first)
+- User should also use Facebook's OG debugger (https://developers.facebook.com/tools/debug/) to force-refresh the trailing-slash URL's preview cache for WhatsApp. Paste https://xfoundryy.vercel.app/ and click "Scrape Again" until the new image appears.

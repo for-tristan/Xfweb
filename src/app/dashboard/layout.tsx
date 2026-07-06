@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     url: 'https://xfoundryy.vercel.app/dashboard',
     images: [
       {
-        url: 'https://xfoundryy.vercel.app/og.png?v=20260707',
+        url: 'https://xfoundryy.vercel.app/og.png?v=20260708',
         width: 1200,
         height: 630,
         alt: 'Dashboard — XFoundry',
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Dashboard — XFoundry',
     description: 'Your personal learning dashboard. Track course progress, recent test results, study streaks, and continue where you left off.',
-    images: ['https://xfoundryy.vercel.app/og.png?v=20260707'],
+    images: ['https://xfoundryy.vercel.app/og.png?v=20260708'],
   },
   robots: { index: false, follow: false }, // Auth-gated, no SEO value
 };

@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       url: `https://xfoundryy.vercel.app/services/${slug}`,
       images: [
         {
-          url: 'https://xfoundryy.vercel.app/og.png?v=20260707',
+          url: 'https://xfoundryy.vercel.app/og.png?v=20260708',
           width: 1200,
           height: 630,
           alt: `${title} — XFoundry`,
@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       card: 'summary_large_image',
       title,
       description,
-      images: ['https://xfoundryy.vercel.app/og.png?v=20260707'],
+      images: ['https://xfoundryy.vercel.app/og.png?v=20260708'],
     },
     keywords: service
       ? [service.title, 'service', 'XFoundry', 'software development']
