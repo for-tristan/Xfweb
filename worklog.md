@@ -846,3 +846,38 @@ Stage Summary:
 - All 6 layout files with openGraph now have og:image set with absolute URL
 - Routes that don't define their own openGraph inherit the root layout's og:image via Next.js metadata merging
 - After Vercel redeploys, sharing any XFoundry link on WhatsApp/Discord/Slack/Twitter/iMessage will show a branded preview banner with logo, title, tagline, and domain
+
+---
+Task ID: og-banner-minimalist-redesign
+Agent: main
+Task: Redesign OG banner — user said it looked like "AI slop"
+
+Work Log:
+- Diagnosed what made the previous banner look AI-generated:
+  * Radial glow behind title (AI trope)
+  * Top + bottom gradient accent bars (decorative clutter)
+  * Centered logo + title (generic AI layout)
+  * Domain pill at bottom (redundant decoration)
+  * DejaVu Sans typography (default font, looks generic)
+
+scripts/generate-og-banner.py (rewritten):
+- Stripped ALL decorative elements: glow, gradient bars, pill, centered layout
+- Switched font from DejaVu Sans → Carlito (Calibri-compatible, much cleaner)
+- New layout (Linear/Vercel/Stripe inspired):
+  * Left-aligned content, 110px padding
+  * Small logo (38px) + wordmark (22px Carlito Bold) top-left
+  * Two-line hero title "Building the future." (84px Carlito Bold, white)
+  * Tagline below (26px Carlito Regular, dim gray)
+  * URL "xfoundryy.vercel.app" bottom-left (18px, dimmer gray)
+  * Single 4px vertical crimson accent line on the left edge — the ONLY color in the image
+  * Generous negative space on the right
+
+public/og.png:
+- Regenerated from new script
+- 1200x630, 23KB (down from 80KB — 71% smaller, less complexity)
+- VLM critique confirms: "minimalist, intentional, professional, not AI slop"
+
+Stage Summary:
+- Commit c2dc701 pushed to origin/main on Xfweb
+- OG banner is now restrained and editorial — single accent, clean typography, lots of negative space
+- All metadata references (root layout + 5 sub-layouts) still point to /og.png, so no other changes needed
