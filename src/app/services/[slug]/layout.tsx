@@ -25,12 +25,12 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   }
 
   const title = service
-    ? `${service.title} — X Foundry`
-    : 'Service — X Foundry';
+    ? `${service.title} — XFoundry`
+    : 'Service — XFoundry';
 
   const description = service?.description
     ? service.description
-    : 'Custom software development, AI integration, security auditing, and team training from X Foundry.';
+    : 'Custom software development, AI integration, security auditing, and team training from XFoundry.';
 
   return {
     title,

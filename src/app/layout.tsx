@@ -8,7 +8,7 @@ import ClickSplash from '@/components/ClickSplash';
 import CookieConsentBanner from '@/components/CookieConsentBanner';
 
 export const metadata: Metadata = {
-  title: 'X Foundry',
+  title: 'XFoundry',
   description: 'The best way to predict the future is to create it.',
   keywords: ['AI', 'machine learning', 'software development', 'tech education', 'web development', 'XFoundry'],
   authors: [{ name: 'Tristan Montaser' }],
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://xfoundryy.vercel.app',
     siteName: 'XFoundry',
-    title: 'XFoundry - Building The Future',
+    title: 'XFoundry',
     description: 'The best way to predict the future is to create it.',
     images: [
       {
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'XFoundry - Building The Future',
+    title: 'XFoundry',
     description: 'The best way to predict the future is to create it.',
     images: ['https://xfoundryy.vercel.app/og.png'],
   },

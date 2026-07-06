@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Coding Games — X Foundry',
+  title: 'Coding Games — XFoundry',
   description: 'Sharpen your programming skills with bite-sized coding challenges. Race against the clock, earn points, and climb the global leaderboard.',
   openGraph: {
     type: 'website',
-    title: 'Coding Games — X Foundry',
+    title: 'Coding Games — XFoundry',
     description: 'Sharpen your programming skills with bite-sized coding challenges. Race against the clock, earn points, and climb the global leaderboard.',
     siteName: 'XFoundry',
     url: 'https://xfoundryy.vercel.app/games',
@@ -14,13 +14,13 @@ export const metadata: Metadata = {
         url: 'https://xfoundryy.vercel.app/og.png',
         width: 1200,
         height: 630,
-        alt: 'Coding Games — X Foundry',
+        alt: 'Coding Games — XFoundry',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Coding Games — X Foundry',
+    title: 'Coding Games — XFoundry',
     description: 'Sharpen your programming skills with bite-sized coding challenges. Race against the clock, earn points, and climb the global leaderboard.',
     images: ['https://xfoundryy.vercel.app/og.png'],
   },
