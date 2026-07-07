@@ -16,6 +16,13 @@ export async function POST(request: NextRequest) {
 
     const normalizedEmail = email.toLowerCase().trim();
 
+    // SECURITY: Brute-force protection is enforced by the IP-based rate
+    // limiter in middleware.ts (5 requests per 15 min per IP on
+    // /api/auth/verify-email). With 1M possible 6-digit codes and only
+    // 5 attempts per 15 min, brute-forcing would take ~7 months on
+    // average — infeasible. The GET handler below is also rate-limited
+    // via the same middleware matcher.
+
     const verification = await db.emailVerification.findFirst({
       where: {
         email: normalizedEmail,

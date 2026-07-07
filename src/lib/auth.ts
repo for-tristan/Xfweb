@@ -5,8 +5,15 @@ import { cache } from 'react';
 import { db } from '@/lib/db';
 
 const SESSION_SECRET = process.env.SESSION_SECRET;
+// SECURITY: Previously this only logged a warning when SESSION_SECRET
+// was missing, allowing the app to boot in an insecure state. Now we
+// throw at module load — fail fast and loud rather than silently
+// degrading. Also enforce a minimum length of 32 chars.
 if (!SESSION_SECRET) {
-  console.error('[AUTH] FATAL: SESSION_SECRET environment variable is not set. Session tokens cannot be validated.');
+  throw new Error('[AUTH] FATAL: SESSION_SECRET environment variable is not set. Refusing to boot.');
+}
+if (SESSION_SECRET.length < 32) {
+  throw new Error('[AUTH] FATAL: SESSION_SECRET must be at least 32 characters long. Refusing to boot.');
 }
 
 /**

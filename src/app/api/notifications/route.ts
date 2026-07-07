@@ -36,6 +36,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Title and message are required' }, { status: 400 });
     }
 
+    // SECURITY: Whitelist notification types. Previously `type` was taken
+    // verbatim from the body — a user could forge 'admin' or 'success'
+    // types for phishing-style UI spoofing (e.g. fake "Admin Alert:
+    // Re-enter your password at https://attacker.example.com").
+    const ALLOWED_TYPES = ['info', 'success', 'warning', 'error', 'friend_request', 'friend_accept', 'friend_reject'];
+    const safeType = type && ALLOWED_TYPES.includes(type) ? type : 'info';
+
+    // SECURITY: Cap title/message length to prevent abuse.
+    const safeTitle = String(title).substring(0, 200);
+    const safeMessage = String(message).substring(0, 1000);
+
     let notificationUserId = user.id;
     if (targetUserId && targetUserId !== user.id) {
       if (user.role !== 'admin') {
@@ -51,9 +62,9 @@ export async function POST(request: NextRequest) {
     const notification = await db.notification.create({
       data: {
         userId: notificationUserId,
-        title,
-        message,
-        type: type || 'info',
+        title: safeTitle,
+        message: safeMessage,
+        type: safeType,
       },
     });
 

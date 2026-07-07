@@ -12,8 +12,14 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const host = request.headers.get('host');
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (host ? `https://${host}` : 'http://localhost:3000');
+  // SECURITY: Never derive baseUrl from Host header — require NEXT_PUBLIC_BASE_URL.
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  if (!baseUrl) {
+    return NextResponse.json(
+      { error: 'OAuth is not configured. NEXT_PUBLIC_BASE_URL must be set in the environment.' },
+      { status: 500 }
+    );
+  }
   const redirectUri = `${baseUrl}/api/auth/github/callback`;
 
   const state = randomBytes(16).toString('hex');

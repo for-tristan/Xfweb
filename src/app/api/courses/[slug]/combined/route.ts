@@ -110,7 +110,11 @@ export async function GET(
         courseId: m.courseId,
         title: m.title,
         description: m.description,
-        content: m.content,
+        // SECURITY: Only return module content if the user has an approved
+        // enrollment AND has unlocked this specific module. Previously the
+        // full content was returned for all modules — leaking premium
+        // material to any authenticated user, even non-enrolled ones.
+        content: (enrollment?.status === 'approved' && (m.unlocked || false)) ? m.content : '',
         moduleOrder: m.moduleOrder,
         unlocked: m.unlocked || false,
         hasAccess: enrollment?.status === 'approved',

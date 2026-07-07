@@ -36,3 +36,23 @@ export function safeRemoveItem(key: string): void {
     // no-op
   }
 }
+
+/**
+ * SECURITY: Strip PII from a user object before caching it in
+ * sessionStorage. The full user object from /api/auth/me includes
+ * email and phone — both are PII that shouldn't sit in JS-accessible
+ * storage where any XSS could read them.
+ *
+ * The cached object is only used by the Edge-fallback path (when
+ * cookies are blocked and the SPA needs to show the user as logged-in
+ * on first paint). For that purpose, only id/username/role/avatar are
+ * needed — email and phone are NOT needed for UI rendering.
+ *
+ * Returns a new object (does not mutate the input).
+ */
+export function stripPiiForCache<T extends Record<string, any>>(user: T): Partial<T> {
+  if (!user || typeof user !== 'object') return {};
+  const { email, phone, company, ...safe } = user;
+  return safe;
+}
+

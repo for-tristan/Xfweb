@@ -33,7 +33,7 @@ import { Footer } from '@/components/home/Footer';
 
 // Shared constants (single source of truth for contact info, socials, etc.)
 import { SITE, CONTACT, SOCIAL } from '@/lib/constants';
-import { safeGetItem, safeSetItem } from '@/lib/safeStorage';
+import { safeGetItem, safeSetItem, stripPiiForCache } from '@/lib/safeStorage';
 
 
 interface User {
@@ -278,7 +278,7 @@ export default function Home({
         if (res.ok) {
           const data = await res.json();
           setUser(data.user);
-          try { sessionStorage.setItem('xfoundry_user', JSON.stringify(data.user)); } catch {}
+          try { sessionStorage.setItem('xfoundry_user', JSON.stringify(stripPiiForCache(data.user))); } catch {}
         } else if (res.status === 403) {
           const data = await res.json();
           if (data.needsVerification) {
@@ -316,7 +316,7 @@ export default function Home({
             const data = await res.json();
             if (data.user) {
               setUser(data.user);
-              try { sessionStorage.setItem('xfoundry_user', JSON.stringify(data.user)); } catch {}
+              try { sessionStorage.setItem('xfoundry_user', JSON.stringify(stripPiiForCache(data.user))); } catch {}
             }
           }
         } catch {}

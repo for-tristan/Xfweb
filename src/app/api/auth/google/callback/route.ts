@@ -27,8 +27,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/?error=oauth_not_configured', request.url));
     }
 
-    const host = request.headers.get('host');
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (host ? `https://${host}` : 'http://localhost:3000');
+    // SECURITY: Never derive baseUrl from Host header (host-header injection
+    // → OAuth code theft). Require NEXT_PUBLIC_BASE_URL explicitly.
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    if (!baseUrl) {
+      return NextResponse.redirect(new URL('/?error=oauth_not_configured', request.url));
+    }
     const redirectUri = `${baseUrl}/api/auth/google/callback`;
 
     const tokenRes = await fetch('https://oauth2.googleapis.com/token', {

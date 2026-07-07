@@ -18,10 +18,14 @@ async function verifyTestAccess(
     return { test: null, error: NextResponse.json({ error: 'Test not found' }, { status: 404 }) };
   }
 
+  // SECURITY: Instructors can only manage tests in courses they own.
+  // Previously this check allowed instructors to manage tests in ANY
+  // global course — same privilege-escalation bug as the courses PUT
+  // route. Global courses are admin-only.
   if (isInstructor && instructorId) {
     const course = await db.course.findUnique({ where: { id: test.module.courseId } });
-    if (!course || (course.instructorId !== instructorId && !course.isGlobal)) {
-      return { test: null, error: NextResponse.json({ error: 'Forbidden: You can only manage tests in your own courses or global courses' }, { status: 403 }) };
+    if (!course || course.instructorId !== instructorId) {
+      return { test: null, error: NextResponse.json({ error: 'Forbidden: You can only manage tests in your own courses' }, { status: 403 }) };
     }
   }
 
@@ -40,14 +44,50 @@ async function verifyModuleCourseAccess(
     return { module: null, error: NextResponse.json({ error: 'Module not found' }, { status: 404 }) };
   }
 
+  // SECURITY: same fix as verifyTestAccess — drop isGlobal exception.
   if (isInstructor && instructorId) {
     const course = await db.course.findUnique({ where: { id: module_.courseId } });
-    if (!course || (course.instructorId !== instructorId && !course.isGlobal)) {
-      return { module: null, error: NextResponse.json({ error: 'Forbidden: You can only manage tests in your own courses or global courses' }, { status: 403 }) };
+    if (!course || course.instructorId !== instructorId) {
+      return { module: null, error: NextResponse.json({ error: 'Forbidden: You can only manage modules in your own courses' }, { status: 403 }) };
     }
   }
 
   return { module: module_, error: null };
+}
+
+/**
+ * SECURITY: Verify that a target userId is actively enrolled (approved)
+ * in the course that owns the given testId. Prevents instructors from
+ * unlocking tests / resetting attempts for arbitrary users who aren't
+ * in their course.
+ */
+async function verifyTargetUserEnrolled(testId: string, userId: string): Promise<{ error: NextResponse | null }> {
+  const test = await db.moduleTest.findUnique({
+    where: { id: testId },
+    select: { module: { select: { courseId: true } } },
+  });
+  if (!test) {
+    return { error: NextResponse.json({ error: 'Test not found' }, { status: 404 }) };
+  }
+  const course = await db.course.findUnique({
+    where: { id: test.module.courseId },
+    select: { slug: true },
+  });
+  if (!course) {
+    return { error: NextResponse.json({ error: 'Course not found' }, { status: 404 }) };
+  }
+  const enrollment = await db.enrollment.findFirst({
+    where: {
+      userId,
+      courseId: course.slug,
+      status: 'approved',
+      deletedAt: null,
+    },
+  });
+  if (!enrollment) {
+    return { error: NextResponse.json({ error: 'Target user is not enrolled in this course' }, { status: 403 }) };
+  }
+  return { error: null };
 }
 
 export async function GET(request: NextRequest) {
@@ -269,6 +309,12 @@ export async function PUT(request: NextRequest) {
       const { error: accessError } = await verifyTestAccess(testId, user?.id, isInstructor, isAdmin);
       if (accessError) return accessError;
 
+      // SECURITY: Verify the target user is actually enrolled in the
+      // course that owns this test. Prevents instructors from unlocking
+      // tests for arbitrary users (inflating pass rates, gifting certs).
+      const { error: enrollError } = await verifyTargetUserEnrolled(testId, userId);
+      if (enrollError) return enrollError;
+
       try {
         await db.testAttempt.deleteMany({
           where: { testId, userId, submittedAt: { not: null } },
@@ -308,6 +354,11 @@ export async function PUT(request: NextRequest) {
 
       const { error: accessError } = await verifyTestAccess(testId, user?.id, isInstructor, isAdmin);
       if (accessError) return accessError;
+
+      // SECURITY: same enrollment check as unlock — prevents instructors
+      // from locking tests for arbitrary users (DoS / harassment vector).
+      const { error: enrollError } = await verifyTargetUserEnrolled(testId, userId);
+      if (enrollError) return enrollError;
 
       try {
         const existing = await db.testUnlock.findUnique({
@@ -352,6 +403,11 @@ export async function PUT(request: NextRequest) {
 
       const { error: accessError } = await verifyTestAccess(testId, user?.id, isInstructor, isAdmin);
       if (accessError) return accessError;
+
+      // SECURITY: same enrollment check — prevents instructors from
+      // wiping any user's test attempt history.
+      const { error: enrollError } = await verifyTargetUserEnrolled(testId, userId);
+      if (enrollError) return enrollError;
 
       await db.testAttempt.deleteMany({ where: { testId, userId } });
 

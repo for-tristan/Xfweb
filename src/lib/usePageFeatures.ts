@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { safeGetItem, safeSetItem } from '@/lib/safeStorage';
+import { safeGetItem, safeSetItem, stripPiiForCache } from '@/lib/safeStorage';
 
 
 export interface User {
@@ -172,7 +172,7 @@ export function usePageFeatures() {
             setProfilePhone(data.user.phone || '');
             setProfileCompany(data.user.company || '');
             // Cache for Edge fallback
-            try { sessionStorage.setItem('xfoundry_user', JSON.stringify(data.user)); } catch {}
+            try { sessionStorage.setItem('xfoundry_user', JSON.stringify(stripPiiForCache(data.user))); } catch {}
           }
         } else if (res.status === 403) {
           const data = await res.json();
@@ -214,7 +214,7 @@ export function usePageFeatures() {
             const data = await res.json();
             if (data.user) {
               setUser(data.user);
-              try { sessionStorage.setItem('xfoundry_user', JSON.stringify(data.user)); } catch {}
+              try { sessionStorage.setItem('xfoundry_user', JSON.stringify(stripPiiForCache(data.user))); } catch {}
             }
           }
         } catch {}
@@ -281,7 +281,7 @@ export function usePageFeatures() {
         setProfilePhone(data.user.phone || '');
         setProfileCompany(data.user.company || '');
         // Cache for Edge fallback (cookies might not persist)
-        try { sessionStorage.setItem('xfoundry_user', JSON.stringify(data.user)); } catch {}
+        try { sessionStorage.setItem('xfoundry_user', JSON.stringify(stripPiiForCache(data.user))); } catch {}
         setAuthModalOpen(false);
         setVerificationStep('idle');
         toast({ title: 'Welcome back!', description: `Signed in as ${data.user.name}` });

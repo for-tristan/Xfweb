@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { verifyPassword, createSession } from '@/lib/auth';
+import { verifyPassword, createSession, hashPassword } from '@/lib/auth';
 import { sendEmailVerificationEmail } from '@/lib/email';
 import { randomInt } from 'crypto';
+
+// SECURITY: Pre-computed dummy hash used to keep login response time
+// constant when the email doesn't exist. Without this, an attacker can
+// enumerate registered emails by measuring response time — existing
+// users pay scrypt's ~50-150ms; non-existent users return instantly.
+// Calling verifyPassword with this dummy hash burns the same time.
+const DUMMY_HASH = hashPassword('dummy-password-for-timing-equalization');
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,6 +28,9 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user) {
+      // SECURITY: Burn the same time a real password verification would
+      // take, so an attacker can't enumerate emails via timing oracle.
+      verifyPassword(password, DUMMY_HASH);
       return NextResponse.json(
         { error: 'Invalid email or password' },
         { status: 401 }

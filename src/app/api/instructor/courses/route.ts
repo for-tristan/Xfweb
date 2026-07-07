@@ -120,8 +120,14 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Course not found' }, { status: 404 });
     }
 
-    if (isInstructor && existing.instructorId !== user!.id && !existing.isGlobal) {
-      return NextResponse.json({ error: 'Forbidden: You can only update your own courses or global courses' }, { status: 403 });
+    // SECURITY: Instructors can only update courses they own. Previously
+    // the check allowed instructors to modify ANY global course
+    // (isGlobal: true) — which let any instructor unpublish, deface, or
+    // re-order the platform's flagship seeded courses. Global courses
+    // are admin-only. The DELETE handler below already correctly forbids
+    // this (no isGlobal exception); PUT now matches.
+    if (isInstructor && existing.instructorId !== user!.id) {
+      return NextResponse.json({ error: 'Forbidden: You can only update your own courses' }, { status: 403 });
     }
 
     const updateData: Record<string, unknown> = {

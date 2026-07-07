@@ -50,7 +50,12 @@ export async function GET(request: NextRequest) {
       courseId: m.courseId,
       title: m.title,
       description: m.description,
-      content: m.content,
+      // SECURITY: Only return module content if the user is enrolled
+      // (approved) AND has unlocked this specific module. Previously
+      // the full content was returned for all modules regardless of
+      // enrollment or unlock status — leaking premium material to any
+      // authenticated user, even newcomers with zero enrollments.
+      content: (enrollment && unlockedModuleIds.has(m.id)) ? m.content : '',
       moduleOrder: m.moduleOrder,
       unlocked: unlockedModuleIds.has(m.id),
       hasAccess: !!enrollment,

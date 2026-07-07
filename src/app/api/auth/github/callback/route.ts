@@ -55,17 +55,21 @@ export async function GET(request: NextRequest) {
       headers: { Authorization: `Bearer ${tokenData.access_token}` },
     });
     const ghEmails = await emailRes.json();
-    const primaryEmailObj = ghEmails.find((e: { primary: boolean; verified: boolean }) => e.primary);
-    const primaryEmail = primaryEmailObj?.email || ghEmails[0]?.email;
-    const isEmailVerified = primaryEmailObj?.verified || ghEmails[0]?.verified || false;
+    // SECURITY: Require the PRIMARY email to be VERIFIED. Previously this
+    // used `primaryEmailObj?.verified || ghEmails[0]?.verified` — the OR
+    // meant an attacker with a GitHub account whose primary email is
+    // UNverified but who has ANY other verified email could register
+    // using the unverified primary email, then take over that email slot
+    // in Xfweb. Now we require primary AND verified on the same object.
+    const primaryVerifiedEmail = ghEmails.find(
+      (e: { primary: boolean; verified: boolean }) => e.primary && e.verified
+    );
 
-    if (!primaryEmail) {
-      return NextResponse.redirect(new URL('/?error=no_email', request.url));
-    }
-
-    if (!isEmailVerified) {
+    if (!primaryVerifiedEmail?.email) {
       return NextResponse.redirect(new URL('/?error=email_not_verified', request.url));
     }
+
+    const primaryEmail = primaryVerifiedEmail.email;
 
     const existingLink = await db.accountLink.findUnique({
       where: {

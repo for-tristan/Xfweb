@@ -12,8 +12,16 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const host = request.headers.get('host');
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (host ? `https://${host}` : 'http://localhost:3000');
+  // SECURITY: Never derive baseUrl from the Host header — it's
+  // attacker-controllable and enables OAuth code theft via host-header
+  // injection. Require NEXT_PUBLIC_BASE_URL to be set explicitly.
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  if (!baseUrl) {
+    return NextResponse.json(
+      { error: 'OAuth is not configured. NEXT_PUBLIC_BASE_URL must be set in the environment.' },
+      { status: 500 }
+    );
+  }
   const redirectUri = `${baseUrl}/api/auth/google/callback`;
 
   const state = randomBytes(16).toString('hex');
