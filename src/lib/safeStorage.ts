@@ -50,7 +50,7 @@ export function safeRemoveItem(key: string): void {
  *
  * Returns a new object (does not mutate the input).
  */
-export function stripPiiForCache<T extends Record<string, any>>(user: T): Partial<T> {
+export function stripPiiForCache(user: Record<string, any>): Record<string, any> {
   if (!user || typeof user !== 'object') return {};
   const { email, phone, company, ...safe } = user;
   return safe;

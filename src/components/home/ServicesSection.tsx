@@ -4,9 +4,16 @@
  * ServicesSection — "Your Digital Future, Built with Care" section.
  * Renders service cards from the database (admin-managed).
  * Clicking a card navigates to /services/[slug].
+ *
+ * Uses a real <Link> (not a div with onClick) so that:
+ * 1. The ClientProviders click interceptor detects the navigation
+ *    immediately and shows the 3-dot loader (no blank-screen gap).
+ * 2. SEO crawlers can follow the link.
+ * 3. Keyboard nav + screen readers work properly.
+ * 4. Right-click "open in new tab" + middle-click work.
  */
 
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { SectionReveal, StaggerReveal } from '@/components/ScrollAnimations';
 import type { Service } from '@/lib/types';
 import { BlurText } from './BlurText';
@@ -16,8 +23,6 @@ interface ServicesSectionProps {
 }
 
 export function ServicesSection({ services }: ServicesSectionProps) {
-  const router = useRouter();
-
   return (
     <section className="v-section" id="services">
       <SectionReveal direction="up" delay={0}>
@@ -36,10 +41,11 @@ export function ServicesSection({ services }: ServicesSectionProps) {
         <div className="v-services-grid">
           {services.length > 0 ? (
             services.map((service) => (
-              <div
+              <Link
                 key={service.id}
+                href={`/services/${service.slug}`}
                 className="v-service-card"
-                onClick={() => router.push(`/services/${service.slug}`)}
+                style={{ textDecoration: 'none', color: 'inherit' }}
               >
                 <div className="v-service-icon">
                   <i className={service.icon}></i>
@@ -48,7 +54,7 @@ export function ServicesSection({ services }: ServicesSectionProps) {
                 <span className="v-service-link">
                   Learn More <i className="fa-solid fa-arrow-right" style={{ fontSize: 11 }}></i>
                 </span>
-              </div>
+              </Link>
             ))
           ) : (
             <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: 40, color: '#5d5d5d' }}>
