@@ -75,7 +75,7 @@ export function Navbar({
   const staggeredMenuItems = [
     { label: 'Home', ariaLabel: 'Go to home page', link: '/', onClick: isHome ? () => scrollToSection('home') : undefined },
     { label: 'Services', ariaLabel: 'View our services', link: '/#services', onClick: isHome ? () => scrollToSection('services') : undefined },
-    { label: 'Programs', ariaLabel: 'View our programs', link: '/#courses', onClick: isHome ? () => scrollToSection('courses') : undefined },
+    { label: 'Courses', ariaLabel: 'View our courses', link: '/#courses', onClick: isHome ? () => scrollToSection('courses') : undefined },
     { label: 'Contact', ariaLabel: 'Get in touch', link: '/#contact', onClick: isHome ? () => scrollToSection('contact') : undefined },
     // Only show student pages for non-newcomer users
     ...(user && user.role !== 'newcomer' ? [
@@ -121,9 +121,9 @@ export function Navbar({
             <li><Link href="/#services" className={isActive('services') ? 'active' : ''}>Services</Link></li>
           )}
           {isHome ? (
-            <li><a href="#courses" className={isActive('courses') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('courses'); }}>Programs</a></li>
+            <li><a href="#courses" className={isActive('courses') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('courses'); }}>Courses</a></li>
           ) : (
-            <li><Link href="/#courses" className={isActive('courses') ? 'active' : ''}>Programs</Link></li>
+            <li><Link href="/#courses" className={isActive('courses') ? 'active' : ''}>Courses</Link></li>
           )}
           {isHome ? (
             <li><a href="#contact" className={isActive('contact') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('contact'); }}>Contact</a></li>
@@ -153,9 +153,9 @@ export function Navbar({
             <li><Link href="/#services" className={isActive('services') ? 'active' : ''}>Services</Link></li>
           )}
           {isHome ? (
-            <li><a href="#courses" className={isActive('courses') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('courses'); }}>Programs</a></li>
+            <li><a href="#courses" className={isActive('courses') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('courses'); }}>Courses</a></li>
           ) : (
-            <li><Link href="/#courses" className={isActive('courses') ? 'active' : ''}>Programs</Link></li>
+            <li><Link href="/#courses" className={isActive('courses') ? 'active' : ''}>Courses</Link></li>
           )}
           {isHome ? (
             <li><a href="#contact" className={isActive('contact') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('contact'); }}>Contact</a></li>

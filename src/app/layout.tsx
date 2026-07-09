@@ -6,6 +6,7 @@ import ClientProviders from '@/components/ClientProviders';
 import GrainBackground from '@/components/GrainBackground';
 import ClickSplash from '@/components/ClickSplash';
 import CookieConsentBanner from '@/components/CookieConsentBanner';
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: 'XFoundry',
@@ -84,6 +85,10 @@ export default function RootLayout({
           <CookieConsentBanner />
           <Toaster />
         </ClientProviders>
+        {/* Vercel Analytics — page-view + Web Vitals tracking.
+            No consent needed for aggregated, anonymized analytics
+            (no PII collected). Renders an invisible script tag. */}
+        <Analytics />
       </body>
     </html>
   );

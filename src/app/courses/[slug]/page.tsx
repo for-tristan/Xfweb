@@ -419,7 +419,7 @@ export default function DynamicCoursePage() {
       <ul className="v-footer-links">
         <li><Link href="/">Home</Link></li>
         <li><Link href="/#services">Services</Link></li>
-        <li><Link href="/#courses">Programs</Link></li>
+        <li><Link href="/#courses">Courses</Link></li>
         {user && user.role !== 'newcomer' && <li><Link href="/games">Games</Link></li>}
         {user && user.role !== 'newcomer' && <li><Link href="/study">Study</Link></li>}
       </ul>
@@ -709,7 +709,7 @@ export default function DynamicCoursePage() {
       <ul className="v-footer-links">
         <li><Link href="/">Home</Link></li>
         <li><Link href="/#services">Services</Link></li>
-        <li><Link href="/#courses">Programs</Link></li>
+        <li><Link href="/#courses">Courses</Link></li>
         {user && user.role !== 'newcomer' && <li><Link href="/games">Games</Link></li>}
         {user && user.role !== 'newcomer' && <li><Link href="/study">Study</Link></li>}
       </ul>

@@ -43,7 +43,7 @@ export function Footer({ scrollToSection, user }: FooterProps) {
           <ul className="v-footer-links">
             <li><a href="#home" onClick={(e) => { e.preventDefault(); scrollToSection('home'); }}>Home</a></li>
             <li><a href="#services" onClick={(e) => { e.preventDefault(); scrollToSection('services'); }}>Services</a></li>
-            <li><a href="#courses" onClick={(e) => { e.preventDefault(); scrollToSection('courses'); }}>Programs</a></li>
+            <li><a href="#courses" onClick={(e) => { e.preventDefault(); scrollToSection('courses'); }}>Courses</a></li>
             {user && user.role !== 'newcomer' && <li><a href="/games">Games</a></li>}
             {user && user.role !== 'newcomer' && <li><a href="/study">Study</a></li>}
             {user && user.role !== 'newcomer' && <li><a href="/dashboard">Dashboard</a></li>}
