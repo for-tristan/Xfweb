@@ -84,7 +84,15 @@ export async function GET(
             passingScore: t.passingScore,
             moduleId: t.moduleId,
             questionCount: t.questions?.length || 0,
-            questions: t.questions || [],
+            // Parse each question's `options` field. The DB stores options
+            // as a JSON string (e.g. '["A","B","C"]'), but the client
+            // (TestModal) expects an actual array. Without this parse,
+            // q.options.map() throws "options.map is not a function".
+            // Mirrors the same logic in /api/courses/tests/questions.
+            questions: (t.questions || []).map((q: any) => ({
+              ...q,
+              options: typeof q.options === 'string' ? JSON.parse(q.options) : (q.options || []),
+            })),
             hasCompleted: !!attempt?.submittedAt,
             attempt: attempt?.submittedAt ? {
               score: attempt.score,

@@ -291,6 +291,11 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
   }
 
   const q = questions[currentQ];
+  // Defensive guard: ensure options is always an array. The DB stores
+  // options as a JSON string; if an endpoint forgets to parse it,
+  // q.options would be a string and .map() would throw. This guard
+  // prevents a white-screen crash in that case.
+  const qOptions = Array.isArray(q.options) ? q.options : [];
 
   return (
     <div style={{
@@ -374,7 +379,7 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
           </h4>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {q.options.map((option, idx) => (
+            {qOptions.map((option, idx) => (
               <button
                 key={idx}
                 onClick={() => {
