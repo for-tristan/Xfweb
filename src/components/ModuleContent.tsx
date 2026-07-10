@@ -134,7 +134,7 @@ export default function ModuleContent({ content }: { content: string }) {
                         }}
                         codeTagProps={{
                           style: {
-                            fontFamily: "'Space Grotesk', monospace',
+                            fontFamily: "\"Space Grotesk\", monospace",
                             color: 'var(--text-light, #efefef)',
                           }
                         }}
