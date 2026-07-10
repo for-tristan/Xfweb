@@ -1,6 +1,6 @@
 'use client';
 
-import React, { HTMLAttributes } from 'react';
+import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -115,51 +115,41 @@ export default function ModuleContent({ content }: { content: string }) {
                 code: ({ children, className }) => {
                   const isBlock = className?.includes('language-');
                   if (isBlock) {
-                    return <code className={className}>{children}</code>;
+                    const language = className!.replace('language-', '') || 'text';
+                    // In react-markdown v10, children is the code text (string or array of strings).
+                    // Concatenate properly to preserve newlines in multi-line blocks.
+                    const codeText = Array.isArray(children)
+                      ? children.map(c => (typeof c === 'string' ? c : String(c ?? ''))).join('')
+                      : (typeof children === 'string' ? children : String(children ?? ''));
+                    return (
+                      <SyntaxHighlighter
+                        style={oneDark}
+                        language={language}
+                        customStyle={{
+                          margin: '16px 0',
+                          borderRadius: 4,
+                          fontSize: 13,
+                          background: 'var(--dark-gray)',
+                          border: '1px solid var(--border-color)',
+                        }}
+                        codeTagProps={{
+                          style: {
+                            fontFamily: "'Space Grotesk', monospace',
+                            color: 'var(--text-light, #efefef)',
+                          }
+                        }}
+                      >
+                        {codeText}
+                      </SyntaxHighlighter>
+                    );
                   }
                   return <code style={mdStyles.code}>{children}</code>;
                 },
-                pre: ({ children }) => {
-                  const codeElement = React.Children.toArray(children).find(
-                    (child) => React.isValidElement(child) && child.type === 'code'
-                  ) as React.ReactElement<HTMLAttributes<HTMLElement>> | undefined;
-                  const className = codeElement?.props?.className || '';
-                  const language = className.replace('language-', '') || 'text';
-
-                  // Recursively extract text from the code element's children.
-                  // ReactMarkdown can pass children as:
-                  // - a string (single-line code) -> works with String()
-                  // - an array of strings (multi-line code) -> String() joins with commas, losing newlines
-                  // - an array of React elements (tokenized) -> String() gives [object Object]
-                  // We need to walk the tree and concatenate all text nodes.
-                  const extractText = (node: any): string => {
-                    if (node === null || node === undefined) return '';
-                    if (typeof node === 'string') return node;
-                    if (typeof node === 'number') return String(node);
-                    if (Array.isArray(node)) return node.map(extractText).join('');
-                    if (React.isValidElement(node)) {
-                      return extractText((node.props as any)?.children);
-                    }
-                    return '';
-                  };
-                  const codeString = extractText(codeElement?.props?.children);
-
-                  return (
-                    <SyntaxHighlighter
-                      style={oneDark}
-                      language={language}
-                      customStyle={{
-                        margin: '16px 0',
-                        borderRadius: 4,
-                        fontSize: 13,
-                        background: 'var(--dark-gray)',
-                        border: '1px solid var(--border-color)',
-                      }}
-                    >
-                      {codeString}
-                    </SyntaxHighlighter>
-                  );
-                },
+                // Don't add a <pre> wrapper — the SyntaxHighlighter above
+                // renders its own <pre>. A bare <pre>{children}</pre> here
+                // would create nested <pre> tags. Pass children through
+                // in a fragment so the SyntaxHighlighter is the sole <pre>.
+                pre: ({ children }) => <>{children}</>,
                 hr: () => <hr style={mdStyles.hr} />,
                 table: ({ children }) => <table style={mdStyles.table}>{children}</table>,
                 th: ({ children }) => <th style={mdStyles.th}>{children}</th>,
