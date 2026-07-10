@@ -125,8 +125,24 @@ export default function ModuleContent({ content }: { content: string }) {
                   ) as React.ReactElement<HTMLAttributes<HTMLElement>> | undefined;
                   const className = codeElement?.props?.className || '';
                   const language = className.replace('language-', '') || 'text';
-                  const codeText = codeElement?.props?.children || '';
-                  const codeString = typeof codeText === 'string' ? codeText : String(codeText);
+
+                  // Recursively extract text from the code element's children.
+                  // ReactMarkdown can pass children as:
+                  // - a string (single-line code) -> works with String()
+                  // - an array of strings (multi-line code) -> String() joins with commas, losing newlines
+                  // - an array of React elements (tokenized) -> String() gives [object Object]
+                  // We need to walk the tree and concatenate all text nodes.
+                  const extractText = (node: any): string => {
+                    if (node === null || node === undefined) return '';
+                    if (typeof node === 'string') return node;
+                    if (typeof node === 'number') return String(node);
+                    if (Array.isArray(node)) return node.map(extractText).join('');
+                    if (React.isValidElement(node)) {
+                      return extractText((node.props as any)?.children);
+                    }
+                    return '';
+                  };
+                  const codeString = extractText(codeElement?.props?.children);
 
                   return (
                     <SyntaxHighlighter
