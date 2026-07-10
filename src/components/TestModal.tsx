@@ -600,7 +600,7 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
           ) : (
             <button
               className="v-btn v-btn-accent"
-              onClick={handleSubmit}
+              onClick={() => handleSubmit()}
               disabled={submitting || timeLeft === 0}
               style={{ opacity: submitting ? 0.6 : 1 }}
             >
