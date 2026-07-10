@@ -236,6 +236,10 @@ export function AuthModal({
                 <p style={{ color: 'var(--text-dim)', fontSize: 14, lineHeight: 1.6 }}>
                   A 6-digit verification code was sent to <strong style={{ color: 'var(--text-light)' }}>{verificationEmail}</strong>. Enter it below to activate your account.
                 </p>
+                <p style={{ marginTop: 10, fontSize: 12, color: 'var(--warning-color)', display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
+                  <i className="fa-solid fa-circle-info" style={{ fontSize: 11 }}></i>
+                  Don&apos;t see it? Check your spam/junk folder.
+                </p>
               </div>
               <form onSubmit={onVerifyEmail}>
                 <WaveInput label="6-Digit Code" type="text" value={verificationCode} onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 6); setVerificationCode(v); }} required maxLength={6} autoFocus style={{ textAlign: 'center', fontSize: 24, letterSpacing: 10, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif" }} />
@@ -283,8 +287,12 @@ export function AuthModal({
               <button className="auth-modal-close" onClick={() => { onClose(); setForgotStep('idle'); }}>&times;</button>
             </div>
             <div className="auth-modal-body">
-              <p style={{ color: 'var(--text-dim)', fontSize: 14, marginBottom: 20, lineHeight: 1.6 }}>
+              <p style={{ color: 'var(--text-dim)', fontSize: 14, marginBottom: 10, lineHeight: 1.6 }}>
                 A 6-digit code was sent to <strong style={{ color: 'var(--text-light)' }}>{forgotEmail}</strong>. Enter it below along with your new password.
+              </p>
+              <p style={{ marginBottom: 20, fontSize: 12, color: 'var(--warning-color)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <i className="fa-solid fa-circle-info" style={{ fontSize: 11 }}></i>
+                Don&apos;t see it? Check your spam/junk folder.
               </p>
               <form onSubmit={onResetSubmit}>
                 <WaveInput label="6-Digit Code" type="text" value={resetCode} onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 6); setResetCode(v); }} required maxLength={6} autoFocus style={{ textAlign: 'center', fontSize: 24, letterSpacing: 10, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif" }} />

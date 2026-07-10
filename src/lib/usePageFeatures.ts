@@ -321,7 +321,7 @@ export function usePageFeatures() {
           setVerificationEmail(data.email);
           setVerificationCode('');
           setVerificationStep('pending');
-          toast({ title: 'Check your email!', description: 'A 6-digit verification code has been sent to your email.' });
+          toast({ title: 'Check your email!', description: 'A 6-digit verification code has been sent. Don\'t forget to check your spam folder.' });
         } else {
           setUser(data.user);
           setProfileName(data.user.name || '');

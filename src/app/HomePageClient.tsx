@@ -655,7 +655,7 @@ export default function Home({
           setVerificationEmail(data.email);
           setVerificationCode('');
           setVerificationStep('pending');
-          toast({ title: 'Check your email!', description: 'A 6-digit verification code has been sent to your email.' });
+          toast({ title: 'Check your email!', description: 'A 6-digit verification code has been sent. Don\'t forget to check your spam folder.' });
         } else {
           setUser(data.user); setAuthModalOpen(false); setDqName(data.user.name); setDqEmail(data.user.email); setCqEmail(data.user.email); toast({ title: 'Account created!', description: `Welcome to XFoundry, ${data.user.name}` });
         }

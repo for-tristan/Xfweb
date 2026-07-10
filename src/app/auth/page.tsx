@@ -427,6 +427,10 @@ function AuthContent() {
                   <p style={{ color: 'var(--text-dim)', fontSize: 14, lineHeight: 1.6 }}>
                     A 6-digit code was sent to <strong style={{ color: 'var(--text-light)' }}>{verificationEmail}</strong>
                   </p>
+                  <p style={{ marginTop: 8, fontSize: 12, color: 'var(--warning-color)', display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
+                    <i className="fa-solid fa-circle-info" style={{ fontSize: 11 }}></i>
+                    Don&apos;t see it? Check your spam/junk folder.
+                  </p>
                 </div>
                 <form onSubmit={handleVerifyEmail}>
                   <WaveInput label="6-Digit Code" type="text" value={verificationCode} onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 6); setVerificationCode(v); }} required maxLength={6} autoFocus style={{ textAlign: 'center', fontSize: 24, letterSpacing: 10, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif" }} />
@@ -476,8 +480,12 @@ function AuthContent() {
             ) : forgotStep === 'code' ? (
               <div style={{ padding: '36px 28px' }}>
                 <h2 style={{ fontFamily: "'Inter Tight', sans-serif", fontSize: 20, fontWeight: 600, color: 'var(--text-light)', marginBottom: 8, textAlign: 'center' }}>Verify Code</h2>
-                <p style={{ color: 'var(--text-dim)', fontSize: 14, marginBottom: 20, lineHeight: 1.6, textAlign: 'center' }}>
+                <p style={{ color: 'var(--text-dim)', fontSize: 14, marginBottom: 8, lineHeight: 1.6, textAlign: 'center' }}>
                   A 6-digit code was sent to <strong style={{ color: 'var(--text-light)' }}>{forgotEmail}</strong>. Enter it below with your new password.
+                </p>
+                <p style={{ marginBottom: 20, fontSize: 12, color: 'var(--warning-color)', display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
+                  <i className="fa-solid fa-circle-info" style={{ fontSize: 11 }}></i>
+                  Don&apos;t see it? Check your spam/junk folder.
                 </p>
                 <form onSubmit={handleResetSubmit}>
                   <WaveInput label="6-Digit Code" type="text" value={resetCode} onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 6); setResetCode(v); }} required maxLength={6} autoFocus style={{ textAlign: 'center', fontSize: 24, letterSpacing: 10, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif" }} />
