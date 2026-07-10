@@ -45,6 +45,8 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
   const [timeLeft, setTimeLeft] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [testStartedAt, setTestStartedAt] = useState<string | null>(null);
+  const [hasStarted, setHasStarted] = useState(false);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [results, setResults] = useState<{
     success: boolean;
     score: number;
@@ -55,15 +57,27 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
   } | null>(null);
   const [error, setError] = useState('');
 
+  // Reset all state when a new test is opened
   useEffect(() => {
-    if (test && !test.hasCompleted) {
+    if (test) {
+      setHasStarted(false);
+      setAnswers({});
+      setCurrentQ(0);
+      setResults(null);
+      setError('');
       setTimeLeft(test.timeLimit * 60);
-      setTestStartedAt(new Date().toISOString());
+      setTestStartedAt(null);
+      setShowLeaveConfirm(false);
     }
   }, [test]);
 
+  // Start the timer only after the user confirms "Start Test"
   useEffect(() => {
-    if (!test || test.hasCompleted || timeLeft <= 0 || results) return;
+    if (!test || !hasStarted || test.hasCompleted || timeLeft <= 0 || results) return;
+
+    if (!testStartedAt) {
+      setTestStartedAt(new Date().toISOString());
+    }
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
@@ -76,20 +90,23 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [test, timeLeft, results, test?.hasCompleted]);
+  }, [test, hasStarted, timeLeft, results, test?.hasCompleted, testStartedAt]);
 
   useEffect(() => {
-    if (timeLeft === 0 && test && !test.hasCompleted && !results && !submitting) {
-      handleSubmit();
+    if (timeLeft === 0 && test && hasStarted && !test.hasCompleted && !results && !submitting) {
+      handleSubmit({ force: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeLeft]);
 
-  const handleSubmit = useCallback(async () => {
+  const handleSubmit = useCallback(async (opts?: { force?: boolean }) => {
     if (!test || submitting || results) return;
 
     const answeredCount = Object.keys(answers).length;
-    if (answeredCount === 0) {
+    // Block explicit submit (Submit Test button) with 0 answers.
+    // But allow forced submit (auto-submit on close / time-up) with 0
+    // answers — the server records a 0-score attempt.
+    if (answeredCount === 0 && !opts?.force) {
       setError('Please answer at least one question');
       return;
     }
@@ -124,7 +141,54 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
     }
 
     setSubmitting(false);
-  }, [test, submitting, results, answers, onSubmitted]);
+  }, [test, submitting, results, answers, onSubmitted, testStartedAt]);
+
+  /**
+   * Smart close handler:
+   * - If test hasn't started (on confirmation screen) → just close
+   * - If test is in progress (started, no results yet) → show leave confirmation
+   * - If results are showing → just close
+   * - If already completed (viewing past attempt) → just close
+   */
+  const handleClose = useCallback(() => {
+    if (hasStarted && !results && !test?.hasCompleted) {
+      setShowLeaveConfirm(true);
+    } else {
+      onClose();
+    }
+  }, [hasStarted, results, test?.hasCompleted, onClose]);
+
+  /**
+   * User confirmed they want to leave mid-test → submit with current
+   * answers (force=true so 0-answer submit is allowed), then close.
+   * If submit fails, close anyway (don't trap user).
+   */
+  const handleConfirmLeave = useCallback(async () => {
+    setShowLeaveConfirm(false);
+    if (!results) {
+      await handleSubmit({ force: true });
+    }
+    onClose();
+  }, [results, handleSubmit, onClose]);
+
+  // ESC key handler — during an active test, ESC triggers the leave
+  // confirmation (not a silent close). On other screens (confirmation,
+  // results, completed), ESC closes normally.
+  useEffect(() => {
+    if (!test) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (showLeaveConfirm) {
+          // ESC on the leave-confirmation dialog just dismisses it
+          setShowLeaveConfirm(false);
+        } else {
+          handleClose();
+        }
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [test, showLeaveConfirm, handleClose]);
 
   if (!test) return null;
 
@@ -158,6 +222,110 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
     const s = seconds % 60;
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   };
+
+  // ---- Confirmation screen: shown before the test starts ----
+  // User must explicitly click "Start Test" to begin. Shows question count
+  // + time limit + passing score so they know what they're committing to.
+  // Timer does NOT start until they click Start.
+  if (!hasStarted && !test.hasCompleted && !results) {
+    return (
+      <div style={{
+        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)',
+        backdropFilter: 'blur(16px) saturate(1.4)', WebkitBackdropFilter: 'blur(16px) saturate(1.4)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 99999, padding: 20,
+      }} data-lenis-prevent>
+        <div style={{
+          background: 'color-mix(in srgb, var(--card-bg) 92%, transparent)',
+          backdropFilter: 'blur(24px) saturate(1.6)', WebkitBackdropFilter: 'blur(24px) saturate(1.6)',
+          border: '1px solid color-mix(in srgb, var(--border-color) 60%, transparent)',
+          borderRadius: 16,
+          padding: '36px 40px', maxWidth: 480, width: '100%', textAlign: 'center',
+          boxShadow: '0 0 0 1px color-mix(in srgb, var(--accent) 8%, transparent), 0 24px 80px rgba(0,0,0,0.5), 0 0 120px color-mix(in srgb, var(--accent) 6%, transparent)',
+        }}>
+          <div style={{
+            width: 64, height: 64, borderRadius: '50%', margin: '0 auto 20px',
+            background: 'color-mix(in srgb, var(--accent) 10%, transparent)',
+            border: '2px solid color-mix(in srgb, var(--accent) 25%, transparent)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <i className="fa-solid fa-file-pen" style={{ fontSize: 26, color: 'var(--accent)' }} />
+          </div>
+
+          <h3 style={{ fontSize: 20, marginBottom: 8, color: 'var(--text-light)', fontFamily: 'var(--font-heading, Inter Tight)', fontWeight: 800 }}>
+            {test.title}
+          </h3>
+          {test.description && (
+            <p style={{ fontSize: 14, color: 'var(--text-dim)', marginBottom: 24, fontFamily: 'var(--font-body, Inter Tight)', lineHeight: 1.5 }}>
+              {test.description}
+            </p>
+          )}
+
+          {/* Test info grid */}
+          <div style={{
+            display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12,
+            padding: '16px 0', marginBottom: 24,
+            borderTop: '1px solid color-mix(in srgb, var(--border-color) 50%, transparent)',
+            borderBottom: '1px solid color-mix(in srgb, var(--border-color) 50%, transparent)',
+          }}>
+            <div>
+              <div style={{ fontSize: 11, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4, fontWeight: 600 }}>
+                <i className="fa-solid fa-list-ol" style={{ marginRight: 4 }} />Questions
+              </div>
+              <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-light)', fontFamily: 'var(--font-heading, Inter Tight)' }}>
+                {questions.length}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4, fontWeight: 600 }}>
+                <i className="fa-solid fa-clock" style={{ marginRight: 4 }} />Time Limit
+              </div>
+              <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-light)', fontFamily: 'var(--font-heading, Inter Tight)' }}>
+                {test.timeLimit}<span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-dim)' }}> min</span>
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4, fontWeight: 600 }}>
+                <i className="fa-solid fa-check-double" style={{ marginRight: 4 }} />Pass Mark
+              </div>
+              <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-light)', fontFamily: 'var(--font-heading, Inter Tight)' }}>
+                {test.passingScore}<span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-dim)' }}>%</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Warning about auto-submit on close */}
+          <div style={{
+            background: 'color-mix(in srgb, var(--warning-color) 8%, transparent)',
+            border: '1px solid color-mix(in srgb, var(--warning-color) 25%, transparent)',
+            borderRadius: 10, padding: '12px 16px', marginBottom: 24,
+            display: 'flex', alignItems: 'flex-start', gap: 10, textAlign: 'left',
+          }}>
+            <i className="fa-solid fa-triangle-exclamation" style={{ color: 'var(--warning-color)', fontSize: 14, marginTop: 2, flexShrink: 0 }} />
+            <span style={{ fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.5 }}>
+              Once you start, the timer begins. If you close the test window, your current answers will be <strong style={{ color: 'var(--text-light)' }}>submitted automatically</strong>.
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', gap: 12 }}>
+            <button
+              className="v-btn v-btn-ghost"
+              onClick={onClose}
+              style={{ flex: 1 }}
+            >
+              <i className="fa-solid fa-xmark" style={{ marginRight: 8 }} /> Cancel
+            </button>
+            <button
+              className="v-btn v-btn-accent"
+              onClick={() => setHasStarted(true)}
+              style={{ flex: 2 }}
+            >
+              <i className="fa-solid fa-play" style={{ marginRight: 8 }} /> Start Test
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const answeredCount = Object.keys(answers).length;
   const isTimeLow = timeLeft <= 60 && timeLeft > 0;
@@ -302,7 +470,7 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
       position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)',
       backdropFilter: 'blur(16px) saturate(1.4)', WebkitBackdropFilter: 'blur(16px) saturate(1.4)',
       display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 99999, padding: 20,
-    }} data-lenis-prevent onClick={onClose}>
+    }} data-lenis-prevent onClick={handleClose}>
       <div style={{
         background: 'color-mix(in srgb, var(--card-bg) 92%, transparent)',
         backdropFilter: 'blur(24px) saturate(1.6)', WebkitBackdropFilter: 'blur(24px) saturate(1.6)',
@@ -337,7 +505,7 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
               <i className="fa-solid fa-clock" style={{ marginRight: 6, fontSize: 13 }} />
               {formatTime(test.timeLimit * 60 - timeLeft)} / {formatTime(test.timeLimit * 60)}
             </div>
-            <button onClick={onClose} className="v-modal-close" style={{ background: 'color-mix(in srgb, var(--text-light) 6%, transparent)', border: '1px solid color-mix(in srgb, var(--border-color) 40%, transparent)', borderRadius: 8, color: 'var(--text-dim)', fontSize: 18, cursor: 'pointer', padding: 4, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <button onClick={handleClose} className="v-modal-close" style={{ background: 'color-mix(in srgb, var(--text-light) 6%, transparent)', border: '1px solid color-mix(in srgb, var(--border-color) 40%, transparent)', borderRadius: 8, color: 'var(--text-dim)', fontSize: 18, cursor: 'pointer', padding: 4, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <i className="fa-solid fa-times" />
             </button>
           </div>
@@ -442,6 +610,70 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
           )}
         </div>
       </div>
+
+      {/* Leave confirmation overlay — shown when user tries to close
+          the test mid-way (clicks backdrop, close button, or ESC).
+          Prevents accidental close + auto-submits current answers. */}
+      {showLeaveConfirm && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
+            backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 100000, padding: 20,
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div
+            style={{
+              background: 'color-mix(in srgb, var(--card-bg) 96%, transparent)',
+              border: '1px solid color-mix(in srgb, var(--error-color) 30%, transparent)',
+              borderRadius: 16, padding: '28px 32px', maxWidth: 420, width: '100%',
+              textAlign: 'center',
+              boxShadow: '0 24px 80px rgba(0,0,0,0.6)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{
+              width: 56, height: 56, borderRadius: '50%', margin: '0 auto 16px',
+              background: 'color-mix(in srgb, var(--error-color) 12%, transparent)',
+              border: '2px solid color-mix(in srgb, var(--error-color) 25%, transparent)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <i className="fa-solid fa-triangle-exclamation" style={{ fontSize: 22, color: 'var(--error-color)' }} />
+            </div>
+            <h3 style={{ fontSize: 17, marginBottom: 8, color: 'var(--text-light)', fontFamily: 'var(--font-heading, Inter Tight)', fontWeight: 800 }}>
+              Submit and close?
+            </h3>
+            <p style={{ fontSize: 13, color: 'var(--text-dim)', marginBottom: 8, lineHeight: 1.5 }}>
+              You&apos;ve answered <strong style={{ color: 'var(--text-light)' }}>{answeredCount}</strong> of <strong style={{ color: 'var(--text-light)' }}>{questions.length}</strong> questions.
+            </p>
+            <p style={{ fontSize: 13, color: 'var(--text-dim)', marginBottom: 24, lineHeight: 1.5 }}>
+              Closing now will <strong style={{ color: 'var(--error-color)' }}>submit your test</strong> with the answers you&apos;ve given so far. You can&apos;t retake it without admin help.
+            </p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                className="v-btn v-btn-ghost"
+                onClick={() => setShowLeaveConfirm(false)}
+                style={{ flex: 1 }}
+              >
+                <i className="fa-solid fa-arrow-left" style={{ marginRight: 6 }} /> Keep Taking
+              </button>
+              <button
+                className="v-btn"
+                onClick={handleConfirmLeave}
+                style={{
+                  flex: 1,
+                  background: 'var(--error-color)', color: 'white',
+                  border: '1px solid var(--error-color)',
+                }}
+              >
+                <i className="fa-solid fa-paper-plane" style={{ marginRight: 6 }} /> Submit & Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style>{`
         @keyframes pulse {
