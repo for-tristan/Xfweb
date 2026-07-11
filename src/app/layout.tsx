@@ -6,6 +6,7 @@ import ClientProviders from '@/components/ClientProviders';
 import GrainBackground from '@/components/GrainBackground';
 import ClickSplash from '@/components/ClickSplash';
 import CookieConsentBanner from '@/components/CookieConsentBanner';
+import PageViewTracker from '@/components/PageViewTracker';
 import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
@@ -77,6 +78,7 @@ export default function RootLayout({
         <GrainBackground />
         <ClickSplash />
         <ClientProviders>
+          <PageViewTracker />
           <main id="main-content">
             <ErrorBoundary>
               {children}

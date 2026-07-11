@@ -481,3 +481,23 @@ model ActivityLog {
   @@index([action])
   @@map("ActivityLog")
 }
+
+model BannedIp {
+  id        String   @id @default(cuid())
+  ip        String   @unique
+  reason    String?
+  bannedBy  String?
+  createdAt DateTime @default(now())
+
+  @@map("BannedIp")
+}
+
+model BannedEmail {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  reason    String?
+  bannedBy  String?
+  createdAt DateTime @default(now())
+
+  @@map("BannedEmail")
+}

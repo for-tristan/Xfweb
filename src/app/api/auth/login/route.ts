@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { verifyPassword, createSession, hashPassword } from '@/lib/auth';
 import { sendEmailVerificationEmail } from '@/lib/email';
 import { logRequest } from '@/lib/activityLog';
+import { isEmailBanned, isIpBanned } from '@/lib/banCheck';
 import { randomInt } from 'crypto';
 
 // SECURITY: Pre-computed dummy hash used to keep login response time
@@ -24,9 +25,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // SECURITY: Check IP ban before processing login
+    const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+                     request.headers.get('x-real-ip') || 'unknown';
+    if (await isIpBanned(clientIp)) {
+      await logRequest(request, 'LOGIN_BLOCKED', {
+        details: 'Login blocked — IP is banned',
+        status: 403,
+      });
+      return NextResponse.json(
+        { error: 'Access denied.' },
+        { status: 403 }
+      );
+    }
+
     const user = await db.user.findUnique({
       where: { email: email.toLowerCase().trim() },
     });
+
+    // SECURITY: Check email ban after finding user (so we have the email)
+    if (user && await isEmailBanned(user.email)) {
+      await logRequest(request, 'LOGIN_BLOCKED', {
+        userId: user.id,
+        email: user.email,
+        details: 'Login blocked — email is banned',
+        status: 403,
+      });
+      return NextResponse.json(
+        { error: 'This account has been suspended. Please contact support.' },
+        { status: 403 }
+      );
+    }
 
     if (!user) {
       // SECURITY: Burn the same time a real password verification would

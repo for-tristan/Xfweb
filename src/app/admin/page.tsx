@@ -68,7 +68,7 @@ export default function AdminPage() {
       toast({ title: 'Access Denied', description: 'Admin access required', variant: 'destructive' });
     }
   }, [loading, user]);
-  const [tab, setTab] = useState<'enrollments' | 'users' | 'progress' | 'modules' | 'quotes' | 'team' | 'services' | 'courses' | 'tests' | 'projects' | 'analytics' | 'logs'>('enrollments');
+  const [tab, setTab] = useState<'enrollments' | 'users' | 'progress' | 'modules' | 'quotes' | 'team' | 'services' | 'courses' | 'tests' | 'projects' | 'analytics' | 'logs' | 'bans'>('enrollments');
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -105,6 +105,69 @@ export default function AdminPage() {
   const [logsAutoRefresh, setLogsAutoRefresh] = useState(true);
   const logsFetchRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // ---- Bans state ----
+  const [bannedIps, setBannedIps] = useState<any[]>([]);
+  const [bannedEmails, setBannedEmails] = useState<any[]>([]);
+  const [bansLoading, setBansLoading] = useState(false);
+  const [banType, setBanType] = useState<'ip' | 'email'>('ip');
+  const [banValue, setBanValue] = useState('');
+  const [banReason, setBanReason] = useState('');
+
+  // ---- Log stats state ----
+  const [logStats, setLogStats] = useState<any>(null);
+
+  const fetchBans = useCallback(async () => {
+    setBansLoading(true);
+    try {
+      const r = await fetch('/api/admin/bans');
+      if (r.ok) {
+        const d = await r.json();
+        setBannedIps(d.bannedIps || []);
+        setBannedEmails(d.bannedEmails || []);
+      }
+    } catch {}
+    setBansLoading(false);
+  }, []);
+
+  const fetchLogStats = useCallback(async () => {
+    try {
+      const r = await fetch('/api/admin/logs/stats');
+      if (r.ok) setLogStats(await r.json());
+    } catch {}
+  }, []);
+
+  const handleBan = async () => {
+    if (!banValue.trim()) return;
+    try {
+      const r = await fetch('/api/admin/bans', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: banType, value: banValue.trim(), reason: banReason.trim() || undefined }),
+      });
+      if (r.ok) {
+        toast({ title: 'Banned', description: `${banType === 'ip' ? 'IP' : 'Email'} banned successfully` });
+        setBanValue(''); setBanReason('');
+        fetchBans();
+      } else {
+        toast({ title: 'Error', description: (await r.json()).error, variant: 'destructive' });
+      }
+    } catch { toast({ title: 'Error', description: 'Operation failed', variant: 'destructive' }); }
+  };
+
+  const handleUnban = async (type: 'ip' | 'email', value: string) => {
+    try {
+      const r = await fetch('/api/admin/bans', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type, value }),
+      });
+      if (r.ok) {
+        toast({ title: 'Unbanned', description: `${type === 'ip' ? 'IP' : 'Email'} unbanned` });
+        fetchBans();
+      }
+    } catch {}
+  };
+
   const fetchLogs = useCallback(async (page = 1, search = '', action = '') => {
     setLogsLoading(true);
     try {
@@ -126,11 +189,14 @@ export default function AdminPage() {
   // Auto-refresh logs every 5 seconds when on the logs tab
   useEffect(() => {
     if (tab !== 'logs' || !logsAutoRefresh) return;
+    fetchLogs(logsPage, logsSearch, logsActionFilter);
+    fetchLogStats();
     const interval = setInterval(() => {
       fetchLogs(logsPage, logsSearch, logsActionFilter);
+      fetchLogStats();
     }, 5000);
     return () => clearInterval(interval);
-  }, [tab, logsAutoRefresh, logsPage, logsSearch, logsActionFilter, fetchLogs]);
+  }, [tab, logsAutoRefresh, logsPage, logsSearch, logsActionFilter, fetchLogs, fetchLogStats]);
   const fetchQuotes = useCallback(async () => {
     setQuotesLoading(true);
     try { const r = await fetch('/api/admin/quotes'); if (r.ok) { const d = await r.json(); setAdminQuotes(d.quotes || []); } } catch {}
@@ -868,8 +934,11 @@ export default function AdminPage() {
             <button className={`filter-btn${tab === 'analytics' ? ' active' : ''}`} onClick={() => { setTab('analytics'); if (!analytics) { fetch('/api/admin/analytics').then(r => r.json()).then(d => setAnalytics(d)).catch(() => {}); } }}>
               <i className="fa-solid fa-chart-bar" style={{ marginRight: 8 }}></i>Analytics
             </button>
-            <button className={`filter-btn${tab === 'logs' ? ' active' : ''}`} onClick={() => { setTab('logs'); fetchLogs(1, logsSearch, logsActionFilter); }} style={{ color: 'var(--warning-color)' }}>
+            <button className={`filter-btn${tab === 'logs' ? ' active' : ''}`} onClick={() => { setTab('logs'); fetchLogs(1, logsSearch, logsActionFilter); fetchLogStats(); }} style={{ color: 'var(--warning-color)' }}>
               <i className="fa-solid fa-list-ul" style={{ marginRight: 8 }}></i>Logs
+            </button>
+            <button className={`filter-btn${tab === 'bans' ? ' active' : ''}`} onClick={() => { setTab('bans'); fetchBans(); }} style={{ color: 'var(--error-color)' }}>
+              <i className="fa-solid fa-ban" style={{ marginRight: 8 }}></i>Bans
             </button>
           </div>
           {tab === 'enrollments' && (
@@ -2338,6 +2407,59 @@ export default function AdminPage() {
           {/* ---- ACTIVITY LOGS TAB ---- */}
           {tab === 'logs' && (
             <div style={{ maxWidth: 1400, margin: '0 auto' }}>
+              {/* Visitor stats summary */}
+              {logStats && (
+                <div className="reveal" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16, marginBottom: 24 }}>
+                  {[
+                    { label: 'Page Views Today', value: logStats.pageViewsToday, icon: 'fa-eye', color: 'var(--accent)' },
+                    { label: 'Unique Visitors Today', value: logStats.uniqueVisitorsToday, icon: 'fa-users', color: '#6b9bf5' },
+                    { label: 'Total Page Views', value: logStats.totalPageViews, icon: 'fa-chart-line', color: 'var(--success-color)' },
+                    { label: 'Total Unique Visitors', value: logStats.uniqueVisitorsTotal, icon: 'fa-globe', color: 'var(--warning-color)' },
+                    { label: 'Logs Today', value: logStats.logsToday, icon: 'fa-list', color: 'var(--text-light)' },
+                    { label: 'Total Logs', value: logStats.totalLogs, icon: 'fa-database', color: 'var(--text-dim)' },
+                  ].map((stat, i) => (
+                    <div key={i} style={{ background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)', border: '1px solid var(--border-color)', borderRadius: 12, padding: '16px 18px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                        <i className={`fa-solid ${stat.icon}`} style={{ color: stat.color, fontSize: 14 }} />
+                        <span style={{ fontSize: 10, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 600 }}>{stat.label}</span>
+                      </div>
+                      <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-light)', fontFamily: 'var(--font-heading)' }}>{typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Top pages + top IPs side by side */}
+              {logStats && (logStats.topPages?.length > 0 || logStats.topIps?.length > 0) && (
+                <div className="reveal" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16, marginBottom: 24 }}>
+                  {logStats.topPages?.length > 0 && (
+                    <div style={{ background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)', border: '1px solid var(--border-color)', borderRadius: 12, padding: 16 }}>
+                      <h4 style={{ fontSize: 12, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 700, marginBottom: 12 }}><i className="fa-solid fa-fire" style={{ marginRight: 6, color: 'var(--accent)' }} />Top Pages Today</h4>
+                      {logStats.topPages.map((p: any, i: number) => (
+                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0', fontSize: 12 }}>
+                          <span style={{ color: 'var(--text-light)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 200 }}>{p.path}</span>
+                          <span style={{ color: 'var(--accent)', fontWeight: 700, flexShrink: 0 }}>{p.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {logStats.topIps?.length > 0 && (
+                    <div style={{ background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)', border: '1px solid var(--border-color)', borderRadius: 12, padding: 16 }}>
+                      <h4 style={{ fontSize: 12, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 700, marginBottom: 12 }}><i className="fa-solid fa-network-wired" style={{ marginRight: 6, color: '#6b9bf5' }} />Top IPs Today</h4>
+                      {logStats.topIps.map((ip: any, i: number) => (
+                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0', fontSize: 12, gap: 8 }}>
+                          <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, flex: 1 }}>
+                            <span style={{ color: 'var(--text-light)', fontFamily: 'monospace' }}>{ip.ip}</span>
+                            {ip.email && <span style={{ color: 'var(--text-dim)', marginLeft: 6, fontSize: 10 }}>({ip.email})</span>}
+                          </div>
+                          <span style={{ color: '#6b9bf5', fontWeight: 700, flexShrink: 0 }}>{ip.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Controls bar */}
               <div className="reveal" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center', marginBottom: 24 }}>
                 <div style={{ flex: '1 1 300px', position: 'relative' }}>
@@ -2491,6 +2613,108 @@ export default function AdminPage() {
                   </button>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* ---- BANS TAB ---- */}
+          {tab === 'bans' && (
+            <div style={{ maxWidth: 900, margin: '0 auto' }}>
+              {/* Add ban form */}
+              <div className="reveal" style={{ background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)', border: '1px solid var(--border-color)', borderRadius: 12, padding: 24, marginBottom: 32 }}>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-light)', marginBottom: 16 }}>
+                  <i className="fa-solid fa-ban" style={{ marginRight: 8, color: 'var(--error-color)' }} />Add New Ban
+                </h3>
+                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
+                  <select value={banType} onChange={(e) => setBanType(e.target.value as 'ip' | 'email')} style={{ padding: '10px 14px', borderRadius: 10, background: 'var(--input-bg)', border: '1px solid var(--border-color)', color: 'var(--text-light)', fontSize: 13, cursor: 'pointer' }}>
+                    <option value="ip">IP Address</option>
+                    <option value="email">Email</option>
+                  </select>
+                  <input
+                    type="text"
+                    placeholder={banType === 'ip' ? 'e.g. 192.168.1.1' : 'e.g. spammer@example.com'}
+                    value={banValue}
+                    onChange={(e) => setBanValue(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' && banValue.trim()) handleBan(); }}
+                    style={{ flex: '1 1 250px', padding: '10px 14px', borderRadius: 10, background: 'var(--input-bg)', border: '1px solid var(--border-color)', color: 'var(--text-light)', fontSize: 13, outline: 'none' }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Reason (optional)"
+                    value={banReason}
+                    onChange={(e) => setBanReason(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' && banValue.trim()) handleBan(); }}
+                    style={{ flex: '1 1 200px', padding: '10px 14px', borderRadius: 10, background: 'var(--input-bg)', border: '1px solid var(--border-color)', color: 'var(--text-light)', fontSize: 13, outline: 'none' }}
+                  />
+                  <button
+                    className="btn"
+                    onClick={handleBan}
+                    disabled={!banValue.trim()}
+                    style={{ padding: '10px 20px', fontSize: 12, background: 'var(--error-color)', border: '1px solid var(--error-color)', color: 'white', opacity: banValue.trim() ? 1 : 0.5 }}
+                  >
+                    <i className="fa-solid fa-ban" style={{ marginRight: 6 }} />Ban
+                  </button>
+                </div>
+                <p style={{ fontSize: 11, color: 'var(--text-dim)' }}>
+                  <i className="fa-solid fa-circle-info" style={{ marginRight: 4 }} />
+                  Banned IPs are blocked from signup + login. Banned emails are blocked from signup + login. Existing sessions are NOT automatically invalidated.
+                </p>
+              </div>
+
+              {/* Banned IPs list */}
+              <div style={{ marginBottom: 32 }}>
+                <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-light)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <i className="fa-solid fa-network-wired" style={{ color: '#6b9bf5' }} />
+                  Banned IPs ({bannedIps.length})
+                </h3>
+                {bansLoading && bannedIps.length === 0 ? (
+                  <p style={{ color: 'var(--text-dim)', fontSize: 13, textAlign: 'center', padding: 20 }}>Loading...</p>
+                ) : bannedIps.length === 0 ? (
+                  <p style={{ color: 'var(--text-dim)', fontSize: 13, textAlign: 'center', padding: 20 }}>No banned IPs</p>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {bannedIps.map((ban) => (
+                      <div key={ban.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '12px 16px', background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)', border: '1px solid var(--border-color)', borderRadius: 10 }}>
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <span style={{ fontFamily: 'monospace', fontSize: 13, color: 'var(--text-light)' }}>{ban.ip}</span>
+                          {ban.reason && <span style={{ marginLeft: 12, fontSize: 12, color: 'var(--text-dim)' }}>{ban.reason}</span>}
+                          <span style={{ marginLeft: 12, fontSize: 10, color: 'var(--text-dim)' }}>{new Date(ban.createdAt).toLocaleDateString()}</span>
+                        </div>
+                        <button className="btn" onClick={() => handleUnban('ip', ban.ip)} style={{ padding: '6px 14px', fontSize: 11, background: 'transparent', border: '1px solid var(--success-color)', color: 'var(--success-color)' }}>
+                          <i className="fa-solid fa-unlock" style={{ marginRight: 4 }} />Unban
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Banned emails list */}
+              <div>
+                <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-light)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <i className="fa-solid fa-envelope" style={{ color: 'var(--error-color)' }} />
+                  Banned Emails ({bannedEmails.length})
+                </h3>
+                {bansLoading && bannedEmails.length === 0 ? (
+                  <p style={{ color: 'var(--text-dim)', fontSize: 13, textAlign: 'center', padding: 20 }}>Loading...</p>
+                ) : bannedEmails.length === 0 ? (
+                  <p style={{ color: 'var(--text-dim)', fontSize: 13, textAlign: 'center', padding: 20 }}>No banned emails</p>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {bannedEmails.map((ban) => (
+                      <div key={ban.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '12px 16px', background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)', border: '1px solid var(--border-color)', borderRadius: 10 }}>
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <span style={{ fontSize: 13, color: 'var(--text-light)' }}>{ban.email}</span>
+                          {ban.reason && <span style={{ marginLeft: 12, fontSize: 12, color: 'var(--text-dim)' }}>{ban.reason}</span>}
+                          <span style={{ marginLeft: 12, fontSize: 10, color: 'var(--text-dim)' }}>{new Date(ban.createdAt).toLocaleDateString()}</span>
+                        </div>
+                        <button className="btn" onClick={() => handleUnban('email', ban.email)} style={{ padding: '6px 14px', fontSize: 11, background: 'transparent', border: '1px solid var(--success-color)', color: 'var(--success-color)' }}>
+                          <i className="fa-solid fa-unlock" style={{ marginRight: 4 }} />Unban
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </section>

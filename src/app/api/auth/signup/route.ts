@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { hashPassword } from '@/lib/auth';
 import { sendEmailVerificationEmail } from '@/lib/email';
 import { logRequest } from '@/lib/activityLog';
+import { isEmailBanned, isIpBanned } from '@/lib/banCheck';
 import { randomInt } from 'crypto';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -59,6 +60,37 @@ export async function POST(request: NextRequest) {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
+
+    // SECURITY: Check email + IP bans before creating account
+    const [emailBanned, ipBanned] = await Promise.all([
+      isEmailBanned(normalizedEmail),
+      isIpBanned(
+        request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+        request.headers.get('x-real-ip') || 'unknown'
+      ),
+    ]);
+    if (emailBanned) {
+      await logRequest(request, 'SIGNUP_BLOCKED', {
+        email: normalizedEmail,
+        details: 'Signup blocked — email is banned',
+        status: 403,
+      });
+      return NextResponse.json(
+        { error: 'This email address is not allowed. Please contact support.' },
+        { status: 403 }
+      );
+    }
+    if (ipBanned) {
+      await logRequest(request, 'SIGNUP_BLOCKED', {
+        email: normalizedEmail,
+        details: 'Signup blocked — IP is banned',
+        status: 403,
+      });
+      return NextResponse.json(
+        { error: 'Access denied.' },
+        { status: 403 }
+      );
+    }
 
     const existingUser = await db.user.findUnique({
       where: { email: normalizedEmail },
