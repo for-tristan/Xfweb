@@ -554,10 +554,18 @@ export default function DynamicCoursePage() {
                                     </div>
                                     <button
                                       className="btn btn-primary"
-                                      style={{ padding: '8px 20px', fontSize: 12 }}
+                                      style={{
+                                        padding: '8px 20px', fontSize: 12,
+                                        ...(t.hasCompleted ? {
+                                          background: 'transparent',
+                                          border: '1px solid var(--border-color)',
+                                          color: 'var(--text-dim)',
+                                          cursor: 'pointer',
+                                        } : {}),
+                                      }}
                                       onClick={(e) => { e.stopPropagation(); setActiveTest(t); }}
                                     >
-                                      <i className="fa-solid fa-play" style={{ marginRight: 6 }}></i>
+                                      <i className={`fa-solid ${t.hasCompleted ? 'fa-eye' : 'fa-play'}`} style={{ marginRight: 6 }}></i>
                                       {t.hasCompleted ? 'View Result' : 'Take Test'}
                                     </button>
                                   </div>

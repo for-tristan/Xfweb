@@ -26,6 +26,19 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Test is not unlocked' }, { status: 403 });
     }
 
+    // SECURITY: Don't return questions if the student already submitted
+    // this test. Prevents retaking via API bypass. The submit endpoint
+    // also enforces this, but this stops the questions from even loading.
+    const existingAttempt = await db.testAttempt.findUnique({
+      where: { testId_userId: { testId, userId: user.id } },
+    });
+    if (existingAttempt && existingAttempt.submittedAt !== null) {
+      return NextResponse.json(
+        { error: 'You have already completed this test. Contact admin to reset.' },
+        { status: 400 }
+      );
+    }
+
     const test = await db.moduleTest.findUnique({
       where: { id: testId },
       include: {
