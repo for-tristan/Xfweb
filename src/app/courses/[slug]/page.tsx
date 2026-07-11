@@ -704,22 +704,29 @@ export default function DynamicCoursePage() {
         onClose={() => { setActiveTest(null); fetchStudentTests(); }}
         onSubmitted={(result) => {
           // Optimistic update: immediately mark the test as completed
-          // in the local state so the button changes from 'Take Test'
-          // to 'View Result' without waiting for a refetch.
+          // in studentTests so the button changes from 'Take Test' to
+          // 'View Result' without waiting for a refetch.
+          //
+          // IMPORTANT: do NOT call setActiveTest here. Changing activeTest
+          // would change the `test` prop on TestModal, triggering its
+          // useEffect that resets `results` to null — destroying the
+          // results screen the user just saw. Just update studentTests
+          // (which controls the button in the module list) and let the
+          // TestModal keep showing its internal results state.
           if (activeTest) {
-            const updatedTest: StudentTest = {
-              ...activeTest,
-              hasCompleted: true,
-              attempt: {
-                score: result.score,
-                totalPoints: result.totalPoints,
-                passed: result.passed,
-                submittedAt: new Date().toISOString(),
-              },
-            };
-            setActiveTest(updatedTest);
             setStudentTests(prev => prev.map(t =>
-              t.id === activeTest.id ? updatedTest : t
+              t.id === activeTest.id
+                ? {
+                    ...t,
+                    hasCompleted: true,
+                    attempt: {
+                      score: result.score,
+                      totalPoints: result.totalPoints,
+                      passed: result.passed,
+                      submittedAt: new Date().toISOString(),
+                    },
+                  }
+                : t
             ));
           }
           // Also refetch in background to sync with server
