@@ -55,16 +55,28 @@ export async function GET(
       // Get tests if enrolled
       if (enroll?.status === 'approved' && mods.length > 0) {
         const moduleIds = mods.map(m => m.id);
-        const [moduleTests, testAttempts, testUnlocks, cert] = await Promise.all([
-          db.moduleTest.findMany({
-            where: { moduleId: { in: moduleIds } },
-            include: { questions: { orderBy: { questionOrder: 'asc' } } },
-          }),
+
+        // Step 1: fetch the module tests first so we have their IDs.
+        // The previous code filtered testAttempts + testUnlocks by
+        // moduleIds — but those tables key on testId (the ModuleTest ID),
+        // NOT moduleId. That bug caused attempts to never be found, so
+        // hasCompleted was always false on page load (the button always
+        // said 'Take Test' even after the student had submitted).
+        const moduleTests = await db.moduleTest.findMany({
+          where: { moduleId: { in: moduleIds } },
+          include: { questions: { orderBy: { questionOrder: 'asc' } } },
+        });
+
+        const testIds = moduleTests.map(t => t.id);
+
+        // Step 2: fetch attempts + unlocks + certificate in parallel,
+        // now correctly filtering by testIds (not moduleIds).
+        const [testAttempts, testUnlocks, cert] = await Promise.all([
           db.testAttempt.findMany({
-            where: { testId: { in: moduleIds }, userId: user.id },
+            where: { testId: { in: testIds }, userId: user.id },
           }).catch(() => []),
           db.testUnlock.findMany({
-            where: { testId: { in: moduleIds }, userId: user.id },
+            where: { testId: { in: testIds }, userId: user.id },
           }).catch(() => []),
           db.certificate.findUnique({
             where: { userId_courseId: { userId: user.id, courseId: slug } },
