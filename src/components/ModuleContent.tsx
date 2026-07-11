@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import TextToSpeechButton from './TextToSpeechButton';
 
 function getYouTubeEmbedUrl(url: string): string | null {
   let match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
@@ -81,6 +82,11 @@ export default function ModuleContent({ content }: { content: string }) {
 
   return (
     <div className="module-content-rendered">
+      {/* Text-to-speech narration button — uses browser's Web Speech API.
+          No backend, no cost. Strips markdown before speaking. */}
+      <div style={{ marginBottom: 16 }}>
+        <TextToSpeechButton text={content} label="Listen to this module" />
+      </div>
       {parts.map((part, idx) => {
         if (part.type === 'video') {
           const embedUrl = getEmbedUrl(part.content);
