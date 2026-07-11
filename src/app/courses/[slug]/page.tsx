@@ -98,6 +98,7 @@ export default function DynamicCoursePage() {
     questions: { id: string; questionText: string; options: string[]; questionType: string; points: number; questionOrder: number }[];
     hasCompleted: boolean;
     attempt: { score: number; totalPoints: number; passed: boolean; submittedAt: string } | null;
+    unlocked: boolean;
   }
   const [studentTests, setStudentTests] = useState<StudentTest[]>([]);
   const [activeTest, setActiveTest] = useState<StudentTest | null>(null);
@@ -163,6 +164,7 @@ export default function DynamicCoursePage() {
               questions: t.questions || [],
               hasCompleted: !!t.hasCompleted,
               attempt: t.attempt || null,
+              unlocked: !!t.unlocked,
             }));
             setStudentTests(results);
           }
@@ -529,7 +531,7 @@ export default function DynamicCoursePage() {
                       )}
                     </div>
                     {mod.unlocked && expandedModule === mod.id && (() => {
-                      const moduleTests = studentTests.filter(t => t.moduleId === mod.id);
+                      const moduleTests = studentTests.filter(t => t.moduleId === mod.id && t.unlocked);
                       return (
                         <div className="module-expanded-content" onClick={(e) => e.stopPropagation()} style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--border-color)', paddingLeft: 56 }}>
                           <ModuleContent content={mod.content} />

@@ -112,7 +112,13 @@ export async function GET(
               passed: attempt.passed,
               submittedAt: attempt.submittedAt,
             } : null,
-            unlocked: unlockMap.has(t.id) || attempt !== undefined,
+            // A test is unlocked ONLY if there's a TestUnlock record for it.
+            // Previously this was `unlockMap.has(t.id) || attempt !== undefined`
+            // — the `|| attempt` override meant that once a student had ANY
+            // attempt (even in-progress), the test was permanently marked
+            // unlocked, even after the admin locked it. Now we respect the
+            // admin's lock: no TestUnlock record = locked.
+            unlocked: unlockMap.has(t.id),
           };
         });
 

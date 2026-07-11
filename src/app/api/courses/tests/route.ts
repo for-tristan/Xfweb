@@ -49,6 +49,7 @@ export async function GET(request: NextRequest) {
           questionOrder: q.questionOrder,
         })),
         hasCompleted,
+        unlocked: true, // All tests from this endpoint are unlocked (queried via testUnlock)
         attempt: hasCompleted && attempt
           ? {
               score: attempt.score,
