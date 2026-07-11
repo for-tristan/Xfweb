@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 export async function POST(request: NextRequest) {
   try {
@@ -96,6 +97,13 @@ export async function POST(request: NextRequest) {
     },
   });
 
+  await logRequest(request, 'TEST_SUBMIT', {
+    userId: user.id,
+    email: user.email,
+    details: `Submitted test "${test.title}" (testId: ${testId}). Score: ${score}/${totalPoints} (${Math.round(scorePercentage * 100) / 100}%), ${passed ? 'PASSED' : 'FAILED'} (passing threshold: ${test.passingScore}%)`,
+    status: 200,
+  });
+
   return NextResponse.json({
     success: true,
     score,
@@ -113,6 +121,12 @@ export async function POST(request: NextRequest) {
   });
   } catch (error) {
     console.error('Test submit error:', error);
+    await logRequest(request, 'TEST_SUBMIT_FAILED', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Server error submitting test (testId: ${testId ?? 'unknown'}): ${(error as Error).message}`,
+      status: 500,
+    });
     return NextResponse.json({ error: 'Failed to submit test' }, { status: 500 });
   }
 }

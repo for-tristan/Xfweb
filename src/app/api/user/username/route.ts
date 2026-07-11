@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 export async function GET(request: NextRequest) {
   try {
@@ -88,9 +89,22 @@ export async function PUT(request: NextRequest) {
       select: { id: true, name: true, email: true, username: true, role: true, phone: true, company: true, avatar: true },
     });
 
+    await logRequest(request, 'USERNAME_CHANGE', {
+      userId: user.id,
+      email: user.email,
+      details: `Changed username from "${user.username}" to "${normalized}"`,
+      status: 200,
+    });
+
     return NextResponse.json({ message: 'Username updated', user: updatedUser });
   } catch (error) {
     console.error('Username update error:', error);
+    await logRequest(request, 'USERNAME_CHANGE_FAILED', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Server error changing username (attempted: ${username ?? 'unknown'}): ${(error as Error).message}`,
+      status: 500,
+    });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

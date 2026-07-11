@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 /** Bust CDN/edge cache for the public projects list + landing page. */
 function bustProjectsCache() {
@@ -31,7 +32,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { error } = await requireAdmin();
+    const { error, user } = await requireAdmin();
     if (error) return error;
 
     const body = await request.json();
@@ -57,6 +58,12 @@ export async function POST(request: NextRequest) {
     });
 
     bustProjectsCache();
+    await logRequest(request, 'ADMIN_PROJECT_CREATE', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Created project "${title}" (slug=${slug}, id=${project.id}, category=${category || 'web'})`,
+      status: 201,
+    });
     return NextResponse.json({ project }, { status: 201 });
   } catch (error: any) {
     console.error('Admin project create error:', error);
@@ -69,7 +76,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { error } = await requireAdmin();
+    const { error, user } = await requireAdmin();
     if (error) return error;
 
     const body = await request.json();
@@ -101,6 +108,12 @@ export async function PUT(request: NextRequest) {
     });
 
     bustProjectsCache();
+    await logRequest(request, 'ADMIN_PROJECT_UPDATE', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Updated project id=${id} ("${existing.title}", slug=${existing.slug})${status !== undefined ? ` status=${status}` : ''}`,
+      status: 200,
+    });
     return NextResponse.json({ project });
   } catch (error: any) {
     console.error('Admin project update error:', error);
@@ -113,7 +126,7 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const { error } = await requireAdmin();
+    const { error, user } = await requireAdmin();
     if (error) return error;
 
     const body = await request.json();
@@ -131,6 +144,12 @@ export async function DELETE(request: NextRequest) {
     await db.project.delete({ where: { id } });
 
     bustProjectsCache();
+    await logRequest(request, 'ADMIN_PROJECT_DELETE', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Deleted project id=${id} ("${existing.title}", slug=${existing.slug})`,
+      status: 200,
+    });
     return NextResponse.json({ message: 'Project deleted successfully' });
   } catch (error) {
     console.error('Admin project delete error:', error);

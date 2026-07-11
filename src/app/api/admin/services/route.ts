@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 /**
  * Bust CDN/edge cache for the public services list + any page that renders
@@ -44,7 +45,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { error } = await requireAdmin();
+    const { error, user } = await requireAdmin();
     if (error) return error;
 
     const body = await request.json();
@@ -82,6 +83,12 @@ export async function POST(request: NextRequest) {
     });
 
     bustServicesCache();
+    await logRequest(request, 'ADMIN_SERVICE_CREATE', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Created service "${title}" (slug=${slug}, id=${service.id}, features=${features?.length || 0})`,
+      status: 201,
+    });
     return NextResponse.json({ service }, { status: 201 });
   } catch (error) {
     console.error('Admin service create error:', error);
@@ -94,7 +101,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { error } = await requireAdmin();
+    const { error, user } = await requireAdmin();
     if (error) return error;
 
     const body = await request.json();
@@ -149,6 +156,12 @@ export async function PUT(request: NextRequest) {
     });
 
     bustServicesCache();
+    await logRequest(request, 'ADMIN_SERVICE_UPDATE', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Updated service id=${id} ("${existing.title}", slug=${existing.slug})${status !== undefined ? ` status=${status}` : ''}`,
+      status: 200,
+    });
     return NextResponse.json({ service });
   } catch (error) {
     console.error('Admin service update error:', error);
@@ -161,7 +174,7 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const { error } = await requireAdmin();
+    const { error, user } = await requireAdmin();
     if (error) return error;
 
     const body = await request.json();
@@ -185,6 +198,12 @@ export async function DELETE(request: NextRequest) {
     await db.service.delete({ where: { id } });
 
     bustServicesCache();
+    await logRequest(request, 'ADMIN_SERVICE_DELETE', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Deleted service id=${id} ("${existing.title}", slug=${existing.slug})`,
+      status: 200,
+    });
     return NextResponse.json({ message: 'Service deleted successfully' });
   } catch (error) {
     console.error('Admin service delete error:', error);

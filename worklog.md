@@ -941,3 +941,78 @@ Stage Summary:
 - 12 fixes applied across 18 files
 - All CRITICAL and HIGH vulnerabilities from the audit are now patched
 - Remaining recommendations (rate-limit store migration to Redis, CSRF tokens, GET verify-email deprecation, legacy password rehashing, CSP nonce, cookie consent enforcement) documented in commit message for future sprints
+
+---
+Task ID: logs-student-social
+Agent: subagent (general-purpose)
+Task: Add logRequest() activity logging to 12 student + social API routes
+
+Work Log:
+- Reviewed activityLog.ts to confirm the logRequest(request, action, options) signature — options = { userId?, email?, details?, status? }. It auto-extracts IP/user-agent/method/path and swallows internal errors, so callers don't need try/catch wrappers.
+- Read all 12 target route files completely before editing, then added the import + logRequest calls in additive-only edits (no existing logic touched).
+- Followed the convention established by auth/login/route.ts: ACTION name on the success path (matches the task spec exactly, e.g. COURSE_ENROLL, TEST_SUBMIT, PROFILE_UPDATE), ACTION_FAILED suffix on the catch-block server-error path.
+
+Student routes (7):
+1. courses/enroll/route.ts — COURSE_ENROLL on success (with courseName/courseId/level/duration), COURSE_ENROLL_FAILED on duplicate-enrollment 409 + on 500 catch.
+2. courses/cancel-enrollment/route.ts — COURSE_CANCEL_ENROLL after notification.create (with courseName/courseId/enrollmentId), COURSE_CANCEL_ENROLL_FAILED on 500 catch.
+3. courses/tests/submit/route.ts — TEST_SUBMIT after testAttempt.upsert (with test.title, testId, score/totalPoints, percentage, PASSED/FAILED + passing threshold), TEST_SUBMIT_FAILED on 500 catch.
+4. user/profile/route.ts — PROFILE_UPDATE after user.update (with name/username/phone/company deltas), PROFILE_UPDATE_FAILED on 500 catch.
+5. user/avatar/route.ts — AVATAR_UPLOAD after user.update (with file size/type/avatarUrl), AVATAR_UPLOAD_FAILED on 500 catch.
+6. user/delete-account/route.ts — ACCOUNT_DELETE after db.user.delete (with userId/email/username) — logged BEFORE deleteAllUserSessions so the audit row lands while the user row still exists contextually; ACCOUNT_DELETE_FAILED on 500 catch.
+7. user/username/route.ts — USERNAME_CHANGE after user.update (with old user.username → new normalized username), USERNAME_CHANGE_FAILED on 500 catch. GET handler untouched.
+
+Social routes (5):
+8. chat/route.ts — CHAT_MESSAGE_SENT after chatMessage.create on POST (with receiverId/message length/messageId), CHAT_MESSAGE_SENT_FAILED on 500 catch. GET handler untouched.
+9. friends/route.ts — FRIEND_REQUEST_SENT on POST success (with friendUser.name/receiverId/requestedUsername); FRIEND_REQUEST_ACCEPTED on PUT accept branch (with friendshipId/senderId); FRIEND_REQUEST_REJECTED on PUT reject branch; FRIEND_REQUEST_SENT_FAILED on POST catch; FRIEND_REQUEST_HANDLE_FAILED on PUT catch. GET/DELETE handlers untouched.
+10. quotes/route.ts — QUOTE_REQUESTED after sendInquiryEmail attempt (with serviceType/company/budget/description length/quoteId), QUOTE_REQUESTED_FAILED on 500 catch.
+11. study/session/route.ts — STUDY_SESSION_STARTED on action='start' (with courseId/courseName/date); also added STUDY_SESSION_STOPPED on action='stop' (with addedDuration + totalDuration, useful for audit); STUDY_SESSION_FAILED on 500 catch. GET handler untouched.
+12. games/submit/route.ts — GAME_SCORE_SUBMIT after gameScore.create (with game/language/difficulty/score/correct/total/timeSpent/scoreId), GAME_SCORE_SUBMIT_FAILED on 500 catch.
+
+All edits are strictly additive — only the import line + logRequest calls were inserted. No existing validation, DB calls, response shapes, or control flow was modified. user.id + user.email were taken from the existing getCurrentUser() call (no new auth calls added).
+
+Stage Summary:
+- git diff --stat: 12 student+social route files changed, +304/-1 lines (the -1 is a whitespace adjustment in courses/tests/submit where the original return-block was reformatted by inserting the log call above it; no logic change).
+- All ACTION names in SCREAMING_SNAKE_CASE.
+- All success-path log calls carry status:200 and meaningful details (course names, test titles, scores, receiver IDs, old/new usernames, etc.).
+- All catch-block log calls use optional-chained user?.id / user?.email so they don't crash if getCurrentUser failed.
+- No TypeScript compiler available locally (tsc not installed) — verified correctness by reading each edited file end-to-end and confirming that every variable referenced in details strings (courseName, testId, test.title, test.passingScore, friendUser.name, friendUsername, friendship.senderId, enrollment.courseName, gameId/score, etc.) is in scope at the call site.
+- Changes are not yet committed — ready for review/commit on the main branch.
+
+---
+Task ID: logs-admin
+Agent: subagent (general-purpose)
+Task: Add logRequest() activity logging to ALL admin API routes
+
+Work Log:
+- Reviewed activityLog.ts to confirm the logRequest(request, action, options) signature: options = { userId?, email?, details?, status? }. Auto-extracts IP/user-agent/method/path; internal errors are caught by the helper so call sites need no try/catch.
+- Listed all 15 admin route files via `find .../api/admin -name route.ts | sort`. Read each file completely before editing.
+- Inspected lib/auth.ts to confirm the AuthUser shape returned by requireAdmin() — it includes .id and .email (plus name, username, role, emailVerified, phone, company, avatar).
+- Per the task spec, skipped GET-only / read-only routes (admin/analytics) — only state-changing POST/PUT/DELETE handlers got log calls. Added the import + logRequest call at the SUCCESS point (after DB writes, before NextResponse.json). Existing logic untouched — edits are strictly additive.
+
+Routes edited (14 of 15 — analytics is GET-only):
+
+1. users/route.ts — PUT → ADMIN_USER_ROLE_CHANGE (target email, id, old role → new role). DELETE → ADMIN_USER_DELETE (deleted user id + last role). Uses admin.id/email from requireAdmin() (admin! for DELETE which has explicit null check; admin?. for PUT).
+2. courses/route.ts — POST → ADMIN_COURSE_CREATE (title/slug/level). PUT → ADMIN_COURSE_UPDATE (id/title/slug, +status if changed). DELETE → ADMIN_COURSE_DELETE (title/id/slug). GET untouched.
+3. modules/route.ts — DELETE branch 1 (module deletion) → ADMIN_MODULE_DELETE. DELETE branch 2 (lock per-user access) → ADMIN_MODULE_LOCK (moduleId/title/userId). POST → ADMIN_MODULE_CREATE (title/courseTitle/id/order). PUT branch unlock → ADMIN_MODULE_UNLOCK. PUT branch unlockAll → ADMIN_MODULE_UNLOCK_ALL (created count). PUT branch update → ADMIN_MODULE_UPDATE. GET untouched.
+4. modules/seed/route.ts — POST → ADMIN_MODULES_SEED (created/updated/skipped/notFound/total). NOTE: had to widen the handler signature from `POST()` to `POST(request: NextRequest)` since the original took no request arg, and add the NextRequest import — needed so logRequest can extract IP/UA/path from the request. Initial edit placed the log call after the return (dead code) — caught and fixed on review so it now runs before the return.
+5. tests/route.ts — POST → ADMIN_TEST_CREATE. PUT addQuestion → ADMIN_TEST_QUESTION_ADD. PUT deleteQuestion → ADMIN_TEST_QUESTION_DELETE. PUT unlock → ADMIN_TEST_UNLOCK. PUT lock → ADMIN_TEST_LOCK. PUT resetAttempt → ADMIN_TEST_ATTEMPT_RESET. PUT resetAllAttempts → ADMIN_TEST_ATTEMPTS_RESET_ALL. PUT default → ADMIN_TEST_UPDATE. DELETE → ADMIN_TEST_DELETE. GET untouched. Each of the 8 distinct actions gets its own ACTION_NAME per the task spec.
+6. enrollments/route.ts — PUT → ADMIN_ENROLLMENT_APPROVE or ADMIN_ENROLLMENT_DECLINE (dynamic based on `status` param) with target email/courseName and old→new status. DELETE → ADMIN_ENROLLMENT_DELETE (enrollmentId/userId/courseName). GET untouched.
+7. certificate/route.ts — POST → ADMIN_CERTIFICATE_ISSUE (certificateId, student email/id, courseName, courseId). Widened `requireAdmin()` destructuring from `{ error }` to `{ error, user }` so admin identity is available.
+8. settings/route.ts — PUT → ADMIN_SETTINGS_UPDATE (count + comma-separated list of updated keys; values not logged since some are secrets). GET untouched.
+9. team/route.ts — POST → ADMIN_TEAM_ADD (name/role/id). PUT → ADMIN_TEAM_UPDATE (id/existing name+role). DELETE → ADMIN_TEAM_DELETE. GET untouched.
+10. services/route.ts — POST → ADMIN_SERVICE_CREATE (title/slug/id/feature count). PUT → ADMIN_SERVICE_UPDATE (id/title/slug, +status if changed). DELETE → ADMIN_SERVICE_DELETE. GET untouched.
+11. quotes/route.ts — PUT → ADMIN_QUOTE_UPDATE (id, old→new status, serviceType). GET untouched.
+12. projects/route.ts — POST → ADMIN_PROJECT_CREATE (title/slug/id/category). PUT → ADMIN_PROJECT_UPDATE (id/title/slug, +status if changed). DELETE → ADMIN_PROJECT_DELETE. GET untouched.
+13. migrate/route.ts — POST → ADMIN_MIGRATE (statement count + per-statement status list, e.g. ok/already_exists/error).
+14. progress/route.ts — PUT → ADMIN_PROGRESS_UPDATE (userId, course, completed/total modules, %). DELETE → ADMIN_PROGRESS_RESET (userId/courseId). GET untouched. NOTE: `deleteAllUserSessions` was already imported but unused in this file pre-existing — left as-is to keep the change additive.
+
+Action-name conventions used (all SCREAMING_SNAKE_CASE):
+- All begin with ADMIN_ prefix so admin actions are trivially filterable in the ActivityLog table.
+- Multi-action routes (modules PUT, tests PUT) get per-branch action names so the audit trail distinguishes e.g. unlocking a single module from unlocking all, or resetting one user's test attempts vs all attempts.
+
+Stage Summary:
+- git diff --stat for this task's files (admin only — other files in the working tree were modified by sibling tasks): 14 admin route files changed, +268/-1 lines (the -1 is the return-then-log bug I caught and fixed in modules/seed/route.ts).
+- Every state-changing admin handler now writes an audit row on the success path with the acting admin's id/email, the action name, and meaningful details (target entity ids, titles, old→new state, etc.).
+- GET handlers and the read-only analytics route were intentionally left un-logged per the task spec ("For GET routes that just fetch data, you can skip logging").
+- No TypeScript compiler available locally (tsc not installed in node_modules) — verified correctness by reading each edited file end-to-end and confirming every variable referenced in `details` strings is in scope at the call site (e.g. `existing.title` is captured before db.course.update in DELETE handlers because Prisma's delete doesn't return the row; `student.email` is available from the earlier findUnique in certificate route; `enrollment.status` is the pre-update value used for the "was X" delta; `result.results` is the runMigrations() return shape).
+- Changes are not yet committed — ready for review/commit on the main branch.

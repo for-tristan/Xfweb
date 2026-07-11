@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { deleteAllUserSessions, requireAdmin } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 async function getTotalModules(courseId: string): Promise<number> {
   try {
@@ -139,7 +140,7 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { error } = await requireAdmin();
+    const { error, user } = await requireAdmin();
     if (error) return error;
 
     const body = await request.json();
@@ -179,6 +180,13 @@ export async function PUT(request: NextRequest) {
       ? Math.round((completedModules.length / totalModules) * 100)
       : 0;
 
+    await logRequest(request, 'ADMIN_PROGRESS_UPDATE', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Updated progress for user id=${userId} in course "${courseName || courseId}" (${completedModules.length}/${totalModules} modules, ${completionPercentage}%)`,
+      status: 200,
+    });
+
     return NextResponse.json({
       message: 'Progress updated successfully',
       progress: {
@@ -199,7 +207,7 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const { error } = await requireAdmin();
+    const { error, user } = await requireAdmin();
     if (error) return error;
 
     const body = await request.json();
@@ -224,6 +232,12 @@ export async function DELETE(request: NextRequest) {
       },
     });
 
+    await logRequest(request, 'ADMIN_PROGRESS_RESET', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Reset progress for user id=${userId} in course id=${courseId}`,
+      status: 200,
+    });
     return NextResponse.json({ message: 'Progress reset successfully', progress });
   } catch (error) {
     console.error('Admin progress reset error:', error);

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 export async function GET(request: NextRequest) {
   try {
@@ -112,7 +113,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { error } = await requireAdmin();
+    const { error, user } = await requireAdmin();
     if (error) return error;
 
     const body = await request.json();
@@ -135,6 +136,12 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    await logRequest(request, 'ADMIN_TEST_CREATE', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Created test "${title}" (id=${test.id}) for module id=${moduleId} (passingScore=${passingScore !== undefined ? passingScore : 70})`,
+      status: 201,
+    });
     return NextResponse.json({ test }, { status: 201 });
   } catch (error) {
     console.error('Admin tests create error:', error);
@@ -175,6 +182,12 @@ export async function PUT(request: NextRequest) {
       },
     });
 
+    await logRequest(request, 'ADMIN_TEST_QUESTION_ADD', {
+      userId: user!.id,
+      email: user!.email,
+      details: `Added question to test id=${testId} ("${test.title}", order=${questionCount})`,
+      status: 200,
+    });
     return NextResponse.json({ question });
   }
 
@@ -189,6 +202,12 @@ export async function PUT(request: NextRequest) {
       where: { id: questionId },
     });
 
+    await logRequest(request, 'ADMIN_TEST_QUESTION_DELETE', {
+      userId: user!.id,
+      email: user!.email,
+      details: `Deleted question id=${questionId} from test id=${testId}`,
+      status: 200,
+    });
     return NextResponse.json({ message: 'Question deleted' });
   }
 
@@ -226,6 +245,12 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to unlock test' }, { status: 500 });
     }
 
+    await logRequest(request, 'ADMIN_TEST_UNLOCK', {
+      userId: user!.id,
+      email: user!.email,
+      details: `Unlocked test id=${testId} for user id=${userId}`,
+      status: 200,
+    });
     return NextResponse.json({ message: 'Test unlocked for user' });
   }
 
@@ -269,6 +294,12 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to lock test' }, { status: 500 });
     }
 
+    await logRequest(request, 'ADMIN_TEST_LOCK', {
+      userId: user!.id,
+      email: user!.email,
+      details: `Locked test id=${testId} for user id=${userId}`,
+      status: 200,
+    });
     return NextResponse.json({ message: 'Test locked for user' });
   }
 
@@ -283,6 +314,12 @@ export async function PUT(request: NextRequest) {
       where: { testId, userId },
     });
 
+    await logRequest(request, 'ADMIN_TEST_ATTEMPT_RESET', {
+      userId: user!.id,
+      email: user!.email,
+      details: `Reset attempts for test id=${testId}, user id=${userId}`,
+      status: 200,
+    });
     return NextResponse.json({ message: 'Attempt reset for user' });
   }
 
@@ -297,6 +334,12 @@ export async function PUT(request: NextRequest) {
       where: { testId },
     });
 
+    await logRequest(request, 'ADMIN_TEST_ATTEMPTS_RESET_ALL', {
+      userId: user!.id,
+      email: user!.email,
+      details: `Reset ALL attempts (${result.count} deleted) for test id=${testId}`,
+      status: 200,
+    });
     return NextResponse.json({ message: `All attempts reset (${result.count} deleted)` });
   }
 
@@ -319,6 +362,12 @@ export async function PUT(request: NextRequest) {
     },
   });
 
+  await logRequest(request, 'ADMIN_TEST_UPDATE', {
+    userId: user!.id,
+    email: user!.email,
+    details: `Updated test id=${id} ("${existing.title}")`,
+    status: 200,
+  });
   return NextResponse.json({ test });
   } catch (error) {
     console.error('Admin tests PUT error:', error);
@@ -328,7 +377,7 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const { error } = await requireAdmin();
+    const { error, user } = await requireAdmin();
     if (error) return error;
 
     const body = await request.json();
@@ -345,6 +394,12 @@ export async function DELETE(request: NextRequest) {
       where: { id },
     });
 
+    await logRequest(request, 'ADMIN_TEST_DELETE', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Deleted test id=${id} ("${existing.title}")`,
+      status: 200,
+    });
     return NextResponse.json({ message: 'Test deleted' });
   } catch (error) {
     console.error('Admin test delete error:', error);

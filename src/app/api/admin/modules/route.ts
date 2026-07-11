@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 export async function DELETE(request: NextRequest) {
   try {
-    const { error } = await requireAdmin();
+    const { error, user } = await requireAdmin();
     if (error) return error;
 
     const body = await request.json();
@@ -14,6 +15,12 @@ export async function DELETE(request: NextRequest) {
       await db.moduleStudy.deleteMany({ where: { moduleId } });
       await db.moduleUnlock.deleteMany({ where: { moduleId } });
       await db.courseModule.delete({ where: { id: moduleId } });
+      await logRequest(request, 'ADMIN_MODULE_DELETE', {
+        userId: user?.id,
+        email: user?.email,
+        details: `Deleted module id=${moduleId}`,
+        status: 200,
+      });
       return NextResponse.json({ message: 'Module deleted' });
     }
 
@@ -47,6 +54,12 @@ export async function DELETE(request: NextRequest) {
       });
     }
 
+    await logRequest(request, 'ADMIN_MODULE_LOCK', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Locked module id=${moduleId} (title="${courseModule?.title || ''}") for user id=${userId}`,
+      status: 200,
+    });
     return NextResponse.json({ message: 'Module locked successfully', deleted: result.count });
   } catch (error) {
     console.error('Admin module lock error:', error);
@@ -112,7 +125,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { error } = await requireAdmin();
+    const { error, user } = await requireAdmin();
     if (error) return error;
 
     const body = await request.json();
@@ -143,6 +156,12 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    await logRequest(request, 'ADMIN_MODULE_CREATE', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Created module "${title}" (id=${module.id}) in course "${course.title}" (id=${courseId}, order=${moduleOrder !== undefined ? moduleOrder : 0})`,
+      status: 201,
+    });
     return NextResponse.json({ module }, { status: 201 });
   } catch (error) {
     console.error('Admin module create error:', error);
@@ -177,6 +196,12 @@ export async function PUT(request: NextRequest) {
           data: { userId: body.userId, title: 'Module Unlocked', message: `"${mod.title}" has been unlocked by an admin.`, type: 'success' },
         });
       }
+      await logRequest(request, 'ADMIN_MODULE_UNLOCK', {
+        userId: adminUser!.id,
+        email: adminUser!.email,
+        details: `Unlocked module id=${body.moduleId} (title="${mod?.title || ''}") for user id=${body.userId}`,
+        status: 200,
+      });
       return NextResponse.json({ message: 'Module unlocked' });
     }
 
@@ -194,6 +219,12 @@ export async function PUT(request: NextRequest) {
           created++;
         }
       }
+      await logRequest(request, 'ADMIN_MODULE_UNLOCK_ALL', {
+        userId: adminUser!.id,
+        email: adminUser!.email,
+        details: `Unlocked all ${created} modules for user id=${body.userId} in course id=${body.courseId}`,
+        status: 200,
+      });
       return NextResponse.json({ created });
     }
 
@@ -213,6 +244,12 @@ export async function PUT(request: NextRequest) {
         ...(content !== undefined && { content }),
         ...(moduleOrder !== undefined && { moduleOrder }),
       },
+    });
+    await logRequest(request, 'ADMIN_MODULE_UPDATE', {
+      userId: adminUser!.id,
+      email: adminUser!.email,
+      details: `Updated module id=${id} (title="${existing.title}")`,
+      status: 200,
     });
     return NextResponse.json({ module });
   } catch (error) {

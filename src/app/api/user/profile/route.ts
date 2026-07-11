@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 export async function PUT(request: NextRequest) {
   try {
@@ -39,9 +40,22 @@ export async function PUT(request: NextRequest) {
       select: { id: true, name: true, email: true, username: true, phone: true, company: true, avatar: true, role: true },
     });
 
+    await logRequest(request, 'PROFILE_UPDATE', {
+      userId: user.id,
+      email: user.email,
+      details: `Updated profile fields: name="${updated.name}"${updated.username ? `, username="${updated.username}"` : ''}${updated.phone ? `, phone="${updated.phone}"` : ', phone=cleared'}${updated.company ? `, company="${updated.company}"` : ', company=cleared'}`,
+      status: 200,
+    });
+
     return NextResponse.json({ user: updated });
   } catch (error) {
     console.error('Profile update error:', error);
+    await logRequest(request, 'PROFILE_UPDATE_FAILED', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Server error updating profile: ${(error as Error).message}`,
+      status: 500,
+    });
     return NextResponse.json({ error: 'Update failed' }, { status: 500 });
   }
 }

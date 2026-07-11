@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 export async function GET() {
   try {
@@ -151,6 +152,13 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    await logRequest(request, 'FRIEND_REQUEST_SENT', {
+      userId: user.id,
+      email: user.email,
+      details: `Sent friend request to "${friendUser.name}" (receiverId: ${friendUser.id}, requestedUsername: ${friendUsername})`,
+      status: 200,
+    });
+
     return NextResponse.json({
       message: `Friend request sent to ${friendUser.name}`,
       friendship: {
@@ -164,6 +172,12 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Send friend request error:', error);
+    await logRequest(request, 'FRIEND_REQUEST_SENT_FAILED', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Server error sending friend request (friendUsername: ${friendUsername ?? 'unknown'}): ${(error as Error).message}`,
+      status: 500,
+    });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -217,15 +231,36 @@ export async function PUT(request: NextRequest) {
         },
       });
 
+      await logRequest(request, 'FRIEND_REQUEST_ACCEPTED', {
+        userId: user.id,
+        email: user.email,
+        details: `Accepted friend request (friendshipId: ${friendshipId}, senderId: ${friendship.senderId})`,
+        status: 200,
+      });
+
       return NextResponse.json({ message: 'Friend request accepted' });
     } else {
       await db.friendship.delete({
         where: { id: friendshipId },
       });
+
+      await logRequest(request, 'FRIEND_REQUEST_REJECTED', {
+        userId: user.id,
+        email: user.email,
+        details: `Rejected friend request (friendshipId: ${friendshipId}, senderId: ${friendship.senderId})`,
+        status: 200,
+      });
+
       return NextResponse.json({ message: 'Friend request rejected' });
     }
   } catch (error) {
     console.error('Handle friend request error:', error);
+    await logRequest(request, 'FRIEND_REQUEST_HANDLE_FAILED', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Server error handling friend request (friendshipId: ${friendshipId ?? 'unknown'}, action: ${action ?? 'unknown'}): ${(error as Error).message}`,
+      status: 500,
+    });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

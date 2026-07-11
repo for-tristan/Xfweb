@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 const SENSITIVE_KEY_PATTERNS = [
   'smtp_pass', 'secret', 'api_key', 'token', 'password',
@@ -42,7 +43,7 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { error } = await requireAdmin();
+    const { error, user } = await requireAdmin();
     if (error) return error;
 
     const body = await request.json();
@@ -69,6 +70,13 @@ export async function PUT(request: NextRequest) {
     for (const setting of results) {
       settingsMap[setting.key] = setting.value;
     }
+
+    await logRequest(request, 'ADMIN_SETTINGS_UPDATE', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Updated ${Object.keys(updates).length} site setting(s): ${Object.keys(updates).join(', ')}`,
+      status: 200,
+    });
 
     return NextResponse.json({ settings: settingsMap });
   } catch (error) {

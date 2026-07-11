@@ -1,6 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 const WEBDEV_MODULES = [
   {
@@ -415,7 +416,7 @@ By the end of this module, you will have a complete, production-quality riced Li
   },
 ];
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
     const { error, user } = await requireAdmin();
     if (error) return error;
@@ -468,6 +469,13 @@ export async function POST() {
         created++;
       }
     }
+
+    await logRequest(request, 'ADMIN_MODULES_SEED', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Seeded modules: created=${created}, updated=${updated}, skipped=${skipped}, notFound=${notFound}, total=${allModules.length}`,
+      status: 200,
+    });
 
     return NextResponse.json({
       message: 'Module seeding complete',

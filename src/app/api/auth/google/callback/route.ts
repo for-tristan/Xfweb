@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { createSession } from '@/lib/auth';
 import { randomBytes } from 'crypto';
 import { hashPassword } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 export async function GET(request: NextRequest) {
   try {
@@ -132,6 +133,14 @@ export async function GET(request: NextRequest) {
     }
 
     const token = await createSession(user.id);
+
+    await logRequest(request, 'OAUTH_GOOGLE_LOGIN', {
+      userId: user.id,
+      email: user.email,
+      details: `Google OAuth login. Role: ${user.role}`,
+      status: 200,
+    });
+
     const response = NextResponse.redirect(new URL('/', request.url));
 
     const secure = process.env.NODE_ENV === 'production';

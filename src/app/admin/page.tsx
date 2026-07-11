@@ -68,7 +68,7 @@ export default function AdminPage() {
       toast({ title: 'Access Denied', description: 'Admin access required', variant: 'destructive' });
     }
   }, [loading, user]);
-  const [tab, setTab] = useState<'enrollments' | 'users' | 'progress' | 'modules' | 'quotes' | 'team' | 'services' | 'courses' | 'tests' | 'projects' | 'analytics'>('enrollments');
+  const [tab, setTab] = useState<'enrollments' | 'users' | 'progress' | 'modules' | 'quotes' | 'team' | 'services' | 'courses' | 'tests' | 'projects' | 'analytics' | 'logs'>('enrollments');
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -93,6 +93,44 @@ export default function AdminPage() {
   const [quotesLoading, setQuotesLoading] = useState(false);
   const [quoteFilter, setQuoteFilter] = useState('all');
   const [quoteActionLoading, setQuoteActionLoading] = useState<string | null>(null);
+
+  // ---- Activity Logs state ----
+  const [logs, setLogs] = useState<any[]>([]);
+  const [logsLoading, setLogsLoading] = useState(false);
+  const [logsPage, setLogsPage] = useState(1);
+  const [logsTotal, setLogsTotal] = useState(0);
+  const [logsTotalPages, setLogsTotalPages] = useState(1);
+  const [logsSearch, setLogsSearch] = useState('');
+  const [logsActionFilter, setLogsActionFilter] = useState('');
+  const [logsAutoRefresh, setLogsAutoRefresh] = useState(true);
+  const logsFetchRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const fetchLogs = useCallback(async (page = 1, search = '', action = '') => {
+    setLogsLoading(true);
+    try {
+      const params = new URLSearchParams({ page: String(page), limit: '50' });
+      if (search) params.set('search', search);
+      if (action) params.set('action', action);
+      const r = await fetch(`/api/admin/logs?${params}`);
+      if (r.ok) {
+        const d = await r.json();
+        setLogs(d.logs);
+        setLogsPage(d.page);
+        setLogsTotal(d.total);
+        setLogsTotalPages(d.totalPages);
+      }
+    } catch {}
+    setLogsLoading(false);
+  }, []);
+
+  // Auto-refresh logs every 5 seconds when on the logs tab
+  useEffect(() => {
+    if (tab !== 'logs' || !logsAutoRefresh) return;
+    const interval = setInterval(() => {
+      fetchLogs(logsPage, logsSearch, logsActionFilter);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [tab, logsAutoRefresh, logsPage, logsSearch, logsActionFilter, fetchLogs]);
   const fetchQuotes = useCallback(async () => {
     setQuotesLoading(true);
     try { const r = await fetch('/api/admin/quotes'); if (r.ok) { const d = await r.json(); setAdminQuotes(d.quotes || []); } } catch {}
@@ -829,6 +867,9 @@ export default function AdminPage() {
             </button>
             <button className={`filter-btn${tab === 'analytics' ? ' active' : ''}`} onClick={() => { setTab('analytics'); if (!analytics) { fetch('/api/admin/analytics').then(r => r.json()).then(d => setAnalytics(d)).catch(() => {}); } }}>
               <i className="fa-solid fa-chart-bar" style={{ marginRight: 8 }}></i>Analytics
+            </button>
+            <button className={`filter-btn${tab === 'logs' ? ' active' : ''}`} onClick={() => { setTab('logs'); fetchLogs(1, logsSearch, logsActionFilter); }} style={{ color: 'var(--warning-color)' }}>
+              <i className="fa-solid fa-list-ul" style={{ marginRight: 8 }}></i>Logs
             </button>
           </div>
           {tab === 'enrollments' && (
@@ -2289,6 +2330,165 @@ export default function AdminPage() {
                       )}
                     </div>
                   ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ---- ACTIVITY LOGS TAB ---- */}
+          {tab === 'logs' && (
+            <div style={{ maxWidth: 1400, margin: '0 auto' }}>
+              {/* Controls bar */}
+              <div className="reveal" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center', marginBottom: 24 }}>
+                <div style={{ flex: '1 1 300px', position: 'relative' }}>
+                  <i className="fa-solid fa-search" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)', fontSize: 13 }} />
+                  <input
+                    type="text"
+                    placeholder="Search by email, action, IP, path, details..."
+                    value={logsSearch}
+                    onChange={(e) => setLogsSearch(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') { fetchLogs(1, logsSearch, logsActionFilter); } }}
+                    style={{ width: '100%', padding: '10px 14px 10px 38px', borderRadius: 10, background: 'var(--input-bg)', border: '1px solid var(--border-color)', color: 'var(--text-light)', fontSize: 13, outline: 'none' }}
+                  />
+                </div>
+                <select
+                  value={logsActionFilter}
+                  onChange={(e) => { setLogsActionFilter(e.target.value); fetchLogs(1, logsSearch, e.target.value); }}
+                  style={{ padding: '10px 14px', borderRadius: 10, background: 'var(--input-bg)', border: '1px solid var(--border-color)', color: 'var(--text-light)', fontSize: 13, cursor: 'pointer' }}
+                >
+                  <option value="">All Actions</option>
+                  <optgroup label="Auth">
+                    <option value="SIGNUP_SUCCESS">Signup</option>
+                    <option value="LOGIN_SUCCESS">Login Success</option>
+                    <option value="LOGIN_FAILED">Login Failed</option>
+                    <option value="LOGOUT">Logout</option>
+                    <option value="EMAIL_VERIFIED">Email Verified</option>
+                    <option value="OAUTH_GOOGLE_LOGIN">Google OAuth</option>
+                    <option value="OAUTH_GITHUB_LOGIN">GitHub OAuth</option>
+                    <option value="PASSWORD_RESET">Password Reset</option>
+                  </optgroup>
+                  <optgroup label="Student">
+                    <option value="COURSE_ENROLL">Course Enroll</option>
+                    <option value="TEST_SUBMIT">Test Submit</option>
+                    <option value="PROFILE_UPDATE">Profile Update</option>
+                    <option value="AVATAR_UPLOAD">Avatar Upload</option>
+                    <option value="ACCOUNT_DELETE">Account Delete</option>
+                  </optgroup>
+                  <optgroup label="Admin">
+                    <option value="ADMIN_USER_ROLE_CHANGE">Role Change</option>
+                    <option value="ADMIN_USER_DELETE">User Delete</option>
+                    <option value="ADMIN_COURSE">Course Actions</option>
+                    <option value="ADMIN_MODULE">Module Actions</option>
+                    <option value="ADMIN_TEST">Test Actions</option>
+                    <option value="ADMIN_ENROLLMENT">Enrollment Actions</option>
+                    <option value="ADMIN_SETTINGS">Settings Update</option>
+                  </optgroup>
+                  <optgroup label="Social">
+                    <option value="CHAT_MESSAGE">Chat Message</option>
+                    <option value="FRIEND_REQUEST">Friend Request</option>
+                    <option value="QUOTE_REQUESTED">Quote Request</option>
+                    <option value="STUDY_SESSION">Study Session</option>
+                    <option value="GAME_SCORE">Game Score</option>
+                  </optgroup>
+                </select>
+                <button
+                  className="btn"
+                  onClick={() => fetchLogs(logsPage, logsSearch, logsActionFilter)}
+                  disabled={logsLoading}
+                  style={{ padding: '10px 16px', fontSize: 12, background: 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 30%, transparent)', color: 'var(--accent)' }}
+                >
+                  <i className={logsLoading ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-rotate-right'} style={{ marginRight: 6 }} />
+                  Refresh
+                </button>
+                <button
+                  className="btn"
+                  onClick={() => setLogsAutoRefresh(v => !v)}
+                  style={{ padding: '10px 16px', fontSize: 12, background: logsAutoRefresh ? 'color-mix(in srgb, var(--success-color) 10%, transparent)' : 'var(--input-bg)', border: logsAutoRefresh ? '1px solid color-mix(in srgb, var(--success-color) 30%, transparent)' : '1px solid var(--border-color)', color: logsAutoRefresh ? 'var(--success-color)' : 'var(--text-dim)' }}
+                >
+                  <i className={`fa-solid ${logsAutoRefresh ? 'fa-pause' : 'fa-play'}`} style={{ marginRight: 6 }} />
+                  {logsAutoRefresh ? 'Auto (5s)' : 'Paused'}
+                </button>
+                <span style={{ fontSize: 12, color: 'var(--text-dim)', marginLeft: 'auto' }}>
+                  {logsTotal.toLocaleString()} total {logsTotal === 1 ? 'log' : 'logs'}
+                </span>
+              </div>
+
+              {/* Logs table */}
+              {logsLoading && logs.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: 60 }}>
+                  <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 28, color: 'var(--accent)', marginBottom: 16 }} />
+                  <p style={{ color: 'var(--text-dim)', fontSize: 14 }}>Loading logs...</p>
+                </div>
+              ) : logs.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: 60 }}>
+                  <i className="fa-solid fa-clipboard-list" style={{ fontSize: 36, color: 'var(--text-dim)', marginBottom: 16, opacity: 0.4 }} />
+                  <p style={{ color: 'var(--text-dim)', fontSize: 14 }}>No logs found</p>
+                </div>
+              ) : (
+                <div style={{ overflowX: 'auto', borderRadius: 12, border: '1px solid var(--border-color)' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                    <thead>
+                      <tr style={{ background: 'var(--input-bg)', textAlign: 'left', position: 'sticky', top: 0 }}>
+                        <th style={{ padding: '10px 14px', color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10, whiteSpace: 'nowrap' }}>Time</th>
+                        <th style={{ padding: '10px 14px', color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10, whiteSpace: 'nowrap' }}>Action</th>
+                        <th style={{ padding: '10px 14px', color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10, whiteSpace: 'nowrap' }}>User</th>
+                        <th style={{ padding: '10px 14px', color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10, whiteSpace: 'nowrap' }}>Email</th>
+                        <th style={{ padding: '10px 14px', color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10, whiteSpace: 'nowrap' }}>IP</th>
+                        <th style={{ padding: '10px 14px', color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10, whiteSpace: 'nowrap' }}>Details</th>
+                        <th style={{ padding: '10px 14px', color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10, whiteSpace: 'nowrap' }}>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {logs.map((log, idx) => {
+                        const isAuthFail = log.action?.includes('FAILED') || log.action?.includes('DELETE') || log.status >= 400;
+                        const isAdmin = log.action?.startsWith('ADMIN_');
+                        const isAuth = log.action?.includes('LOGIN') || log.action?.includes('SIGNUP') || log.action?.includes('OAUTH') || log.action?.includes('LOGOUT') || log.action?.includes('VERIFIED');
+                        const actionColor = isAuthFail ? 'var(--error-color)' : isAdmin ? 'var(--accent)' : isAuth ? '#6b9bf5' : 'var(--text-light)';
+                        return (
+                          <tr key={log.id} style={{ borderBottom: '1px solid var(--border-color)', background: idx % 2 === 0 ? 'transparent' : 'color-mix(in srgb, var(--text-light) 2%, transparent)' }}>
+                            <td style={{ padding: '8px 14px', color: 'var(--text-dim)', whiteSpace: 'nowrap', fontSize: 11 }}>
+                              {new Date(log.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                            </td>
+                            <td style={{ padding: '8px 14px', whiteSpace: 'nowrap' }}>
+                              <span style={{ padding: '3px 8px', borderRadius: 6, fontSize: 10, fontWeight: 700, background: `color-mix(in srgb, ${actionColor} 12%, transparent)`, color: actionColor, border: `1px solid color-mix(in srgb, ${actionColor} 25%, transparent)` }}>
+                                {log.action}
+                              </span>
+                            </td>
+                            <td style={{ padding: '8px 14px', color: 'var(--text-light)', whiteSpace: 'nowrap', fontSize: 11, maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {log.userId ? <span title={log.userId} style={{ fontFamily: 'monospace', fontSize: 10 }}>{log.userId.substring(0, 12)}...</span> : <span style={{ color: 'var(--text-dim)', opacity: 0.5 }}>-</span>}
+                            </td>
+                            <td style={{ padding: '8px 14px', color: 'var(--text-light)', whiteSpace: 'nowrap', fontSize: 11, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {log.email || <span style={{ color: 'var(--text-dim)', opacity: 0.5 }}>-</span>}
+                            </td>
+                            <td style={{ padding: '8px 14px', color: 'var(--text-dim)', whiteSpace: 'nowrap', fontSize: 11, fontFamily: 'monospace' }}>
+                              {log.ip || '-'}
+                            </td>
+                            <td style={{ padding: '8px 14px', color: 'var(--text-dim)', fontSize: 11, maxWidth: 400, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {log.details || <span style={{ opacity: 0.5 }}>-</span>}
+                            </td>
+                            <td style={{ padding: '8px 14px', whiteSpace: 'nowrap', fontSize: 11 }}>
+                              {log.status ? (
+                                <span style={{ color: log.status < 400 ? 'var(--success-color)' : 'var(--error-color)', fontWeight: 700 }}>{log.status}</span>
+                              ) : '-'}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* Pagination */}
+              {logsTotalPages > 1 && (
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center', marginTop: 24 }}>
+                  <button className="btn" disabled={logsPage <= 1} onClick={() => fetchLogs(logsPage - 1, logsSearch, logsActionFilter)} style={{ padding: '8px 16px', fontSize: 12, opacity: logsPage <= 1 ? 0.4 : 1 }}>
+                    <i className="fa-solid fa-chevron-left" /> Prev
+                  </button>
+                  <span style={{ fontSize: 12, color: 'var(--text-dim)' }}>Page {logsPage} of {logsTotalPages}</span>
+                  <button className="btn" disabled={logsPage >= logsTotalPages} onClick={() => fetchLogs(logsPage + 1, logsSearch, logsActionFilter)} style={{ padding: '8px 16px', fontSize: 12, opacity: logsPage >= logsTotalPages ? 0.4 : 1 }}>
+                    Next <i className="fa-solid fa-chevron-right" />
+                  </button>
                 </div>
               )}
             </div>

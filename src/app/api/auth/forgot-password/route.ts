@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { sendPasswordResetEmail } from '@/lib/email';
+import { logRequest } from '@/lib/activityLog';
 import { randomInt } from 'crypto';
 
 export async function POST(request: NextRequest) {
@@ -49,6 +50,13 @@ export async function POST(request: NextRequest) {
     } catch (emailErr: any) {
       console.error('[ForgotPassword] Email send failed:', emailErr?.message || emailErr);
     }
+
+    await logRequest(request, 'PASSWORD_RESET_REQUESTED', {
+      userId: user.id,
+      email: user.email,
+      details: 'Password reset code sent',
+      status: 200,
+    });
 
     return NextResponse.json({
       message: 'If an account with that email exists, a reset code has been sent.',

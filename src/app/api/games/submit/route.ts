@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 export async function POST(request: NextRequest) {
   try {
@@ -56,9 +57,22 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    await logRequest(request, 'GAME_SCORE_SUBMIT', {
+      userId: user.id,
+      email: user.email,
+      details: `Submitted game score (game: ${game}, language: ${language}, difficulty: ${difficulty}, score: ${numScore}, correct: ${numCorrect}/${numTotal}, timeSpent: ${numTimeSpent}s, scoreId: ${gameScore.id})`,
+      status: 200,
+    });
+
     return NextResponse.json({ message: 'Score submitted!', score: gameScore });
   } catch (error) {
     console.error('Game score submit error:', error);
+    await logRequest(request, 'GAME_SCORE_SUBMIT_FAILED', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Server error submitting game score (game: ${game ?? 'unknown'}, language: ${language ?? 'unknown'}, difficulty: ${difficulty ?? 'unknown'}): ${(error as Error).message}`,
+      status: 500,
+    });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

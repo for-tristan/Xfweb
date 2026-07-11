@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth';
 import { createClient } from '@libsql/client';
+import { logRequest } from '@/lib/activityLog';
 
 
 async function runMigrations() {
@@ -39,10 +40,16 @@ async function runMigrations() {
 // Use POST (admin-gated) to run migrations intentionally.
 export async function POST(request: NextRequest) {
   try {
-    const { error } = await requireAdmin();
+    const { error, user } = await requireAdmin();
     if (error) return error;
 
     const result = await runMigrations();
+    await logRequest(request, 'ADMIN_MIGRATE', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Ran DB migrations: ${result.results?.length || 0} statement(s); statuses=${result.results?.map((r: any) => r.status).join(',') || 'n/a'}`,
+      status: 200,
+    });
     return NextResponse.json(result);
   } catch (error: any) {
     console.error('Migration error:', error);

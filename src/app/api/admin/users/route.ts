@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 export async function GET(request: NextRequest) {
   try {
@@ -138,6 +139,13 @@ export async function PUT(request: NextRequest) {
     // (see usePageFeatures / HomePageClient focus listeners) — no
     // forced re-login required.
 
+    await logRequest(request, 'ADMIN_USER_ROLE_CHANGE', {
+      userId: admin?.id,
+      email: admin?.email,
+      details: `Target user ${updated.email} (id=${updated.id}) role changed from "${targetUser.role}" to "${role}"`,
+      status: 200,
+    });
+
     return NextResponse.json({
       message: `User role updated to ${role}`,
       user: updated,
@@ -215,6 +223,13 @@ export async function DELETE(request: NextRequest) {
       db.testUnlock.deleteMany({ where: { userId } }),
       db.user.delete({ where: { id: userId } }),
     ]);
+
+    await logRequest(request, 'ADMIN_USER_DELETE', {
+      userId: admin!.id,
+      email: admin!.email,
+      details: `Deleted user id=${userId} (was role="${targetUser.role}")`,
+      status: 200,
+    });
 
     return NextResponse.json({
       message: 'User deleted successfully',

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { hashPassword } from '@/lib/auth';
 import { sendEmailVerificationEmail } from '@/lib/email';
+import { logRequest } from '@/lib/activityLog';
 import { randomInt } from 'crypto';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -122,6 +123,13 @@ export async function POST(request: NextRequest) {
       } catch (emailErr: any) {
         console.error('[Signup] Email send failed:', emailErr?.message || emailErr);
       }
+
+      await logRequest(request, 'SIGNUP_SUCCESS', {
+        userId: user.id,
+        email: user.email,
+        details: `New account created (unverified). Name: ${user.name}, Role: ${user.role}`,
+        status: 200,
+      });
 
       return NextResponse.json({
         message: 'Account created. Please check your email for a verification code.',

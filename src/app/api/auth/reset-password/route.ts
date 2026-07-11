@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { hashPassword, deleteAllUserSessions } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -88,6 +89,13 @@ export async function POST(request: NextRequest) {
     ]);
 
     await deleteAllUserSessions(user.id);
+
+    await logRequest(request, 'PASSWORD_RESET_SUCCESS', {
+      userId: user.id,
+      email: user.email,
+      details: 'Password reset + all sessions invalidated',
+      status: 200,
+    });
 
     return NextResponse.json({
       message: 'Password has been reset successfully. You can now sign in with your new password.',

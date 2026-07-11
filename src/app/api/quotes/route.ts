@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 import { sendInquiryEmail } from '@/lib/email';
+import { logRequest } from '@/lib/activityLog';
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,12 +44,25 @@ export async function POST(request: NextRequest) {
       console.error('[Quotes] Email send failed:', emailErr?.message || emailErr);
     }
 
+    await logRequest(request, 'QUOTE_REQUESTED', {
+      userId: user.id,
+      email: user.email,
+      details: `Submitted quote request (serviceType: ${serviceType}, company: ${company || 'none'}, budget: ${budget || 'unspecified'}, description length: ${description?.length ?? 0} chars, quoteId: ${quote.id})`,
+      status: 200,
+    });
+
     return NextResponse.json({
       message: 'Quote request submitted successfully!',
       quote,
     });
   } catch (error) {
     console.error('Quote submit error:', error);
+    await logRequest(request, 'QUOTE_REQUESTED_FAILED', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Server error submitting quote request (serviceType: ${serviceType ?? 'unknown'}): ${(error as Error).message}`,
+      status: 500,
+    });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

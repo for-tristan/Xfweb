@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { deleteSession } from '@/lib/auth';
+import { deleteSession, getCurrentUser } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 export async function POST(request: NextRequest) {
   try {
+    const user = await getCurrentUser().catch(() => null);
     const sessionToken = request.cookies.get('xfoundry_session')?.value;
     if (sessionToken) {
       await deleteSession(sessionToken);
     }
+
+    await logRequest(request, 'LOGOUT', {
+      userId: user?.id,
+      email: user?.email,
+      status: 200,
+    });
 
     const response = NextResponse.json({ message: 'Logged out successfully' });
 

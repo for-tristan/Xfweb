@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 export async function GET() {
   try {
@@ -33,7 +34,7 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { error } = await requireAdmin();
+    const { error, user } = await requireAdmin();
     if (error) return error;
 
     const body = await request.json();
@@ -79,6 +80,13 @@ export async function PUT(request: NextRequest) {
         });
       } catch {}
     }
+
+    await logRequest(request, 'ADMIN_QUOTE_UPDATE', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Quote id=${id} status changed from "${existing.status}" to "${status}" (serviceType="${existing.serviceType}")`,
+      status: 200,
+    });
 
     return NextResponse.json({ quote });
   } catch (error) {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 export async function POST(request: NextRequest) {
   try {
@@ -56,6 +57,12 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingEnrollment) {
+      await logRequest(request, 'COURSE_ENROLL_FAILED', {
+        userId: user.id,
+        email: user.email,
+        details: `Duplicate enrollment attempt for course "${courseName}" (courseId: ${courseId})`,
+        status: 409,
+      });
       return NextResponse.json(
         { error: 'You are already enrolled in this course' },
         { status: 409 }
@@ -83,12 +90,25 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    await logRequest(request, 'COURSE_ENROLL', {
+      userId: user.id,
+      email: user.email,
+      details: `Enrolled in course "${courseName}" (courseId: ${courseId}, level: ${courseLevel || 'Beginner'}, duration: ${duration || 'Self-paced'})`,
+      status: 200,
+    });
+
     return NextResponse.json({
       message: 'Enrolled successfully!',
       enrollment,
     });
   } catch (error) {
     console.error('Enrollment error:', error);
+    await logRequest(request, 'COURSE_ENROLL_FAILED', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Server error during enrollment (courseId: ${courseId ?? 'unknown'}, courseName: ${courseName ?? 'unknown'}): ${(error as Error).message}`,
+      status: 500,
+    });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

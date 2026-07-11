@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { createSession } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 export async function POST(request: NextRequest) {
   try {
@@ -67,6 +68,13 @@ export async function POST(request: NextRequest) {
     ]);
 
     const token = await createSession(user.id);
+
+    await logRequest(request, 'EMAIL_VERIFIED', {
+      userId: user.id,
+      email: user.email,
+      details: 'Email verified + session created',
+      status: 200,
+    });
 
     const response = NextResponse.json({
       message: 'Email verified successfully',

@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
 import { createHash } from 'crypto';
+import { logRequest } from '@/lib/activityLog';
 
 export async function POST(request: NextRequest) {
   try {
-    const { error } = await requireAdmin();
+    const { error, user } = await requireAdmin();
     if (error) return error;
 
     const body = await request.json();
@@ -76,6 +77,13 @@ export async function POST(request: NextRequest) {
         message: `Congratulations! You have earned a certificate for completing "${courseName}". Certificate ID: ${certificateId}. Go to your course page to download your PDF certificate.`,
         type: 'success',
       },
+    });
+
+    await logRequest(request, 'ADMIN_CERTIFICATE_ISSUE', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Issued certificate ${certificateId} to ${student.email} (student id=${userId}, course="${courseName}", courseId=${courseId})`,
+      status: 200,
     });
 
     return NextResponse.json({

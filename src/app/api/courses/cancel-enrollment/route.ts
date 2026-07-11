@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 export async function DELETE(request: NextRequest) {
   try {
@@ -123,11 +124,24 @@ export async function DELETE(request: NextRequest) {
       },
     });
 
+    await logRequest(request, 'COURSE_CANCEL_ENROLL', {
+      userId: user.id,
+      email: user.email,
+      details: `Cancelled enrollment in "${enrollment.courseName}" (courseId: ${courseId}, enrollmentId: ${enrollmentId}). Progress, module access, certificates, and test attempts removed.`,
+      status: 200,
+    });
+
     return NextResponse.json({
       message: 'Enrollment cancelled successfully. Progress and module access removed.',
     });
   } catch (error) {
     console.error('Cancel enrollment error:', error);
+    await logRequest(request, 'COURSE_CANCEL_ENROLL_FAILED', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Server error cancelling enrollment (enrollmentId: ${enrollmentId ?? 'unknown'}): ${(error as Error).message}`,
+      status: 500,
+    });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -50,9 +51,22 @@ export async function POST(request: NextRequest) {
       data: { avatar: avatarUrl },
     });
 
+    await logRequest(request, 'AVATAR_UPLOAD', {
+      userId: user.id,
+      email: user.email,
+      details: `Uploaded new avatar (size: ${file.size} bytes, type: ${file.type}, url: ${avatarUrl})`,
+      status: 200,
+    });
+
     return NextResponse.json({ avatarUrl });
   } catch (error) {
     console.error('Avatar upload error:', error);
+    await logRequest(request, 'AVATAR_UPLOAD_FAILED', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Server error uploading avatar: ${(error as Error).message}`,
+      status: 500,
+    });
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
   }
 }

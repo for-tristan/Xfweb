@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 const MAX_DURATION_SECONDS = 86400;
 
@@ -61,6 +62,13 @@ export async function POST(request: NextRequest) {
         },
       });
 
+      await logRequest(request, 'STUDY_SESSION_STARTED', {
+        userId: user.id,
+        email: user.email,
+        details: `Started study session (courseId: ${courseId}, courseName: ${body.courseName || courseId}, date: ${today})`,
+        status: 200,
+      });
+
       return NextResponse.json({
         session,
         courseName: body.courseName || courseId,
@@ -99,12 +107,25 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    await logRequest(request, 'STUDY_SESSION_STOPPED', {
+      userId: user.id,
+      email: user.email,
+      details: `Stopped study session (courseId: ${courseId}, courseName: ${body.courseName || courseId}, date: ${today}, addedDuration: ${cappedDuration}s, totalDuration: ${session.duration}s)`,
+      status: 200,
+    });
+
     return NextResponse.json({
       session,
       courseName: body.courseName || courseId,
     });
   } catch (error) {
     console.error('Study session error:', error);
+    await logRequest(request, 'STUDY_SESSION_FAILED', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Server error during study session (action: ${action ?? 'unknown'}, courseId: ${courseId ?? 'unknown'}): ${(error as Error).message}`,
+      status: 500,
+    });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

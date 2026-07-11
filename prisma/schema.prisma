@@ -41,6 +41,7 @@ model User {
   gameScores          GameScore[]
   aiConversations     AiConversation[]
   instructedCourses   Course[]      @relation("CourseInstructor")
+  activityLogs        ActivityLog[]
 }
 
 model Enrollment {
@@ -457,3 +458,26 @@ model AiMessage {
   @@index([createdAt])
 }
 
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String?  @map("userid")
+  email     String?
+  action    String
+  details   String?
+  method    String
+  path      String
+  ip        String?
+  userAgent String?  @map("useragent")
+  status    Int?
+  createdAt DateTime @default(now()) @map("createdat")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([userId])
+  @@index([email])
+  @@index([ip])
+  @@index([action])
+  @@map("ActivityLog")
+}

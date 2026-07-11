@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
 import { sendEnrollmentStatusEmail } from '@/lib/email';
+import { logRequest } from '@/lib/activityLog';
 
 export async function GET(request: NextRequest) {
   try {
@@ -176,6 +177,13 @@ export async function PUT(request: NextRequest) {
       console.error('[Enrollments] Email send failed:', emailErr?.message || emailErr);
     }
 
+    await logRequest(request, status === 'approved' ? 'ADMIN_ENROLLMENT_APPROVE' : 'ADMIN_ENROLLMENT_DECLINE', {
+      userId: adminUser!.id,
+      email: adminUser!.email,
+      details: `Enrollment id=${enrollmentId} for user ${updated.user.email} ("${updated.courseName}") ${status} (was "${enrollment.status}")`,
+      status: 200,
+    });
+
     return NextResponse.json({
       message: `Enrollment ${status} successfully`,
       enrollment: updated,
@@ -191,7 +199,7 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const { error } = await requireAdmin();
+    const { error, user } = await requireAdmin();
     if (error) return error;
 
     const body = await request.json();
@@ -249,6 +257,13 @@ export async function DELETE(request: NextRequest) {
         message: `Your enrollment in "${enrollment.courseName}" has been removed by an admin. Your progress and module access have been reset.`,
         type: 'warning',
       },
+    });
+
+    await logRequest(request, 'ADMIN_ENROLLMENT_DELETE', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Deleted enrollment id=${enrollmentId} for user id=${userId} (course="${enrollment.courseName}", courseId=${courseId})`,
+      status: 200,
     });
 
     return NextResponse.json({

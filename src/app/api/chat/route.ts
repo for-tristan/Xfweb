@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 export async function GET(request: NextRequest) {
   try {
@@ -89,9 +90,22 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    await logRequest(request, 'CHAT_MESSAGE_SENT', {
+      userId: user.id,
+      email: user.email,
+      details: `Sent chat message to receiverId: ${receiverId} (length: ${content.trim().length} chars, messageId: ${message.id})`,
+      status: 200,
+    });
+
     return NextResponse.json({ message });
   } catch (error) {
     console.error('Send message error:', error);
+    await logRequest(request, 'CHAT_MESSAGE_SENT_FAILED', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Server error sending chat message (receiverId: ${receiverId ?? 'unknown'}): ${(error as Error).message}`,
+      status: 500,
+    });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

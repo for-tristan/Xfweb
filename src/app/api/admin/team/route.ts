@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
+import { logRequest } from '@/lib/activityLog';
 
 /** Bust CDN/edge cache for the public team list + landing page. */
 function bustTeamCache() {
@@ -34,7 +35,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { error } = await requireAdmin();
+    const { error, user } = await requireAdmin();
     if (error) return error;
 
     const body = await request.json();
@@ -61,6 +62,12 @@ export async function POST(request: NextRequest) {
     });
 
     bustTeamCache();
+    await logRequest(request, 'ADMIN_TEAM_ADD', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Added team member "${name}" (role="${role}", id=${member.id})`,
+      status: 201,
+    });
     return NextResponse.json({ member }, { status: 201 });
   } catch (error) {
     console.error('Admin team member create error:', error);
@@ -73,7 +80,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { error } = await requireAdmin();
+    const { error, user } = await requireAdmin();
     if (error) return error;
 
     const body = await request.json();
@@ -109,6 +116,12 @@ export async function PUT(request: NextRequest) {
     });
 
     bustTeamCache();
+    await logRequest(request, 'ADMIN_TEAM_UPDATE', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Updated team member id=${id} ("${existing.name}", role="${existing.role}")`,
+      status: 200,
+    });
     return NextResponse.json({ member });
   } catch (error) {
     console.error('Admin team member update error:', error);
@@ -121,7 +134,7 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const { error } = await requireAdmin();
+    const { error, user } = await requireAdmin();
     if (error) return error;
 
     const body = await request.json();
@@ -145,6 +158,12 @@ export async function DELETE(request: NextRequest) {
     await db.teamMember.delete({ where: { id } });
 
     bustTeamCache();
+    await logRequest(request, 'ADMIN_TEAM_DELETE', {
+      userId: user?.id,
+      email: user?.email,
+      details: `Deleted team member id=${id} ("${existing.name}", role="${existing.role}")`,
+      status: 200,
+    });
     return NextResponse.json({ message: 'Team member deleted successfully' });
   } catch (error) {
     console.error('Admin team member delete error:', error);

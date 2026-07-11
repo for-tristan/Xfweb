@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { verifyPassword, createSession, hashPassword } from '@/lib/auth';
 import { sendEmailVerificationEmail } from '@/lib/email';
+import { logRequest } from '@/lib/activityLog';
 import { randomInt } from 'crypto';
 
 // SECURITY: Pre-computed dummy hash used to keep login response time
@@ -31,6 +32,11 @@ export async function POST(request: NextRequest) {
       // SECURITY: Burn the same time a real password verification would
       // take, so an attacker can't enumerate emails via timing oracle.
       verifyPassword(password, DUMMY_HASH);
+      await logRequest(request, 'LOGIN_FAILED', {
+        email: email.toLowerCase().trim(),
+        details: 'No account with this email',
+        status: 401,
+      });
       return NextResponse.json(
         { error: 'Invalid email or password' },
         { status: 401 }
@@ -40,6 +46,12 @@ export async function POST(request: NextRequest) {
     const isValid = verifyPassword(password, user.password);
 
     if (!isValid) {
+      await logRequest(request, 'LOGIN_FAILED', {
+        userId: user.id,
+        email: user.email,
+        details: 'Wrong password',
+        status: 401,
+      });
       return NextResponse.json(
         { error: 'Invalid email or password' },
         { status: 401 }
@@ -84,6 +96,13 @@ export async function POST(request: NextRequest) {
         { status: 403 }
       );
     }
+
+    await logRequest(request, 'LOGIN_SUCCESS', {
+      userId: user.id,
+      email: user.email,
+      details: `User logged in. Role: ${user.role}`,
+      status: 200,
+    });
 
     const token = await createSession(user.id);
 
