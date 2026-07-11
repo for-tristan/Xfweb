@@ -1016,3 +1016,173 @@ Stage Summary:
 - GET handlers and the read-only analytics route were intentionally left un-logged per the task spec ("For GET routes that just fetch data, you can skip logging").
 - No TypeScript compiler available locally (tsc not installed in node_modules) — verified correctness by reading each edited file end-to-end and confirming every variable referenced in `details` strings is in scope at the call site (e.g. `existing.title` is captured before db.course.update in DELETE handlers because Prisma's delete doesn't return the row; `student.email` is available from the earlier findUnique in certificate route; `enrollment.status` is the pre-update value used for the "was X" delta; `result.results` is the runMigrations() return shape).
 - Changes are not yet committed — ready for review/commit on the main branch.
+
+---
+Task ID: query-audit
+Agent: DB Query Audit Agent
+Task: Audit all DB queries under src/app/api/ for ID mismatches (testId/moduleId/courseId/slug/userId confusion)
+
+Work Log:
+- Read prisma/schema.prisma in full to map every FK and the (unenforced) courseId-slug convention.
+- Audited 22 focus-area route files (courses, instructor, admin, study, games) plus related files (courses/[slug]/route.ts, courses/cancel-enrollment, instructor/courses, admin/courses, admin/analytics, admin/modules/seed).
+- For every db.*.findMany / findUnique / findFirst / update / updateMany / delete / deleteMany / upsert / create / count / groupBy call, verified that the where-clause field names match the schema and that the filtered values are the correct TYPE of ID.
+
+Schema conventions established (used as ground truth):
+- Course.id           = CUID (Prisma default). Course.slug = unique string.
+- CourseModule.courseId = FK → Course.id (NOT slug). Enforced by @relation.
+- ModuleTest.moduleId   = FK → CourseModule.id. Enforced.
+- TestQuestion.testId   = FK → ModuleTest.id. Enforced.
+- TestAttempt.testId    = FK → ModuleTest.id (NOT moduleId). Enforced. ← root of the original bug
+- TestUnlock.testId     = FK → ModuleTest.id. Enforced.
+- ModuleUnlock.moduleId = FK → CourseModule.id. Enforced.
+- ModuleStudy.moduleId  = FK → CourseModule.id. Enforced.
+- Enrollment.courseId       = String, NO FK. Stores Course SLUG (by convention, confirmed by 6 call sites).
+- CourseProgress.courseId   = String, NO FK. Stores Course SLUG (confirmed by 4 call sites — all do slug→id translation before querying CourseModule).
+- Certificate.courseId      = String, NO FK. Stores Course SLUG (confirmed by 4 call sites).
+- StudySession.courseId     = String, NO FK. Stores 'general' or any course identifier (no FK enforcement; clients can send either slug or id — currently unused for joins).
+
+Findings:
+
+═══════════════════════════════════════════════════════════════════════
+FINDING 1 — CRITICAL: certificate issuance bypass via courseId slug/id confusion
+═══════════════════════════════════════════════════════════════════════
+File: src/app/api/admin/certificate/route.ts
+Line: 43
+Severity: CRITICAL (security + correctness)
+
+Buggy query:
+    const totalModules = await db.courseModule.count({ where: { courseId } });
+
+Bug:
+    `courseId` comes from the request body and is used throughout this same route as
+    the Course SLUG:
+      - line 35: courseProgress.findUnique({ where: { userId_courseId: { userId, courseId } } })
+                 → CourseProgress.courseId stores SLUG, so `courseId` is a slug here.
+      - line 60: course.findUnique({ where: { slug: courseId } })
+                 → confirms `courseId` is meant to be a slug.
+    But on line 43 the SAME `courseId` (slug) is fed into CourseModule.courseId, which
+    the schema declares as `course Course @relation(fields: [courseId], references: [id])`
+    — i.e. it expects the Course.id CUID, NOT the slug.
+
+Effect:
+    `db.courseModule.count({ where: { courseId: <slug> } })` returns 0 for every course,
+    because no CourseModule row has courseId equal to a slug. The subsequent check
+        if (completedModules.length < totalModules)
+    becomes `X < 0` → always false. The endpoint therefore approves certificate
+    issuance for ANY student who has a CourseProgress row, even if they have completed
+    zero modules. Admins can mint certificates that bypass the completion requirement.
+
+    (Side-effect: the response payload's `total` field is also always 0, so the admin
+    UI shows "0/0 modules completed" — but the cert is still issued.)
+
+Fix (mirror the pattern in /api/admin/progress/route.ts getTotalModules and
+     /api/courses/modules/route.ts):
+
+    // BEFORE
+    const totalModules = await db.courseModule.count({ where: { courseId } });
+
+    // AFTER
+    const course = await db.course.findUnique({ where: { slug: courseId } });
+    const realCourseId = course ? course.id : courseId;
+    const totalModules = await db.courseModule.count({ where: { courseId: realCourseId } });
+
+    (The route already does `course.findUnique({ where: { slug: courseId } })` on
+    line 60 for the courseName lookup — that fetch should be hoisted ABOVE line 43
+    so `realCourseId` is available for both the count and the name lookup,
+    eliminating the duplicate query.)
+
+═══════════════════════════════════════════════════════════════════════
+FINDING 2 — VERIFIED FIX (no action needed): combined route testId/moduleId bug
+═══════════════════════════════════════════════════════════════════════
+File: src/app/api/courses/[slug]/combined/route.ts
+Lines: 65-83
+
+The previously-reported bug (`testAttempts.findMany({ where: { testId: { in: moduleIds } } })`)
+has been correctly fixed. The route now:
+  1. Fetches moduleTests via `db.moduleTest.findMany({ where: { moduleId: { in: moduleIds } } })`
+     — moduleIds are CourseModule.id values, which matches ModuleTest.moduleId. CORRECT.
+  2. Builds `testIds = moduleTests.map(t => t.id)` — ModuleTest.id values.
+  3. Fetches `testAttempt.findMany({ where: { testId: { in: testIds }, userId: user.id } })`
+     and `testUnlock.findMany({ where: { testId: { in: testIds }, userId: user.id } })`
+     — both filter by ModuleTest.id, which matches TestAttempt.testId / TestUnlock.testId.
+     CORRECT.
+  4. Looks up Certificate by `where: { userId_courseId: { userId: user.id, courseId: slug } }`
+     — uses slug for Certificate.courseId. CORRECT.
+
+No further action required on this file.
+
+═══════════════════════════════════════════════════════════════════════
+FINDING 3 — LOW: dead code in instructor/tests route
+═══════════════════════════════════════════════════════════════════════
+File: src/app/api/instructor/tests/route.ts
+Lines: 161-163
+
+    const moduleFilter = isInstructor
+      ? { courseId: { in: instructorCourseIds } }
+      : {};
+
+    This `moduleFilter` variable is declared but never referenced. The actual
+    moduleTest.findMany call on line 168 correctly uses
+    `where: { module: { courseId: { in: instructorCourseIds } } }` (filtering through
+    the ModuleTest→CourseModule→Course relation). The dead variable is harmless but
+    misleading — a reader might think the route is missing a `where: moduleFilter`
+    somewhere. Recommend deleting lines 161-163.
+
+    Not a correctness bug; no ID mismatch.
+
+═══════════════════════════════════════════════════════════════════════
+Routes audited with NO ID-mismatch issues (clean):
+═══════════════════════════════════════════════════════════════════════
+- src/app/api/courses/route.ts                       (enrollment groupBy uses slug ✓)
+- src/app/api/courses/[slug]/route.ts                (course lookup by slug ✓)
+- src/app/api/courses/[slug]/combined/route.ts       (FIXED — see Finding 2)
+- src/app/api/courses/modules/route.ts               (slug→id translation for CourseModule ✓)
+- src/app/api/courses/tests/route.ts                 (testUnlock.testId ✓)
+- src/app/api/courses/tests/questions/route.ts       (testId_userId composite ✓)
+- src/app/api/courses/tests/submit/route.ts          (testId_userId composite ✓)
+- src/app/api/courses/progress/route.ts              (slug→id map for moduleCount ✓)
+- src/app/api/courses/certificate/route.ts           (Certificate.courseId = slug ✓)
+- src/app/api/courses/enroll/route.ts                (Enrollment.courseId = slug from body ✓)
+- src/app/api/courses/my-enrollments/route.ts        (userId from session ✓)
+- src/app/api/courses/cancel-enrollment/route.ts     (cascading deletes use correct IDs ✓)
+- src/app/api/instructor/courses/route.ts            (enrollment groupBy uses slugs ✓)
+- src/app/api/instructor/tests/route.ts              (testId/moduleId FKs ✓; see Finding 3 for dead code)
+- src/app/api/instructor/modules/route.ts            (courseModule.courseId = Course.id ✓)
+- src/app/api/instructor/progress/route.ts           (slug for CourseProgress, id for CourseModule ✓)
+- src/app/api/instructor/enrollments/route.ts        (Enrollment.courseId = slug ✓)
+- src/app/api/instructor/analytics/route.ts          (courseSlugs vs courseCUIDs correctly split ✓)
+- src/app/api/admin/courses/route.ts                 (cascading deletes use slug for enrollment/progress/session/cert, id for courseModule ✓)
+- src/app/api/admin/modules/route.ts                 (FK usage ✓)
+- src/app/api/admin/modules/seed/route.ts            (slug→id map before CourseModule.create ✓)
+- src/app/api/admin/tests/route.ts                   (course lookup by id from test.module.courseId ✓)
+- src/app/api/admin/progress/route.ts                (getTotalModules helper does slug→id ✓)
+- src/app/api/admin/enrollments/route.ts             (slug for Enrollment, id for CourseModule ✓)
+- src/app/api/admin/analytics/route.ts               (no courseId filter; admin sees all ✓)
+- src/app/api/admin/certificate/route.ts             (BUG — see Finding 1)
+- src/app/api/admin/migrate/route.ts                 (no business queries; raw SQL ✓)
+- src/app/api/study/session/route.ts                 (courseId free-form string, no FK ✓)
+- src/app/api/study/leaderboard/route.ts             (filters by 'general' ✓)
+- src/app/api/games/submit/route.ts                  (userId from session ✓)
+- src/app/api/games/leaderboard/route.ts             (no user-specific filter ✓)
+- src/app/api/games/questions/route.ts               (no DB queries; AI generation only ✓)
+- src/app/api/questions/route.ts                     (no DB queries; AI generation only ✓)
+
+Cross-cutting observations (informational, no action required):
+- The pattern of using `courseId` for BOTH Course.id and Course.slug across different
+  models is a recurring source of confusion. Strongly recommend:
+    (a) renaming Enrollment.courseId / CourseProgress.courseId / Certificate.courseId /
+        StudySession.courseId to `courseSlug` in a future migration, OR
+    (b) adding a CHECK / app-layer validation that the value matches a Course.slug.
+  This would have made the original combined-route bug and Finding 1 impossible.
+- Several routes (instructor/modules, admin/modules POST) take `courseId` from the
+  body and look up Course by `where: { id: courseId }`. If the caller mistakenly
+  sends a slug, the lookup returns null → 404. Safe (no silent corruption), but
+  worth documenting the expected value type in a JSDoc on each handler.
+
+Stage Summary:
+- 1 CRITICAL bug found: /api/admin/certificate/route.ts line 43 — admin can mint
+  certificates for students who have not completed the course.
+- 1 previously-reported bug verified fixed: /api/courses/[slug]/combined/route.ts.
+- 1 LOW-priority cleanup: dead `moduleFilter` variable in instructor/tests route.
+- 32 route files audited in total; all others are clean.
+- No edits made per task instructions — report only.

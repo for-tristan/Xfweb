@@ -158,10 +158,6 @@ export async function GET(request: NextRequest) {
         })).map(c => c.id)
       : [];
 
-    const moduleFilter = isInstructor
-      ? { courseId: { in: instructorCourseIds } }
-      : {};
-
     if (viewGrades === '1') {
       const tests = await db.moduleTest.findMany({
         orderBy: { createdAt: 'desc' },

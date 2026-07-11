@@ -40,7 +40,16 @@ export async function POST(request: NextRequest) {
     }
 
     const completedModules: number[] = JSON.parse(progress.completedModules || '[]');
-    const totalModules = await db.courseModule.count({ where: { courseId } });
+
+    // SECURITY FIX: CourseModule.courseId stores the Course's CUID (id),
+    // NOT the slug. The `courseId` variable here is a slug (e.g.
+    // 'web-dev-bootcamp'). Previously this query used the slug directly,
+    // which always returned 0 modules — bypassing the completion check
+    // and allowing admins to issue certificates for incomplete courses.
+    // Now we look up the course by slug to get its real ID first.
+    const course = await db.course.findUnique({ where: { slug: courseId } });
+    const realCourseId = course ? course.id : courseId;
+    const totalModules = await db.courseModule.count({ where: { courseId: realCourseId } });
 
     if (completedModules.length < totalModules) {
       return NextResponse.json({
@@ -57,7 +66,6 @@ export async function POST(request: NextRequest) {
       month: 'long',
       day: 'numeric',
     });
-    const course = await db.course.findUnique({ where: { slug: courseId } });
     const courseName = course ? course.title : (progress.courseName || courseId);
 
     await db.certificate.create({
