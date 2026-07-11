@@ -173,7 +173,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Send friend request error:', error);
     await logRequest(request, 'FRIEND_REQUEST_SENT_FAILED', {
-      details: `Server error sending friend request (friendUsername: ${friendUsername ?? 'unknown'}): ${(error as Error).message}`,
+      details: `Server error: ${(error as Error).message}`,
       status: 500,
     });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -254,7 +254,7 @@ export async function PUT(request: NextRequest) {
   } catch (error) {
     console.error('Handle friend request error:', error);
     await logRequest(request, 'FRIEND_REQUEST_HANDLE_FAILED', {
-      details: `Server error handling friend request (friendshipId: ${friendshipId ?? 'unknown'}, action: ${action ?? 'unknown'}): ${(error as Error).message}`,
+      details: `Server error: ${(error as Error).message}`,
       status: 500,
     });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

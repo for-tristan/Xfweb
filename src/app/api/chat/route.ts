@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Send message error:', error);
     await logRequest(request, 'CHAT_MESSAGE_SENT_FAILED', {
-      details: `Server error sending chat message (receiverId: ${receiverId ?? 'unknown'}): ${(error as Error).message}`,
+      details: `Server error sending chat message: ${(error as Error).message}`,
       status: 500,
     });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

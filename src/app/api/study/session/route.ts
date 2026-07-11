@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Study session error:', error);
     await logRequest(request, 'STUDY_SESSION_FAILED', {
-      details: `Server error during study session (action: ${action ?? 'unknown'}, courseId: ${courseId ?? 'unknown'}): ${(error as Error).message}`,
+      details: `Server error: ${(error as Error).message}`,
       status: 500,
     });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

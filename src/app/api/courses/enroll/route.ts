@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Enrollment error:', error);
     await logRequest(request, 'COURSE_ENROLL_FAILED', {
-      details: `Server error during enrollment (courseId: ${courseId ?? 'unknown'}, courseName: ${courseName ?? 'unknown'}): ${(error as Error).message}`,
+      details: `Server error: ${(error as Error).message}`,
       status: 500,
     });
     return NextResponse.json(

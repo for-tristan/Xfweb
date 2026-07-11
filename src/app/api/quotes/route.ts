@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Quote submit error:', error);
     await logRequest(request, 'QUOTE_REQUESTED_FAILED', {
-      details: `Server error submitting quote request (serviceType: ${serviceType ?? 'unknown'}): ${(error as Error).message}`,
+      details: `Server error: ${(error as Error).message}`,
       status: 500,
     });
     return NextResponse.json(
