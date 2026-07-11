@@ -36,7 +36,7 @@ interface StudentTest {
 interface TestModalProps {
   test: StudentTest | null;
   onClose: () => void;
-  onSubmitted?: () => void;
+  onSubmitted?: (result: { score: number; totalPoints: number; passed: boolean; scorePercentage: number }) => void;
 }
 
 export default function TestModal({ test, onClose, onSubmitted }: TestModalProps) {
@@ -132,7 +132,15 @@ export default function TestModal({ test, onClose, onSubmitted }: TestModalProps
           scorePercentage: data.scorePercentage,
           correctQuestionIds: data.correctQuestionIds || [],
         });
-        if (onSubmitted) onSubmitted();
+        // Pass result to parent so it can optimistically update the
+        // studentTests state — the button changes from 'Take Test' to
+        // 'View Result' immediately, without waiting for a refetch.
+        if (onSubmitted) onSubmitted({
+          score: data.score,
+          totalPoints: data.totalPoints,
+          passed: data.passed,
+          scorePercentage: data.scorePercentage,
+        });
       } else {
         setError(data.error || 'Failed to submit test');
       }

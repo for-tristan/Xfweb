@@ -699,7 +699,33 @@ export default function DynamicCoursePage() {
       </section>
       </div>}
 
-      <TestModal test={activeTest} onClose={() => { setActiveTest(null); fetchStudentTests(); }} onSubmitted={fetchStudentTests} />
+      <TestModal
+        test={activeTest}
+        onClose={() => { setActiveTest(null); fetchStudentTests(); }}
+        onSubmitted={(result) => {
+          // Optimistic update: immediately mark the test as completed
+          // in the local state so the button changes from 'Take Test'
+          // to 'View Result' without waiting for a refetch.
+          if (activeTest) {
+            const updatedTest: StudentTest = {
+              ...activeTest,
+              hasCompleted: true,
+              attempt: {
+                score: result.score,
+                totalPoints: result.totalPoints,
+                passed: result.passed,
+                submittedAt: new Date().toISOString(),
+              },
+            };
+            setActiveTest(updatedTest);
+            setStudentTests(prev => prev.map(t =>
+              t.id === activeTest.id ? updatedTest : t
+            ));
+          }
+          // Also refetch in background to sync with server
+          fetchStudentTests();
+        }}
+      />
 
       {!(loading || minLoading) &&<footer className="v-footer" style={{ marginTop: 80 }}>
   <div className="v-footer-grid">
