@@ -51,8 +51,6 @@ export async function PUT(request: NextRequest) {
   } catch (error) {
     console.error('Profile update error:', error);
     await logRequest(request, 'PROFILE_UPDATE_FAILED', {
-      userId: user?.id,
-      email: user?.email,
       details: `Server error updating profile: ${(error as Error).message}`,
       status: 500,
     });

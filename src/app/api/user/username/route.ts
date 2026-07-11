@@ -100,8 +100,6 @@ export async function PUT(request: NextRequest) {
   } catch (error) {
     console.error('Username update error:', error);
     await logRequest(request, 'USERNAME_CHANGE_FAILED', {
-      userId: user?.id,
-      email: user?.email,
       details: `Server error changing username (attempted: ${username ?? 'unknown'}): ${(error as Error).message}`,
       status: 500,
     });

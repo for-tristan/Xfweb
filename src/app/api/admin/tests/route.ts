@@ -137,8 +137,6 @@ export async function POST(request: NextRequest) {
     });
 
     await logRequest(request, 'ADMIN_TEST_CREATE', {
-      userId: user?.id,
-      email: user?.email,
       details: `Created test "${title}" (id=${test.id}) for module id=${moduleId} (passingScore=${passingScore !== undefined ? passingScore : 70})`,
       status: 201,
     });
@@ -395,8 +393,6 @@ export async function DELETE(request: NextRequest) {
     });
 
     await logRequest(request, 'ADMIN_TEST_DELETE', {
-      userId: user?.id,
-      email: user?.email,
       details: `Deleted test id=${id} ("${existing.title}")`,
       status: 200,
     });

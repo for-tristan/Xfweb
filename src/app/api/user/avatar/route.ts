@@ -62,8 +62,6 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Avatar upload error:', error);
     await logRequest(request, 'AVATAR_UPLOAD_FAILED', {
-      userId: user?.id,
-      email: user?.email,
       details: `Server error uploading avatar: ${(error as Error).message}`,
       status: 500,
     });

@@ -11,8 +11,6 @@ export async function POST(request: NextRequest) {
     }
 
     await logRequest(request, 'LOGOUT', {
-      userId: user?.id,
-      email: user?.email,
       status: 200,
     });
 

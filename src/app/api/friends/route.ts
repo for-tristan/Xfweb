@@ -173,8 +173,6 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Send friend request error:', error);
     await logRequest(request, 'FRIEND_REQUEST_SENT_FAILED', {
-      userId: user?.id,
-      email: user?.email,
       details: `Server error sending friend request (friendUsername: ${friendUsername ?? 'unknown'}): ${(error as Error).message}`,
       status: 500,
     });
@@ -256,8 +254,6 @@ export async function PUT(request: NextRequest) {
   } catch (error) {
     console.error('Handle friend request error:', error);
     await logRequest(request, 'FRIEND_REQUEST_HANDLE_FAILED', {
-      userId: user?.id,
-      email: user?.email,
       details: `Server error handling friend request (friendshipId: ${friendshipId ?? 'unknown'}, action: ${action ?? 'unknown'}): ${(error as Error).message}`,
       status: 500,
     });

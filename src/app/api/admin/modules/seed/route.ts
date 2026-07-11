@@ -471,8 +471,6 @@ export async function POST(request: NextRequest) {
     }
 
     await logRequest(request, 'ADMIN_MODULES_SEED', {
-      userId: user?.id,
-      email: user?.email,
       details: `Seeded modules: created=${created}, updated=${updated}, skipped=${skipped}, notFound=${notFound}, total=${allModules.length}`,
       status: 200,
     });

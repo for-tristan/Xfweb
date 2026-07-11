@@ -260,8 +260,6 @@ export async function DELETE(request: NextRequest) {
     });
 
     await logRequest(request, 'ADMIN_ENROLLMENT_DELETE', {
-      userId: user?.id,
-      email: user?.email,
       details: `Deleted enrollment id=${enrollmentId} for user id=${userId} (course="${enrollment.courseName}", courseId=${courseId})`,
       status: 200,
     });

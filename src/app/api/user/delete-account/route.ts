@@ -60,8 +60,6 @@ export async function DELETE(request: NextRequest) {
   } catch (error) {
     console.error('Account deletion error:', error);
     await logRequest(request, 'ACCOUNT_DELETE_FAILED', {
-      userId: user?.id,
-      email: user?.email,
       details: `Server error deleting account: ${(error as Error).message}`,
       status: 500,
     });

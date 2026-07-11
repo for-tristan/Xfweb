@@ -181,8 +181,6 @@ export async function PUT(request: NextRequest) {
       : 0;
 
     await logRequest(request, 'ADMIN_PROGRESS_UPDATE', {
-      userId: user?.id,
-      email: user?.email,
       details: `Updated progress for user id=${userId} in course "${courseName || courseId}" (${completedModules.length}/${totalModules} modules, ${completionPercentage}%)`,
       status: 200,
     });
@@ -233,8 +231,6 @@ export async function DELETE(request: NextRequest) {
     });
 
     await logRequest(request, 'ADMIN_PROGRESS_RESET', {
-      userId: user?.id,
-      email: user?.email,
       details: `Reset progress for user id=${userId} in course id=${courseId}`,
       status: 200,
     });

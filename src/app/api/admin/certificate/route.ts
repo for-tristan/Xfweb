@@ -80,8 +80,6 @@ export async function POST(request: NextRequest) {
     });
 
     await logRequest(request, 'ADMIN_CERTIFICATE_ISSUE', {
-      userId: user?.id,
-      email: user?.email,
       details: `Issued certificate ${certificateId} to ${student.email} (student id=${userId}, course="${courseName}", courseId=${courseId})`,
       status: 200,
     });

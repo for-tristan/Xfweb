@@ -140,8 +140,6 @@ export async function POST(request: NextRequest) {
 
     bustCoursesCache();
     await logRequest(request, 'ADMIN_COURSE_CREATE', {
-      userId: user?.id,
-      email: user?.email,
       details: `Created course "${title}" (slug=${slug}, level=${level || 'Beginner'})`,
       status: 201,
     });
@@ -198,8 +196,6 @@ export async function PUT(request: NextRequest) {
 
     bustCoursesCache();
     await logRequest(request, 'ADMIN_COURSE_UPDATE', {
-      userId: user?.id,
-      email: user?.email,
       details: `Updated course "${existing.title}" (id=${id}, slug=${existing.slug})${status !== undefined ? ` status=${status}` : ''}`,
       status: 200,
     });
@@ -260,8 +256,6 @@ export async function DELETE(request: NextRequest) {
 
     bustCoursesCache();
     await logRequest(request, 'ADMIN_COURSE_DELETE', {
-      userId: user?.id,
-      email: user?.email,
       details: `Deleted course "${existing.title}" (id=${id}, slug=${slug})`,
       status: 200,
     });

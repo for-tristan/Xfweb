@@ -121,8 +121,6 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Study session error:', error);
     await logRequest(request, 'STUDY_SESSION_FAILED', {
-      userId: user?.id,
-      email: user?.email,
       details: `Server error during study session (action: ${action ?? 'unknown'}, courseId: ${courseId ?? 'unknown'}): ${(error as Error).message}`,
       status: 500,
     });

@@ -84,8 +84,6 @@ export async function POST(request: NextRequest) {
 
     bustServicesCache();
     await logRequest(request, 'ADMIN_SERVICE_CREATE', {
-      userId: user?.id,
-      email: user?.email,
       details: `Created service "${title}" (slug=${slug}, id=${service.id}, features=${features?.length || 0})`,
       status: 201,
     });
@@ -157,8 +155,6 @@ export async function PUT(request: NextRequest) {
 
     bustServicesCache();
     await logRequest(request, 'ADMIN_SERVICE_UPDATE', {
-      userId: user?.id,
-      email: user?.email,
       details: `Updated service id=${id} ("${existing.title}", slug=${existing.slug})${status !== undefined ? ` status=${status}` : ''}`,
       status: 200,
     });
@@ -199,8 +195,6 @@ export async function DELETE(request: NextRequest) {
 
     bustServicesCache();
     await logRequest(request, 'ADMIN_SERVICE_DELETE', {
-      userId: user?.id,
-      email: user?.email,
       details: `Deleted service id=${id} ("${existing.title}", slug=${existing.slug})`,
       status: 200,
     });

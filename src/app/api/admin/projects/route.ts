@@ -59,8 +59,6 @@ export async function POST(request: NextRequest) {
 
     bustProjectsCache();
     await logRequest(request, 'ADMIN_PROJECT_CREATE', {
-      userId: user?.id,
-      email: user?.email,
       details: `Created project "${title}" (slug=${slug}, id=${project.id}, category=${category || 'web'})`,
       status: 201,
     });
@@ -109,8 +107,6 @@ export async function PUT(request: NextRequest) {
 
     bustProjectsCache();
     await logRequest(request, 'ADMIN_PROJECT_UPDATE', {
-      userId: user?.id,
-      email: user?.email,
       details: `Updated project id=${id} ("${existing.title}", slug=${existing.slug})${status !== undefined ? ` status=${status}` : ''}`,
       status: 200,
     });
@@ -145,8 +141,6 @@ export async function DELETE(request: NextRequest) {
 
     bustProjectsCache();
     await logRequest(request, 'ADMIN_PROJECT_DELETE', {
-      userId: user?.id,
-      email: user?.email,
       details: `Deleted project id=${id} ("${existing.title}", slug=${existing.slug})`,
       status: 200,
     });

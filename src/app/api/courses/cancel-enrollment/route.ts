@@ -137,8 +137,6 @@ export async function DELETE(request: NextRequest) {
   } catch (error) {
     console.error('Cancel enrollment error:', error);
     await logRequest(request, 'COURSE_CANCEL_ENROLL_FAILED', {
-      userId: user?.id,
-      email: user?.email,
       details: `Server error cancelling enrollment (enrollmentId: ${enrollmentId ?? 'unknown'}): ${(error as Error).message}`,
       status: 500,
     });

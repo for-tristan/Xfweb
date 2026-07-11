@@ -101,8 +101,6 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Send message error:', error);
     await logRequest(request, 'CHAT_MESSAGE_SENT_FAILED', {
-      userId: user?.id,
-      email: user?.email,
       details: `Server error sending chat message (receiverId: ${receiverId ?? 'unknown'}): ${(error as Error).message}`,
       status: 500,
     });

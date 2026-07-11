@@ -16,8 +16,6 @@ export async function DELETE(request: NextRequest) {
       await db.moduleUnlock.deleteMany({ where: { moduleId } });
       await db.courseModule.delete({ where: { id: moduleId } });
       await logRequest(request, 'ADMIN_MODULE_DELETE', {
-        userId: user?.id,
-        email: user?.email,
         details: `Deleted module id=${moduleId}`,
         status: 200,
       });
@@ -55,8 +53,6 @@ export async function DELETE(request: NextRequest) {
     }
 
     await logRequest(request, 'ADMIN_MODULE_LOCK', {
-      userId: user?.id,
-      email: user?.email,
       details: `Locked module id=${moduleId} (title="${courseModule?.title || ''}") for user id=${userId}`,
       status: 200,
     });
@@ -157,8 +153,6 @@ export async function POST(request: NextRequest) {
     });
 
     await logRequest(request, 'ADMIN_MODULE_CREATE', {
-      userId: user?.id,
-      email: user?.email,
       details: `Created module "${title}" (id=${module.id}) in course "${course.title}" (id=${courseId}, order=${moduleOrder !== undefined ? moduleOrder : 0})`,
       status: 201,
     });

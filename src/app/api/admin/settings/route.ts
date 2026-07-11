@@ -72,8 +72,6 @@ export async function PUT(request: NextRequest) {
     }
 
     await logRequest(request, 'ADMIN_SETTINGS_UPDATE', {
-      userId: user?.id,
-      email: user?.email,
       details: `Updated ${Object.keys(updates).length} site setting(s): ${Object.keys(updates).join(', ')}`,
       status: 200,
     });

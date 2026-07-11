@@ -68,8 +68,6 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Game score submit error:', error);
     await logRequest(request, 'GAME_SCORE_SUBMIT_FAILED', {
-      userId: user?.id,
-      email: user?.email,
       details: `Server error submitting game score (game: ${game ?? 'unknown'}, language: ${language ?? 'unknown'}, difficulty: ${difficulty ?? 'unknown'}): ${(error as Error).message}`,
       status: 500,
     });

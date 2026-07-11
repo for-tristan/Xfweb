@@ -45,8 +45,6 @@ export async function POST(request: NextRequest) {
 
     const result = await runMigrations();
     await logRequest(request, 'ADMIN_MIGRATE', {
-      userId: user?.id,
-      email: user?.email,
       details: `Ran DB migrations: ${result.results?.length || 0} statement(s); statuses=${result.results?.map((r: any) => r.status).join(',') || 'n/a'}`,
       status: 200,
     });

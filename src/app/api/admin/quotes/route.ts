@@ -82,8 +82,6 @@ export async function PUT(request: NextRequest) {
     }
 
     await logRequest(request, 'ADMIN_QUOTE_UPDATE', {
-      userId: user?.id,
-      email: user?.email,
       details: `Quote id=${id} status changed from "${existing.status}" to "${status}" (serviceType="${existing.serviceType}")`,
       status: 200,
     });

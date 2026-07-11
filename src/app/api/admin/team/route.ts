@@ -63,8 +63,6 @@ export async function POST(request: NextRequest) {
 
     bustTeamCache();
     await logRequest(request, 'ADMIN_TEAM_ADD', {
-      userId: user?.id,
-      email: user?.email,
       details: `Added team member "${name}" (role="${role}", id=${member.id})`,
       status: 201,
     });
@@ -117,8 +115,6 @@ export async function PUT(request: NextRequest) {
 
     bustTeamCache();
     await logRequest(request, 'ADMIN_TEAM_UPDATE', {
-      userId: user?.id,
-      email: user?.email,
       details: `Updated team member id=${id} ("${existing.name}", role="${existing.role}")`,
       status: 200,
     });
@@ -159,8 +155,6 @@ export async function DELETE(request: NextRequest) {
 
     bustTeamCache();
     await logRequest(request, 'ADMIN_TEAM_DELETE', {
-      userId: user?.id,
-      email: user?.email,
       details: `Deleted team member id=${id} ("${existing.name}", role="${existing.role}")`,
       status: 200,
     });
