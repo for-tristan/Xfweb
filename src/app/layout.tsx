@@ -86,13 +86,12 @@ export default async function RootLayout({
     // Check IP ban + device ban + email ban in parallel
     try {
       const [ipBan, deviceBan, emailBan] = await Promise.all([
-        ip ? db.bannedIp.findUnique({ where: { ip } }) : null,
-        deviceId ? db.bannedDevice.findUnique({ where: { deviceId } }) : null,
-        currentUser?.email ? db.bannedEmail.findUnique({ where: { email: currentUser.email } }) : null,
+        ip ? db.bannedIp.findUnique({ where: { ip } }).catch(e => { console.error('[layout] IP ban query error:', e.message); return null; }) : null,
+        deviceId ? db.bannedDevice.findUnique({ where: { deviceId } }).catch(e => { console.error('[layout] Device ban query error:', e.message); return null; }) : null,
+        currentUser?.email ? db.bannedEmail.findUnique({ where: { email: currentUser.email } }).catch(e => { console.error('[layout] Email ban query error:', e.message); return null; }) : null,
       ]);
 
       if (ipBan) {
-        // Invalidate session if logged in
         if (currentUser) await deleteAllUserSessions(currentUser.id).catch(() => {});
         redirect(`/banned?ip=${encodeURIComponent(ip)}${ipBan.reason ? `&reason=${encodeURIComponent(ipBan.reason)}` : ''}`);
       }
@@ -101,8 +100,6 @@ export default async function RootLayout({
         redirect(`/banned?device=${encodeURIComponent(deviceId)}${deviceBan.reason ? `&reason=${encodeURIComponent(deviceBan.reason)}` : ''}`);
       }
       if (emailBan) {
-        // Email ban — invalidate ALL sessions for this user so they can't
-        // access API routes or reload pages without being redirected.
         if (currentUser) await deleteAllUserSessions(currentUser.id).catch(() => {});
         redirect(`/banned?email=${encodeURIComponent(currentUser!.email)}${emailBan.reason ? `&reason=${encodeURIComponent(emailBan.reason)}` : ''}`);
       }

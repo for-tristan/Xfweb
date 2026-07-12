@@ -3,7 +3,7 @@ CREATE TABLE "BannedDevice" (
     "id" TEXT NOT NULL,
     "deviceId" TEXT NOT NULL,
     "reason" TEXT,
-    "bannedby" TEXT,
+    "bannedBy" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "BannedDevice_pkey" PRIMARY KEY ("id")

@@ -17,14 +17,16 @@ export async function GET(request: NextRequest) {
     const deviceId = request.cookies.get('xfoundry_device_id')?.value || '';
     const user = await getCurrentUser().catch(() => null);
 
+    // Debug: log what we're checking (helps diagnose ban issues)
+    console.log('[ban-check] Checking:', { ip: !!ip, deviceId: deviceId ? deviceId.substring(0, 16) + '...' : 'none', email: user?.email || 'none' });
+
     const [ipBan, deviceBan, emailBan] = await Promise.all([
-      ip ? db.bannedIp.findUnique({ where: { ip } }) : null,
-      deviceId ? db.bannedDevice.findUnique({ where: { deviceId } }) : null,
-      user?.email ? db.bannedEmail.findUnique({ where: { email: user.email } }) : null,
+      ip ? db.bannedIp.findUnique({ where: { ip } }).catch(e => { console.error('[ban-check] IP query error:', e.message); return null; }) : null,
+      deviceId ? db.bannedDevice.findUnique({ where: { deviceId } }).catch(e => { console.error('[ban-check] Device query error:', e.message); return null; }) : null,
+      user?.email ? db.bannedEmail.findUnique({ where: { email: user.email } }).catch(e => { console.error('[ban-check] Email query error:', e.message); return null; }) : null,
     ]);
 
     if (ipBan) {
-      // Invalidate session
       if (user) await db.session.deleteMany({ where: { userId: user.id } }).catch(() => {});
       return NextResponse.json({
         banned: true,
@@ -55,8 +57,8 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ banned: false });
-  } catch {
-    // DB down — fail open
-    return NextResponse.json({ banned: false });
+  } catch (error: any) {
+    console.error('[ban-check] FATAL:', error?.message || error);
+    return NextResponse.json({ banned: false, error: 'ban-check failed' });
   }
 }
