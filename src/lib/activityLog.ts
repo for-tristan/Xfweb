@@ -81,9 +81,10 @@ export async function logRequest(
   }
 
   // Append device ID to details so admins can see it in the logs
-  // without needing a schema migration. Format: [device:abc123...]
+  // and copy it to ban the device. Store the FULL device ID (not
+  // truncated) so the ban actually matches.
   const baseDetails = options?.details || '';
-  const deviceTag = deviceId ? ` [device: ${deviceId.substring(0, 16)}...]` : '';
+  const deviceTag = deviceId ? ` [device: ${deviceId}]` : '';
   const details = baseDetails + deviceTag;
 
   await logActivity({

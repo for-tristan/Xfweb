@@ -2561,6 +2561,7 @@ export default function AdminPage() {
                         <th style={{ padding: '10px 14px', color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10, whiteSpace: 'nowrap' }}>Device</th>
                         <th style={{ padding: '10px 14px', color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10, whiteSpace: 'nowrap' }}>Details</th>
                         <th style={{ padding: '10px 14px', color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10, whiteSpace: 'nowrap' }}>Status</th>
+                        <th style={{ padding: '10px 14px', color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10, whiteSpace: 'nowrap' }}>Ban</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -2596,11 +2597,11 @@ export default function AdminPage() {
                             <td style={{ padding: '8px 14px', whiteSpace: 'nowrap', fontSize: 10, fontFamily: 'monospace' }}>
                               {deviceId ? (
                                 <span
-                                  title={deviceId}
-                                  style={{ color: '#a78bfa', cursor: 'pointer', maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', display: 'inline-block', verticalAlign: 'middle' }}
-                                  onClick={() => { navigator.clipboard?.writeText(deviceId.replace('...', '')); toast({ title: 'Copied', description: 'Device ID copied to clipboard' }); }}
+                                  title={`Click to copy: ${deviceId}`}
+                                  style={{ color: '#a78bfa', cursor: 'pointer', maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis', display: 'inline-block', verticalAlign: 'middle' }}
+                                  onClick={() => { navigator.clipboard?.writeText(deviceId); toast({ title: 'Copied', description: 'Device ID copied to clipboard' }); }}
                                 >
-                                  {deviceId}
+                                  {deviceId.substring(0, 20)}...
                                 </span>
                               ) : <span style={{ color: 'var(--text-dim)', opacity: 0.3 }}>-</span>}
                             </td>
@@ -2611,6 +2612,50 @@ export default function AdminPage() {
                               {log.status ? (
                                 <span style={{ color: log.status < 400 ? 'var(--success-color)' : 'var(--error-color)', fontWeight: 700 }}>{log.status}</span>
                               ) : '-'}
+                            </td>
+                            {/* Quick-ban buttons — ban the IP/device/email directly from the logs */}
+                            <td style={{ padding: '8px 14px', whiteSpace: 'nowrap', fontSize: 10 }}>
+                              <div style={{ display: 'flex', gap: 4 }}>
+                                {log.ip && log.ip !== 'unknown' && (
+                                  <button
+                                    title={`Ban IP: ${log.ip}`}
+                                    onClick={() => {
+                                      fetch('/api/admin/bans', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'ip', value: log.ip, reason: `Banned from Logs tab (action: ${log.action})` }) })
+                                        .then(r => r.ok ? toast({ title: 'IP Banned', description: log.ip }) : toast({ title: 'Error', variant: 'destructive' }) : null)
+                                        .catch(() => {});
+                                    }}
+                                    style={{ background: 'transparent', border: '1px solid rgba(239,68,68,0.3)', color: 'var(--error-color)', borderRadius: 4, padding: '2px 6px', fontSize: 9, cursor: 'pointer', fontFamily: 'inherit' }}
+                                  >
+                                    <i className="fa-solid fa-ban" /> IP
+                                  </button>
+                                )}
+                                {deviceId && (
+                                  <button
+                                    title={`Ban Device: ${deviceId.substring(0, 20)}...`}
+                                    onClick={() => {
+                                      fetch('/api/admin/bans', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'device', value: deviceId, reason: `Banned from Logs tab (action: ${log.action})` }) })
+                                        .then(r => r.ok ? toast({ title: 'Device Banned', description: deviceId.substring(0, 20) + '...' }) : toast({ title: 'Error', variant: 'destructive' }) : null)
+                                        .catch(() => {});
+                                    }}
+                                    style={{ background: 'transparent', border: '1px solid rgba(167,139,250,0.3)', color: '#a78bfa', borderRadius: 4, padding: '2px 6px', fontSize: 9, cursor: 'pointer', fontFamily: 'inherit' }}
+                                  >
+                                    <i className="fa-solid fa-fingerprint" /> Device
+                                  </button>
+                                )}
+                                {log.email && (
+                                  <button
+                                    title={`Ban Email: ${log.email}`}
+                                    onClick={() => {
+                                      fetch('/api/admin/bans', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'email', value: log.email, reason: `Banned from Logs tab (action: ${log.action})` }) })
+                                        .then(r => r.ok ? toast({ title: 'Email Banned', description: log.email }) : toast({ title: 'Error', variant: 'destructive' }) : null)
+                                        .catch(() => {});
+                                    }}
+                                    style={{ background: 'transparent', border: '1px solid rgba(239,68,68,0.3)', color: 'var(--error-color)', borderRadius: 4, padding: '2px 6px', fontSize: 9, cursor: 'pointer', fontFamily: 'inherit' }}
+                                  >
+                                    <i className="fa-solid fa-envelope" /> Email
+                                  </button>
+                                )}
+                              </div>
                             </td>
                           </tr>
                         );
