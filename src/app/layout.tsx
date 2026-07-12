@@ -12,6 +12,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { headers, cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
+import { getCurrentUser, deleteAllUserSessions } from '@/lib/auth';
 
 export const metadata: Metadata = {
   title: 'XFoundry',
@@ -53,14 +54,17 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // BAN CHECK: Check if the visitor's IP is banned. If so, redirect
-  // to /banned. Skip the check for the /banned route itself (avoids
-  // infinite redirect loop) and for API routes (they handle bans
-  // individually at the route level).
+  // BAN CHECK: Check IP + device + email bans on every page load.
+  // If banned, redirect to /banned immediately.
   //
-  // Note: Next.js layouts don't receive searchParams, so we detect
-  // the current path via the x-invoke-path header (set by Next.js
-  // internally) or x-pathname (set by some hosting platforms).
+  // This catches users who are ALREADY logged in when they get banned —
+  // they're redirected to /banned on their next page load, not when they
+  // try to log in again. Their session is also invalidated so they can't
+  // access API routes either.
+  //
+  // Skip the check for the /banned route itself (avoids infinite redirect
+  // loop) and for API routes (they handle bans individually at the route
+  // level).
   const headerList = await headers();
   const pathname = headerList.get('x-invoke-path') ||
                    headerList.get('x-pathname') || '';
@@ -68,26 +72,44 @@ export default async function RootLayout({
   const isApiRoute = pathname.startsWith('/api/');
 
   if (!isBannedRoute && !isApiRoute) {
-    const headerList = await headers();
     const ip = headerList.get('x-forwarded-for')?.split(',')[0]?.trim() ||
                headerList.get('x-real-ip') || '';
     const cookieStore = await cookies();
     const deviceId = cookieStore.get('xfoundry_device_id')?.value || '';
 
-    // Check IP ban + device ban in parallel
+    // Get the logged-in user (if any) so we can check email ban.
+    // getCurrentUser() is cached per request via React cache(), so this
+    // doesn't add an extra DB hit if other server components also call it.
+    const currentUser = await getCurrentUser().catch(() => null);
+
+    // Check IP ban + device ban + email ban in parallel
     try {
-      const [ipBan, deviceBan] = await Promise.all([
+      const [ipBan, deviceBan, emailBan] = await Promise.all([
         ip ? db.bannedIp.findUnique({ where: { ip } }) : null,
         deviceId ? db.bannedDevice.findUnique({ where: { deviceId } }) : null,
+        currentUser?.email ? db.bannedEmail.findUnique({ where: { email: currentUser.email } }) : null,
       ]);
 
       if (ipBan) {
+        // Invalidate session if logged in
+        if (currentUser) await deleteAllUserSessions(currentUser.id).catch(() => {});
         redirect(`/banned?ip=${encodeURIComponent(ip)}${ipBan.reason ? `&reason=${encodeURIComponent(ipBan.reason)}` : ''}`);
       }
       if (deviceBan) {
+        if (currentUser) await deleteAllUserSessions(currentUser.id).catch(() => {});
         redirect(`/banned?device=${encodeURIComponent(deviceId)}${deviceBan.reason ? `&reason=${encodeURIComponent(deviceBan.reason)}` : ''}`);
       }
-    } catch {
+      if (emailBan) {
+        // Email ban — invalidate ALL sessions for this user so they can't
+        // access API routes or reload pages without being redirected.
+        if (currentUser) await deleteAllUserSessions(currentUser.id).catch(() => {});
+        redirect(`/banned?email=${encodeURIComponent(currentUser!.email)}${emailBan.reason ? `&reason=${encodeURIComponent(emailBan.reason)}` : ''}`);
+      }
+    } catch (e) {
+      // If redirect threw, re-throw (redirect() throws internally)
+      if (e && typeof e === 'object' && 'digest' in e && typeof e.digest === 'string' && e.digest.startsWith('NEXT_REDIRECT')) {
+        throw e;
+      }
       // DB down — fail open (don't block everyone)
     }
   }
