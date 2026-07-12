@@ -304,7 +304,7 @@ export function usePageFeatures() {
         }
       } else if (data.banned) {
         // Banned user — redirect to /banned page
-        const params = new URLSearchParams({ noredir: '1' });
+        const params = new URLSearchParams();
         if (data.ip) params.set('ip', data.ip);
         if (data.email) params.set('email', data.email);
         if (data.banType) params.set('reason', data.banType === 'ip' ? 'Your IP address has been banned' : 'Your email address has been banned');

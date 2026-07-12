@@ -49,26 +49,31 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
-  searchParams,
 }: Readonly<{
   children: React.ReactNode;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }>) {
   // BAN CHECK: Check if the visitor's IP is banned. If so, redirect
-  // to /banned. The /banned page passes ?noredir=1 to prevent the
-  // infinite redirect loop (since the root layout wraps /banned too).
-  const params = await searchParams;
-  const skipBanCheck = params.noredir === '1';
+  // to /banned. Skip the check for the /banned route itself (avoids
+  // infinite redirect loop) and for API routes (they handle bans
+  // individually at the route level).
+  //
+  // Note: Next.js layouts don't receive searchParams, so we detect
+  // the current path via the x-invoke-path header (set by Next.js
+  // internally) or x-pathname (set by some hosting platforms).
+  const headerList = await headers();
+  const pathname = headerList.get('x-invoke-path') ||
+                   headerList.get('x-pathname') || '';
+  const isBannedRoute = pathname === '/banned' || pathname.startsWith('/banned');
+  const isApiRoute = pathname.startsWith('/api/');
 
-  if (!skipBanCheck) {
-    const headerList = await headers();
+  if (!isBannedRoute && !isApiRoute) {
     const ip = headerList.get('x-forwarded-for')?.split(',')[0]?.trim() ||
                headerList.get('x-real-ip') || '';
     if (ip) {
       try {
         const ban = await db.bannedIp.findUnique({ where: { ip } });
         if (ban) {
-          redirect(`/banned?noredir=1&ip=${encodeURIComponent(ip)}${ban.reason ? `&reason=${encodeURIComponent(ban.reason)}` : ''}`);
+          redirect(`/banned?ip=${encodeURIComponent(ip)}${ban.reason ? `&reason=${encodeURIComponent(ban.reason)}` : ''}`);
         }
       } catch {
         // DB down — fail open (don't block everyone)
