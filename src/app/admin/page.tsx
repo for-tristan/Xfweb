@@ -2558,6 +2558,7 @@ export default function AdminPage() {
                         <th style={{ padding: '10px 14px', color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10, whiteSpace: 'nowrap' }}>User</th>
                         <th style={{ padding: '10px 14px', color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10, whiteSpace: 'nowrap' }}>Email</th>
                         <th style={{ padding: '10px 14px', color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10, whiteSpace: 'nowrap' }}>IP</th>
+                        <th style={{ padding: '10px 14px', color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10, whiteSpace: 'nowrap' }}>Device</th>
                         <th style={{ padding: '10px 14px', color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10, whiteSpace: 'nowrap' }}>Details</th>
                         <th style={{ padding: '10px 14px', color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10, whiteSpace: 'nowrap' }}>Status</th>
                       </tr>
@@ -2568,6 +2569,11 @@ export default function AdminPage() {
                         const isAdmin = log.action?.startsWith('ADMIN_');
                         const isAuth = log.action?.includes('LOGIN') || log.action?.includes('SIGNUP') || log.action?.includes('OAUTH') || log.action?.includes('LOGOUT') || log.action?.includes('VERIFIED');
                         const actionColor = isAuthFail ? 'var(--error-color)' : isAdmin ? 'var(--accent)' : isAuth ? '#6b9bf5' : 'var(--text-light)';
+                        // Extract device ID from details field (format: [device: abc123...])
+                        const deviceMatch = log.details?.match(/\[device:\s*([^\]]+)\]/);
+                        const deviceId = deviceMatch ? deviceMatch[1].trim() : '';
+                        // Strip the [device: ...] tag from details so it's not duplicated
+                        const cleanDetails = log.details?.replace(/\s*\[device:\s*[^\]]+\]/, '') || '';
                         return (
                           <tr key={log.id} style={{ borderBottom: '1px solid var(--border-color)', background: idx % 2 === 0 ? 'transparent' : 'color-mix(in srgb, var(--text-light) 2%, transparent)' }}>
                             <td style={{ padding: '8px 14px', color: 'var(--text-dim)', whiteSpace: 'nowrap', fontSize: 11 }}>
@@ -2587,8 +2593,19 @@ export default function AdminPage() {
                             <td style={{ padding: '8px 14px', color: 'var(--text-dim)', whiteSpace: 'nowrap', fontSize: 11, fontFamily: 'monospace' }}>
                               {log.ip || '-'}
                             </td>
-                            <td style={{ padding: '8px 14px', color: 'var(--text-dim)', fontSize: 11, maxWidth: 400, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                              {log.details || <span style={{ opacity: 0.5 }}>-</span>}
+                            <td style={{ padding: '8px 14px', whiteSpace: 'nowrap', fontSize: 10, fontFamily: 'monospace' }}>
+                              {deviceId ? (
+                                <span
+                                  title={deviceId}
+                                  style={{ color: '#a78bfa', cursor: 'pointer', maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', display: 'inline-block', verticalAlign: 'middle' }}
+                                  onClick={() => { navigator.clipboard?.writeText(deviceId.replace('...', '')); toast({ title: 'Copied', description: 'Device ID copied to clipboard' }); }}
+                                >
+                                  {deviceId}
+                                </span>
+                              ) : <span style={{ color: 'var(--text-dim)', opacity: 0.3 }}>-</span>}
+                            </td>
+                            <td style={{ padding: '8px 14px', color: 'var(--text-dim)', fontSize: 11, maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {cleanDetails || <span style={{ opacity: 0.5 }}>-</span>}
                             </td>
                             <td style={{ padding: '8px 14px', whiteSpace: 'nowrap', fontSize: 11 }}>
                               {log.status ? (
