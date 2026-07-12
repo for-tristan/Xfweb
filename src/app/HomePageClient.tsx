@@ -636,6 +636,15 @@ export default function Home({
           toast({ title: 'Verification Required', description: data.error });
         }
       }
+      else if (data.banned) {
+        // Banned user — redirect to /banned page
+        const params = new URLSearchParams({ noredir: '1' });
+        if (data.ip) params.set('ip', data.ip);
+        if (data.email) params.set('email', data.email);
+        if (data.banType) params.set('reason', data.banType === 'ip' ? 'Your IP address has been banned' : 'Your email address has been banned');
+        window.location.href = `/banned?${params.toString()}`;
+        return;
+      }
       else { toast({ title: 'Login Failed', description: data.error, variant: 'destructive' }); }
     } catch { toast({ title: 'Error', description: 'Something went wrong', variant: 'destructive' }); }
     setLoginLoading(false);

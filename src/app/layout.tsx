@@ -8,6 +8,9 @@ import ClickSplash from '@/components/ClickSplash';
 import CookieConsentBanner from '@/components/CookieConsentBanner';
 import PageViewTracker from '@/components/PageViewTracker';
 import { Analytics } from "@vercel/analytics/next";
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { db } from '@/lib/db';
 
 export const metadata: Metadata = {
   title: 'XFoundry',
@@ -44,11 +47,35 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  searchParams,
 }: Readonly<{
   children: React.ReactNode;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }>) {
+  // BAN CHECK: Check if the visitor's IP is banned. If so, redirect
+  // to /banned. The /banned page passes ?noredir=1 to prevent the
+  // infinite redirect loop (since the root layout wraps /banned too).
+  const params = await searchParams;
+  const skipBanCheck = params.noredir === '1';
+
+  if (!skipBanCheck) {
+    const headerList = await headers();
+    const ip = headerList.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+               headerList.get('x-real-ip') || '';
+    if (ip) {
+      try {
+        const ban = await db.bannedIp.findUnique({ where: { ip } });
+        if (ban) {
+          redirect(`/banned?noredir=1&ip=${encodeURIComponent(ip)}${ban.reason ? `&reason=${encodeURIComponent(ban.reason)}` : ''}`);
+        }
+      } catch {
+        // DB down — fail open (don't block everyone)
+      }
+    }
+  }
+
   return (
     <html lang="en" suppressHydrationWarning className="scrollbar-hidden">
       <head>

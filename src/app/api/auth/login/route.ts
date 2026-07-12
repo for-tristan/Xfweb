@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
         status: 403,
       });
       return NextResponse.json(
-        { error: 'Access denied.' },
+        { error: 'Access denied.', banned: true, banType: 'ip', ip: clientIp },
         { status: 403 }
       );
     }
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
         status: 403,
       });
       return NextResponse.json(
-        { error: 'This account has been suspended. Please contact support.' },
+        { error: 'This account has been suspended.', banned: true, banType: 'email', email: user.email },
         { status: 403 }
       );
     }
