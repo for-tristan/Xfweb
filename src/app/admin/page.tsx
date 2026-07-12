@@ -2621,7 +2621,7 @@ export default function AdminPage() {
                                     title={`Ban IP: ${log.ip}`}
                                     onClick={() => {
                                       fetch('/api/admin/bans', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'ip', value: log.ip, reason: `Banned from Logs tab (action: ${log.action})` }) })
-                                        .then(r => r.ok ? toast({ title: 'IP Banned', description: log.ip }) : toast({ title: 'Error', variant: 'destructive' }) : null)
+                                        .then(r => { if (r.ok) toast({ title: 'IP Banned', description: log.ip }); else toast({ title: 'Error', variant: 'destructive' }); })
                                         .catch(() => {});
                                     }}
                                     style={{ background: 'transparent', border: '1px solid rgba(239,68,68,0.3)', color: 'var(--error-color)', borderRadius: 4, padding: '2px 6px', fontSize: 9, cursor: 'pointer', fontFamily: 'inherit' }}
@@ -2634,7 +2634,7 @@ export default function AdminPage() {
                                     title={`Ban Device: ${deviceId.substring(0, 20)}...`}
                                     onClick={() => {
                                       fetch('/api/admin/bans', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'device', value: deviceId, reason: `Banned from Logs tab (action: ${log.action})` }) })
-                                        .then(r => r.ok ? toast({ title: 'Device Banned', description: deviceId.substring(0, 20) + '...' }) : toast({ title: 'Error', variant: 'destructive' }) : null)
+                                        .then(r => { if (r.ok) toast({ title: 'Device Banned', description: deviceId.substring(0, 20) + '...' }); else toast({ title: 'Error', variant: 'destructive' }); })
                                         .catch(() => {});
                                     }}
                                     style={{ background: 'transparent', border: '1px solid rgba(167,139,250,0.3)', color: '#a78bfa', borderRadius: 4, padding: '2px 6px', fontSize: 9, cursor: 'pointer', fontFamily: 'inherit' }}
@@ -2647,7 +2647,7 @@ export default function AdminPage() {
                                     title={`Ban Email: ${log.email}`}
                                     onClick={() => {
                                       fetch('/api/admin/bans', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'email', value: log.email, reason: `Banned from Logs tab (action: ${log.action})` }) })
-                                        .then(r => r.ok ? toast({ title: 'Email Banned', description: log.email }) : toast({ title: 'Error', variant: 'destructive' }) : null)
+                                        .then(r => { if (r.ok) toast({ title: 'Email Banned', description: log.email }); else toast({ title: 'Error', variant: 'destructive' }); })
                                         .catch(() => {});
                                     }}
                                     style={{ background: 'transparent', border: '1px solid rgba(239,68,68,0.3)', color: 'var(--error-color)', borderRadius: 4, padding: '2px 6px', fontSize: 9, cursor: 'pointer', fontFamily: 'inherit' }}
