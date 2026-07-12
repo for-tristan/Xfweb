@@ -307,7 +307,8 @@ export function usePageFeatures() {
         const params = new URLSearchParams();
         if (data.ip) params.set('ip', data.ip);
         if (data.email) params.set('email', data.email);
-        if (data.banType) params.set('reason', data.banType === 'ip' ? 'Your IP address has been banned' : 'Your email address has been banned');
+        if (data.device) params.set('device', data.device);
+        if (data.banType) params.set('reason', data.banType === 'ip' ? 'Your IP address has been banned' : data.banType === 'device' ? 'Your device has been banned' : 'Your email address has been banned');
         window.location.href = `/banned?${params.toString()}`;
         return;
       } else { toast({ title: 'Login Failed', description: data.error, variant: 'destructive' }); }

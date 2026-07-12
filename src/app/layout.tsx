@@ -7,8 +7,9 @@ import GrainBackground from '@/components/GrainBackground';
 import ClickSplash from '@/components/ClickSplash';
 import CookieConsentBanner from '@/components/CookieConsentBanner';
 import PageViewTracker from '@/components/PageViewTracker';
+import DeviceFingerprintCollector from '@/components/DeviceFingerprintCollector';
 import { Analytics } from "@vercel/analytics/next";
-import { headers } from 'next/headers';
+import { headers, cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 
@@ -67,17 +68,27 @@ export default async function RootLayout({
   const isApiRoute = pathname.startsWith('/api/');
 
   if (!isBannedRoute && !isApiRoute) {
+    const headerList = await headers();
     const ip = headerList.get('x-forwarded-for')?.split(',')[0]?.trim() ||
                headerList.get('x-real-ip') || '';
-    if (ip) {
-      try {
-        const ban = await db.bannedIp.findUnique({ where: { ip } });
-        if (ban) {
-          redirect(`/banned?ip=${encodeURIComponent(ip)}${ban.reason ? `&reason=${encodeURIComponent(ban.reason)}` : ''}`);
-        }
-      } catch {
-        // DB down — fail open (don't block everyone)
+    const cookieStore = await cookies();
+    const deviceId = cookieStore.get('xfoundry_device_id')?.value || '';
+
+    // Check IP ban + device ban in parallel
+    try {
+      const [ipBan, deviceBan] = await Promise.all([
+        ip ? db.bannedIp.findUnique({ where: { ip } }) : null,
+        deviceId ? db.bannedDevice.findUnique({ where: { deviceId } }) : null,
+      ]);
+
+      if (ipBan) {
+        redirect(`/banned?ip=${encodeURIComponent(ip)}${ipBan.reason ? `&reason=${encodeURIComponent(ipBan.reason)}` : ''}`);
       }
+      if (deviceBan) {
+        redirect(`/banned?device=${encodeURIComponent(deviceId)}${deviceBan.reason ? `&reason=${encodeURIComponent(deviceBan.reason)}` : ''}`);
+      }
+    } catch {
+      // DB down — fail open (don't block everyone)
     }
   }
 
@@ -110,6 +121,7 @@ export default async function RootLayout({
         <GrainBackground />
         <ClickSplash />
         <ClientProviders>
+          <DeviceFingerprintCollector />
           <PageViewTracker />
           <main id="main-content">
             <ErrorBoundary>

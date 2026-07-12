@@ -501,3 +501,13 @@ model BannedEmail {
 
   @@map("BannedEmail")
 }
+
+model BannedDevice {
+  id          String   @id @default(cuid())
+  deviceId    String   @unique
+  reason      String?
+  bannedBy    String?
+  createdAt   DateTime @default(now())
+
+  @@map("BannedDevice")
+}

@@ -23,15 +23,17 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function BannedPage({ searchParams }: { searchParams: Promise<{ ip?: string; email?: string; reason?: string }> }) {
+export default async function BannedPage({ searchParams }: { searchParams: Promise<{ ip?: string; email?: string; device?: string; reason?: string }> }) {
   const params = await searchParams;
   const ip = params.ip || '';
   const email = params.email || '';
+  const device = params.device || '';
   const redirectReason = params.reason || '';
 
   // Look up ban records
   let ipBan: { reason: string | null; createdAt: Date } | null = null;
   let emailBan: { reason: string | null; createdAt: Date } | null = null;
+  let deviceBan: { reason: string | null; createdAt: Date } | null = null;
 
   try {
     if (ip) {
@@ -43,6 +45,9 @@ export default async function BannedPage({ searchParams }: { searchParams: Promi
         select: { reason: true, createdAt: true },
       });
     }
+    if (device) {
+      deviceBan = await db.bannedDevice.findUnique({ where: { deviceId: device }, select: { reason: true, createdAt: true } });
+    }
   } catch {
     // DB might be down — still show the banned page
   }
@@ -51,6 +56,7 @@ export default async function BannedPage({ searchParams }: { searchParams: Promi
   if (redirectReason) banReasons.push(redirectReason);
   if (ipBan?.reason && !banReasons.includes(ipBan.reason)) banReasons.push(ipBan.reason);
   if (emailBan?.reason && !banReasons.includes(emailBan.reason)) banReasons.push(emailBan.reason);
+  if (deviceBan?.reason && !banReasons.includes(deviceBan.reason)) banReasons.push(deviceBan.reason);
   const hasReasons = banReasons.length > 0;
 
   return (
@@ -131,6 +137,7 @@ export default async function BannedPage({ searchParams }: { searchParams: Promi
             You are no longer permitted to access this website.
             {ip && <><br /><span style={{ fontSize: 12, color: '#525252' }}>IP: <code style={{ fontFamily: 'monospace', color: '#737373' }}>{ip}</code></span></>}
             {email && <><br /><span style={{ fontSize: 12, color: '#525252' }}>Email: <code style={{ fontFamily: 'monospace', color: '#737373' }}>{email}</code></span></>}
+            {device && <><br /><span style={{ fontSize: 12, color: '#525252' }}>Device: <code style={{ fontFamily: 'monospace', color: '#737373' }}>{device.substring(0, 16)}...</code></span></>}
           </p>
 
           {/* Ban reason(s) */}

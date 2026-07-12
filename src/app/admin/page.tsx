@@ -108,8 +108,9 @@ export default function AdminPage() {
   // ---- Bans state ----
   const [bannedIps, setBannedIps] = useState<any[]>([]);
   const [bannedEmails, setBannedEmails] = useState<any[]>([]);
+  const [bannedDevices, setBannedDevices] = useState<any[]>([]);
   const [bansLoading, setBansLoading] = useState(false);
-  const [banType, setBanType] = useState<'ip' | 'email'>('ip');
+  const [banType, setBanType] = useState<'ip' | 'email' | 'device'>('ip');
   const [banValue, setBanValue] = useState('');
   const [banReason, setBanReason] = useState('');
 
@@ -124,6 +125,7 @@ export default function AdminPage() {
         const d = await r.json();
         setBannedIps(d.bannedIps || []);
         setBannedEmails(d.bannedEmails || []);
+        setBannedDevices(d.bannedDevices || []);
       }
     } catch {}
     setBansLoading(false);
@@ -2625,13 +2627,14 @@ export default function AdminPage() {
                   <i className="fa-solid fa-ban" style={{ marginRight: 8, color: 'var(--error-color)' }} />Add New Ban
                 </h3>
                 <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
-                  <select value={banType} onChange={(e) => setBanType(e.target.value as 'ip' | 'email')} style={{ padding: '10px 14px', borderRadius: 10, background: 'var(--input-bg)', border: '1px solid var(--border-color)', color: 'var(--text-light)', fontSize: 13, cursor: 'pointer' }}>
+                  <select value={banType} onChange={(e) => setBanType(e.target.value as 'ip' | 'email' | 'device')} style={{ padding: '10px 14px', borderRadius: 10, background: 'var(--input-bg)', border: '1px solid var(--border-color)', color: 'var(--text-light)', fontSize: 13, cursor: 'pointer' }}>
                     <option value="ip">IP Address</option>
                     <option value="email">Email</option>
+                    <option value="device">Device ID</option>
                   </select>
                   <input
                     type="text"
-                    placeholder={banType === 'ip' ? 'e.g. 192.168.1.1' : 'e.g. spammer@example.com'}
+                    placeholder={banType === 'ip' ? 'e.g. 192.168.1.1' : banType === 'email' ? 'e.g. spammer@example.com' : 'e.g. a1b2c3d4e5f6...'}
                     value={banValue}
                     onChange={(e) => setBanValue(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter' && banValue.trim()) handleBan(); }}
@@ -2656,7 +2659,7 @@ export default function AdminPage() {
                 </div>
                 <p style={{ fontSize: 11, color: 'var(--text-dim)' }}>
                   <i className="fa-solid fa-circle-info" style={{ marginRight: 4 }} />
-                  Banned IPs are blocked from signup + login. Banned emails are blocked from signup + login. Existing sessions are NOT automatically invalidated.
+                  Banned IPs are blocked from signup + login. Banned emails are blocked from signup + login. Banned devices are blocked from ALL pages (hardware fingerprint — survives VPN + incognito). Existing sessions are NOT automatically invalidated.
                 </p>
               </div>
 
@@ -2708,6 +2711,34 @@ export default function AdminPage() {
                           <span style={{ marginLeft: 12, fontSize: 10, color: 'var(--text-dim)' }}>{new Date(ban.createdAt).toLocaleDateString()}</span>
                         </div>
                         <button className="btn" onClick={() => handleUnban('email', ban.email)} style={{ padding: '6px 14px', fontSize: 11, background: 'transparent', border: '1px solid var(--success-color)', color: 'var(--success-color)' }}>
+                          <i className="fa-solid fa-unlock" style={{ marginRight: 4 }} />Unban
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Banned devices list */}
+              <div style={{ marginTop: 32 }}>
+                <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-light)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <i className="fa-solid fa-fingerprint" style={{ color: '#a78bfa' }} />
+                  Banned Devices ({bannedDevices.length})
+                </h3>
+                {bansLoading && bannedDevices.length === 0 ? (
+                  <p style={{ color: 'var(--text-dim)', fontSize: 13, textAlign: 'center', padding: 20 }}>Loading...</p>
+                ) : bannedDevices.length === 0 ? (
+                  <p style={{ color: 'var(--text-dim)', fontSize: 13, textAlign: 'center', padding: 20 }}>No banned devices</p>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {bannedDevices.map((ban) => (
+                      <div key={ban.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '12px 16px', background: 'color-mix(in srgb, var(--card-bg) 50%, transparent)', border: '1px solid var(--border-color)', borderRadius: 10 }}>
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <span style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--text-light)' }}>{ban.deviceId}</span>
+                          {ban.reason && <span style={{ marginLeft: 12, fontSize: 12, color: 'var(--text-dim)' }}>{ban.reason}</span>}
+                          <span style={{ marginLeft: 12, fontSize: 10, color: 'var(--text-dim)' }}>{new Date(ban.createdAt).toLocaleDateString()}</span>
+                        </div>
+                        <button className="btn" onClick={() => handleUnban('device', ban.deviceId)} style={{ padding: '6px 14px', fontSize: 11, background: 'transparent', border: '1px solid var(--success-color)', color: 'var(--success-color)' }}>
                           <i className="fa-solid fa-unlock" style={{ marginRight: 4 }} />Unban
                         </button>
                       </div>

@@ -6,21 +6,22 @@ import { logRequest } from '@/lib/activityLog';
 /**
  * Admin ban management endpoint.
  *
- * GET    — list all banned IPs + emails
- * POST   — ban an IP or email { type: 'ip'|'email', value, reason }
- * DELETE — unban an IP or email { type, value }
+ * GET    — list all banned IPs + emails + devices
+ * POST   — ban an IP, email, or device { type: 'ip'|'email'|'device', value, reason }
+ * DELETE — unban an IP, email, or device { type, value }
  */
 export async function GET(request: NextRequest) {
   try {
     const { error } = await requireAdmin();
     if (error) return error;
 
-    const [bannedIps, bannedEmails] = await Promise.all([
+    const [bannedIps, bannedEmails, bannedDevices] = await Promise.all([
       db.bannedIp.findMany({ orderBy: { createdAt: 'desc' } }),
       db.bannedEmail.findMany({ orderBy: { createdAt: 'desc' } }),
+      db.bannedDevice.findMany({ orderBy: { createdAt: 'desc' } }),
     ]);
 
-    return NextResponse.json({ bannedIps, bannedEmails });
+    return NextResponse.json({ bannedIps, bannedEmails, bannedDevices });
   } catch (error) {
     console.error('Admin bans fetch error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -52,8 +53,14 @@ export async function POST(request: NextRequest) {
         update: { reason: reason || null, bannedBy: user!.id },
         create: { email: normalized, reason: reason || null, bannedBy: user!.id },
       });
+    } else if (type === 'device') {
+      await db.bannedDevice.upsert({
+        where: { deviceId: value },
+        update: { reason: reason || null, bannedBy: user!.id },
+        create: { deviceId: value, reason: reason || null, bannedBy: user!.id },
+      });
     } else {
-      return NextResponse.json({ error: 'type must be "ip" or "email"' }, { status: 400 });
+      return NextResponse.json({ error: 'type must be "ip", "email", or "device"' }, { status: 400 });
     }
 
     await logRequest(request, 'ADMIN_BAN_ADD', {
@@ -86,8 +93,10 @@ export async function DELETE(request: NextRequest) {
       await db.bannedIp.delete({ where: { ip: value } }).catch(() => {});
     } else if (type === 'email') {
       await db.bannedEmail.delete({ where: { email: value.toLowerCase().trim() } }).catch(() => {});
+    } else if (type === 'device') {
+      await db.bannedDevice.delete({ where: { deviceId: value } }).catch(() => {});
     } else {
-      return NextResponse.json({ error: 'type must be "ip" or "email"' }, { status: 400 });
+      return NextResponse.json({ error: 'type must be "ip", "email", or "device"' }, { status: 400 });
     }
 
     await logRequest(request, 'ADMIN_BAN_REMOVE', {

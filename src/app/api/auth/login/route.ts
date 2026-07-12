@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 import { verifyPassword, createSession, hashPassword } from '@/lib/auth';
 import { sendEmailVerificationEmail } from '@/lib/email';
 import { logRequest } from '@/lib/activityLog';
-import { isEmailBanned, isIpBanned } from '@/lib/banCheck';
+import { isEmailBanned, isIpBanned, isDeviceBanned } from '@/lib/banCheck';
 import { randomInt } from 'crypto';
 
 // SECURITY: Pre-computed dummy hash used to keep login response time
@@ -25,16 +25,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // SECURITY: Check IP ban before processing login
+    // SECURITY: Check IP + device ban before processing login
     const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
                      request.headers.get('x-real-ip') || 'unknown';
-    if (await isIpBanned(clientIp)) {
+    const deviceId = request.cookies.get('xfoundry_device_id')?.value || '';
+    const [ipBanned, deviceBanned] = await Promise.all([
+      isIpBanned(clientIp),
+      isDeviceBanned(deviceId),
+    ]);
+    if (ipBanned) {
       await logRequest(request, 'LOGIN_BLOCKED', {
         details: 'Login blocked — IP is banned',
         status: 403,
       });
       return NextResponse.json(
         { error: 'Access denied.', banned: true, banType: 'ip', ip: clientIp },
+        { status: 403 }
+      );
+    }
+    if (deviceBanned) {
+      await logRequest(request, 'LOGIN_BLOCKED', {
+        details: 'Login blocked — device is banned',
+        status: 403,
+      });
+      return NextResponse.json(
+        { error: 'Access denied.', banned: true, banType: 'device', device: deviceId },
         { status: 403 }
       );
     }
