@@ -64,6 +64,7 @@ export async function GET(request: NextRequest) {
     if (viewGrades === '1') {
       const tests = await db.moduleTest.findMany({
         orderBy: { createdAt: 'desc' },
+        take: 200,
         include: {
           module: {
             select: { id: true, title: true },
@@ -83,6 +84,7 @@ export async function GET(request: NextRequest) {
 
     const tests = await db.moduleTest.findMany({
       orderBy: { createdAt: 'desc' },
+      take: 200,
       include: {
         _count: { select: { questions: true, attempts: true } },
         module: {

@@ -136,6 +136,7 @@ export async function GET() {
     const sessions = await db.studySession.findMany({
       where: { userId: user.id, courseId: 'general' },
       orderBy: { date: 'desc' },
+      take: 365,
     });
 
     const today = getTodayStr();

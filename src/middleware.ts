@@ -34,6 +34,13 @@ const RATE_LIMITS: Record<string, RateLimitConfig> = {
   // /api/ban-check is polled every 10s by BanCheckPoller. Allow up to
   // 20/min per IP (normal usage is 6/min, blocks brute-force probing).
   '/api/ban-check': { windowMs: 60 * 1000, maxRequests: 20 },
+  // Student-facing routes — prevent abuse without throttling normal use
+  '/api/courses/tests/submit': { windowMs: 60 * 1000, maxRequests: 5 },
+  '/api/courses/enroll': { windowMs: 60 * 1000, maxRequests: 5 },
+  '/api/courses/cancel-enrollment': { windowMs: 60 * 1000, maxRequests: 5 },
+  '/api/ai/conversations': { windowMs: 60 * 1000, maxRequests: 30 },
+  '/api/study/session': { windowMs: 60 * 1000, maxRequests: 20 },
+  '/api/notifications': { windowMs: 60 * 1000, maxRequests: 30 },
 };
 
 setInterval(() => {
@@ -122,5 +129,10 @@ export const config = {
     '/api/log-error',
     '/api/track-view',
     '/api/ban-check',
+    '/api/courses/tests/submit',
+    '/api/courses/enroll',
+    '/api/courses/cancel-enrollment',
+    '/api/study/session',
+    '/api/notifications',
   ],
 };

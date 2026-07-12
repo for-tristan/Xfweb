@@ -21,6 +21,7 @@ export async function GET() {
 
     const projects = await db.project.findMany({
       orderBy: { displayOrder: 'asc' },
+      take: 100,
     });
 
     return NextResponse.json({ projects });

@@ -12,6 +12,7 @@ export async function GET() {
     const conversations = await db.aiConversation.findMany({
       where: { userId: user.id },
       orderBy: { updatedAt: 'desc' },
+      take: 50,
       select: {
         id: true,
         title: true,
@@ -79,6 +80,7 @@ export async function PATCH(request: NextRequest) {
         role: { in: ['user', 'assistant'] },
       },
       orderBy: { createdAt: 'asc' },
+      take: 100,
       select: {
         id: true,
         role: true,

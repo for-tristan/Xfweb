@@ -34,6 +34,7 @@ export async function GET(request: NextRequest) {
         ],
       },
       orderBy: { createdAt: 'asc' },
+      take: 200,
       select: {
         id: true,
         senderId: true,

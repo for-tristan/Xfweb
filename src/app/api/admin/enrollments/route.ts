@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
 
     const enrollments = await db.enrollment.findMany({
       where: whereClause,
+      take: 500,
       include: {
         user: {
           select: {
