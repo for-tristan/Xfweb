@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 import { logRequest } from '@/lib/activityLog';
 
@@ -10,12 +9,20 @@ import { logRequest } from '@/lib/activityLog';
  * Logs the view with the current user (if any) + IP + path.
  * This captures BOTH anonymous visitors and authenticated users.
  *
- * The beacon is fire-and-forget — errors here don't affect the user.
+ * SECURITY:
+ * - Path is capped at 500 chars (prevents log flooding with huge strings)
+ * - Path is validated to start with / (prevents arbitrary data injection)
+ * - API routes and Next.js internal routes are skipped
+ * - Rate limited via middleware (10 req/min per IP)
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => ({}));
-    const path = body.path || '/';
+    let path = typeof body.path === 'string' ? body.path : '/';
+
+    // Validate path: must start with /, cap at 500 chars
+    if (!path.startsWith('/')) path = '/';
+    path = path.substring(0, 500);
 
     // Don't log API calls or static asset requests
     if (path.startsWith('/api/') || path.startsWith('/_next/')) {

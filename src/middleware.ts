@@ -28,6 +28,12 @@ const RATE_LIMITS: Record<string, RateLimitConfig> = {
   // /api/log-error was previously unauthenticated + unthrottled — open to
   // log injection / log poisoning / disk-fill DoS.
   '/api/log-error': { windowMs: 60 * 1000, maxRequests: 10 },
+  // /api/track-view is called on every page navigation. Allow up to 30/min
+  // per IP (enough for active browsing, blocks log-flooding attacks).
+  '/api/track-view': { windowMs: 60 * 1000, maxRequests: 30 },
+  // /api/ban-check is polled every 10s by BanCheckPoller. Allow up to
+  // 20/min per IP (normal usage is 6/min, blocks brute-force probing).
+  '/api/ban-check': { windowMs: 60 * 1000, maxRequests: 20 },
 };
 
 setInterval(() => {
@@ -114,5 +120,7 @@ export const config = {
     '/api/games/questions',
     '/api/friends/:path*',
     '/api/log-error',
+    '/api/track-view',
+    '/api/ban-check',
   ],
 };
