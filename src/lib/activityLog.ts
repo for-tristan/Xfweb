@@ -71,6 +71,8 @@ export async function logRequest(
     request.headers.get('x-real-ip') ||
     'unknown';
   const userAgent = request.headers.get('user-agent') || 'unknown';
+  // Extract device ID from cookie so it shows in the logs
+  const deviceId = request.cookies.get('xfoundry_device_id')?.value || '';
   let path: string;
   try {
     path = new URL(request.url).pathname;
@@ -78,11 +80,17 @@ export async function logRequest(
     path = request.url || '';
   }
 
+  // Append device ID to details so admins can see it in the logs
+  // without needing a schema migration. Format: [device:abc123...]
+  const baseDetails = options?.details || '';
+  const deviceTag = deviceId ? ` [device: ${deviceId.substring(0, 16)}...]` : '';
+  const details = baseDetails + deviceTag;
+
   await logActivity({
     userId: options?.userId,
     email: options?.email,
     action,
-    details: options?.details,
+    details,
     method: request.method,
     path,
     ip,

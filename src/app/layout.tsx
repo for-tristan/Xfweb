@@ -8,6 +8,7 @@ import ClickSplash from '@/components/ClickSplash';
 import CookieConsentBanner from '@/components/CookieConsentBanner';
 import PageViewTracker from '@/components/PageViewTracker';
 import DeviceFingerprintCollector from '@/components/DeviceFingerprintCollector';
+import BanCheckPoller from '@/components/BanCheckPoller';
 import { Analytics } from "@vercel/analytics/next";
 import { headers, cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -144,6 +145,7 @@ export default async function RootLayout({
         <ClickSplash />
         <ClientProviders>
           <DeviceFingerprintCollector />
+          <BanCheckPoller />
           <PageViewTracker />
           <main id="main-content">
             <ErrorBoundary>
