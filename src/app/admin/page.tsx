@@ -156,7 +156,7 @@ export default function AdminPage() {
     } catch { toast({ title: 'Error', description: 'Operation failed', variant: 'destructive' }); }
   };
 
-  const handleUnban = async (type: 'ip' | 'email', value: string) => {
+  const handleUnban = async (type: 'ip' | 'email' | 'device', value: string) => {
     try {
       const r = await fetch('/api/admin/bans', {
         method: 'DELETE',
