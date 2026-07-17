@@ -185,8 +185,6 @@ const GradualBlur: React.FC<GradualBlurProps> = props => {
   // area behind it. On low-end devices that's prohibitive. Skip entirely.
   //
   // NOTE: useMemo runs during SSR too — must guard ALL browser-only APIs.
-  // Previously this called window.matchMedia unconditionally and broke
-  // the /games prerender with "window is not defined".
   const [skipForLowEnd, setSkipForLowEnd] = useState(false);
   useEffect(() => {
     if (typeof window === 'undefined' || typeof navigator === 'undefined') return;

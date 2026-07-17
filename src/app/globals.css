@@ -2870,19 +2870,6 @@ select optgroup {
     .course-content { padding: 24px; }
     .scroll-indicator span { font-size: 9px; }
     .page-hero, .course-hero { padding: 40px 16px; }
-    .study-focus-grid { gap: 20px; }
-    .study-timer-display { font-size: 56px !important; }
-    .study-timer-padding { padding: 28px 0 !important; }
-    .study-card { padding: 20px !important; }
-    .study-stats-grid { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
-    .study-stats-box { padding: 12px !important; }
-    .study-stats-value { font-size: 16px !important; }
-    .study-leaderboard-entry { gap: 10px !important; padding: 10px 12px !important; }
-    .study-leaderboard-rank { width: 28px !important; height: 28px !important; font-size: 10px !important; }
-    .study-leaderboard-avatar { width: 32px !important; height: 32px !important; font-size: 12px !important; }
-    .study-leaderboard-name { font-size: 13px !important; }
-    .study-leaderboard-hours { font-size: 14px !important; }
-    .study-leaderboard-scroll { max-height: 400px !important; }
 }
 
 
@@ -3594,23 +3581,6 @@ select optgroup {
     /* Service detail page */
     .page-title { font-size: clamp(24px, 7vw, 36px) !important; }
 
-    /* Study page */
-    .study-timer-display { font-size: 56px !important; }
-    .study-leaderboard-entry { gap: 8px !important; padding: 10px 10px !important; }
-    .study-leaderboard-rank { width: 24px !important; height: 24px !important; font-size: 10px !important; }
-    .study-leaderboard-avatar { width: 30px !important; height: 30px !important; font-size: 11px !important; }
-    .study-leaderboard-name { font-size: 12px !important; min-width: 0 !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
-    .study-leaderboard-hours { font-size: 13px !important; flex-shrink: 0 !important; }
-
-    /* Dashboard page */
-    .dashboard-section { padding: 100px 14px 60px !important; }
-    .dashboard-hero-card { padding: 18px !important; }
-    .dashboard-inline-stats { gap: 12px !important; }
-    .dashboard-course-row { gap: 10px !important; }
-    .dashboard-test-row { gap: 8px !important; }
-    .dashboard-test-module-title { flex: 1 !important; min-width: 0 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; margin-right: 8px !important; }
-    .dashboard-test-pct { flex-shrink: 0 !important; }
-    .dashboard-stat-value { flex-shrink: 0 !important; }
 }
 
 @media (max-width: 380px) {
@@ -3618,10 +3588,6 @@ select optgroup {
     .enroll-card { padding: 20px 14px !important; }
     .module-item { padding: 14px 10px !important; gap: 10px !important; }
     .cta-section { padding: 32px 12px !important; }
-    .study-timer-display { font-size: 48px !important; }
-    .dashboard-section { padding: 90px 12px 50px !important; }
-    .dashboard-hero-card { padding: 16px 14px !important; }
-    .dashboard-inline-stats { gap: 8px !important; }
     .v-footer-grid { gap: 32px !important; }
 }
 
@@ -4070,8 +4036,6 @@ body {
   .v-course-card,
   .v-contact-info,
   .v-contact-form,
-  .v-leaderboard-card,
-  .v-timer-card,
   [style*="backdrop-filter"],
   [style*="WebkitBackdropFilter"],
   [style*="-webkit-backdrop-filter"] {
@@ -5319,6 +5283,241 @@ body {
   max-width: 1200px;
   margin: 0 auto;
 }
+
+/* ============================================================
+   Services — Split layout: divider accordion + About Us
+   ============================================================ */
+.v-services-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+/* ---- LEFT: Divider-only accordion ---- */
+.v-services-accordion-d {
+  display: flex;
+  flex-direction: column;
+  padding-top: 40px;
+}
+
+.v-service-panel-d {
+  border-bottom: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+.v-service-panel-d:first-child {
+  border-top: 1px solid var(--border-color);
+}
+.v-service-panel-d--open {
+  border-bottom-color: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+.v-service-panel-d--open + .v-service-panel-d {
+  border-top-color: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.v-service-panel-d-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  padding: 24px 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+.v-service-panel-d:not(.v-service-panel-d--open) .v-service-panel-d-header:hover {
+  padding-left: 12px;
+}
+
+.v-service-panel-d-icon-wrap {
+  font-size: 24px;
+  color: var(--accent);
+  flex-shrink: 0;
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+.v-service-panel-d-icon-wrap i {
+  display: block;
+}
+.v-service-panel-d--open .v-service-panel-d-icon-wrap {
+  transform: scale(1.15);
+}
+.v-service-panel-d:not(.v-service-panel-d--open) .v-service-panel-d-header:hover .v-service-panel-d-icon-wrap {
+  transform: scale(1.1);
+}
+
+.v-service-panel-d-title {
+  flex: 1;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-light);
+  margin: 0;
+  line-height: 1.3;
+  font-family: var(--font-heading);
+  transition: color 0.3s ease;
+}
+.v-service-panel-d--open .v-service-panel-d-title {
+  color: var(--accent);
+}
+
+.v-service-panel-d-toggle {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+.v-service-panel-d--open .v-service-panel-d-toggle {
+  color: var(--accent);
+  transform: rotate(180deg);
+}
+
+.v-service-panel-d-content {
+  overflow: hidden;
+  transition: max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+.v-service-panel-d-body {
+  padding: 0 0 24px 62px;
+}
+
+.v-service-panel-d-desc {
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.7;
+  margin: 0 0 16px;
+}
+
+.v-service-panel-d-link {
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+  transition: all 0.3s ease;
+}
+.v-service-panel-d-link:hover {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  transform: translateX(4px);
+}
+
+/* ---- RIGHT: About Us + faded glowing logo behind ---- */
+.v-services-about {
+  position: relative;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  overflow: hidden;
+}
+
+.v-services-about-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 340px;
+  height: 340px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.08;
+  filter: drop-shadow(0 0 40px color-mix(in srgb, var(--accent) 50%, transparent));
+}
+.v-services-about-logo svg {
+  width: 100%;
+  height: 100%;
+}
+
+.v-services-about-content {
+  position: relative;
+  z-index: 1;
+  max-width: 480px;
+  padding: 32px 32px 32px 80px;
+}
+
+.v-services-about-title {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--text-light);
+  margin: 0 0 24px;
+  line-height: 1.3;
+  font-family: var(--font-heading);
+}
+
+.v-services-about-desc {
+  font-size: 17px;
+  color: var(--text-dim);
+  line-height: 1.8;
+  margin: 0 0 24px;
+}
+
+@media (max-width: 900px) {
+  .v-services-split {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .v-services-about {
+    min-height: auto;
+  }
+  .v-services-about-logo {
+    width: 240px;
+    height: 240px;
+  }
+  .v-services-about-content {
+    max-width: 100%;
+    padding: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .v-service-panel-d-header {
+    gap: 14px;
+    padding: 20px 0;
+  }
+  .v-service-panel-d-icon-wrap {
+    font-size: 20px;
+    width: 28px;
+  }
+  .v-service-panel-d-title {
+    font-size: 15px;
+  }
+  .v-service-panel-d-body {
+    padding: 0 0 20px 42px;
+  }
+  .v-services-about-title {
+    font-size: 22px;
+  }
+  .v-services-about-desc {
+    font-size: 15px;
+  }
+  .v-services-about-logo {
+    width: 180px;
+    height: 180px;
+  }
+  .v-services-about-content {
+    padding: 24px 20px 24px 40px;
+  }
+}
+
 
 .v-course-card {
   background: var(--card-bg);

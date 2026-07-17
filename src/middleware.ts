@@ -21,8 +21,6 @@ const RATE_LIMITS: Record<string, RateLimitConfig> = {
   '/api/quotes': { windowMs: 60 * 60 * 1000, maxRequests: 10 },
   '/api/ai/chat': { windowMs: 60 * 1000, maxRequests: 15 },
   '/api/ai/upload': { windowMs: 60 * 1000, maxRequests: 10 },
-  '/api/games/submit': { windowMs: 60 * 1000, maxRequests: 10 },
-  '/api/games/questions': { windowMs: 60 * 1000, maxRequests: 10 },
   '/api/friends': { windowMs: 60 * 1000, maxRequests: 10 },
   '/api/auth/resend-verification': { windowMs: 60 * 60 * 1000, maxRequests: 5 },
   // /api/log-error was previously unauthenticated + unthrottled — open to
@@ -39,7 +37,6 @@ const RATE_LIMITS: Record<string, RateLimitConfig> = {
   '/api/courses/enroll': { windowMs: 60 * 1000, maxRequests: 5 },
   '/api/courses/cancel-enrollment': { windowMs: 60 * 1000, maxRequests: 5 },
   '/api/ai/conversations': { windowMs: 60 * 1000, maxRequests: 30 },
-  '/api/study/session': { windowMs: 60 * 1000, maxRequests: 20 },
   '/api/notifications': { windowMs: 60 * 1000, maxRequests: 30 },
 };
 
@@ -123,8 +120,6 @@ export const config = {
     '/api/chat/:path*',
     '/api/quotes/:path*',
     '/api/ai/:path*',
-    '/api/games/submit',
-    '/api/games/questions',
     '/api/friends/:path*',
     '/api/log-error',
     '/api/track-view',
@@ -132,7 +127,6 @@ export const config = {
     '/api/courses/tests/submit',
     '/api/courses/enroll',
     '/api/courses/cancel-enrollment',
-    '/api/study/session',
     '/api/notifications',
   ],
 };

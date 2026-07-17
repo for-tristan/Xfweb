@@ -79,14 +79,43 @@ export function Navbar({
     { label: 'Contact', ariaLabel: 'Get in touch', link: '/#contact', onClick: isHome ? () => scrollToSection('contact') : undefined },
     // Only show student pages for non-newcomer users
     ...(user && user.role !== 'newcomer' ? [
-      { label: 'Games', ariaLabel: 'Play games', link: '/games' },
-      { label: 'Study', ariaLabel: 'Study zone', link: '/study' },
-      { label: 'Dashboard', ariaLabel: 'Your dashboard', link: '/dashboard' },
       { label: 'AI', ariaLabel: 'AI chatbot', link: '/chat', highlight: true },
     ] : []),
     ...(user && user.role === 'admin' ? [{ label: 'Admin', ariaLabel: 'Admin panel', link: '/admin' }] : []),
     ...(user && user.role === 'instructor' ? [{ label: 'Instructor', ariaLabel: 'Instructor panel', link: '/instructor' }] : []),
   ];
+
+  const navLinks = (
+    <>
+      {isHome ? (
+        <li><a href="#home" className={isActive('home') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('home'); }}>Home</a></li>
+      ) : (
+        <li><Link href="/" className={isActive('home') ? 'active' : ''}>Home</Link></li>
+      )}
+      {isHome ? (
+        <li><a href="#services" className={isActive('services') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('services'); }}>Services</a></li>
+      ) : (
+        <li><Link href="/#services" className={isActive('services') ? 'active' : ''}>Services</Link></li>
+      )}
+      {isHome ? (
+        <li><a href="#courses" className={isActive('courses') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('courses'); }}>Courses</a></li>
+      ) : (
+        <li><Link href="/#courses" className={isActive('courses') ? 'active' : ''}>Courses</Link></li>
+      )}
+      {isHome ? (
+        <li><a href="#contact" className={isActive('contact') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('contact'); }}>Contact</a></li>
+      ) : (
+        <li><Link href="/#contact" className={isActive('contact') ? 'active' : ''}>Contact</Link></li>
+      )}
+      {user && user.role !== 'newcomer' && <li><Link href="/chat" prefetch className={`nav-ai-link${isActive('chat') ? ' active' : ''}`}>AI</Link></li>}
+      {user && user.role === 'admin' && (
+        <li><Link href="/admin" prefetch className={isActive('admin') ? 'active' : ''} style={{ color: 'var(--primary-red)' }}>Admin</Link></li>
+      )}
+      {user && user.role === 'instructor' && (
+        <li><Link href="/instructor" prefetch className={isActive('instructor') ? 'active' : ''} style={{ color: 'var(--primary-red)' }}>Instructor</Link></li>
+      )}
+    </>
+  );
 
   return (
     <nav
@@ -109,70 +138,8 @@ export function Navbar({
           minWidth: 'max-content',
         }}
       >
-        <ul className="nav-links-compact">
-          {isHome ? (
-            <li><a href="#home" className={isActive('home') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('home'); }}>Home</a></li>
-          ) : (
-            <li><Link href="/" className={isActive('home') ? 'active' : ''}>Home</Link></li>
-          )}
-          {isHome ? (
-            <li><a href="#services" className={isActive('services') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('services'); }}>Services</a></li>
-          ) : (
-            <li><Link href="/#services" className={isActive('services') ? 'active' : ''}>Services</Link></li>
-          )}
-          {isHome ? (
-            <li><a href="#courses" className={isActive('courses') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('courses'); }}>Courses</a></li>
-          ) : (
-            <li><Link href="/#courses" className={isActive('courses') ? 'active' : ''}>Courses</Link></li>
-          )}
-          {isHome ? (
-            <li><a href="#contact" className={isActive('contact') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('contact'); }}>Contact</a></li>
-          ) : (
-            <li><Link href="/#contact" className={isActive('contact') ? 'active' : ''}>Contact</Link></li>
-          )}
-          {user && user.role !== 'newcomer' && <li><Link href="/games" prefetch className={isActive('games') ? 'active' : ''}>Games</Link></li>}
-          {user && user.role !== 'newcomer' && <li><Link href="/study" prefetch className={isActive('study') ? 'active' : ''}>Study</Link></li>}
-          {user && user.role !== 'newcomer' && <li><Link href="/dashboard" prefetch className={isActive('dashboard') ? 'active' : ''}>Dashboard</Link></li>}
-          {user && user.role !== 'newcomer' && <li><Link href="/chat" prefetch className={`nav-ai-link${isActive('chat') ? ' active' : ''}`}>AI</Link></li>}
-          {user && user.role === 'admin' && (
-            <li><Link href="/admin" prefetch className={isActive('admin') ? 'active' : ''} style={{ color: 'var(--primary-red)' }}>Admin</Link></li>
-          )}
-          {user && user.role === 'instructor' && (
-            <li><Link href="/instructor" prefetch className={isActive('instructor') ? 'active' : ''} style={{ color: 'var(--primary-red)' }}>Instructor</Link></li>
-          )}
-        </ul>
-        <ul className="nav-links" id="navLinks">
-          {isHome ? (
-            <li><a href="#home" className={isActive('home') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('home'); }}>Home</a></li>
-          ) : (
-            <li><Link href="/" className={isActive('home') ? 'active' : ''}>Home</Link></li>
-          )}
-          {isHome ? (
-            <li><a href="#services" className={isActive('services') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('services'); }}>Services</a></li>
-          ) : (
-            <li><Link href="/#services" className={isActive('services') ? 'active' : ''}>Services</Link></li>
-          )}
-          {isHome ? (
-            <li><a href="#courses" className={isActive('courses') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('courses'); }}>Courses</a></li>
-          ) : (
-            <li><Link href="/#courses" className={isActive('courses') ? 'active' : ''}>Courses</Link></li>
-          )}
-          {isHome ? (
-            <li><a href="#contact" className={isActive('contact') ? 'active' : ''} onClick={(e) => { e.preventDefault(); scrollToSection('contact'); }}>Contact</a></li>
-          ) : (
-            <li><Link href="/#contact" className={isActive('contact') ? 'active' : ''}>Contact</Link></li>
-          )}
-          {user && user.role !== 'newcomer' && <li><Link href="/games" prefetch className={isActive('games') ? 'active' : ''}>Games</Link></li>}
-          {user && user.role !== 'newcomer' && <li><Link href="/study" prefetch className={isActive('study') ? 'active' : ''}>Study</Link></li>}
-          {user && user.role !== 'newcomer' && <li><Link href="/dashboard" prefetch className={isActive('dashboard') ? 'active' : ''}>Dashboard</Link></li>}
-          {user && user.role !== 'newcomer' && <li><Link href="/chat" prefetch className={`nav-ai-link${isActive('chat') ? ' active' : ''}`}>AI</Link></li>}
-          {user && user.role === 'admin' && (
-            <li><Link href="/admin" prefetch className={isActive('admin') ? 'active' : ''} style={{ color: 'var(--primary-red)' }}>Admin</Link></li>
-          )}
-          {user && user.role === 'instructor' && (
-            <li><Link href="/instructor" prefetch className={isActive('instructor') ? 'active' : ''} style={{ color: 'var(--primary-red)' }}>Instructor</Link></li>
-          )}
-        </ul>
+        <ul className="nav-links-compact">{navLinks}</ul>
+        <ul className="nav-links" id="navLinks">{navLinks}</ul>
       </GlassSurface>
       <NavActions
         theme={theme} onToggleTheme={onToggleTheme} onChangeTheme={onChangeTheme} onSearchOpen={onSearchOpen}
