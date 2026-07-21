@@ -63,7 +63,7 @@ const nextConfig: NextConfig = {
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
               "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com",
-              "img-src 'self' data: blob: https://res.cloudinary.com https://lh3.googleusercontent.com https://avatars.githubusercontent.com",
+              "img-src 'self' data: blob: https:",
               "connect-src 'self' https://vercel.live https://vitals.vercel-insights.com",
               "frame-src https://www.youtube.com https://youtube.com https://player.vimeo.com",
               "object-src 'none'",

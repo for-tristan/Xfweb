@@ -15,6 +15,7 @@ const TestModal = dynamic(() => import('@/components/TestModal'), { ssr: false }
 const ModuleContent = dynamic(() => import('@/components/ModuleContent'), { ssr: false });
 import ConfirmModal from '@/components/ConfirmModal';
 import GradualBlur from '@/components/GradualBlur';
+import ScrollToTop from '@/components/ScrollToTop';
 import { rafThrottle } from '@/lib/throttle';
 
 interface CourseModule {
@@ -115,6 +116,8 @@ export default function DynamicCoursePage() {
   const [courseModules, setCourseModules] = useState<CourseModule[]>([]);
   const [modulesLoading, setModulesLoading] = useState(false);
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
+  const sidebarRef = useRef<HTMLDivElement | null>(null);
+  const readerRef = useRef<HTMLDivElement | null>(null);
 
   const [confirmModal, setConfirmModal] = useState<{ open: boolean; title: string; message: string; confirmLabel: string; danger: boolean; icon: string; onConfirm: () => void }>({ open: false, title: '', message: '', confirmLabel: 'Confirm', danger: false, icon: 'fa-solid fa-exclamation-triangle', onConfirm: () => {} });
 
@@ -208,6 +211,37 @@ export default function DynamicCoursePage() {
       return () => clearTimeout(t);
     }
   }, [loading, minLoading, checkReveals]);
+
+  // When a module is expanded, ensure its entry in the sidebar's scrollable list is visible.
+  useEffect(() => {
+    if (!expandedModule) return;
+    try {
+      const side = sidebarRef.current;
+      const list = side?.querySelector('.v-course-module-list') as HTMLElement | null;
+      const el = list?.querySelector(`[data-module-id="${expandedModule}"]`) as HTMLElement | null;
+      if (el && list) {
+        // scroll inside the module list, not the whole page
+        el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+      }
+    } catch (e) {}
+  }, [expandedModule]);
+
+  // When switching modules, bring the reader to the top so the user starts at the beginning
+  // of the module content. Also reset any internal scroll inside the reader.
+  useEffect(() => {
+    if (!expandedModule) return;
+    try {
+      const reader = readerRef.current;
+      if (reader) {
+        // If the reader itself has scrollable content, reset it
+        try { reader.scrollTop = 0; } catch (e) {}
+        // Scroll the page so the reader's top is near the top of the viewport
+        const rect = reader.getBoundingClientRect();
+        const offset = 20; // small offset from top
+        window.scrollTo({ top: window.scrollY + rect.top - offset, behavior: 'smooth' });
+      }
+    } catch (e) {}
+  }, [expandedModule]);
 
   const toggleModule = (modId: string) => {
     setExpandedModule(prev => prev === modId ? null : modId);
@@ -445,7 +479,7 @@ export default function DynamicCoursePage() {
     </div>
   </div>
   <div className="v-footer-bottom">
-    <p>&copy; {new Date().getFullYear()} X-Foundry. All Rights Reserved.</p>
+    <p>&copy; {new Date().getFullYear()} XFoundry. All Rights Reserved.</p>
   </div>
 </footer>}
       </>
@@ -485,16 +519,28 @@ export default function DynamicCoursePage() {
 
       {!(loading || minLoading) && <div className="page-transition-enter">
 
-      <section style={{ background: 'var(--black)', padding: `${isMobile ? '120px 16px 32px' : '160px 60px 40px'}`, position: 'relative', overflow: 'hidden', zIndex: 2 }}>
-        <div className="container-max" style={{ paddingLeft: isMobile ? 0 : undefined, paddingRight: isMobile ? 0 : undefined, maxWidth: 800, margin: '0 auto' }}>
+      <section style={{ background: 'var(--black)', padding: `${isMobile ? '120px 16px 32px' : '140px 40px 40px'}`, position: 'relative', zIndex: 2 }}>
+        <div className="container-max" style={{ paddingLeft: isMobile ? 0 : undefined, paddingRight: isMobile ? 0 : undefined }}>
           <div style={{ marginBottom: 32 }}>
-            <h1 style={{ fontFamily: "var(--font-heading)", fontSize: isMobile ? 24 : 36, fontWeight: 800, color: 'var(--text-light)', marginTop: 16 }}>
-              {course.title.split('&').length > 1 ? (
-                <>{course.title.split('&')[0].trim()}&amp; <span className="v-highlight">{course.title.split('&')[1].trim()}</span></>
-              ) : (
-                <>{course.title.split(' ').slice(0, Math.ceil(course.title.split(' ').length / 2)).join(' ')} <span className="v-highlight">{course.title.split(' ').slice(Math.ceil(course.title.split(' ').length / 2)).join(' ')}</span></>
-              )}
-            </h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+              <div style={{
+                width: 56, height: 56, borderRadius: 14,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 24, color: 'var(--accent)', flexShrink: 0,
+              }}>
+                <i className={course.icon || 'fa-solid fa-graduation-cap'} />
+              </div>
+              <div>
+                <span style={{ fontSize: 13, color: 'var(--text-dim)' }}>{course.level} · {course.duration}</span>
+                <h1 style={{ fontFamily: "var(--font-heading)", fontSize: isMobile ? 24 : 32, fontWeight: 800, color: 'var(--text-light)', margin: 0, lineHeight: 1.1 }}>
+                  {course.title.split('&').length > 1 ? (
+                    <>{course.title.split('&')[0].trim()}&amp; <span className="v-highlight">{course.title.split('&')[1].trim()}</span></>
+                  ) : (
+                    <>{course.title.split(' ').slice(0, Math.ceil(course.title.split(' ').length / 2)).join(' ')} <span className="v-highlight">{course.title.split(' ').slice(Math.ceil(course.title.split(' ').length / 2)).join(' ')}</span></>
+                  )}
+                </h1>
+              </div>
+            </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
             <div className="course-main reveal-up">
@@ -511,83 +557,6 @@ export default function DynamicCoursePage() {
                   </div>
                 </>
               )}
-
-              <h2 style={{ marginTop: 36 }}>Course Modules</h2>
-              <div className="module-list">
-                {modulesLoading ? (
-                  <div style={{ textAlign: 'center', padding: 40 }}><i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 24, color: 'var(--accent)', marginBottom: 12, display: 'block' }}></i><p style={{ color: 'var(--text-dim)', fontSize: 14 }}>Loading modules...</p></div>
-                ) : courseModules.length > 0 ? courseModules.map((mod) => (
-                  <div key={mod.id} className="module-item" style={{ cursor: mod.unlocked ? 'pointer' : 'default', flexDirection: 'column', alignItems: 'stretch', gap: 0, opacity: mod.unlocked ? 1 : 0.6 }} onClick={() => mod.unlocked && toggleModule(mod.id)}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                      <div className="module-num" style={mod.unlocked ? { background: 'rgba(34,197,94,0.15)', borderColor: 'rgba(34,197,94,0.4)', color: 'var(--success-color)' } : {}}>
-                        {mod.unlocked ? <i className="fa-solid fa-unlock" style={{ fontSize: 12 }}></i> : <i className="fa-solid fa-lock" style={{ fontSize: 12 }}></i>}
-                      </div>
-                      <div className="module-info" style={{ flex: 1 }}>
-                        <h4>{mod.title}</h4>
-                        <p>{mod.description}</p>
-                      </div>
-                      {mod.unlocked && (
-                        <i className={`fa-solid fa-chevron-${expandedModule === mod.id ? 'up' : 'down'}`} style={{ color: 'var(--text-dim)', fontSize: 12, flexShrink: 0, transition: 'transform 0.2s' }}></i>
-                      )}
-                    </div>
-                    {mod.unlocked && expandedModule === mod.id && (() => {
-                      const moduleTests = studentTests.filter(t => t.moduleId === mod.id && t.unlocked);
-                      return (
-                        <div className="module-expanded-content" onClick={(e) => e.stopPropagation()} style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--border-color)', paddingLeft: 56 }}>
-                          <ModuleContent content={mod.content} />
-                          {moduleTests.length > 0 && (
-                            <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--border-color)' }}>
-                              <h4 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-light)', marginBottom: 12 }}>
-                                <i className="fa-solid fa-file-alt" style={{ color: 'var(--accent)', marginRight: 8 }}></i>Module Test{moduleTests.length > 1 ? 's' : ''}
-                              </h4>
-                              {moduleTests.map((t) => (
-                                <div key={t.id} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', padding: 16, borderRadius: 4, marginBottom: 10 }}>
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
-                                    <div>
-                                      <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-light)' }}>{t.title}</div>
-                                      <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 4 }}>
-                                        {t.questionCount} questions &middot; {t.timeLimit}min &middot; Pass: {t.passingScore}%
-                                        {t.hasCompleted && t.attempt && (
-                                          <span style={{ marginLeft: 12, color: t.attempt.passed ? 'var(--success-color)' : 'var(--error-color)', fontWeight: 700 }}>
-                                            {t.attempt.passed ? 'PASSED' : 'FAILED'} ({t.attempt.score}/{t.attempt.totalPoints})
-                                          </span>
-                                        )}
-                                      </div>
-                                    </div>
-                                    <button
-                                      className="btn btn-primary"
-                                      style={{
-                                        padding: '8px 20px', fontSize: 12,
-                                        ...(t.hasCompleted ? {
-                                          background: 'transparent',
-                                          border: '1px solid var(--border-color)',
-                                          color: 'var(--text-dim)',
-                                          cursor: 'pointer',
-                                        } : {}),
-                                      }}
-                                      onClick={(e) => { e.stopPropagation(); setActiveTest(t); }}
-                                    >
-                                      <i className={`fa-solid ${t.hasCompleted ? 'fa-eye' : 'fa-play'}`} style={{ marginRight: 6 }}></i>
-                                      {t.hasCompleted ? 'View Result' : 'Take Test'}
-                                    </button>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })()}
-                    {!mod.unlocked && enrollment?.status === 'approved' && (
-                      <div style={{ marginTop: 8, paddingLeft: 56, fontSize: 12, color: 'var(--warning-color)' }}>
-                        <i className="fa-solid fa-info-circle" style={{ marginRight: 6 }}></i>Complete previous modules to unlock. Admin controls access.
-                      </div>
-                    )}
-                  </div>
-                )) : !user ? (
-                  <div style={{ textAlign: 'center', padding: 40 }}><p style={{ color: 'var(--text-dim)', fontSize: 14 }}>Sign in to view module content</p></div>
-                ) : null}
-              </div>
 
               {course.prerequisites && (
                 <>
@@ -608,64 +577,225 @@ export default function DynamicCoursePage() {
               )}
             </div>
 
-            <aside className="enroll-card reveal-up reveal-delay-1">
-              {enrollment ? (
-                <div className="enroll-success show">
-                  <div className="success-icon-lg" style={{ background: `${enrollment.status === 'approved' ? 'var(--success-color)' : enrollment.status === 'declined' ? 'var(--error-color)' : 'var(--warning-color)'}20`, borderRadius: '50%', width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                    <i className={`fas ${enrollment.status === 'approved' ? 'fa-check' : enrollment.status === 'declined' ? 'fa-times' : 'fa-clock'}`} style={{ fontSize: 28, color: enrollment.status === 'approved' ? 'var(--success-color)' : enrollment.status === 'declined' ? 'var(--error-color)' : 'var(--warning-color)' }} />
+            {/* Sidebar + Reader (shown for approved users) OR locked module list (shown for unenrolled) */}
+            {courseModules.length > 0 ? (
+              enrollment?.status === 'approved' ? (
+                <div className="v-course-reader-layout">
+                  {/* LEFT: Module sidebar */}
+                  <aside className="v-course-sidebar" ref={sidebarRef}>
+                    <div className="v-course-sidebar-header">
+                      <h3>Modules</h3>
+                      <div className="v-course-progress">
+                        <div className="v-course-progress-bar">
+                          <div
+                            className="v-course-progress-fill"
+                            style={{ width: `${(courseModules.filter(m => m.unlocked).length / courseModules.length) * 100}%` }}
+                          />
+                        </div>
+                        <span className="v-course-progress-text">
+                          {courseModules.filter(m => m.unlocked).length}/{courseModules.length} unlocked
+                        </span>
+                      </div>
+                    </div>
+                    <div className="v-course-module-list">
+                      {courseModules.map((mod) => {
+                        const isActive = expandedModule === mod.id;
+                        const moduleTests = studentTests.filter(t => t.moduleId === mod.id && t.unlocked);
+                        return (
+                          <button
+                            key={mod.id}
+                            data-module-id={mod.id}
+                            className={`v-course-module-item${isActive ? ' v-course-module-item--active' : ''}`}
+                            onClick={() => mod.unlocked && setExpandedModule(mod.id)}
+                            disabled={!mod.unlocked}
+                            style={{ opacity: mod.unlocked ? 1 : 0.5 }}
+                          >
+                            <div className="v-course-module-num">
+                              {mod.unlocked ? (
+                                <i className="fa-solid fa-unlock" style={{ fontSize: 11 }} />
+                              ) : (
+                                <i className="fa-solid fa-lock" style={{ fontSize: 11 }} />
+                              )}
+                            </div>
+                            <div className="v-course-module-info">
+                              <span className="v-course-module-title">{mod.title}</span>
+                              <span className="v-course-module-desc">{mod.description}</span>
+                              {moduleTests.length > 0 && (
+                                <span className="v-course-module-test-badge">
+                                  <i className="fa-solid fa-file-alt" style={{ fontSize: 9, marginRight: 4 }} />
+                                  {moduleTests.length} test{moduleTests.length > 1 ? 's' : ''}
+                                </span>
+                              )}
+                            </div>
+                            {isActive && <i className="fa-solid fa-chevron-right v-course-module-chevron" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                  {/* Certificate download for approved users */}
+                  {certificate && (
+                    <div style={{ margin: '16px', padding: 16, background: 'color-mix(in srgb, var(--success-color) 8%, transparent)', border: '1px solid color-mix(in srgb, var(--success-color) 20%, transparent)', borderRadius: 10 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                        <i className="fa-solid fa-award" style={{ fontSize: 20, color: 'var(--success-color)' }} />
+                        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-light)' }}>Certificate Available</span>
+                      </div>
+                      <button className="btn btn-primary" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }} onClick={handleDownloadCert} disabled={certDownloading}>
+                        <i className={certDownloading ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-file-pdf'} /> {certDownloading ? 'Downloading...' : 'Download Certificate'}
+                      </button>
+                    </div>
+                  )}
+                  </aside>
+
+                  {/* RIGHT: Module reader */}
+                  <div className="v-course-reader" ref={readerRef}>
+                    {expandedModule ? (
+                      (() => {
+                        const mod = courseModules.find(m => m.id === expandedModule);
+                        if (!mod) return null;
+                        const moduleTests = studentTests.filter(t => t.moduleId === mod.id && t.unlocked);
+                        const nextMod = courseModules.find(m => m.moduleOrder > mod.moduleOrder && m.unlocked);
+                        return (
+                          <div className="v-course-reader-content" onClick={(e) => e.stopPropagation()}>
+                            <div className="v-course-reader-header">
+                              <span className="v-course-reader-eyebrow">Module {mod.moduleOrder}</span>
+                              <h2>{mod.title}</h2>
+                              <p className="v-course-reader-desc">{mod.description}</p>
+                            </div>
+                            <div className="v-course-reader-body">
+                              <ModuleContent content={mod.content} />
+                            </div>
+
+                            {moduleTests.length > 0 && (
+                              <div className="v-course-reader-tests">
+                                <h4>
+                                  <i className="fa-solid fa-file-alt" style={{ color: 'var(--accent)', marginRight: 8 }} />
+                                  Module Test{moduleTests.length > 1 ? 's' : ''}
+                                </h4>
+                                {moduleTests.map((t) => (
+                                  <div key={t.id} className="v-course-test-card">
+                                    <div>
+                                      <div className="v-course-test-title">{t.title}</div>
+                                      <div className="v-course-test-meta">
+                                        {t.questionCount} questions · {t.timeLimit}min · Pass: {t.passingScore}%
+                                        {t.hasCompleted && t.attempt && (
+                                          <span style={{ marginLeft: 12, color: t.attempt.passed ? 'var(--success-color)' : 'var(--error-color)', fontWeight: 700 }}>
+                                            {t.attempt.passed ? 'PASSED' : 'FAILED'} ({t.attempt.score}/{t.attempt.totalPoints})
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+                                    <button
+                                      className="btn btn-primary"
+                                      style={{ padding: '8px 20px', fontSize: 12 }}
+                                      onClick={(e) => { e.stopPropagation(); setActiveTest(t); }}
+                                    >
+                                      <i className={`fa-solid ${t.hasCompleted ? 'fa-eye' : 'fa-play'}`} style={{ marginRight: 6 }} />
+                                      {t.hasCompleted ? 'View Result' : 'Take Test'}
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {nextMod && (
+                              <div className="v-course-reader-next">
+                                <button className="btn btn-primary" onClick={() => setExpandedModule(nextMod.id)}>
+                                  Next Module: {nextMod.title} <i className="fa-solid fa-arrow-right" style={{ marginLeft: 8 }} />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })()
+                    ) : (
+                      <div className="v-course-reader-empty">
+                        <i className="fa-solid fa-book-open" style={{ fontSize: 48, color: 'var(--accent)', opacity: 0.3, marginBottom: 16 }} />
+                        <h3>Select a module to start reading</h3>
+                        <p>Choose any unlocked module from the sidebar to view its content.</p>
+                      </div>
+                    )}
                   </div>
-                  <div style={{ textAlign: 'center', marginBottom: 16 }}>{statusBadge(enrollment.status)}</div>
-                  <h4 style={{ textAlign: 'center', marginBottom: 8 }}>
-                    {enrollment.status === 'approved' ? 'Welcome!' : enrollment.status === 'declined' ? 'Request Declined' : 'Request Submitted!'}
-                  </h4>
-                  <p style={{ textAlign: 'center', marginBottom: 4 }}>
-                    {enrollment.status === 'approved' ? 'Check your email for the welcome guide and Discord invite.' : enrollment.status === 'declined' ? 'Unfortunately your enrollment request was not approved at this time.' : 'Your enrollment request is being reviewed. We\'ll notify you once a decision is made.'}
-                  </p>
-                  {enrollment.status === 'approved' && certificate && (
-                    <button className="btn btn-primary" style={{ marginTop: 16, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }} onClick={(e) => { e.stopPropagation(); handleDownloadCert(); }} disabled={certDownloading}>
-                      <i className={certDownloading ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-file-pdf'} /> {certDownloading ? 'Downloading...' : 'Download Certificate'}
-                    </button>
-                  )}
-                  {enrollment.status === 'pending' && (
-                    <button className="btn btn-secondary" style={{ marginTop: 16, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }} onClick={handleCancelEnrollment} disabled={canceling}>
-                      <i className={canceling ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-times-circle'} /> {canceling ? 'Cancelling...' : 'Cancel Enrollment'}
-                    </button>
-                  )}
                 </div>
               ) : (
-                <div className="enroll-form">
-                  <div className="enroll-price">{course.price} <span>/ course</span></div>
-                  <p className="enroll-note">Start your {course.title.split('&')[0].trim()} journey today</p>
-
-                  <form onSubmit={handleEnroll}>
-                    <WaveInput label="Full Name *" type="text" value={formName} onChange={(e) => setFormName(e.target.value)} required />
-                    <WaveInput label="Email Address *" type="email" value={formEmail} onChange={(e) => setFormEmail(e.target.value)} required />
-                    <WaveInput label="Phone Number *" type="tel" value={formPhone} onChange={(e) => setFormPhone(e.target.value)} placeholder="+20..." required />
-                    <div className="form-group">
-                      <label>Experience Level</label>
-                      <select value={formExperience} onChange={(e) => setFormExperience(e.target.value)}>
-                        <option value="" disabled>Select level...</option>
-                        <option value="beginner">Beginner</option>
-                        <option value="intermediate">Intermediate</option>
-                        <option value="advanced">Advanced</option>
-                      </select>
+                /* LOCKED MODULE LIST — shown for unenrolled users */
+                <div className="v-course-enroll-wrap">
+                  <div className="course-main reveal-up" style={{ flex: 1 }}>
+                    <h2>Course Modules</h2>
+                    <div className="v-course-module-list" style={{ marginTop: 16 }}>
+                      {courseModules.map((mod) => (
+                        <div key={mod.id} className="v-course-locked-module">
+                          <div className="v-course-module-num" style={{ background: 'var(--border-color)', borderColor: 'var(--border-color)', color: 'var(--text-dim)' }}>
+                            <i className="fa-solid fa-lock" style={{ fontSize: 11 }} />
+                          </div>
+                          <div className="v-course-module-info">
+                            <span className="v-course-module-title">{mod.title}</span>
+                            <span className="v-course-module-desc">{mod.description}</span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <WaveInput label="What motivates you? *" type="text" value={formMotivation} onChange={(e) => setFormMotivation(e.target.value)} required />
-                    <button type="submit" className="btn btn-primary" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 8 }} disabled={enrolling}>
-                      <i className={enrolling ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-paper-plane'} /> {enrolling ? 'Submitting...' : 'Request Enrollment'}
-                    </button>
-                  </form>
-
-                  <div className="enroll-features">
-                    <h4>What&apos;s Included:</h4>
-                    <div className="feature-check"><i className="fa-solid fa-check" /> {course.duration} of content</div>
-                    <div className="feature-check"><i className="fa-solid fa-check" /> Hands-on projects</div>
-                    <div className="feature-check"><i className="fa-solid fa-check" /> Discord community</div>
-                    <div className="feature-check"><i className="fa-solid fa-check" /> Lifetime access</div>
                   </div>
+
+                  <aside className="enroll-card reveal-up reveal-delay-1">
+                    {enrollment ? (
+                      <div className="enroll-success show">
+                        <div className="success-icon-lg" style={{ background: `${enrollment.status === 'approved' ? 'var(--success-color)' : enrollment.status === 'declined' ? 'var(--error-color)' : 'var(--warning-color)'}20`, borderRadius: '50%', width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                          <i className={`fas ${enrollment.status === 'approved' ? 'fa-check' : enrollment.status === 'declined' ? 'fa-times' : 'fa-clock'}`} style={{ fontSize: 28, color: enrollment.status === 'approved' ? 'var(--success-color)' : enrollment.status === 'declined' ? 'var(--error-color)' : 'var(--warning-color)' }} />
+                        </div>
+                        <div style={{ textAlign: 'center', marginBottom: 16 }}>{statusBadge(enrollment.status)}</div>
+                        <h4 style={{ textAlign: 'center', marginBottom: 8 }}>
+                          {enrollment.status === 'approved' ? 'Welcome!' : enrollment.status === 'declined' ? 'Request Declined' : 'Request Submitted!'}
+                        </h4>
+                        <p style={{ textAlign: 'center', marginBottom: 4 }}>
+                          {enrollment.status === 'approved' ? 'Check your email for the welcome guide and Discord invite.' : enrollment.status === 'declined' ? 'Unfortunately your enrollment request was not approved at this time.' : 'Your enrollment request is being reviewed. We\'ll notify you once a decision is made.'}
+                        </p>
+                        {enrollment.status === 'approved' && certificate && (
+                          <button className="btn btn-primary" style={{ marginTop: 16, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }} onClick={(e) => { e.stopPropagation(); handleDownloadCert(); }} disabled={certDownloading}>
+                            <i className={certDownloading ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-file-pdf'} /> {certDownloading ? 'Downloading...' : 'Download Certificate'}
+                          </button>
+                        )}
+                        {enrollment.status === 'pending' && (
+                          <button className="btn btn-secondary" style={{ marginTop: 16, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }} onClick={handleCancelEnrollment} disabled={canceling}>
+                            <i className={canceling ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-times-circle'} /> {canceling ? 'Cancelling...' : 'Cancel Enrollment'}
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="enroll-form">
+                        <div className="enroll-price">{course.price} <span>/ course</span></div>
+                        <p className="enroll-note">Start your {course.title.split('&')[0].trim()} journey today</p>
+                        <form onSubmit={handleEnroll}>
+                          <WaveInput label="Full Name *" type="text" value={formName} onChange={(e) => setFormName(e.target.value)} required />
+                          <WaveInput label="Email Address *" type="email" value={formEmail} onChange={(e) => setFormEmail(e.target.value)} required />
+                          <WaveInput label="Phone Number *" type="tel" value={formPhone} onChange={(e) => setFormPhone(e.target.value)} placeholder="+20..." required />
+                          <div className="form-group">
+                            <label>Experience Level</label>
+                            <select value={formExperience} onChange={(e) => setFormExperience(e.target.value)}>
+                              <option value="" disabled>Select level...</option>
+                              <option value="beginner">Beginner</option>
+                              <option value="intermediate">Intermediate</option>
+                              <option value="advanced">Advanced</option>
+                            </select>
+                          </div>
+                          <WaveInput label="What motivates you? *" type="text" value={formMotivation} onChange={(e) => setFormMotivation(e.target.value)} required />
+                          <button type="submit" className="btn btn-primary" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 8 }} disabled={enrolling}>
+                            <i className={enrolling ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-paper-plane'} /> {enrolling ? 'Submitting...' : 'Request Enrollment'}
+                          </button>
+                        </form>
+                        <div className="enroll-features">
+                          <h4>What&apos;s Included:</h4>
+                          <div className="feature-check"><i className="fa-solid fa-check" /> {course.duration} of content</div>
+                          <div className="feature-check"><i className="fa-solid fa-check" /> Hands-on projects</div>
+                          <div className="feature-check"><i className="fa-solid fa-check" /> Discord community</div>
+                          <div className="feature-check"><i className="fa-solid fa-check" /> Lifetime access</div>
+                        </div>
+                      </div>
+                    )}
+                  </aside>
                 </div>
-              )}
-            </aside>
+              )
+            ) : null}
           </div>
         </div>
       </section>
@@ -776,7 +906,7 @@ export default function DynamicCoursePage() {
     </div>
   </div>
   <div className="v-footer-bottom">
-    <p>&copy; {new Date().getFullYear()} X-Foundry. All Rights Reserved.</p>
+    <p>&copy; {new Date().getFullYear()} XFoundry. All Rights Reserved.</p>
   </div>
 </footer>}
 
@@ -790,6 +920,9 @@ export default function DynamicCoursePage() {
         danger={confirmModal.danger}
         icon={confirmModal.icon}
       />
+
+      {/* Scroll-to-top button */}
+      <ScrollToTop />
     </>
   );
 }

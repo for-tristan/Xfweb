@@ -213,7 +213,7 @@ export default function DynamicServicePage() {
     </div>
   </div>
   <div className="v-footer-bottom">
-    <p>&copy; {new Date().getFullYear()} X-Foundry. All Rights Reserved.</p>
+    <p>&copy; {new Date().getFullYear()} XFoundry. All Rights Reserved.</p>
   </div>
 </footer>}
       </>
@@ -428,7 +428,7 @@ export default function DynamicServicePage() {
     </div>
   </div>
   <div className="v-footer-bottom">
-    <p>&copy; {new Date().getFullYear()} X-Foundry. All Rights Reserved.</p>
+    <p>&copy; {new Date().getFullYear()} XFoundry. All Rights Reserved.</p>
   </div>
 </footer>}
     </>

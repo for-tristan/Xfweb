@@ -25,12 +25,12 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   }
 
   const title = course
-    ? `${course.title} — X Foundry`
-    : 'Course — X Foundry';
+    ? `${course.title} — XFoundry`
+    : 'Course — XFoundry';
 
   const description = course?.description
     ? `${course.description} (${course.level} · ${course.duration} · ${course.price})`
-    : 'Learn modern software development with X Foundry. Structured curriculum, hands-on projects, and certification.';
+    : 'Learn modern software development with XFoundry. Structured curriculum, hands-on projects, and certification.';
 
   return {
     title,

@@ -26,7 +26,10 @@ import { BlurText } from '@/components/home/BlurText';
 import { FaqItem } from '@/components/home/FaqItem';
 import { EnrollButton } from '@/components/home/EnrollButton';
 import { ServicesSection } from '@/components/home/ServicesSection';
-import { ProjectsSection } from '@/components/home/ProjectsSection';
+import { ManifestoSection } from '@/components/home/ManifestoSection';
+import { ProgramsSection } from '@/components/home/ProgramsSection';
+import { ProcessSection } from '@/components/home/ProcessSection';
+import { TechStackSection } from '@/components/home/TechStackSection';
 import { FaqSection } from '@/components/home/FaqSection';
 import { TeamSection } from '@/components/home/TeamSection';
 import { Footer } from '@/components/home/Footer';
@@ -114,12 +117,10 @@ export default function Home({
   initialServices = [],
   initialCourses = [],
   initialTeam = [],
-  initialProjects = [],
 }: {
   initialServices?: DynamicService[];
   initialCourses?: Course[];
   initialTeam?: Array<{id:string;name:string;role:string;bio:string;avatar:string;icon:string;linkedinUrl:string;githubUrl:string;displayOrder:number}>;
-  initialProjects?: Array<{id:string;title:string;slug:string;description:string;category:string;tags:string[];icon:string;imageUrl:string;projectUrl:string;status:string;displayOrder:number}>;
 }) {
   const { toast } = useToast();
   const router = useRouter();
@@ -255,7 +256,6 @@ export default function Home({
   const scrolledRef = useRef(false);
   const atBottomRef = useRef(false);
   const activeNavRef = useRef('home');
-  const [projectFilter, setProjectFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
 
@@ -934,7 +934,6 @@ export default function Home({
   const [dynamicServices, setDynamicServices] = useState<DynamicService[]>(initialServices);
   const [dynamicCourses, setDynamicCourses] = useState<Course[]>(initialCourses);
   const [dynamicTeam, setDynamicTeam] = useState<Array<{id:string;name:string;role:string;bio:string;avatar:string;icon:string;linkedinUrl:string;githubUrl:string;displayOrder:number}>>(initialTeam);
-  const [dynamicProjects, setDynamicProjects] = useState<Array<{id:string;title:string;slug:string;description:string;category:string;tags:string[];icon:string;imageUrl:string;projectUrl:string;status:string;displayOrder:number}>>(initialProjects);
 
   useEffect(() => {
     const fetchDynamicData = async () => {
@@ -944,11 +943,10 @@ export default function Home({
         // swr=300) and purged via revalidatePath on admin mutations, so
         // this fetch sees fresh data within ~60s of an admin edit.
         // Initial data comes from server-side props (no blocking fetch).
-        const [servicesRes, coursesRes, teamRes, projectsRes] = await Promise.all([
+        const [servicesRes, coursesRes, teamRes] = await Promise.all([
           fetch('/api/services', { cache: 'no-store' }),
           fetch('/api/courses', { cache: 'no-store' }),
           fetch('/api/team', { cache: 'no-store' }),
-          fetch('/api/projects', { cache: 'no-store' }),
         ]);
         if (servicesRes.ok) {
           const servicesData = await servicesRes.json();
@@ -972,10 +970,6 @@ export default function Home({
         if (teamRes.ok) {
           const teamData = await teamRes.json();
           setDynamicTeam(teamData.members || []);
-        }
-        if (projectsRes.ok) {
-          const projectsData = await projectsRes.json();
-          setDynamicProjects(projectsData.projects || []);
         }
       } catch (e) { console.error('Failed to fetch dynamic data:', e); }
     };
@@ -1078,113 +1072,55 @@ export default function Home({
       </section>
       </ScrollFadeSection>
       )}
+      <ManifestoSection />
+      <ScrollFadeSection pin fadeDistance="80vh" zIndex={1} pinOffset={80}>
       <ServicesSection services={servicesDataArr} />
-      <ProjectsSection projects={dynamicProjects} />
-      <section className="v-section" id="courses">
-
-        <SectionReveal direction="up" delay={0}>
-          <div className="v-section-header">
-            <h2 className="v-section-title"><BlurText text="Tech" tag="span" stagger={0.02} /> <span className="v-highlight">Programs</span></h2>
-            <p className="v-section-desc" style={{ marginTop: 16 }}>
-              Master technologies with our expert-led programs.
-            </p>
-          </div>
-        </SectionReveal>
-
-        <StaggerReveal direction="up" staggerDelay={80}>
-        <div className="v-courses-grid">
-          {availableCourses.length > 0 ? availableCourses.map((course, idx) => {
-            const techTags = course.features.slice(0, 4);
-            return (
-              <div
-                key={course.id}
-                className="v-course-card"
-                role="button"
-                tabIndex={0}
-                onClick={() => router.push(`/courses/${course.id}`)}
-                onKeyDown={(e) => {
-                  // Enter / Space triggers navigation, matching native link behavior.
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    router.push(`/courses/${course.id}`);
-                  }
-                }}
-                aria-label={`View ${course.name} course details`}
-              >
-                  <div className="v-course-body">
-                    <div className="v-course-top-row">
-                      <span className="v-course-category">{course.category}</span>
-                      <span className="v-course-level">{course.level}</span>
-                    </div>
-                    <h3>{course.name}</h3>
-                    <p>{course.description}</p>
-                    <div className="v-course-meta">
-                      <span><i className="fa-solid fa-clock"></i> {course.duration}</span>
-                      <span><i className="fa-solid fa-users"></i> {course.enrollmentCount != null ? `${course.enrollmentCount} enrolled` : 'Enrolling Now'}</span>
-                      <span><i className="fa-solid fa-tag"></i> {course.price}</span>
-                    </div>
-                    <div className="v-course-tags">
-                      {techTags.map((tag, ti) => <span key={ti} className="v-course-tag">{tag}</span>)}
-                    </div>
-                    <div className="v-course-footer">
-                      <span className="v-course-view-link" aria-hidden="true">
-                        View Course <i className="fa-solid fa-arrow-right"></i>
-                      </span>
-                      <div onClick={(e) => e.stopPropagation()} style={{ display: 'inline-block' }}>
-                        <EnrollButton courseId={course.id} courseName={course.name} onEnroll={() => openEnrollModal(course)} status={enrollmentStatus[course.id]} />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-            );
-          }) : (
-            <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-dim)', gridColumn: '1 / -1' }}>No courses available yet.</div>
-          )}
-        </div>
-        </StaggerReveal>
-      </section>
+      </ScrollFadeSection>
+      <ProgramsSection
+        courses={availableCourses}
+        enrollmentStatus={enrollmentStatus}
+        onEnroll={openEnrollModal}
+        onNavigate={(courseId) => router.push(`/courses/${courseId}`)}
+      />
+      <ProcessSection />
       <FaqSection />
       <TeamSection team={dynamicTeam} />
-      <section className="v-section" id="contact">
-
-        <SectionReveal direction="up" delay={0}>
-          <div className="v-section-header">
-            <h2 className="v-section-title"><BlurText text="Request A" tag="span" stagger={0.02} /> <span className="v-highlight">Quote</span></h2>
-            <p className="v-section-desc" style={{ marginTop: 16 }}>
-              Ready to transform your project? Let&apos;s discuss how X-Foundry can help you achieve your goals.
-            </p>
-          </div>
-        </SectionReveal>
+      <TechStackSection />
+      <section className="v-section v-contact-section" id="contact">
+        <div className="v-section-inner">
+          <SectionReveal direction="up" delay={0}>
+            <div className="v-section-header">
+              <h2 className="v-section-title">
+                <BlurText text="Request A" tag="span" stagger={0.02} /> <span className="v-highlight">Quote</span>
+              </h2>
+              <p className="v-section-desc" style={{ marginTop: 16 }}>
+                Ready to transform your project? Let&apos;s discuss how XFoundry can help you achieve your goals.
+              </p>
+            </div>
+          </SectionReveal>
 
         <div className="v-contact-grid">
           <SectionReveal direction="left" delay={100}>
             <div className="v-contact-info">
-            <h3>Let&apos;s Build Something Amazing Together</h3>
-            <p>Whether you need custom software development, AI integration, security auditing, or team training — we&apos;re here to help. Reach out and let&apos;s start a conversation about your next big project.</p>
-            <ul className="v-info-list">
-              <li className="v-info-item">
-                <div className="v-info-icon"><i className="fa-solid fa-envelope"></i></div>
-                <div className="v-info-text">
-                  <h4>Email Us</h4>
-                  <p>{contactEmail}</p>
-                </div>
-              </li>
-              <li className="v-info-item">
-                <div className="v-info-icon"><i className="fa-solid fa-phone-alt"></i></div>
-                <div className="v-info-text">
-                  <h4>Call Us</h4>
-                  <p>{contactPhone}</p>
-                </div>
-              </li>
-              <li className="v-info-item">
-                <div className="v-info-icon"><i className="fa-solid fa-clock"></i></div>
-                <div className="v-info-text">
-                  <h4>Business Hours</h4>
-                  <p>{businessHours}</p>
-                </div>
-              </li>
-            </ul>
-          </div>
+              <h3>Let&apos;s Build Something Amazing Together</h3>
+              <p>Whether you need custom software development, AI integration, security auditing, or team training, we&apos;re here to help. Reach out and let&apos;s start a conversation about your next big project.</p>
+              <ul className="v-info-list">
+                <li className="v-info-item">
+                  <div className="v-info-icon"><i className="fa-solid fa-envelope"></i></div>
+                  <div className="v-info-text">
+                    <h4>Email</h4>
+                    <p>{contactEmail}</p>
+                  </div>
+                </li>
+                <li className="v-info-item">
+                  <div className="v-info-icon"><i className="fa-solid fa-phone-alt"></i></div>
+                  <div className="v-info-text">
+                    <h4>Phone</h4>
+                    <p>{contactPhone}</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
           </SectionReveal>
 
             <SectionReveal direction="right" delay={200}>
@@ -1230,6 +1166,7 @@ export default function Home({
             </div>
             </div>
             </SectionReveal>
+        </div>
         </div>
       </section>
       <Footer scrollToSection={scrollToSection} user={user} />
@@ -1278,7 +1215,7 @@ export default function Home({
             </div>
             <div className="auth-modal-body" style={{ padding: '28px 32px' }}>
               <p style={{ color: 'var(--text-dim)', fontSize: 14, lineHeight: 1.8, marginBottom: 24 }}>{svc.description}</p>
-              <h4 style={{ fontFamily: "'Orbitron', sans-serif", fontWeight: 700, fontSize: 13, color: 'var(--text-light)', marginBottom: 14, letterSpacing: 1, textTransform: 'uppercase' }}>What We Offer</h4>
+              <h4 style={{ fontFamily: "'Inter Tight', sans-serif", fontWeight: 700, fontSize: 13, color: 'var(--text-light)', marginBottom: 14, letterSpacing: 1, textTransform: 'uppercase' }}>What We Offer</h4>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 28 }}>
                 {svc.features.map((f, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--border-color)', borderRadius: 6 }}>

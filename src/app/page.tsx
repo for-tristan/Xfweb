@@ -66,21 +66,6 @@ const getTeam = unstable_cache(
   { tags: ['public-team'], revalidate: 60 }
 );
 
-const getProjects = unstable_cache(
-  async () => {
-    const projects = await db.project.findMany({
-      where: { status: 'active' },
-      orderBy: { displayOrder: 'asc' },
-    });
-    return projects.map((p) => ({
-      ...p,
-      tags: JSON.parse(p.tags || '[]'),
-    }));
-  },
-  ['landing-projects-v1'],
-  { tags: ['public-projects'], revalidate: 60 }
-);
-
 // ---- Types (must match HomePageClient's expected props) -------------------
 
 interface DynamicService {
@@ -112,11 +97,10 @@ export default async function Home() {
   // Fetch all four data sources in parallel on the server. Any failure
   // degrades gracefully — HomePageClient has its own client-side refresh
   // effect that will retry.
-  const [services, courses, team, projects] = await Promise.all([
+  const [services, courses, team] = await Promise.all([
     getServices().catch(() => []),
     getCourses().catch(() => []),
     getTeam().catch(() => []),
-    getProjects().catch(() => []),
   ]);
 
   // Transform courses to the shape HomePageClient expects (same mapping
@@ -139,7 +123,6 @@ export default async function Home() {
       initialServices={services as DynamicService[]}
       initialCourses={mappedCourses}
       initialTeam={team as any[]}
-      initialProjects={projects as any[]}
     />
   );
 }

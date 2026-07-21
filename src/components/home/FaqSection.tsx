@@ -38,7 +38,7 @@ export function FaqSection() {
             <span className="v-highlight">Questions?</span>
           </h2>
           <p className="v-section-desc" style={{ marginTop: 16 }}>
-            Everything you need to know about X-Foundry courses and services.
+            Everything you need to know about XFoundry courses and services.
           </p>
         </div>
       </SectionReveal>

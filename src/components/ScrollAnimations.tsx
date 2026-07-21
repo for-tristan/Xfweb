@@ -1,9 +1,10 @@
 'use client';
 import { useEffect, useRef, useCallback, ReactNode } from 'react';
 
-// Firefox detection — skip ALL scroll-based reveal animations on Firefox
-// to prevent scroll jumps. Firefox's compositor can't handle the
-// IntersectionObserver + transform combination without main-thread reflow.
+// Firefox detection — skip ALL scroll-based reveal animations on Firefox.
+// Firefox's compositor can't handle the IntersectionObserver + transform
+// combination without main-thread reflow = scroll jumps. Elements are
+// visible by default (no .reveal class = no transform = no animation).
 const isFirefox = typeof navigator !== 'undefined' && /Firefox/i.test(navigator.userAgent);
 
 function useRevealOnScroll(threshold = 0.1) {
@@ -48,7 +49,8 @@ export function SectionReveal({ children, direction = 'up', delay = 0, className
       ([entry]) => {
         if (entry.isIntersecting) {
           el.classList.add('visible');
-          obs.disconnect();
+        } else {
+          el.classList.remove('visible');
         }
       },
       { threshold: 0.1 }
@@ -83,7 +85,10 @@ export function StaggerReveal({ children, className = '', staggerDelay = 80, dir
           for (let i = 0; i < children.length; i++) {
             (children[i] as HTMLElement).classList.add('visible');
           }
-          obs.disconnect();
+        } else {
+          for (let i = 0; i < children.length; i++) {
+            (children[i] as HTMLElement).classList.remove('visible');
+          }
         }
       },
       { threshold: 0.1 }
@@ -122,231 +127,4 @@ export function ScrollProgressBar() {
   );
 }
 
-export function ParallaxLayer({ children, speed = 0.3, className = '' }: {
-  children: React.ReactNode;
-  speed?: number;
-  className?: string;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const rafRef = useRef<number>(0);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const handleScroll = () => {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(() => {
-        const rect = el.getBoundingClientRect();
-        const centerY = rect.top + rect.height / 2;
-        const viewportCenter = window.innerHeight / 2;
-        const offset = (centerY - viewportCenter) * speed;
-        el.style.transform = `translateY(${offset}px)`;
-      });
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      cancelAnimationFrame(rafRef.current);
-    };
-  }, [speed]);
-  return <div ref={ref} className={className} style={{ willChange: 'transform' }}>{children}</div>;
-}
 
-export function TextSplitReveal({ text, className = '', tag = 'h2', delay = 0 }: {
-  text: string;
-  className?: string;
-  tag?: 'h1' | 'h2' | 'h3' | 'h4' | 'p' | 'span';
-  delay?: number;
-}) {
-  const ref = useRef<HTMLElement>(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const chars = text.split('').map((char, i) =>
-      char === ' '
-        ? `<span style="display:inline-block;width:0.3em;opacity:0;transform:translate3d(50px,0,0);transition:opacity 0.6s cubic-bezier(0.16,1,0.3,1) ${delay + i * 30}ms,transform 0.6s cubic-bezier(0.16,1,0.3,1) ${delay + i * 30}ms">&nbsp;</span>`
-        : `<span style="display:inline-block;opacity:0;transform:translate3d(50px,0,0);transition:opacity 0.6s cubic-bezier(0.16,1,0.3,1) ${delay + i * 30}ms,transform 0.6s cubic-bezier(0.16,1,0.3,1) ${delay + i * 30}ms">${char}</span>`
-    ).join('');
-    el.innerHTML = chars;
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        const spans = el.querySelectorAll('span');
-        if (entry.isIntersecting) {
-          spans.forEach(s => {
-            (s as HTMLElement).style.opacity = '1';
-            (s as HTMLElement).style.transform = 'translate3d(0,0,0)';
-          });
-          obs.disconnect();
-        }
-      },
-      { threshold: 0.3 }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [text, delay]);
-  const Tag = tag as React.ElementType;
-  return <Tag ref={ref} className={className} />;
-}
-
-export function CounterAnimation({ target, suffix = '', className = '' }: {
-  target: number;
-  suffix?: string;
-  className?: string;
-}) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const animatedRef = useRef(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !animatedRef.current) {
-          animatedRef.current = true;
-          const duration = 2000;
-          const start = performance.now();
-          const animate = (now: number) => {
-            const elapsed = now - start;
-            const progress = Math.min(elapsed / duration, 1);
-            const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-            if (el) el.textContent = Math.round(eased * target) + suffix;
-            if (progress < 1) requestAnimationFrame(animate);
-          };
-          requestAnimationFrame(animate);
-        }
-      },
-      { threshold: 0.5 }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [target, suffix]);
-  return <span ref={ref} className={className}>0{suffix}</span>;
-}
-
-export function MagneticButton({ children, className = '', strength = 0.3, onClick }: {
-  children: React.ReactNode;
-  className?: string;
-  strength?: number;
-  onClick?: () => void;
-}) {
-  const ref = useRef<HTMLButtonElement>(null);
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    const el = ref.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
-    el.style.transform = `translateX(${x * strength}px) translateY(${y * strength}px)`;
-  }, [strength]);
-  const handleMouseLeave = useCallback(() => {
-    const el = ref.current;
-    if (!el) return;
-    el.style.transform = 'translateX(0) translateY(0)';
-    el.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
-    setTimeout(() => { if (el) el.style.transition = ''; }, 500);
-  }, []);
-  return (
-    <button ref={ref} className={className} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} onClick={onClick}>
-      {children}
-    </button>
-  );
-}
-
-export function TiltCard({ children, className = '', glare = true }: {
-  children: React.ReactNode;
-  className?: string;
-  glare?: boolean;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    const el = ref.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const y = (e.clientY - rect.top) / rect.height;
-    const tiltX = (y - 0.5) * -15;
-    const tiltY = (x - 0.5) * 15;
-    el.style.transform = `perspective(800px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(1.02,1.02,1.02)`;
-    if (glare) {
-      el.style.setProperty('--glare-x', `${x * 100}%`);
-      el.style.setProperty('--glare-y', `${y * 100}%`);
-    }
-  }, [glare]);
-  const handleMouseLeave = useCallback(() => {
-    const el = ref.current;
-    if (!el) return;
-    el.style.transform = '';
-  }, []);
-  return (
-    <div ref={ref} className={`v-card tilt-card ${className}`} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} style={{ transformStyle: 'preserve-3d', willChange: 'transform' }}>
-      {glare && (
-        <div style={{
-          position: 'absolute', inset: 0, borderRadius: 'inherit', pointerEvents: 'none',
-          background: `radial-gradient(circle at var(--glare-x, 50%) var(--glare-y, 50%), rgba(255,255,255,0.08), transparent 60%)`,
-          opacity: 0, transition: 'opacity 0.3s',
-        }} />
-      )}
-      {children}
-    </div>
-  );
-}
-
-export function GlowButton({ children, className = '', onClick }: {
-  children: React.ReactNode;
-  className?: string;
-  onClick?: () => void;
-}) {
-  return (
-    <button className={`glow-btn ${className}`} onClick={onClick}>
-      {children}
-    </button>
-  );
-}
-
-export function FloatingParticles({ count = 20, className = '' }: {
-  count?: number;
-  className?: string;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    el.innerHTML = '';
-    for (let i = 0; i < count; i++) {
-      const particle = document.createElement('div');
-      const size = Math.random() * 4 + 2;
-      const x = Math.random() * 100;
-      const y = Math.random() * 100;
-      const dur = Math.random() * 6 + 4;
-      const delay = Math.random() * 4;
-      particle.style.cssText = `
-        position:absolute;
-        width:${size}px;height:${size}px;
-        background:var(--accent);
-        border-radius:50%;
-        opacity:${Math.random() * 0.3 + 0.05};
-        left:${x}%;top:${y}%;
-        animation:floatParticle ${dur}s ease-in-out ${delay}s infinite alternate;
-        pointer-events:none;
-      `;
-      el.appendChild(particle);
-    }
-  }, [count]);
-  return <div ref={ref} className={className} style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }} />;
-}
-
-export function MorphingShape({ className = '' }: { className?: string }) {
-  return (
-    <div className={`morphing-shape ${className}`} style={{ opacity: 0.06 }}>
-      <svg viewBox="0 0 500 500" style={{ width: '100%', height: '100%' }}>
-        <path fill="var(--accent)">
-          <animate attributeName="d"
-            values="M440,320Q430,390,380,430Q330,470,270,450Q210,430,150,410Q90,390,70,330Q50,270,60,210Q70,150,120,110Q170,70,230,60Q290,50,340,80Q390,110,420,170Q450,230,440,320Z;
-                    M450,300Q460,370,400,420Q340,470,270,460Q200,450,140,420Q80,390,60,320Q40,250,70,180Q100,110,170,80Q240,50,310,70Q380,90,420,160Q460,230,450,300Z;
-                    M430,310Q440,380,390,430Q340,480,270,460Q200,440,150,400Q100,360,80,290Q60,220,90,160Q120,100,190,70Q260,40,330,70Q400,100,430,170Q460,240,430,310Z;
-                    M440,320Q430,390,380,430Q330,470,270,450Q210,430,150,410Q90,390,70,330Q50,270,60,210Q70,150,120,110Q170,70,230,60Q290,50,340,80Q390,110,420,170Q450,230,440,320Z"
-            dur="12s" repeatCount="indefinite" />
-        </path>
-      </svg>
-    </div>
-  );
-}

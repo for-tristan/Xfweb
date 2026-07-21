@@ -354,7 +354,7 @@ function ChatContent() {
   return (
     <>
       <title>XF AI | Chat</title>
-      <meta name="description" content="Chat with XF AI — your intelligent assistant for coding, learning, and tech career advice." />
+      <meta name="description" content="Chat with XF AI, your intelligent assistant for coding, learning, and tech career advice." />
 
 
       <AuthGate loading={loading} minLoading={minLoading} user={user} onSignIn={() => openAuthModal('signin', 'Sign in to chat with XF AI')} onSignUp={() => openAuthModal('signup')} />

@@ -2,6 +2,10 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 
+// Firefox detection — skip pin on Firefox to avoid scroll jumps.
+// Sections render normally (no position:fixed) on Firefox.
+const isFirefox = typeof navigator !== 'undefined' && /Firefox/i.test(navigator.userAgent);
+
 interface ScrollFadeSectionProps {
   children: React.ReactNode;
   pin?: boolean;
@@ -9,6 +13,7 @@ interface ScrollFadeSectionProps {
   zIndex?: number;
   scrub?: number;
   className?: string;
+  pinOffset?: number;
 }
 
 function lerp(current: number, target: number, factor: number): number {
@@ -24,6 +29,7 @@ export default function ScrollFadeSection({
   zIndex = 1,
   scrub = 0.08,
   className = '',
+  pinOffset = 0,
 }: ScrollFadeSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
@@ -64,17 +70,17 @@ export default function ScrollFadeSection({
     let state: PinState;
     let progress = 0;
 
-    if (rect.top > 0) {
+    if (rect.top > pinOffset) {
       state = 'unpinned';
       progress = 0;
-    } else if (rect.bottom < innerHeight + 4) {
+    } else if (rect.bottom < innerHeight + pinOffset + 4) {
       // +4px hysteresis: only switch to 'past' when clearly scrolled past,
       // prevents flicker between pinned/past near the boundary.
       state = 'past';
       progress = 1;
     } else {
       state = 'pinned';
-      const scrolledPast = -rect.top;
+      const scrolledPast = pinOffset - rect.top;
       progress = Math.min(1, scrolledPast / fadePx);
     }
 
@@ -87,7 +93,7 @@ export default function ScrollFadeSection({
 
     if (state === 'pinned') {
       inner.style.position = 'fixed';
-      inner.style.top = '0';
+      inner.style.top = `${pinOffset}px`;
       inner.style.left = '0';
       inner.style.width = '100%';
       inner.style.bottom = '';
@@ -195,6 +201,10 @@ export default function ScrollFadeSection({
   }, [scrub]);
 
   useEffect(() => {
+    // On Firefox, skip the pin/fade effect entirely — no scroll listener,
+    // no position:fixed. Sections render normally.
+    if (isFirefox) return;
+
     measureAndSetHeight();
     updateTarget();
     startAnimation();

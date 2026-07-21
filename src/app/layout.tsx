@@ -5,6 +5,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import ClientProviders from '@/components/ClientProviders';
 import GrainBackground from '@/components/GrainBackground';
 import ClickSplash from '@/components/ClickSplash';
+import ClickSound from '@/components/ClickSound';
 import CookieConsentBanner from '@/components/CookieConsentBanner';
 import PageViewTracker from '@/components/PageViewTracker';
 import DeviceFingerprintCollector from '@/components/DeviceFingerprintCollector';
@@ -137,9 +138,9 @@ export default async function RootLayout({
         />
       </head>
       <body className="xf-body">
-        <a href="#main-content" className="skip-link">Skip to main content</a>
         <GrainBackground />
         <ClickSplash />
+        <ClickSound />
         <ClientProviders>
           <DeviceFingerprintCollector />
           <BanCheckPoller />

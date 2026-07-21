@@ -5,7 +5,7 @@
  */
 
 export const SITE = {
-  name: 'X-Foundry',
+  name: 'XFoundry',
   tagline: 'The best way to predict the future is to create it.',
   description:
     'Comprehensive technology solutions designed to accelerate your digital transformation.',
